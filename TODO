@@ -1,0 +1,18 @@
+code:
+* blep etc in a module?
+* osc post filter init val? osc post filter and one pole init val from input?
+* audio rate optional pulse width/slope inputs?
+* one pole process const input? (return also if const out)
+* optimize triangle generation for constant pulse width
+* naming type suffixes math.h vs random.h
+* API for buffer fill, scale, offset, zero, copy...?
+* web examples construction/destruction
+* web effect multichannel in?
+
+build system:
+* make makefiles handle paths with spaces etc
+* can run su on windows? (system-wide install)
+* make autodependencies (.d?)
+* make from... directories
+* order-only prerequisites to avoid multiple make updates? (https://interrupt.memfault.com/blog/gnu-make-guidelines#order-only-prerequisites)
+* clang + Ofast & bulk memory (maybe using old binaryen)

@@ -22,39 +22,16 @@
 #include <bw_math.h>
 #include <bw_inline_one_pole.h>
 
-struct _bw_osc_tri {
-	// Coefficients
-	float	smooth_mA1;
-
-	// Parameters
-	char	first_run;
-	char	antialiasing;
-	float	slope;
-
-	// State
-	float	slope_z1;
-};
-
-bw_osc_tri bw_osc_tri_new() {
-	bw_osc_tri instance = (bw_osc_tri)BW_MALLOC(sizeof(struct _bw_osc_tri));
-	if (instance == NULL)
-		return NULL;
-
+void bw_osc_tri_init(bw_osc_tri *instance) {
 	instance->antialiasing = 0;
 	instance->slope = 0.5f;
-
-	return instance;
 }
 
-void bw_osc_tri_free(bw_osc_tri instance) {
-	BW_FREE(instance);
-}
-
-void bw_osc_tri_set_sample_rate(bw_osc_tri instance, float sample_rate) {
+void bw_osc_tri_set_sample_rate(bw_osc_tri *instance, float sample_rate) {
 	instance->smooth_mA1 = bw_inline_one_pole_get_mA1(sample_rate, 0.005f);
 }
 
-void bw_osc_tri_reset(bw_osc_tri instance) {
+void bw_osc_tri_reset(bw_osc_tri *instance) {
 	instance->first_run = 1;
 }
 
@@ -65,7 +42,7 @@ static inline float blamp_diff(float x) {
 		: x * (x * (x * ((0.1666666666666667f - 0.01666666666666667f * x) * x - 0.6666666666666666f) + 1.333333333333333f) - 1.333333333333333f) + 0.5333333333333333f;
 }
 
-void bw_osc_tri_process(bw_osc_tri instance, const float *x, const float *x_phase_inc, float* y, int n_samples) {
+void bw_osc_tri_process(bw_osc_tri *instance, const float *x, const float *x_phase_inc, float* y, int n_samples) {
 	if (instance->first_run) {
 		instance->slope_z1 = instance->slope;
 		instance->first_run = 0;
@@ -113,10 +90,10 @@ void bw_osc_tri_process(bw_osc_tri instance, const float *x, const float *x_phas
 	}
 }
 
-void bw_osc_tri_set_antialiasing(bw_osc_tri instance, char value) {
+void bw_osc_tri_set_antialiasing(bw_osc_tri *instance, char value) {
 	instance->antialiasing = value;
 }
 
-void bw_osc_tri_set_slope(bw_osc_tri instance, float value) {
+void bw_osc_tri_set_slope(bw_osc_tri *instance, float value) {
 	instance->slope = value;
 }

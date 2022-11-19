@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Post-filter to decolorate oscillator waveshapers when antialiasing is on.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -50,28 +55,17 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_filt
  *  ```>>> */
-typedef struct _bw_osc_filt *bw_osc_filt;
+typedef struct _bw_osc_filt bw_osc_filt;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_osc_filt_new()
+ *    #### bw_osc_filt_init()
  *  ```>>> */
-bw_osc_filt bw_osc_filt_new();
+void bw_osc_filt_init(bw_osc_filt *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_osc_filt_free()
- *  ```>>> */
-void bw_osc_filt_free(bw_osc_filt instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
@@ -83,7 +77,7 @@ void bw_osc_filt_free(bw_osc_filt instance);
 /*! ...
  *    #### bw_osc_filt_reset()
  *  ```>>> */
-void bw_osc_filt_reset(bw_osc_filt instance);
+void bw_osc_filt_reset(bw_osc_filt *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -91,7 +85,7 @@ void bw_osc_filt_reset(bw_osc_filt instance);
 /*! ...
  *    #### bw_osc_filt_process()
  *  ```>>> */
-void bw_osc_filt_process(bw_osc_filt instance, const float *x, float* y, int n_samples);
+void bw_osc_filt_process(bw_osc_filt *instance, const float *x, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
@@ -101,13 +95,26 @@ void bw_osc_filt_process(bw_osc_filt instance, const float *x, float* y, int n_s
 /*! ...
  *    #### bw_osc_filt_set_enabled()
  *  ```>>> */
-void bw_osc_filt_set_enabled(bw_osc_filt instance, char value);
+void bw_osc_filt_set_enabled(bw_osc_filt *instance, char value);
 /*! <<<```
  *    Sets whether the filter is enabled (`value` non-`0`) or bypassed (`0`)
  *    for the given `instance`.
  *
  *    Default value: non-`0`.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_osc_filt {
+	// Parameters
+	char	enabled;
+
+	// State
+	float	x_z1;
+	float	y_z1;
+};
+
 
 #ifdef __cplusplus
 }

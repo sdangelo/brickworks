@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Envelope follower made of a full-wave rectifier followed by
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -51,34 +56,23 @@ extern "C" {
 /*! api {{{
  *    #### bw_env_follow
  *  ```>>> */
-typedef struct _bw_env_follow *bw_env_follow;
+typedef struct _bw_env_follow bw_env_follow;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_env_follow_new()
+ *    #### bw_env_follow_init()
  *  ```>>> */
-bw_env_follow bw_env_follow_new();
+void bw_env_follow_init(bw_env_follow *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_env_follow_free()
- *  ```>>> */
-void bw_env_follow_free(bw_env_follow instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_env_follow_set_sample_rate()
  *  ```>>> */
-void bw_env_follow_set_sample_rate(bw_env_follow instance, float sample_rate);
+void bw_env_follow_set_sample_rate(bw_env_follow *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -86,7 +80,7 @@ void bw_env_follow_set_sample_rate(bw_env_follow instance, float sample_rate);
 /*! ...
  *    #### bw_env_follow_reset()
  *  ```>>> */
-void bw_env_follow_reset(bw_env_follow instance);
+void bw_env_follow_reset(bw_env_follow *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -94,7 +88,7 @@ void bw_env_follow_reset(bw_env_follow instance);
 /*! ...
  *    #### bw_env_follow_process()
  *  ```>>> */
-void bw_env_follow_process(bw_env_follow instance, const float *x, float *y, int n_samples);
+void bw_env_follow_process(bw_env_follow *instance, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
@@ -104,13 +98,13 @@ void bw_env_follow_process(bw_env_follow instance, const float *x, float *y, int
 /*! ...
  *    #### bw_env_follow_get_one_pole()
  *  ```>>> */
-bw_one_pole bw_env_follow_get_one_pole(bw_env_follow instance);
+bw_one_pole *bw_env_follow_get_one_pole(bw_env_follow *instance);
 /*! <<<```
- *    Returns the handle to the internal one-pole filter of the given
+ *    Returns a pointer to the internal one-pole filter of the given
  *    `instance`.
  *
- *    The returned handle must not be used for any other purpose than setting
- *    its parameters.
+ *    The returned pointer must not be used for any other purpose than setting
+ *    parameters.
  *
  *    This is **NOT** a function that gets an output parameter as described in
  *    the [documentation for DSP modules](api#dsp).
@@ -120,6 +114,14 @@ bw_one_pole bw_env_follow_get_one_pole(bw_env_follow instance);
  *    [**NOT** thread-safe](api#thread-safe-function), and has
  *    [no side effects](api#no-side-effects).
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_env_follow {
+	// Sub-components
+	bw_one_pole	one_pole;
+};
 
 #ifdef __cplusplus
 }

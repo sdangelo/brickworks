@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_inline_one_pole bw_math }}}
  *  description {{{
  *    Linear ADSR envelope generator.
@@ -39,6 +39,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -58,34 +63,23 @@ extern "C" {
 /*! api {{{
  *    #### bw_env_gen
  *  ```>>> */
-typedef struct _bw_env_gen *bw_env_gen;
+typedef struct _bw_env_gen bw_env_gen;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_env_gen_new()
+ *    #### bw_env_gen_init()
  *  ```>>> */
-bw_env_gen bw_env_gen_new();
+void bw_env_gen_init(bw_env_gen *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_env_gen_free()
- *  ```>>> */
-void bw_env_gen_free(bw_env_gen instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_env_gen_set_sample_rate()
  *  ```>>> */
-void bw_env_gen_set_sample_rate(bw_env_gen instance, float sample_rate);
+void bw_env_gen_set_sample_rate(bw_env_gen *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -93,7 +87,7 @@ void bw_env_gen_set_sample_rate(bw_env_gen instance, float sample_rate);
 /*! ...
  *    #### bw_env_gen_reset()
  *  ```>>> */
-void bw_env_gen_reset(bw_env_gen instance);
+void bw_env_gen_reset(bw_env_gen *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -101,7 +95,7 @@ void bw_env_gen_reset(bw_env_gen instance);
 /*! ...
  *    #### bw_env_gen_process()
  *  ```>>> */
-void bw_env_gen_process(bw_env_gen instance, float* y, int n_samples);
+void bw_env_gen_process(bw_env_gen *instance, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` generate `n_samples` samples and puts them in
  *    the output buffer `y`.
@@ -110,7 +104,7 @@ void bw_env_gen_process(bw_env_gen instance, float* y, int n_samples);
 /*! ...
  *    #### bw_env_gen_set_gate()
  *  ```>>> */
-void bw_env_gen_set_gate(bw_env_gen instance, char value);
+void bw_env_gen_set_gate(bw_env_gen *instance, char value);
 /*! <<<```
  *    Sets the input gate to be either off (`0`) or on (non-`0`) for the given
  *    `instance`.
@@ -121,7 +115,7 @@ void bw_env_gen_set_gate(bw_env_gen instance, char value);
 /*! ...
  *    #### bw_env_gen_set_attack()
  *  ```>>> */
-void bw_env_gen_set_attack(bw_env_gen instance, float value);
+void bw_env_gen_set_attack(bw_env_gen *instance, float value);
 /*! <<<```
  *    Sets the attack time to `value` (s) for the given `instance`.
  *
@@ -133,7 +127,7 @@ void bw_env_gen_set_attack(bw_env_gen instance, float value);
 /*! ...
  *    #### bw_env_gen_set_decay()
  *  ```>>> */
-void bw_env_gen_set_decay(bw_env_gen instance, float value);
+void bw_env_gen_set_decay(bw_env_gen *instance, float value);
 /*! <<<```
  *    Sets the decay time to `value` (s) for the given `instance`.
  *
@@ -145,7 +139,7 @@ void bw_env_gen_set_decay(bw_env_gen instance, float value);
 /*! ...
  *    #### bw_env_gen_set_sustain()
  *  ```>>> */
-void bw_env_gen_set_sustain(bw_env_gen instance, float value);
+void bw_env_gen_set_sustain(bw_env_gen *instance, float value);
 /*! <<<```
  *    Sets the sustain level to `value` for the given `instance`.
  *
@@ -155,7 +149,7 @@ void bw_env_gen_set_sustain(bw_env_gen instance, float value);
 /*! ...
  *    #### bw_env_gen_set_release()
  *  ```>>> */
-void bw_env_gen_set_release(bw_env_gen instance, float value);
+void bw_env_gen_set_release(bw_env_gen *instance, float value);
 /*! <<<```
  *    Sets the release time to `value` (s) for the given `instance`.
  *
@@ -167,10 +161,45 @@ void bw_env_gen_set_release(bw_env_gen instance, float value);
 /*! ...
  *    #### bw_env_gen_get_is_off()
  *  ```>>> */
-char bw_env_gen_get_is_off(bw_env_gen instance);
+char bw_env_gen_get_is_off(bw_env_gen *instance);
 /*! <<<```
  *    Returns `0` if the given `instance` is in the off state, non-`0` otherwise.
  *  }}} */
+
+/* WARNING: this enum is not part of the public API. Please, do not use it. */
+typedef enum {
+	_bw_env_gen_state_off,
+	_bw_env_gen_state_attack,
+	_bw_env_gen_state_decay,
+	_bw_env_gen_state_sustain,
+	_bw_env_gen_state_release
+} _bw_env_gen_state;
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_env_gen {
+	// Coefficients
+	float			T;
+	float			smooth_mA1;
+
+	float			attack_inc;
+	float			decay_inc;
+	float			release_inc;
+
+	// Parameters
+	char			gate;
+	float			attack;
+	float			decay;
+	float			sustain;
+	float			release;
+	int			param_changed;
+
+	// State
+	char			first_run;
+	_bw_env_gen_state	state;
+	float			y_z1;
+};
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_inline_one_pole bw_math }}}
  *  description {{{
  *    State variable filter (2nd order, 12 dB/oct) model with separated lowpass,
@@ -27,6 +27,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -46,34 +51,23 @@ extern "C" {
 /*! api {{{
  *    #### bw_svf
  *  ```>>> */
-typedef struct _bw_svf *bw_svf;
+typedef struct _bw_svf bw_svf;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_svf_new()
+ *    #### bw_svf_init()
  *  ```>>> */
-bw_svf bw_svf_new();
+void bw_svf_init(bw_svf *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_svf_free()
- *  ```>>> */
-void bw_svf_free(bw_svf instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_svf_set_sample_rate()
  *  ```>>> */
-void bw_svf_set_sample_rate(bw_svf instance, float sample_rate);
+void bw_svf_set_sample_rate(bw_svf *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -81,7 +75,7 @@ void bw_svf_set_sample_rate(bw_svf instance, float sample_rate);
 /*! ...
  *    #### bw_svf_reset()
  *  ```>>> */
-void bw_svf_reset(bw_svf instance);
+void bw_svf_reset(bw_svf *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -89,7 +83,7 @@ void bw_svf_reset(bw_svf instance);
 /*! ...
  *    #### bw_svf_process()
  *  ```>>> */
-void bw_svf_process(bw_svf instance, const float *x, float* y_lp, float *y_bp, float *y_hp, int n_samples);
+void bw_svf_process(bw_svf *instance, const float *x, float* y_lp, float *y_bp, float *y_hp, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
@@ -100,7 +94,7 @@ void bw_svf_process(bw_svf instance, const float *x, float* y_lp, float *y_bp, f
 /*! ...
  *    #### bw_svf_set_cutoff()
  *  ```>>> */
-void bw_svf_set_cutoff(bw_svf instance, float value);
+void bw_svf_set_cutoff(bw_svf *instance, float value);
 /*! <<<```
  *    Sets the cutoff frequency to the given `value` (Hz) for the given
  *    `instance`.
@@ -111,13 +105,41 @@ void bw_svf_set_cutoff(bw_svf instance, float value);
 /*! ...
  *    #### bw_svf_set_Q()
  *  ```>>> */
-void bw_svf_set_Q(bw_svf instance, float value);
+void bw_svf_set_Q(bw_svf *instance, float value);
 /*! <<<```
  *    Sets the quality factor to the given `value` (Hz) for the given
  *    `instance`.
  *
  *    Default value: `0.5f`.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_svf {
+	// Coefficients
+	float	t_k;
+	float	smooth_mA1;
+
+	float	t;
+	float	k;
+	float	hp_hp_z1;
+	float	hp_bp_z1;
+	float	hp_x;
+
+	// Parameters
+	float	cutoff;
+	float	Q;
+
+	float	cutoff_cur;
+	float	Q_cur;
+
+	// State
+	char	first_run;
+	float	hp_z1;
+	float	lp_z1;
+	float	bp_z1;
+};
 
 #ifdef __cplusplus
 }

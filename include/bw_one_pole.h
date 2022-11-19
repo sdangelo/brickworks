@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    One-pole (6 dB/oct) lowpass filter with unitary DC gain, separate attack
@@ -27,6 +27,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -46,9 +51,9 @@ extern "C" {
 /*! api {{{
  *    #### bw_one_pole
  *  ```>>> */
-typedef struct _bw_one_pole *bw_one_pole;
+typedef struct _bw_one_pole bw_one_pole;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
  
 /*! ...
@@ -66,28 +71,17 @@ typedef enum {
  *  >>> */
 
 /*! ...
- *    #### bw_one_pole_new()
+ *    #### bw_one_pole_init()
  *  ```>>> */
-bw_one_pole bw_one_pole_new();
+void bw_one_pole_init(bw_one_pole *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_one_pole_free()
- *  ```>>> */
-void bw_one_pole_free(bw_one_pole instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_one_pole_set_sample_rate()
  *  ```>>> */
-void bw_one_pole_set_sample_rate(bw_one_pole instance, float sample_rate);
+void bw_one_pole_set_sample_rate(bw_one_pole *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -95,7 +89,7 @@ void bw_one_pole_set_sample_rate(bw_one_pole instance, float sample_rate);
 /*! ...
  *    #### bw_one_pole_reset()
  *  ```>>> */
-void bw_one_pole_reset(bw_one_pole instance);
+void bw_one_pole_reset(bw_one_pole *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -103,7 +97,7 @@ void bw_one_pole_reset(bw_one_pole instance);
 /*! ...
  *    #### bw_one_pole_process()
  *  ```>>> */
-void bw_one_pole_process(bw_one_pole instance, const float* x, float* y, int n_samples);
+void bw_one_pole_process(bw_one_pole *instance, const float* x, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
@@ -113,7 +107,7 @@ void bw_one_pole_process(bw_one_pole instance, const float* x, float* y, int n_s
 /*! ...
  *    #### bw_one_pole_set_init_val()
  *  ```>>> */
-void bw_one_pole_set_init_val(bw_one_pole instance, float value);
+void bw_one_pole_set_init_val(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets the initial/quiescent `value` for the given `instance`.
  *
@@ -127,7 +121,7 @@ void bw_one_pole_set_init_val(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_cutoff()
  *  ```>>> */
-void bw_one_pole_set_cutoff(bw_one_pole instance, float value);
+void bw_one_pole_set_cutoff(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets both the upgoing (attack) and downgoing (decay) cutoff frequency to
  *    the given `value` (Hz) for the given `instance`.
@@ -143,7 +137,7 @@ void bw_one_pole_set_cutoff(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_cutoff_up()
  *  ```>>> */
-void bw_one_pole_set_cutoff_up(bw_one_pole instance, float value);
+void bw_one_pole_set_cutoff_up(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets the upgoing (attack) cutoff frequency to the given `value` (Hz) for
  *    the given `instance`.
@@ -157,7 +151,7 @@ void bw_one_pole_set_cutoff_up(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_cutoff_down()
  *  ```>>> */
-void bw_one_pole_set_cutoff_down(bw_one_pole instance, float value);
+void bw_one_pole_set_cutoff_down(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets the downgoing (attack) cutoff frequency to the given `value` (Hz)
  *    for the given `instance`.
@@ -171,7 +165,7 @@ void bw_one_pole_set_cutoff_down(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_tau()
  *  ```>>> */
-void bw_one_pole_set_tau(bw_one_pole instance, float value);
+void bw_one_pole_set_tau(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets both the upgoing (attack) and downgoing (decay) time constant to the
  *    given `value` (s) for the given `instance`.
@@ -187,7 +181,7 @@ void bw_one_pole_set_tau(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_tau_up()
  *  ```>>> */
-void bw_one_pole_set_tau_up(bw_one_pole instance, float value);
+void bw_one_pole_set_tau_up(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets the upgoing (attack) time constant to the given `value` (s) for the
  *    given `instance`.
@@ -201,7 +195,7 @@ void bw_one_pole_set_tau_up(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_tau_down()
  *  ```>>> */
-void bw_one_pole_set_tau_down(bw_one_pole instance, float value);
+void bw_one_pole_set_tau_down(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets the downgoing (decay) time constant to the given `value` (s) for the
  *    given `instance`.
@@ -215,7 +209,7 @@ void bw_one_pole_set_tau_down(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_sticky_thresh()
  *  ```>>> */
-void bw_one_pole_set_sticky_thresh(bw_one_pole instance, float value);
+void bw_one_pole_set_sticky_thresh(bw_one_pole *instance, float value);
 /*! <<<```
  *    Sets the target-reach threshold specified by `value` for the given
  *    `instance`.
@@ -231,10 +225,35 @@ void bw_one_pole_set_sticky_thresh(bw_one_pole instance, float value);
 /*! ...
  *    #### bw_one_pole_set_sticky_mode()
  *  ```>>> */
-void bw_one_pole_set_sticky_mode(bw_one_pole instance, bw_one_pole_sticky_mode value);
+void bw_one_pole_set_sticky_mode(bw_one_pole *instance, bw_one_pole_sticky_mode value);
 /*! <<<```
  *    Sets the current distance metric for sticky behavior.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_one_pole {
+	// Coefficients
+	float			Ttm2pi;
+
+	float			mA1u;
+	float			mA1d;
+	float			st2;
+
+	// Parameters
+	float			init_val;
+	float			cutoff_up;
+	float			cutoff_down;
+	float			sticky_thresh;
+	bw_one_pole_sticky_mode sticky_mode;
+	int			param_changed;
+
+	// State
+	char			first_run;
+	float			x_z1;
+	float			y_z1;
+};
 
 #ifdef __cplusplus
 }

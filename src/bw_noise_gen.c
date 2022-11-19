@@ -22,36 +22,16 @@
 #include <bw_rand.h>
 #include <bw_math.h>
 
-struct _bw_noise_gen {
-	// Coefficients
-	float		 scaling_k;
-
-	// Parameters
-	char		 sample_rate_scaling;
-
-	// State
-	uint64_t	*state;
-};
-
-bw_noise_gen bw_noise_gen_new(uint64_t *state) {
-	bw_noise_gen instance = (bw_noise_gen)BW_MALLOC(sizeof(struct _bw_noise_gen));
-	if (instance == NULL)
-		return NULL;
-
+void bw_noise_gen_init(bw_noise_gen *instance, uint64_t *state) {
 	instance->state = state;
 	instance->sample_rate_scaling = 0;
-	return instance;
 }
 
-void bw_noise_gen_free(bw_noise_gen instance) {
-	BW_FREE(instance);
-}
-
-void bw_noise_gen_set_sample_rate(bw_noise_gen instance, float sample_rate) {
+void bw_noise_gen_set_sample_rate(bw_noise_gen *instance, float sample_rate) {
 	instance->scaling_k = 0.004761904761904762f * bw_sqrtf_2(sample_rate);
 }
 
-void bw_noise_gen_process(bw_noise_gen instance, float* y, int n_samples) {
+void bw_noise_gen_process(bw_noise_gen *instance, float* y, int n_samples) {
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_rand_f(instance->state);
 
@@ -60,6 +40,6 @@ void bw_noise_gen_process(bw_noise_gen instance, float* y, int n_samples) {
 			y[i] *= instance->scaling_k;
 }
 
-void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen instance, char value) {
+void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen *instance, char value) {
 	instance->sample_rate_scaling = value;
 }

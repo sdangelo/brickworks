@@ -22,39 +22,16 @@
 #include <bw_math.h>
 #include <bw_inline_one_pole.h>
 
-struct _bw_osc_pulse {
-	// Coefficients
-	float	smooth_mA1;
-
-	// Parameters
-	char	first_run;
-	char	antialiasing;
-	float	pulse_width;
-
-	// State
-	float	pw_z1;
-};
-
-bw_osc_pulse bw_osc_pulse_new() {
-	bw_osc_pulse instance = (bw_osc_pulse)BW_MALLOC(sizeof(struct _bw_osc_pulse));
-	if (instance == NULL)
-		return NULL;
-
+void bw_osc_pulse_init(bw_osc_pulse *instance) {
 	instance->antialiasing = 0;
 	instance->pulse_width = 0.5f;
-
-	return instance;
 }
 
-void bw_osc_pulse_free(bw_osc_pulse instance) {
-	BW_FREE(instance);
-}
-
-void bw_osc_pulse_set_sample_rate(bw_osc_pulse instance, float sample_rate) {
+void bw_osc_pulse_set_sample_rate(bw_osc_pulse *instance, float sample_rate) {
 	instance->smooth_mA1 = bw_inline_one_pole_get_mA1(sample_rate, 0.005f);
 }
 
-void bw_osc_pulse_reset(bw_osc_pulse instance) {
+void bw_osc_pulse_reset(bw_osc_pulse *instance) {
 	instance->first_run = 1;
 }
 
@@ -65,7 +42,7 @@ static inline float blep_diff(float x) {
 		: x * (x * ((0.6666666666666666f - 0.08333333333333333f * x) * x - 2.0f) + 2.666666666666667f) - 1.333333333333333f;
 }
 
-void bw_osc_pulse_process(bw_osc_pulse instance, const float *x, const float *x_phase_inc, float* y, int n_samples) {
+void bw_osc_pulse_process(bw_osc_pulse *instance, const float *x, const float *x_phase_inc, float* y, int n_samples) {
 	if (instance->first_run) {
 		instance->pw_z1 = instance->pulse_width;
 		instance->first_run = 0;
@@ -107,10 +84,10 @@ void bw_osc_pulse_process(bw_osc_pulse instance, const float *x, const float *x_
 	}
 }
 
-void bw_osc_pulse_set_antialiasing(bw_osc_pulse instance, char value) {
+void bw_osc_pulse_set_antialiasing(bw_osc_pulse *instance, char value) {
 	instance->antialiasing = value;
 }
 
-void bw_osc_pulse_set_pulse_width(bw_osc_pulse instance, float value) {
+void bw_osc_pulse_set_pulse_width(bw_osc_pulse *instance, float value) {
 	instance->pulse_width = value;
 }

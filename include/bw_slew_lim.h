@@ -19,13 +19,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Slew-rate limiter with separate maximum increasing and decreasing rates.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -45,34 +50,23 @@ extern "C" {
 /*! api {{{
  *    #### bw_slew_lim
  *  ```>>> */
-typedef struct _bw_slew_lim *bw_slew_lim;
+typedef struct _bw_slew_lim bw_slew_lim;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
  
 /*! ...
- *    #### bw_slew_lim_new()
+ *    #### bw_slew_lim_init()
  *  ```>>> */
-bw_slew_lim bw_slew_lim_new();
+void bw_slew_lim_new(bw_slew_lim *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_slew_lim_free()
- *  ```>>> */
-void bw_slew_lim_free(bw_slew_lim instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_slew_lim_set_sample_rate()
  *  ```>>> */
-void bw_slew_lim_set_sample_rate(bw_slew_lim instance, float sample_rate);
+void bw_slew_lim_set_sample_rate(bw_slew_lim *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -80,7 +74,7 @@ void bw_slew_lim_set_sample_rate(bw_slew_lim instance, float sample_rate);
 /*! ...
  *    #### bw_slew_lim_reset()
  *  ```>>> */
-void bw_slew_lim_reset(bw_slew_lim instance);
+void bw_slew_lim_reset(bw_slew_lim *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -88,7 +82,7 @@ void bw_slew_lim_reset(bw_slew_lim instance);
 /*! ...
  *    #### bw_slew_lim_process()
  *  ```>>> */
-void bw_slew_lim_process(bw_slew_lim instance, const float* x, float* y, int n_samples);
+void bw_slew_lim_process(bw_slew_lim *instance, const float* x, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
@@ -98,7 +92,7 @@ void bw_slew_lim_process(bw_slew_lim instance, const float* x, float* y, int n_s
 /*! ...
  *    #### bw_slew_lim_set_init_val()
  *  ```>>> */
-void bw_slew_lim_set_init_val(bw_slew_lim instance, float value);
+void bw_slew_lim_set_init_val(bw_slew_lim *instance, float value);
 /*! <<<```
  *    Sets the initial/quiescent `value` for the given `instance`.
  *
@@ -112,7 +106,7 @@ void bw_slew_lim_set_init_val(bw_slew_lim instance, float value);
 /*! ...
  *    #### bw_slew_lim_set_max_rate()
  *  ```>>> */
-void bw_slew_lim_set_max_rate(bw_slew_lim instance, float value);
+void bw_slew_lim_set_max_rate(bw_slew_lim *instance, float value);
 /*! <<<```
  *    Sets both the maximum increasing and decreasing variation rate to the
  *    given `value` (1/s) for the given `instance`.
@@ -129,7 +123,7 @@ void bw_slew_lim_set_max_rate(bw_slew_lim instance, float value);
 /*! ...
  *    #### bw_slew_lim_set_max_inc_rate()
  *  ```>>> */
-void bw_slew_lim_set_max_inc_rate(bw_slew_lim instance, float value);
+void bw_slew_lim_set_max_inc_rate(bw_slew_lim *instance, float value);
 /*! <<<```
  *    Sets the maximum increasing variation rate to the given `value` (1/s) for
  *    the given `instance`.
@@ -143,7 +137,7 @@ void bw_slew_lim_set_max_inc_rate(bw_slew_lim instance, float value);
 /*! ...
  *    #### bw_slew_lim_set_max_inc_rate()
  *  ```>>> */
-void bw_slew_lim_set_max_dec_rate(bw_slew_lim instance, float value);
+void bw_slew_lim_set_max_dec_rate(bw_slew_lim *instance, float value);
 /*! <<<```
  *    Sets the maximum decreasing variation rate to the given `value` (1/s) for
  *    the given `instance`.
@@ -153,6 +147,23 @@ void bw_slew_lim_set_max_dec_rate(bw_slew_lim instance, float value);
  *
  *    Default value: `INFINITY`.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_slew_lim {
+	// Coefficients
+	float	T;
+
+	// Parameters
+	float	init_val;
+	float	max_inc_rate;
+	float	max_dec_rate;
+
+	// State
+	char	first_run;
+	float	y_z1;
+};
 
 #ifdef __cplusplus
 }

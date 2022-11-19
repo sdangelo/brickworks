@@ -1,0 +1,7 @@
+0.2.0
+-----
+  Refactored API of DSP modules to avoid dynamic memory allocation.
+
+0.1.0
+-----
+  First release.

@@ -21,44 +21,22 @@
 
 #include <bw_math.h>
 
-struct _bw_slew_lim {
-	// Coefficients
-	float	T;
-
-	// Parameters
-	float	init_val;
-	float	max_inc_rate;
-	float	max_dec_rate;
-
-	// State
-	char	first_run;
-	float	y_z1;
-};
-
-bw_slew_lim bw_slew_lim_new() {
-	bw_slew_lim instance = (bw_slew_lim)BW_MALLOC(sizeof(struct _bw_slew_lim));
-	if (instance != NULL) {
-		instance->init_val = 0.f;
-		instance->max_inc = INFINITY;
-		instance->max_dec = INFINITY;
-	}
-	return instance;
+void bw_slew_lim_init(bw_slew_lim *instance) {
+	instance->init_val = 0.f;
+	instance->max_inc = INFINITY;
+	instance->max_dec = INFINITY;
 }
 
-void bw_slew_lim_free(bw_slew_lim instance) {
-	BW_FREE(instance);
-}
-
-void bw_slew_lim_set_sample_rate(bw_slew_lim instance, float sample_rate) {
+void bw_slew_lim_set_sample_rate(bw_slew_lim *instance, float sample_rate) {
 	instance->T = 1.f / sample_rate;
 }
 
-void bw_slew_lim_reset(bw_slew_lim instance) {
+void bw_slew_lim_reset(bw_slew_lim *instance) {
 	instance->first_run = 1;
 	instance->param_changed = ~0;
 }
 
-void bw_slew_lim_process(bw_slew_lim instance, const float* x, float* y, int n_samples) {
+void bw_slew_lim_process(bw_slew_lim *instance, const float* x, float* y, int n_samples) {
 	if (instance->first_run) {
 		instance->y_z1 = instance->init_val;
 		instance->first_run = 0;
@@ -93,19 +71,19 @@ void bw_slew_lim_process(bw_slew_lim instance, const float* x, float* y, int n_s
 	}
 }
 
-void bw_slew_lim_set_init_val(bw_slew_lim instance, float value) {
+void bw_slew_lim_set_init_val(bw_slew_lim *instance, float value) {
 	instance->init_val = value;
 }
 
-void bw_slew_lim_set_max_rate(bw_slew_lim instance, float value) {
+void bw_slew_lim_set_max_rate(bw_slew_lim *instance, float value) {
 	instance->max_inc_rate = value;
 	instance->max_dec_rate = value;
 }
 
-void bw_slew_lim_set_max_inc_rate(bw_slew_lim instance, float value) {
+void bw_slew_lim_set_max_inc_rate(bw_slew_lim *instance, float value) {
 	instance->max_inc_rate = value;
 }
 
-void bw_slew_lim_set_max_dec_rate(bw_slew_lim instance, float value) {
+void bw_slew_lim_set_max_dec_rate(bw_slew_lim *instance, float value) {
 	instance->max_dec_rate = value;
 }

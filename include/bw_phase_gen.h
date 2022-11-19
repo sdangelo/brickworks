@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -28,6 +28,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -47,34 +52,23 @@ extern "C" {
 /*! api {{{
  *    #### bw_phase_gen
  *  ```>>> */
-typedef struct _bw_phase_gen *bw_phase_gen;
+typedef struct _bw_phase_gen bw_phase_gen;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_phase_gen_new()
+ *    #### bw_phase_gen_init()
  *  ```>>> */
-bw_phase_gen bw_phase_gen_new();
+void bw_phase_gen_init(bw_phase_gen *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_phase_gen_free()
- *  ```>>> */
-void bw_phase_gen_free(bw_phase_gen instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_phase_gen_set_sample_rate()
  *  ```>>> */
-void bw_phase_gen_set_sample_rate(bw_phase_gen instance, float sample_rate);
+void bw_phase_gen_set_sample_rate(bw_phase_gen *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -82,7 +76,7 @@ void bw_phase_gen_set_sample_rate(bw_phase_gen instance, float sample_rate);
 /*! ...
  *    #### bw_phase_gen_reset()
  *  ```>>> */
-void bw_phase_gen_reset(bw_phase_gen instance);
+void bw_phase_gen_reset(bw_phase_gen *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -90,7 +84,7 @@ void bw_phase_gen_reset(bw_phase_gen instance);
 /*! ...
  *    #### bw_phase_gen_process()
  *  ```>>> */
-void bw_phase_gen_process(bw_phase_gen instance, const float *x_mod, float* y, float *y_phase_inc, int n_samples);
+void bw_phase_gen_process(bw_phase_gen *instance, const float *x_mod, float* y, float *y_phase_inc, int n_samples);
 /*! <<<```
  *    Lets the given `instance` generate `n_samples` samples and puts them in
  *    the output buffer `y`.
@@ -104,7 +98,7 @@ void bw_phase_gen_process(bw_phase_gen instance, const float *x_mod, float* y, f
 /*! ...
  *    #### bw_phase_gen_set_frequency()
  *  ```>>> */
-void bw_phase_gen_set_frequency(bw_phase_gen instance, float value);
+void bw_phase_gen_set_frequency(bw_phase_gen *instance, float value);
 /*! <<<```
  *    Sets the base frequency to `value` (Hz) for the given `instance`.
  *    
@@ -114,12 +108,33 @@ void bw_phase_gen_set_frequency(bw_phase_gen instance, float value);
 /*! ...
  *    #### bw_phase_gen_set_portamento_tau()
  *  ```>>> */
-void bw_phase_gen_set_portamento_tau(bw_phase_gen instance, float value);
+void bw_phase_gen_set_portamento_tau(bw_phase_gen *instance, float value);
 /*! <<<```
  *    Sets the portamento time constant `value` (s) for the given `instance`.
  *
  *    Default value: `0.f`.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_phase_gen {
+	// Coefficients
+	float		T;
+
+	float		portamento_target;
+	float		portamento_mA1;
+
+	// Parameters
+	float		frequency;
+	float		portamento_tau;
+	int		param_changed;
+
+	// State
+	char		first_run;
+	float		phase;
+	float		portamento_z1;
+};
 
 #ifdef __cplusplus
 }

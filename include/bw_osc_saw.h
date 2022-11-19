@@ -19,13 +19,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Sawtooth oscillator waveshaper with PolyBLEP antialiasing.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -45,28 +50,17 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_saw
  *  ```>>> */
-typedef struct _bw_osc_saw *bw_osc_saw;
+typedef struct _bw_osc_saw bw_osc_saw;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_osc_saw_new()
+ *    #### bw_osc_saw_init()
  *  ```>>> */
-bw_osc_saw bw_osc_saw_new();
+void bw_osc_saw_init(bw_osc_saw *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_osc_saw_free()
- *  ```>>> */
-void bw_osc_saw_free(bw_osc_saw instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
@@ -78,7 +72,7 @@ void bw_osc_saw_free(bw_osc_saw instance);
 /*! ...
  *    #### bw_osc_saw_process()
  *  ```>>> */
-void bw_osc_saw_process(bw_osc_saw instance, const float *x, const float *x_phase_inc, float* y, int n_samples);
+void bw_osc_saw_process(bw_osc_saw *instance, const float *x, const float *x_phase_inc, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` containing the normalized phase signal and fills the
@@ -88,13 +82,21 @@ void bw_osc_saw_process(bw_osc_saw instance, const float *x, const float *x_phas
 /*! ...
  *    #### bw_osc_saw_set_antialiasing()
  *  ```>>> */
-void bw_osc_saw_set_antialiasing(bw_osc_saw instance, char value);
+void bw_osc_saw_set_antialiasing(bw_osc_saw *instance, char value);
 /*! <<<```
  *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) for the
  *    given `instance`.
  *
  *    Default value: `0`.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_osc_saw {
+	// Parameters
+	char	antialiasing;
+};
 
 #ifdef __cplusplus
 }

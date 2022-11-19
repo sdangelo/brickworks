@@ -21,48 +21,18 @@
 
 #include <bw_math.h>
 
-struct _bw_one_pole {
-	// Coefficients
-	float			Ttm2pi;
-
-	float			mA1u;
-	float			mA1d;
-	float			st2;
-
-	// Parameters
-	float			init_val;
-	float			cutoff_up;
-	float			cutoff_down;
-	float			sticky_thresh;
-	bw_one_pole_sticky_mode sticky_mode;
-	int			param_changed;
-
-	// State
-	char	first_run;
-	float	x_z1;
-	float	y_z1;
-};
-
-bw_one_pole bw_one_pole_new() {
-	bw_one_pole instance = (bw_one_pole)BW_MALLOC(sizeof(struct _bw_one_pole));
-	if (instance != NULL) {
-		instance->init_val = 0.f;
-		instance->cutoff_up = INFINITY;
-		instance->cutoff_down = INFINITY;
-		instance->sticky_thresh = 0.f;
-	}
-	return instance;
+void bw_one_pole_init(bw_one_pole *instance) {
+	instance->init_val = 0.f;
+	instance->cutoff_up = INFINITY;
+	instance->cutoff_down = INFINITY;
+	instance->sticky_thresh = 0.f;
 }
 
-void bw_one_pole_free(bw_one_pole instance) {
-	BW_FREE(instance);
-}
-
-void bw_one_pole_set_sample_rate(bw_one_pole instance, float sample_rate) {
+void bw_one_pole_set_sample_rate(bw_one_pole *instance, float sample_rate) {
 	instance->Ttm2pi = -6.283185307179586f / sample_rate;
 }
 
-void bw_one_pole_reset(bw_one_pole instance) {
+void bw_one_pole_reset(bw_one_pole *instance) {
 	instance->first_run = 1;
 	instance->param_changed = ~0;
 }
@@ -71,7 +41,7 @@ void bw_one_pole_reset(bw_one_pole instance) {
 #define PARAM_CUTOFF_DOWN	(1<<1)
 #define PARAM_STICKY_THRESH	(1<<2)
 
-void bw_one_pole_process(bw_one_pole instance, const float* x, float* y, int n_samples) {
+void bw_one_pole_process(bw_one_pole *instance, const float* x, float* y, int n_samples) {
 	if (instance->param_changed) {
 		if (instance->param_changed & PARAM_CUTOFF_UP)
 			instance->mA1u = bw_expf_3(instance->Ttm2pi * instance->cutoff_up);
@@ -160,51 +130,51 @@ void bw_one_pole_process(bw_one_pole instance, const float* x, float* y, int n_s
 	}
 }
 
-void bw_one_pole_set_init_val(bw_one_pole instance, float value) {
+void bw_one_pole_set_init_val(bw_one_pole *instance, float value) {
 	instance->init_val = value;
 }
 
-void bw_one_pole_set_cutoff(bw_one_pole instance, float value) {
+void bw_one_pole_set_cutoff(bw_one_pole *instance, float value) {
 	bw_one_pole_set_cutoff_up(instance, value);
 	bw_one_pole_set_cutoff_down(instance, value);
 }
 
-void bw_one_pole_set_cutoff_up(bw_one_pole instance, float value) {
+void bw_one_pole_set_cutoff_up(bw_one_pole *instance, float value) {
 	if (instance->cutoff_up != value) {
 		instance->cutoff_up = value;
 		instance->param_changed |= PARAM_CUTOFF_UP;
 	}
 }
 
-void bw_one_pole_set_cutoff_down(bw_one_pole instance, float value) {
+void bw_one_pole_set_cutoff_down(bw_one_pole *instance, float value) {
 	if (instance->cutoff_down != value) {
 		instance->cutoff_down = value;
 		instance->param_changed |= PARAM_CUTOFF_DOWN;
 	}
 }
 
-void bw_one_pole_set_tau(bw_one_pole instance, float value) {
+void bw_one_pole_set_tau(bw_one_pole *instance, float value) {
 	bw_one_pole_set_tau_up(instance, value);
 	bw_one_pole_set_tau_down(instance, value);
 }
 
-void bw_one_pole_set_tau_up(bw_one_pole instance, float value) {
+void bw_one_pole_set_tau_up(bw_one_pole *instance, float value) {
 	bw_one_pole_set_cutoff_up(instance, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
 	// tau < 1 ns is instantaneous for any practical purpose
 }
 
-void bw_one_pole_set_tau_down(bw_one_pole instance, float value) {
+void bw_one_pole_set_tau_down(bw_one_pole *instance, float value) {
 	bw_one_pole_set_cutoff_down(instance, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
 	// as before
 }
 
-void bw_one_pole_set_sticky_thresh(bw_one_pole instance, float value) {
+void bw_one_pole_set_sticky_thresh(bw_one_pole *instance, float value) {
 	if (instance->sticky_thresh != value) {
 		instance->sticky_thresh = value;
 		instance->param_changed |= PARAM_STICKY_THRESH;
 	}
 }
 
-void bw_one_pole_set_sticky_mode(bw_one_pole instance, bw_one_pole_sticky_mode value) {
+void bw_one_pole_set_sticky_mode(bw_one_pole *instance, bw_one_pole_sticky_mode value) {
 	instance->sticky_mode = value;
 }

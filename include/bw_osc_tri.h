@@ -19,7 +19,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_inline_one_pole bw_math }}}
  *  description {{{
  *    Triangle oscillator waveshaper with variable slope (increasing time over
@@ -27,6 +27,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -46,34 +51,23 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_tri
  *  ```>>> */
-typedef struct _bw_osc_tri *bw_osc_tri;
+typedef struct _bw_osc_tri bw_osc_tri;
 /*! <<<```
- *    Instance handle.
+ *    Instance object.
  *  >>> */
 
 /*! ...
- *    #### bw_osc_tri_new()
+ *    #### bw_osc_tri_init()
  *  ```>>> */
-bw_osc_tri bw_osc_tri_new();
+void bw_osc_tri_init(bw_osc_tri *instance);
 /*! <<<```
- *    Creates a new instance.
- *
- *    Returns the newly-created instance handle or `NULL` if there was not
- *    enough memory.
- *  >>> */
-
-/*! ...
- *    #### bw_osc_tri_free()
- *  ```>>> */
-void bw_osc_tri_free(bw_osc_tri instance);
-/*! <<<```
- *    Destroys an `instance`.
+ *    Initializes the `instance` object.
  *  >>> */
 
 /*! ...
  *    #### bw_osc_tri_set_sample_rate()
  *  ```>>> */
-void bw_osc_tri_set_sample_rate(bw_osc_tri instance, float sample_rate);
+void bw_osc_tri_set_sample_rate(bw_osc_tri *instance, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `instance`.
  *  >>> */
@@ -81,7 +75,7 @@ void bw_osc_tri_set_sample_rate(bw_osc_tri instance, float sample_rate);
 /*! ...
  *    #### bw_osc_tri_reset()
  *  ```>>> */
-void bw_osc_tri_reset(bw_osc_tri instance);
+void bw_osc_tri_reset(bw_osc_tri *instance);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
@@ -89,7 +83,7 @@ void bw_osc_tri_reset(bw_osc_tri instance);
 /*! ...
  *    #### bw_osc_tri_process()
  *  ```>>> */
-void bw_osc_tri_process(bw_osc_tri instance, const float *x, const float *x_phase_inc, float* y, int n_samples);
+void bw_osc_tri_process(bw_osc_tri *instance, const float *x, const float *x_phase_inc, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` containing the normalized phase signal and fills the
@@ -102,7 +96,7 @@ void bw_osc_tri_process(bw_osc_tri instance, const float *x, const float *x_phas
 /*! ...
  *    #### bw_osc_tri_set_antialiasing()
  *  ```>>> */
-void bw_osc_tri_set_antialiasing(bw_osc_tri instance, char value);
+void bw_osc_tri_set_antialiasing(bw_osc_tri *instance, char value);
 /*! <<<```
  *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) for the
  *    given `instance`.
@@ -113,13 +107,29 @@ void bw_osc_tri_set_antialiasing(bw_osc_tri instance, char value);
 /*! ...
  *    #### bw_osc_tri_set_slope()
  *  ```>>> */
-void bw_osc_tri_set_slope(bw_osc_tri instance, float value);
+void bw_osc_tri_set_slope(bw_osc_tri *instance, float value);
 /*! <<<```
  *    Sets the slope (increasing time over period) to `value` (range [`0.f`,
  *    `1.f`]) for the given `instance`.
  *
  *    Default value: `0.5f`.
  *  }}} */
+
+/* WARNING: the internal definition of this struct is not part of the public
+ * API. Its content may change at any time in future versions. Please, do not
+ * access its members directly. */
+struct _bw_osc_tri {
+	// Coefficients
+	float	smooth_mA1;
+
+	// Parameters
+	char	first_run;
+	char	antialiasing;
+	float	slope;
+
+	// State
+	float	slope_z1;
+};
 
 #ifdef __cplusplus
 }

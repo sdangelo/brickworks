@@ -21,43 +21,16 @@
 
 #include <bw_math.h>
 
-struct _bw_phase_gen {
-	// Coefficients
-	float		T;
-
-	float		portamento_target;
-	float		portamento_mA1;
-
-	// Parameters
-	float		frequency;
-	float		portamento_tau;
-	int		param_changed;
-
-	// State
-	char		first_run;
-	float		phase;
-	float		portamento_z1;
-};
-
-bw_phase_gen bw_phase_gen_new() {
-	bw_phase_gen instance = (bw_phase_gen)BW_MALLOC(sizeof(struct _bw_phase_gen));
-	if (instance == NULL)
-		return NULL;
-
+void bw_phase_gen_init(bw_phase_gen *instance) {
 	instance->frequency = 1.f;
 	instance->portamento_tau = 0.f;
-	return instance;
 }
 
-void bw_phase_gen_free(bw_phase_gen instance) {
-	BW_FREE(instance);
-}
-
-void bw_phase_gen_set_sample_rate(bw_phase_gen instance, float sample_rate) {
+void bw_phase_gen_set_sample_rate(bw_phase_gen *instance, float sample_rate) {
 	instance->T = 1.f / sample_rate;
 }
 
-void bw_phase_gen_reset(bw_phase_gen instance) {
+void bw_phase_gen_reset(bw_phase_gen *instance) {
 	instance->first_run = 1;
 	instance->param_changed = ~0;
 }
@@ -65,7 +38,7 @@ void bw_phase_gen_reset(bw_phase_gen instance) {
 #define PARAM_FREQUENCY		1
 #define PARAM_PORTAMENTO_TAU	(1<<1)
 
-void bw_phase_gen_process(bw_phase_gen instance, const float *x_mod, float* y, float *y_phase_inc, int n_samples) {
+void bw_phase_gen_process(bw_phase_gen *instance, const float *x_mod, float* y, float *y_phase_inc, int n_samples) {
 	if (instance->param_changed) {
 		if (instance->param_changed & PARAM_FREQUENCY)
 			instance->portamento_target = instance->T * instance->frequency;
@@ -107,14 +80,14 @@ void bw_phase_gen_process(bw_phase_gen instance, const float *x_mod, float* y, f
 		}
 }
 
-void bw_phase_gen_set_frequency(bw_phase_gen instance, float value) {
+void bw_phase_gen_set_frequency(bw_phase_gen *instance, float value) {
 	if (instance->frequency != value) {
 		instance->frequency = value;
 		instance->param_changed |= PARAM_FREQUENCY;
 	}
 }
 
-void bw_phase_gen_set_portamento_tau(bw_phase_gen instance, float value) {
+void bw_phase_gen_set_portamento_tau(bw_phase_gen *instance, float value) {
 	if (instance->portamento_tau != value) {
 		instance->portamento_tau = value;
 		instance->param_changed |= PARAM_PORTAMENTO_TAU;

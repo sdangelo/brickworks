@@ -22,61 +22,20 @@
 #include <bw_math.h>
 #include <bw_inline_one_pole.h>
 
-typedef enum {
-	state_off,
-	state_attack,
-	state_decay,
-	state_sustain,
-	state_release
-} state_t;
-
-struct _bw_env_gen {
-	// Coefficients
-	float	T;
-	float	smooth_mA1;
-
-	float	attack_inc;
-	float	decay_inc;
-	float	release_inc;
-
-	// Parameters
-	char	gate;
-	float	attack;
-	float	decay;
-	float	sustain;
-	float	release;
-	int	param_changed;
-
-	// State
-	char	first_run;
-	state_t	state;
-	float	y_z1;
-};
-
-bw_env_gen bw_env_gen_new() {
-	bw_env_gen instance = (bw_env_gen)BW_MALLOC(sizeof(struct _bw_env_gen));
-	if (instance == NULL)
-		return NULL;
-
+void bw_env_gen_init(bw_env_gen *instance) {
 	instance->gate = 0;
 	instance->attack = 0.f;
 	instance->decay = 0.f;
 	instance->sustain = 1.f;
 	instance->release = 0.f;
-
-	return instance;
 }
 
-void bw_env_gen_free(bw_env_gen instance) {
-	BW_FREE(instance);
-}
-
-void bw_env_gen_set_sample_rate(bw_env_gen instance, float sample_rate) {
+void bw_env_gen_set_sample_rate(bw_env_gen *instance, float sample_rate) {
 	instance->T = 1.f / sample_rate;
 	instance->smooth_mA1 = bw_inline_one_pole_get_mA1(sample_rate, 0.05f);
 }
 
-void bw_env_gen_reset(bw_env_gen instance) {
+void bw_env_gen_reset(bw_env_gen *instance) {
 	instance->first_run = 1;
 	instance->param_changed = ~0;
 }
@@ -86,7 +45,7 @@ void bw_env_gen_reset(bw_env_gen instance) {
 #define PARAM_SUSTAIN	(1<<2)
 #define PARAM_RELEASE	(1<<3)
 
-void bw_env_gen_process(bw_env_gen instance, float* y, int n_samples) {
+void bw_env_gen_process(bw_env_gen *instance, float* y, int n_samples) {
 	if (instance->param_changed) {
 		// 1 ns considered instantaneous
 		if (instance->param_changed & PARAM_ATTACK)
@@ -98,47 +57,47 @@ void bw_env_gen_process(bw_env_gen instance, float* y, int n_samples) {
 	}
 
 	if (instance->first_run) {
-		instance->state = state_off;
+		instance->state = _bw_env_gen_state_off;
 		instance->y_z1 = 0.f;
 		instance->first_run = 0;
 	}
 
 	if (instance->gate) {
-		if (instance->state == state_off || instance->state == state_release)
-			instance->state = state_attack;
+		if (instance->state == _bw_env_gen_state_off || instance->state == _bw_env_gen_state_release)
+			instance->state = _bw_env_gen_state_attack;
 	} else {
-		if (instance->state != state_off)
-			instance->state = state_release;
+		if (instance->state != _bw_env_gen_state_off)
+			instance->state = _bw_env_gen_state_release;
 	}
 
 	for (int i = 0; i < n_samples; i++) {
 		float v;
 		switch (instance->state) {
-		case state_attack:
+		case _bw_env_gen_state_attack:
 			v = instance->y_z1 + instance->attack_inc;
 			if (v >= 1.f) {
 				v = 1.f;
-				instance->state = state_decay;
+				instance->state = _bw_env_gen_state_decay;
 			}
 			break;
-		case state_decay:
+		case _bw_env_gen_state_decay:
 			v = instance->y_z1 + instance->decay_inc;
 			if (v <= instance->sustain) {
 				v = instance->sustain;
-				instance->state = state_sustain;
+				instance->state = _bw_env_gen_state_sustain;
 			}
 			break;
-		case state_sustain:
+		case _bw_env_gen_state_sustain:
 			v = bw_inline_one_pole(instance->sustain, instance->y_z1, instance->smooth_mA1);
 			break;
-		case state_release:
+		case _bw_env_gen_state_release:
 			v = instance->y_z1 + instance->release_inc;
 			if (v <= 0.f) {
 				v = 0.f;
-				instance->state = state_off;
+				instance->state = _bw_env_gen_state_off;
 			}
 			break;
-		case state_off:
+		case _bw_env_gen_state_off:
 			v = 0.f;
 			break;
 		}
@@ -148,38 +107,38 @@ void bw_env_gen_process(bw_env_gen instance, float* y, int n_samples) {
 	}
 }
 
-void bw_env_gen_set_gate(bw_env_gen instance, char value) {
+void bw_env_gen_set_gate(bw_env_gen *instance, char value) {
 	instance->gate = value;
 }
 
-void bw_env_gen_set_attack(bw_env_gen instance, float value) {
+void bw_env_gen_set_attack(bw_env_gen *instance, float value) {
 	if (instance->attack != value) {
 		instance->attack = value;
 		instance->param_changed |= PARAM_ATTACK;
 	}
 }
 
-void bw_env_gen_set_decay(bw_env_gen instance, float value) {
+void bw_env_gen_set_decay(bw_env_gen *instance, float value) {
 	if (instance->decay != value) {
 		instance->decay = value;
 		instance->param_changed |= PARAM_DECAY;
 	}
 }
 
-void bw_env_gen_set_sustain(bw_env_gen instance, float value) {
+void bw_env_gen_set_sustain(bw_env_gen *instance, float value) {
 	if (instance->sustain != value) {
 		instance->sustain = value;
 		instance->param_changed |= PARAM_SUSTAIN;
 	}
 }
 
-void bw_env_gen_set_release(bw_env_gen instance, float value) {
+void bw_env_gen_set_release(bw_env_gen *instance, float value) {
 	if (instance->release != value) {
 		instance->release = value;
 		instance->param_changed |= PARAM_RELEASE;
 	}
 }
 
-char bw_env_gen_get_is_off(bw_env_gen instance) {
-	return instance->state == state_off;
+char bw_env_gen_get_is_off(bw_env_gen *instance) {
+	return instance->state == _bw_env_gen_state_off;
 }

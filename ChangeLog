@@ -5,7 +5,7 @@
   * Renamed bw_example_fx to bw_example_fx_svf.
   * Removed output "Level" parameter from bw_example_fx_svf.
   * Now using correct "Fx|Filter" VST3 subcategory for bw_example_fx_svf.
-  * Using official logo as VST3 plugin icon
+  * Using official logo as VST3 plugin icon.
 
 0.1.0
 -----

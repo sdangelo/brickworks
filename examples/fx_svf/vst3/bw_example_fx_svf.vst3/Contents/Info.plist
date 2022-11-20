@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>bw_example_fx</string>
+    <string>bw_example_fx_svf</string>
 
     <key>CFBundleExecutable</key>
-    <string>bw_example_fx</string>
+    <string>bw_example_fx_svf</string>
 
 </dict>
 </plist>

@@ -24,15 +24,15 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx* bw_example_fx;
+typedef struct _bw_example_fx_svf* bw_example_fx_svf;
 
-bw_example_fx bw_example_fx_new();
-void bw_example_fx_free(bw_example_fx instance);
-void bw_example_fx_set_sample_rate(bw_example_fx instance, float sample_rate);
-void bw_example_fx_reset(bw_example_fx instance);
-void bw_example_fx_process(bw_example_fx instance, const float** x, float** y, int n_samples);
-void bw_example_fx_set_parameter(bw_example_fx instance, int index, float value);
-float bw_example_fx_get_parameter(bw_example_fx instance, int index);
+bw_example_fx_svf bw_example_fx_svf_new();
+void bw_example_fx_svf_free(bw_example_fx_svf instance);
+void bw_example_fx_svf_set_sample_rate(bw_example_fx_svf instance, float sample_rate);
+void bw_example_fx_svf_reset(bw_example_fx_svf instance);
+void bw_example_fx_svf_process(bw_example_fx_svf instance, const float** x, float** y, int n_samples);
+void bw_example_fx_svf_set_parameter(bw_example_fx_svf instance, int index, float value);
+float bw_example_fx_svf_get_parameter(bw_example_fx_svf instance, int index);
 
 #ifdef __cplusplus
 }

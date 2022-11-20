@@ -49,7 +49,7 @@ struct config_parameter {
 #define COMPANY_WEBSITE		"https://www.orastron.com/"
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
-#define PLUGIN_NAME		"bw_example_fx"
+#define PLUGIN_NAME		"bw_example_fx_svf"
 #define PLUGIN_VERSION		"0.2.0"
 
 #define NUM_BUSES_IN		1
@@ -65,25 +65,24 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 	{ "Audio out", 1, 0, 0, IO_MONO }
 };
 
-#define NUM_PARAMETERS		3
+#define NUM_PARAMETERS		2
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 	{ "Cutoff", "Cutoff", "", 0, 0, 0, 0.5f },
-	{ "Q", "Q", "", 0, 0, 0, 0.f },
-	{ "Level", "Level", "", 1, 0, 0, 0.f }
+	{ "Q", "Q", "", 0, 0, 0, 0.f }
 };
 
 // Internal API
 
-#include "bw_example_fx.h"
+#include "bw_example_fx_svf.h"
 
-#define P_TYPE				bw_example_fx
-#define P_NEW				bw_example_fx_new
-#define P_FREE				bw_example_fx_free
-#define P_SET_SAMPLE_RATE		bw_example_fx_set_sample_rate
-#define P_RESET				bw_example_fx_reset
-#define P_PROCESS			bw_example_fx_process
-#define P_SET_PARAMETER			bw_example_fx_set_parameter
-#define P_GET_PARAMETER			bw_example_fx_get_parameter
+#define P_TYPE				bw_example_fx_svf
+#define P_NEW				bw_example_fx_svf_new
+#define P_FREE				bw_example_fx_svf_free
+#define P_SET_SAMPLE_RATE		bw_example_fx_svf_set_sample_rate
+#define P_RESET				bw_example_fx_svf_reset
+#define P_PROCESS			bw_example_fx_svf_process
+#define P_SET_PARAMETER			bw_example_fx_svf_set_parameter
+#define P_GET_PARAMETER			bw_example_fx_svf_get_parameter
 
 #endif

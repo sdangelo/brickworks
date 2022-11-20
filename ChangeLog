@@ -1,6 +1,10 @@
 0.2.0
 -----
-  Refactored API of DSP modules to avoid dynamic memory allocation.
+  * Refactored API of DSP modules to avoid dynamic memory allocation.
+  * Added bw_wah and bw_example_fx_wah.
+  * Renamed bw_example_fx to bw_example_fx_svf.
+  * Removed output "Level" parameter from bw_example_fx_svf.
+  * Now using correct "Fx|Filter" VST3 subcategory for bw_example_fx_svf.
 
 0.1.0
 -----

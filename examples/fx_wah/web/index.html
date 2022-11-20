@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!--
+
+  Brickworks
+
+  Copyright (C) 2022 Orastron Srl unipersonale
+
+  Brickworks is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, version 3 of the License.
+
+  Brickworks is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+
+  File author: Stefano D'Angelo
+
+-->
+<html>
+  <head>
+    <title>Brickworks web effect example</title>
+    <script src="config.js"></script>
+    <script>
+var audioCtx;
+
+var Effect = {
+	node: null,
+	moduleAdded: false,
+	wasmBytes: null,
+
+	init: async function () {
+		if (!this.moduleAdded) {
+			await audioCtx.audioWorklet.addModule("processor.js");
+			this.moduleAdded = true;
+		}
+
+		if (!this.wasmBytes)
+			this.wasmBytes = await fetch("module.wasm")
+				.then((response) => response.arrayBuffer())
+				.then((bytes) => bytes);
+		if (!this.wasmBytes.byteLength) {
+			this.wasmBytes = null;
+			throw "could not fetch WebAssembly module";
+		}
+
+		if (!this.node)
+			this.node = new AudioWorkletNode(audioCtx, "BWExample",
+				{
+					numberOfInputs: 1,
+					numberOfOutputs: 1,
+					outputChannelCount: [ 1 ],
+					processorOptions: {
+						wasmBytes: this.wasmBytes
+					}
+				});
+		this.node.connect(audioCtx.destination);
+	}
+};
+
+var Player = {
+	sourceBuffer: null,
+	playing: false,
+	started: false,
+
+	load: function (buffer, successCb, errorCb) {
+		let t = this;
+		audioCtx.decodeAudioData(buffer,
+			function (data) {
+				if (t.started)
+					t.sourceBuffer.stop();
+				if (t.playing)
+					t.sourceBuffer.disconnect();
+				t.sourceBuffer = audioCtx.createBufferSource();
+				t.sourceBuffer.buffer = data;
+				t.sourceBuffer.loop = true;
+				if (t.started)
+					t.sourceBuffer.start();
+				if (t.playing) {
+					t.started = true;
+					t.sourceBuffer.connect(Effect.node);
+				}
+				successCb();
+			},
+			function () { errorCb(); });
+	},
+	
+	togglePlayPause: function () {
+		if (this.playing) {
+			this.sourceBuffer.disconnect();
+			this.playing = false;
+		} else {
+			if (!this.started) {
+				this.sourceBuffer.start();
+				this.started = true;
+			}
+			this.sourceBuffer.connect(Effect.node);
+			this.playing = true;
+		}
+	}
+};
+
+var initState = 0; // 0 = not inited, 1 = in progress, 2 = inited
+
+window.addEventListener("load", function (e) {
+	var start = document.getElementById("start");
+	var starting = document.getElementById("starting");
+	var main = document.getElementById("main");
+	var file = document.getElementById("file");
+	var playPause = document.getElementById("playPause");
+	var controls = document.getElementById("controls");
+
+	// reset on refresh
+	file.value = "";
+	playPause.disabled = true; 
+
+	for (var i = 0; i < parameters.length; i++) {
+		var div = document.createElement("div");
+		controls.appendChild(div);
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "p" + i);
+		label.innerText = parameters[i].name;
+		div.appendChild(label);
+
+		var range = document.createElement("input");
+		range.setAttribute("type", "range");
+		range.setAttribute("id", "p" + i);
+		range.setAttribute("name", "p" + i);
+		range.setAttribute("min", "0");
+		range.setAttribute("max", "1");
+		range.setAttribute("step", "any");
+		range.value = parameters[i].defaultValue;
+		if (parameters[i].output)
+			range.setAttribute("readonly", "true");
+		else {
+			let index = i;
+			range.addEventListener("input", function (e) {
+				var p = Effect.node.parameters.get(parameters[index].name);
+				p.setValueAtTime(e.target.value, 0);
+			});
+		}
+		div.appendChild(range);
+	}
+
+	start.addEventListener("click", async function () {
+		initState = 1;
+		start.disabled = true;
+		starting.hidden = false;
+
+		try {
+			if (!audioCtx)
+				audioCtx = new AudioContext();
+			await Effect.init();
+
+			Effect.node.port.onmessage = function (e) { document.getElementById("p" + e.data.index).value = e.data.value; };
+			
+			initState = 2;
+			start.hidden = true;
+			starting.hidden = true;
+			main.hidden = false;
+		} catch (err) {
+			alert("Colud not initialize: " + err);
+
+			initState = 0;
+			start.disabled = false;
+			starting.hidden = true;
+		}
+	});
+
+	file.addEventListener("change", function () {
+		var fileReader = new FileReader();
+		fileReader.readAsArrayBuffer(this.files[0]);
+		fileReader.onload = function (e) {
+			Player.load(e.target.result,
+				function () { playPause.disabled = false; },
+				function () { alert("Could not decode the chosen file"); });
+		};
+		fileReader.onerror = function (e) { alert("Could not read file"); };
+	});
+
+	playPause.addEventListener("click", function () {
+		Player.togglePlayPause();
+		playPause.innerText = Player.playing ? "Pause" : "Play";
+	});
+});
+    </script>
+  </head>
+  <body>
+    <h1>Brickworks web effect example</h1>
+    <input id="start" type="button" value="Start">
+    <p id="starting" hidden>Starting...</p>
+    <div id="main" hidden>
+      <h2>Player</h2>
+      <label for="file">Choose a file:</label>
+      <input type="file" id="file" name="file" accept="audio/*">
+      <br>
+      <button id="playPause" disabled>Play</button>
+      <h2>Effect</h2>
+      <div id="controls">
+      </div>
+    </div>
+  </body>
+</html>

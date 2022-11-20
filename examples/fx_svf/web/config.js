@@ -38,10 +38,5 @@ var parameters = [
 		name:		"Q",
 		output:		false,
 		defaultValue:	0.0
-	},
-	{
-		name:		"Level",
-		output:		true,
-		defaultValue:	0.0
 	}
 ];

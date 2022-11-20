@@ -16,3 +16,5 @@ build system:
 * make from... directories
 * order-only prerequisites to avoid multiple make updates? (https://interrupt.memfault.com/blog/gnu-make-guidelines#order-only-prerequisites)
 * clang + Ofast & bulk memory (maybe using old binaryen)
+* put common parts of Makefiles together somewhere/somehow (DRY)
+* recursive make?

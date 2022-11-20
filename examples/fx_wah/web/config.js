@@ -14,22 +14,24 @@
  *
  * You should have received a copy of the GNU General Public License
  *
- * File authors: Stefano D'Angelo, Paolo Marrone
+ * File author: Stefano D'Angelo
  */
 
-#ifndef _VST3_CONFIG_H
-#define _VST3_CONFIG_H
+var buses = [
+	{
+		stereo:		false,
+		output:		false
+	},
+	{
+		stereo:		false,
+		output:		true
+	}
+];
 
-#define PLUGIN_SUBCATEGORY	"Fx|Tools"
-
-#define PLUGIN_GUID_1		0x38ebec3f
-#define PLUGIN_GUID_2		0x24fe43e7
-#define PLUGIN_GUID_3		0x94ff4552
-#define PLUGIN_GUID_4		0xd09f9716
-
-#define CTRL_GUID_1		0x41a5db7d
-#define CTRL_GUID_2		0x15af468f
-#define CTRL_GUID_3		0x9e63697f
-#define CTRL_GUID_4		0x21facb4f
-
-#endif
+var parameters = [
+	{
+		name:		"Wah",
+		output:		false,
+		defaultValue:	0.5
+	}
+];

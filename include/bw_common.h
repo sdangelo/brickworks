@@ -27,6 +27,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Removed BW_MALLOC, BW_REALLOC, and BW_FREE.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -75,24 +80,6 @@
  *  >>> */
 #ifndef INFINITY
 # include <math.h>
-#endif
-
-/*! ...
- *    #### BW_MALLOC, BW_REALLOC, BW_FREE
- *    If any of these is not defined, then `stdlib.h` is `#include`d and the
- *    missing ones are defined as `malloc`, `realloc`, or `free`, respectively.
- *  >>> */
-#if !defined(BW_MALLOC) || !defined(BW_REALLOC) || !defined(BW_FREE)
-# include <stdlib.h>
-# ifndef BW_MALLOC
-#  define BW_MALLOC malloc
-# endif
-# ifndef BW_REALLOC
-#  define BW_REALLOC realloc
-# endif
-# ifndef BW_FREE
-#  define BW_FREE free
-# endif
 #endif
 
 /*! ... }}} */

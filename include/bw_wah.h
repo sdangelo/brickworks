@@ -20,7 +20,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common bw_inline_one_pole bw_math bw_wah }}}
+ *  requires {{{ bw_config bw_common bw_one_pole bw_math bw_wah }}}
  *  description {{{
  *    Wah effect.
  *

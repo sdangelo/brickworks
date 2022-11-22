@@ -20,7 +20,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common bw_inline_one_pole bw_math }}}
+ *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
  *  description {{{
  *    State variable filter (2nd order, 12 dB/oct) model with separated lowpass,
  *    bandpass, and highpass outputs.
@@ -29,7 +29,7 @@
  *    <ul>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *          <li>Refactored API.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -113,13 +113,20 @@ void bw_svf_set_Q(bw_svf *instance, float value);
  *    Default value: `0.5f`.
  *  }}} */
 
+#include <bw_one_pole.h>
+
 /* WARNING: the internal definition of this struct is not part of the public
  * API. Its content may change at any time in future versions. Please, do not
  * access its members directly. */
 struct _bw_svf {
+	// Sub-components
+	bw_one_pole_coeffs	smooth_cutoff_coeffs;
+	bw_one_pole_state	smooth_cutoff_state;
+	bw_one_pole_coeffs	smooth_Q_coeffs;
+	bw_one_pole_state	smooth_Q_state;
+	
 	// Coefficients
 	float	t_k;
-	float	smooth_mA1;
 
 	float	t;
 	float	k;

@@ -363,7 +363,10 @@ static inline float bw_sqrtf_2(float x);
  *    Relative error < 0.0007%.
  *  }}} */
 
-/* Implementation */
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
 
 typedef union {
 	float f;

@@ -20,16 +20,22 @@
 #include <bw_svf.h>
 
 #include <bw_math.h>
-#include <bw_inline_one_pole.h>
 
 void bw_svf_init(bw_svf *instance) {
+	bw_one_pole_init(&instance->smooth_cutoff_coeffs);
+	bw_one_pole_set_tau(&instance->smooth_cutoff_coeffs, 0.05f);
+	bw_one_pole_set_sticky_thresh(&instance->smooth_cutoff_coeffs, 1e-3f);
+	bw_one_pole_init(&instance->smooth_Q_coeffs);
+	bw_one_pole_set_tau(&instance->smooth_Q_coeffs, 0.05f);
+	bw_one_pole_set_sticky_thresh(&instance->smooth_Q_coeffs, 1e-3f);
 	instance->cutoff = 1e3f;
 	instance->Q = 0.5f;
 }
 
 void bw_svf_set_sample_rate(bw_svf *instance, float sample_rate) {
+	bw_one_pole_set_sample_rate(&instance->smooth_cutoff_coeffs, sample_rate);
+	bw_one_pole_set_sample_rate(&instance->smooth_Q_coeffs, sample_rate);
 	instance->t_k = 3.141592653589793f / sample_rate;
-	instance->smooth_mA1 = bw_inline_one_pole_get_mA1(sample_rate, 0.05f);
 }
 
 void bw_svf_reset(bw_svf *instance) {
@@ -40,15 +46,17 @@ void bw_svf_reset(bw_svf *instance) {
 #define PARAM_Q		(1<<1)
 
 static inline void update_coefficients(bw_svf *instance) {
+	bw_one_pole_update_coeffs_audio(&instance->smooth_cutoff_coeffs);
+	bw_one_pole_update_coeffs_audio(&instance->smooth_Q_coeffs);
 	const char cutoff_changed = instance->cutoff != instance->cutoff_cur || instance->first_run;
 	const char Q_changed = instance->Q != instance->Q_cur || instance->first_run;
 	if (cutoff_changed || Q_changed) {
 		if (cutoff_changed) {
-			instance->cutoff_cur = bw_inline_one_pole_sticky_rel(instance->cutoff, instance->cutoff_cur, instance->smooth_mA1, 1e-6f);
+			instance->cutoff_cur = bw_one_pole_process1_sticky_rel(&instance->smooth_cutoff_coeffs, &instance->smooth_cutoff_state, instance->cutoff);
 			instance->t = bw_tanf_3(instance->t_k * instance->cutoff_cur);
 		}
 		if (Q_changed) {
-			instance->Q_cur = bw_inline_one_pole_sticky_abs(instance->Q, instance->Q_cur, instance->smooth_mA1, 1e-6f);
+			instance->Q_cur = bw_one_pole_process1_sticky_abs(&instance->smooth_Q_coeffs, &instance->smooth_Q_state, instance->Q);
 			instance->k = bw_rcpf_2(instance->Q_cur);
 		}
 		const float kpt = instance->k + instance->t;
@@ -60,14 +68,21 @@ static inline void update_coefficients(bw_svf *instance) {
 
 void bw_svf_process(bw_svf *instance, const float *x, float *y_lp, float *y_bp, float *y_hp, int n_samples) {
 	if (instance->first_run) {
-		instance->cutoff_cur = instance->cutoff;
-		instance->Q_cur = instance->Q;
+		bw_one_pole_set_init_val(&instance->smooth_cutoff_coeffs, instance->cutoff);
+		bw_one_pole_reset_coeffs(&instance->smooth_cutoff_coeffs);
+		bw_one_pole_reset_state(&instance->smooth_cutoff_coeffs, &instance->smooth_cutoff_state);
+		bw_one_pole_set_init_val(&instance->smooth_Q_coeffs, instance->Q);
+		bw_one_pole_reset_coeffs(&instance->smooth_Q_coeffs);
+		bw_one_pole_reset_state(&instance->smooth_Q_coeffs, &instance->smooth_Q_state);
 		update_coefficients(instance);
 		instance->hp_z1 = 0.f;
 		instance->lp_z1 = 0.f;
 		instance->bp_z1 = 0.f;
 		instance->first_run = 0;
 	}
+	
+	bw_one_pole_update_coeffs_ctrl(&instance->smooth_cutoff_coeffs);
+	bw_one_pole_update_coeffs_ctrl(&instance->smooth_Q_coeffs);
 
 	for (int i = 0; i < n_samples; i++) {
 		update_coefficients(instance);

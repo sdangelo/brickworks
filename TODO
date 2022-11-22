@@ -8,6 +8,7 @@ code:
 * API for buffer fill, scale, offset, zero, copy...?
 * web examples construction/destruction
 * web effect multichannel in?
+* check const restrict etc.
 
 build system:
 * make makefiles handle paths with spaces etc

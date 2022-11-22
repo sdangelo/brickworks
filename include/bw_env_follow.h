@@ -120,7 +120,8 @@ bw_one_pole *bw_env_follow_get_one_pole(bw_env_follow *instance);
  * access its members directly. */
 struct _bw_env_follow {
 	// Sub-components
-	bw_one_pole	one_pole;
+	bw_one_pole_coeffs	one_pole_coeffs;
+	bw_one_pole_state	one_pole_state;
 };
 
 #ifdef __cplusplus

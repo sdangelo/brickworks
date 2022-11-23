@@ -1,5 +1,6 @@
 CC=clang
 CFLAGS= \
+	-D__WASM__ \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../common/web \
 	-I${ROOT_DIR}/../../../include \

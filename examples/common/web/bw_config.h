@@ -20,12 +20,6 @@
 #ifndef _BW_CONFIG_H
 #define _BW_CONFIG_H
 
-#include "walloc.h"
-
-#define BW_MALLOC malloc
-#define BW_REALLOC realloc
-#define BW_FREE free
-
 #define INFINITY (__builtin_inff())
 
 #endif

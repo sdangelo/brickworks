@@ -20,7 +20,11 @@
 #include "bw_example_fx_svf.h"
 
 #include <bw_svf.h>
-#include <stdlib.h>
+#ifdef __WASM__
+# include "walloc.h"
+#else
+# include <stdlib.h>
+#endif
 
 enum {
 	p_cutoff,

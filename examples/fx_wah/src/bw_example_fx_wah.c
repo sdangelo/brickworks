@@ -19,8 +19,13 @@
 
 #include "bw_example_fx_wah.h"
 
-#include <bw_common.h>
 #include <bw_wah.h>
+#ifdef __WASM__
+# include "walloc.h"
+#else
+# include <stdlib.h>
+#endif
+
 
 enum {
 	p_wah,
@@ -29,37 +34,39 @@ enum {
 
 struct _bw_example_fx_wah {
 	// Sub-components
-	bw_wah		wah;
+	bw_wah_coeffs	wah_coeffs;
+	bw_wah_state	wah_state;
 
 	// Parameters
 	float		params[p_n];
 };
 
 bw_example_fx_wah bw_example_fx_wah_new() {
-	bw_example_fx_wah instance = (bw_example_fx_wah)BW_MALLOC(sizeof(struct _bw_example_fx_wah));
+	bw_example_fx_wah instance = (bw_example_fx_wah)malloc(sizeof(struct _bw_example_fx_wah));
 	if (instance != NULL)
-		bw_wah_init(&instance->wah);
+		bw_wah_init(&instance->wah_coeffs);
 	return instance;
 }
 
 void bw_example_fx_wah_free(bw_example_fx_wah instance) {
-	BW_FREE(instance);
+	free(instance);
 }
 
 void bw_example_fx_wah_set_sample_rate(bw_example_fx_wah instance, float sample_rate) {
-	bw_wah_set_sample_rate(&instance->wah, sample_rate);
+	bw_wah_set_sample_rate(&instance->wah_coeffs, sample_rate);
 }
 
 void bw_example_fx_wah_reset(bw_example_fx_wah instance) {
-	bw_wah_reset(&instance->wah);
+	bw_wah_reset_coeffs(&instance->wah_coeffs);
+	bw_wah_reset_state(&instance->wah_coeffs, &instance->wah_state);
 }
 
 void bw_example_fx_wah_process(bw_example_fx_wah instance, const float** x, float** y, int n_samples) {
-	bw_wah_process(&instance->wah, x[0], y[0], n_samples);
+	bw_wah_process(&instance->wah_coeffs, &instance->wah_state, x[0], y[0], n_samples);
 }
 
 void bw_example_fx_wah_set_parameter(bw_example_fx_wah instance, int index, float value) {
-	bw_wah_set_wah(&instance->wah, value);
+	bw_wah_set_wah(&instance->wah_coeffs, value);
 }
 
 float bw_example_fx_wah_get_parameter(bw_example_fx_wah instance, int index) {

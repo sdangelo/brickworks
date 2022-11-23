@@ -5,8 +5,8 @@
   * Added bw_wah and bw_example_fx_wah.
   * Added BW_RESTRICT and removed BW_MALLOC, BW_REALLOC, and BW_FREE from
     bw_common.
-  * Renamed bw_example_fx to bw_example_fx_svf.
-  * Removed output "Level" parameter from bw_example_fx_svf.
+  * Renamed bw_example_fx to bw_example_fx_svf are removed output "Level"
+    parameter from it.
   * Using correct "Fx|Filter" VST3 subcategory for bw_example_fx_svf.
   * Using official logo as VST3 plugin icon.
 

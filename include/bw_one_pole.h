@@ -48,6 +48,8 @@
 extern "C" {
 #endif
 
+#include <bw_common.h>
+
 /*! api {{{
  *    #### bw_one_pole_coeffs
  *  ```>>> */
@@ -75,39 +77,39 @@ typedef enum {
  *
  *    #### bw_one_pole_init()
  *  ```>>> */
-static inline void bw_one_pole_init(bw_one_pole_coeffs *restrict coeffs);
+static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes `coeffs`.
  *
  *    #### bw_one_pole_set_sample_rate()
  *  ```>>> */
-static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *restrict coeffs, float sample_rate);
+static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
  *
  *    #### bw_one_pole_reset_state()
  *  ```>>> */
-static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state);
+static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state);
 /*! <<<```
  *    Resets the given `state` to the initial state using the given `coeffs`.
  *  >>> */
 
-static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *restrict coeffs);
+static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs);
 
-static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *restrict coeffs);
-static inline void bw_one_pole_update_coeffs_audio(bw_one_pole_coeffs *restrict coeffs);
+static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs);
+static inline void bw_one_pole_update_coeffs_audio(bw_one_pole_coeffs *BW_RESTRICT coeffs);
 
-static inline float bw_one_pole_process1(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x);
-static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x);
-static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x);
-static inline float bw_one_pole_process1_asym(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x);
-static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x);
-static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x);
+static inline float bw_one_pole_process1(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
+static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
+static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
+static inline float bw_one_pole_process1_asym(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
+static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
+static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 
 /*! ...
  *    #### bw_one_pole_process()
  *  ```>>> */
-static inline void bw_one_pole_process(bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, const float *x, float *y, int n_samples);
+static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
@@ -117,7 +119,7 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *restrict coeffs, bw_o
 /*! ...
  *    #### bw_one_pole_set_init_val()
  *  ```>>> */
-static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the initial/quiescent `value` for the given `instance`.
  *
@@ -131,7 +133,7 @@ static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *restrict coeffs,
 /*! ...
  *    #### bw_one_pole_set_cutoff()
  *  ```>>> */
-static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets both the upgoing (attack) and downgoing (decay) cutoff frequency to
  *    the given `value` (Hz) for the given `instance`.
@@ -147,7 +149,7 @@ static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *restrict coeffs, f
 /*! ...
  *    #### bw_one_pole_set_cutoff_up()
  *  ```>>> */
-static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the upgoing (attack) cutoff frequency to the given `value` (Hz) for
  *    the given `instance`.
@@ -161,7 +163,7 @@ static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *restrict coeffs
 /*! ...
  *    #### bw_one_pole_set_cutoff_down()
  *  ```>>> */
-static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the downgoing (attack) cutoff frequency to the given `value` (Hz)
  *    for the given `instance`.
@@ -175,7 +177,7 @@ static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *restrict coef
 /*! ...
  *    #### bw_one_pole_set_tau()
  *  ```>>> */
-static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets both the upgoing (attack) and downgoing (decay) time constant to the
  *    given `value` (s) for the given `instance`.
@@ -191,7 +193,7 @@ static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *restrict coeffs, floa
 /*! ...
  *    #### bw_one_pole_set_tau_up()
  *  ```>>> */
-static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the upgoing (attack) time constant to the given `value` (s) for the
  *    given `instance`.
@@ -205,7 +207,7 @@ static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *restrict coeffs, f
 /*! ...
  *    #### bw_one_pole_set_tau_down()
  *  ```>>> */
-static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the downgoing (decay) time constant to the given `value` (s) for the
  *    given `instance`.
@@ -219,7 +221,7 @@ static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *restrict coeffs,
 /*! ...
  *    #### bw_one_pole_set_sticky_thresh()
  *  ```>>> */
-static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *restrict coeffs, float value);
+static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the target-reach threshold specified by `value` for the given
  *    `instance`.
@@ -235,7 +237,7 @@ static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *restrict co
 /*! ...
  *    #### bw_one_pole_set_sticky_mode()
  *  ```>>> */
-static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *restrict coeffs, bw_one_pole_sticky_mode value);
+static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_sticky_mode value);
 /*! <<<```
  *    Sets the current distance metric for sticky behavior.
  *  }}} */
@@ -272,27 +274,27 @@ struct _bw_one_pole_state {
 
 #include <bw_math.h>
 
-static inline void bw_one_pole_init(bw_one_pole_coeffs *restrict coeffs) {
+static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	coeffs->init_val = 0.f;
 	coeffs->cutoff_up = INFINITY;
 	coeffs->cutoff_down = INFINITY;
 	coeffs->sticky_thresh = 0.f;
 }
 
-static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *restrict coeffs, float sample_rate) {
+static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	coeffs->Ttm2pi = -6.283185307179586f / sample_rate;
 }
 
-static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *restrict coeffs) {
+static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	coeffs->param_changed = ~0;
 	bw_one_pole_update_coeffs_ctrl(coeffs);
 }
 
-static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state) {
+static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state) {
 	state->y_z1 = coeffs->init_val;
 }
 
-static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *restrict coeffs) {
+static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_CUTOFF_UP)
 			coeffs->mA1u = bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_up);
@@ -304,16 +306,16 @@ static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *restrict c
 	}
 }
 
-static inline void bw_one_pole_update_coeffs_audio(bw_one_pole_coeffs *restrict coeffs) {
+static inline void bw_one_pole_update_coeffs_audio(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 }
 
-static inline float bw_one_pole_process1(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x) {
+static inline float bw_one_pole_process1(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
 	const float y = x + coeffs->mA1u * (state->y_z1 - x);
 	state->y_z1 = y;
 	return y;
 }
 
-static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x) {
+static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2)
@@ -322,7 +324,7 @@ static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *re
 	return y;
 }
 
-static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x) {
+static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2 * x * x)
@@ -331,13 +333,13 @@ static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *re
 	return y;
 }
 
-static inline float bw_one_pole_process1_asym(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x) {
+static inline float bw_one_pole_process1_asym(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
 	const float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	state->y_z1 = y;
 	return y;
 }
 
-static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x) {
+static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2)
@@ -346,7 +348,7 @@ static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeff
 	return y;
 }
 
-static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, float x) {
+static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2 * x * x)
@@ -355,7 +357,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeff
 	return y;
 }
 
-static inline void bw_one_pole_process(bw_one_pole_coeffs *restrict coeffs, bw_one_pole_state *restrict state, const float *x, float *y, int n_samples) {
+static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_one_pole_update_coeffs_ctrl(coeffs);
 	
 	if (coeffs->mA1u != coeffs->mA1d) {
@@ -388,52 +390,52 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *restrict coeffs, bw_o
 	}
 }
 
-static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->init_val = value;
 }
 
-static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_one_pole_set_cutoff_up(coeffs, value);
 	bw_one_pole_set_cutoff_down(coeffs, value);
 }
 
-static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->cutoff_up != value) {
 		coeffs->cutoff_up = value;
 		coeffs->param_changed |= _BW_ONE_POLE_PARAM_CUTOFF_UP;
 	}
 }
 
-static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->cutoff_down != value) {
 		coeffs->cutoff_down = value;
 		coeffs->param_changed |= _BW_ONE_POLE_PARAM_CUTOFF_DOWN;
 	}
 }
 
-static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_one_pole_set_tau_up(coeffs, value);
 	bw_one_pole_set_tau_down(coeffs, value);
 }
 
-static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_one_pole_set_cutoff_up(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
 	// tau < 1 ns is instantaneous for any practical purpose
 }
 
-static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_one_pole_set_cutoff_down(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
 	// as before
 }
 
-static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *restrict coeffs, float value) {
+static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->sticky_thresh != value) {
 		coeffs->sticky_thresh = value;
 		coeffs->param_changed |= _BW_ONE_POLE_PARAM_STICKY_THRESH;
 	}
 }
 
-static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *restrict coeffs, bw_one_pole_sticky_mode value) {
+static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_sticky_mode value) {
 	coeffs->sticky_mode = value;
 }
 

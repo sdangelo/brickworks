@@ -30,6 +30,7 @@
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Removed BW_MALLOC, BW_REALLOC, and BW_FREE.</li>
+ *          <li>Added BW_RESTRICT.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -80,6 +81,14 @@
  *  >>> */
 #ifndef INFINITY
 # include <math.h>
+#endif
+
+#ifndef BW_RESTRICT
+# if defined(__STDC__) && (__STDC_VERSION__ >= 199901L)
+#  define BW_RESTRICT restrict
+# else
+#  define BW_RESTRICT
+# endif
 #endif
 
 /*! ... }}} */

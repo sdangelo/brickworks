@@ -9,6 +9,7 @@ code:
 * web examples construction/destruction
 * web effect multichannel in?
 * check const restrict etc.
+* define BW_RESTRICT to __restrict or similar when the compiler supports it
 
 build system:
 * make makefiles handle paths with spaces etc

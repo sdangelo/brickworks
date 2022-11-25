@@ -9,6 +9,7 @@
     parameter from it.
   * Using correct "Fx|Filter" VST3 subcategory for bw_example_fx_svf.
   * Using official logo as VST3 plugin icon.
+  * Fixed potential bug when setting parameters in examples.
 
 0.1.0
 -----

@@ -87,13 +87,7 @@ static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs);
 static inline void bw_svf_update_coeffs_ctrl(bw_svf_coeffs *BW_RESTRICT coeffs);
 static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs);
 
-static inline float bw_svf_process1_lp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x);
-static inline float bw_svf_process1_bp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x);
-static inline float bw_svf_process1_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x);
-static inline void bw_svf_process1_lp_bp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp);
-static inline void bw_svf_process1_lp_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_hp);
-static inline void bw_svf_process1_bp_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_bp, float *y_hp);
-static inline void bw_svf_process1_lp_bp_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp);
+static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp);
 
 /*! ...
  *    #### bw_svf_process()
@@ -154,9 +148,6 @@ struct _bw_svf_coeffs {
 	// Parameters
 	float			cutoff;
 	float			Q;
-
-	float			cutoff_cur;
-	float			Q_cur;
 };
 
 struct _bw_svf_state {
@@ -184,16 +175,18 @@ static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, flo
 }
 
 static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, char force) {
-	const char cutoff_changed = force || coeffs->cutoff != coeffs->cutoff_cur;
-	const char Q_changed = force || coeffs->Q != coeffs->Q_cur;
+	float cutoff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_cutoff_state);
+	float Q_cur = bw_one_pole_get_y_z1(&coeffs->smooth_Q_state);
+	const char cutoff_changed = force || coeffs->cutoff != cutoff_cur;
+	const char Q_changed = force || coeffs->Q != Q_cur;
 	if (cutoff_changed || Q_changed) {
 		if (cutoff_changed) {
-			coeffs->cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_cutoff_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
-			coeffs->t = bw_tanf_3(coeffs->t_k * coeffs->cutoff_cur);
+			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_cutoff_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
+			coeffs->t = bw_tanf_3(coeffs->t_k * cutoff_cur);
 		}
 		if (Q_changed) {
-			coeffs->Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_Q_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
-			coeffs->k = bw_rcpf_2(coeffs->Q_cur);
+			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_Q_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
+			coeffs->k = bw_rcpf_2(Q_cur);
 		}
 		const float kpt = coeffs->k + coeffs->t;
 		coeffs->hp_hp_z1 = coeffs->t * kpt;
@@ -225,46 +218,7 @@ static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs)
 	_bw_svf_do_update_coeffs(coeffs, 0);
 }
 
-static inline float bw_svf_process1_lp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x) {
-	float lp, bp, hp;
-	bw_svf_process1_lp_bp_hp(coeffs, state, x, &lp, &bp, &hp);
-	return lp;
-}
-
-static inline float bw_svf_process1_bp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x) {
-	float lp, bp, hp;
-	bw_svf_process1_lp_bp_hp(coeffs, state, x, &lp, &bp, &hp);
-	return bp;
-}
-
-static inline float bw_svf_process1_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x) {
-	float lp, bp, hp;
-	bw_svf_process1_lp_bp_hp(coeffs, state, x, &lp, &bp, &hp);
-	return hp;
-}
-
-static inline void bw_svf_process1_lp_bp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp) {
-	float lp, bp, hp;
-	bw_svf_process1_lp_bp_hp(coeffs, state, x, &lp, &bp, &hp);
-	*y_lp = lp;
-	*y_bp = bp;
-}
-
-static inline void bw_svf_process1_lp_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_hp) {
-	float lp, bp, hp;
-	bw_svf_process1_lp_bp_hp(coeffs, state, x, &lp, &bp, &hp);
-	*y_lp = lp;
-	*y_hp = hp;
-}
-
-static inline void bw_svf_process1_bp_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_bp, float *y_hp) {
-	float lp, bp, hp;
-	bw_svf_process1_lp_bp_hp(coeffs, state, x, &lp, &bp, &hp);
-	*y_bp = bp;
-	*y_hp = hp;
-}
-
-static inline void bw_svf_process1_lp_bp_hp(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp) {
+static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp) {
 	*y_hp = coeffs->hp_x * (x - state->lp_z1 + coeffs->hp_bp_z1 * state->bp_z1 - coeffs->hp_hp_z1 * state->hp_z1);
 	*y_bp = state->bp_z1 - coeffs->t * (*y_hp + state->hp_z1);
 	*y_lp = state->lp_z1 - coeffs->t * (*y_bp + state->bp_z1);
@@ -280,24 +234,27 @@ static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_stat
 			if (y_hp != NULL) {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					bw_svf_process1_lp_bp_hp(coeffs, state, x[i], y_lp + i, y_bp + i, y_hp + i);
+					bw_svf_process1(coeffs, state, x[i], y_lp + i, y_bp + i, y_hp + i);
 				}
 			} else {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					bw_svf_process1_lp_bp(coeffs, state, x[i], y_lp + i, y_bp + i);
+					float v_lp;
+					bw_svf_process1(coeffs, state, x[i], &v_lp, y_bp + i, y_hp + i);
 				}
 			}
 		} else {
 			if (y_hp != NULL) {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					bw_svf_process1_lp_hp(coeffs, state, x[i], y_lp + i, y_hp + i);
+					float v_bp;
+					bw_svf_process1(coeffs, state, x[i], y_lp + i, &v_bp, y_hp + i);
 				}
 			} else {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					y_lp[i] = bw_svf_process1_lp(coeffs, state, x[i]);
+					float v_bp, v_hp;
+					bw_svf_process1(coeffs, state, x[i], y_lp + i, &v_bp, &v_hp);
 				}
 			}
 		}
@@ -306,24 +263,28 @@ static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_stat
 			if (y_hp != NULL) {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					bw_svf_process1_bp_hp(coeffs, state, x[i], y_bp + i, y_hp + i);
+					float v_lp;
+					bw_svf_process1(coeffs, state, x[i], &v_lp, y_bp + i, y_hp + i);
 				}
 			} else {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					y_bp[i] = bw_svf_process1_bp(coeffs, state, x[i]);
+					float v_lp, v_hp;
+					bw_svf_process1(coeffs, state, x[i], &v_lp, y_bp + i, &v_hp);
 				}
 			}
 		} else {
 			if (y_hp != NULL) {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					y_hp[i] = bw_svf_process1_hp(coeffs, state, x[i]);
+					float v_lp, v_bp;
+					bw_svf_process1(coeffs, state, x[i], &v_lp, &v_bp, y_hp + i);
 				}
 			} else {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					const float v = bw_svf_process1_lp(coeffs, state, x[i]);
+					float v_lp, v_bp, v_hp;
+					bw_svf_process1(coeffs, state, x[i], &v_lp, &v_bp, &v_hp);
 				}
 			}
 		}

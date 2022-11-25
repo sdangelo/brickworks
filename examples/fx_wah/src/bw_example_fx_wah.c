@@ -66,6 +66,7 @@ void bw_example_fx_wah_process(bw_example_fx_wah instance, const float** x, floa
 }
 
 void bw_example_fx_wah_set_parameter(bw_example_fx_wah instance, int index, float value) {
+	instance->params[index] = value;
 	bw_wah_set_wah(&instance->wah_coeffs, value);
 }
 

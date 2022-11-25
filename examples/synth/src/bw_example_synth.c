@@ -21,12 +21,20 @@
 
 #include <bw_math.h>
 #include <bw_phase_gen.h>
+#ifdef __WASM__
+# include "walloc.h"
+#else
+# include <stdlib.h>
+#endif
+
+/*
 #include <bw_osc_pulse.h>
 #include <bw_osc_filt.h>
 #include <bw_svf.h>
 #include <bw_env_gen.h>
 #include <bw_vol.h>
 #include <bw_env_follow.h>
+*/
 
 enum {
 	p_volume,
@@ -46,13 +54,16 @@ enum {
 
 struct _bw_example_synth {
 	// Sub-components
-	bw_phase_gen		phase_gen;
+	bw_phase_gen_coeffs	phase_gen_coeffs;
+	bw_phase_gen_state	phase_gen_state;
+	/*
 	bw_osc_pulse		osc_pulse;
 	bw_osc_filt		osc_filt;
 	bw_svf			svf;
 	bw_env_gen		env_gen;
 	bw_vol			vol;
 	bw_env_follow		env_follow;
+	*/
 
 	// Parameters
 	float			params[p_n];
@@ -66,11 +77,12 @@ struct _bw_example_synth {
 };
 
 bw_example_synth bw_example_synth_new() {
-	bw_example_synth instance = (bw_example_synth)BW_MALLOC(sizeof(struct _bw_example_synth));
+	bw_example_synth instance = (bw_example_synth)malloc(sizeof(struct _bw_example_synth));
 	if (instance == NULL)
 		return NULL;
 
-	bw_phase_gen_init(&instance->phase_gen);
+	bw_phase_gen_init(&instance->phase_gen_coeffs);
+	/*
 	bw_osc_pulse_init(&instance->osc_pulse);
 	bw_osc_filt_init(&instance->osc_filt);
 	bw_svf_init(&instance->svf);
@@ -80,43 +92,52 @@ bw_example_synth bw_example_synth_new() {
 
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse, 1);
 	bw_one_pole_set_cutoff_down(bw_env_follow_get_one_pole(&instance->env_follow), 1.f);
+	*/
 
 	return instance;
 }
 
 void bw_example_synth_free(bw_example_synth instance) {
-	BW_FREE(instance);
+	free(instance);
 }
 
 void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_rate) {
-	bw_phase_gen_set_sample_rate(&instance->phase_gen, sample_rate);
+	bw_phase_gen_set_sample_rate(&instance->phase_gen_coeffs, sample_rate);
+	/*
 	bw_osc_pulse_set_sample_rate(&instance->osc_pulse, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf, sample_rate);
 	bw_env_gen_set_sample_rate(&instance->env_gen, sample_rate);
 	bw_vol_set_sample_rate(&instance->vol, sample_rate);
 	bw_env_follow_set_sample_rate(&instance->env_follow, sample_rate);
+	*/
 }
 
 void bw_example_synth_reset(bw_example_synth instance) {
-	bw_phase_gen_reset(&instance->phase_gen);
+	bw_phase_gen_reset_coeffs(&instance->phase_gen_coeffs);
+	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state);
+	/*
 	bw_osc_pulse_reset(&instance->osc_pulse);
 	bw_osc_filt_reset(&instance->osc_filt);
 	bw_svf_reset(&instance->svf);
 	bw_env_gen_reset(&instance->env_gen);
 	bw_vol_reset(&instance->vol);
 	bw_env_follow_reset(&instance->env_follow);
+	*/
 	instance->note = -1;
 }
 
 void bw_example_synth_process(bw_example_synth instance, const float** x, float** y, int n_samples) {
 	// TODO: I was too lazy to keep track of master tune and note and only update when needed, could be improved
 	if (instance->note != -1) {
-		bw_phase_gen_set_frequency(&instance->phase_gen,
+		bw_phase_gen_set_frequency(&instance->phase_gen_coeffs,
 				440.f * bw_pow2f_3(8.333333333333333e-2f * ((instance->note - 69) + 2.f * instance->params[p_master_tune] - 1.f)));
-		bw_env_gen_set_gate(&instance->env_gen, 1);
+		//bw_env_gen_set_gate(&instance->env_gen, 1);
 	} else
-		bw_env_gen_set_gate(&instance->env_gen, 0);
+		;
+		//bw_env_gen_set_gate(&instance->env_gen, 0);
 
+	bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, y[0], instance->buf, n_samples);
+	/*
 	for (int i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = y[0] + i;
 		const uint32_t n = bw_minu32(n_samples - i, BUFFER_SIZE);
@@ -131,19 +152,22 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 		bw_env_follow_process(&instance->env_follow, out, instance->buf, n);
 		instance->level = instance->buf[i + n - 1];
 	}
+	*/
+	instance->level = 0.f;
 }
 
 void bw_example_synth_set_parameter(bw_example_synth instance, int index, float value) {
+	instance->params[index] = value;
 	switch (index) {
+	/*
 	case p_volume:
 		bw_vol_set_volume(&instance->vol, value);
 		break;
-	case p_master_tune:
-		instance->params[p_master_tune] = value;
-		break;
+	*/
 	case p_portamento:
-		bw_phase_gen_set_portamento_tau(&instance->phase_gen, value);
+		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, value);
 		break;
+	/*
 	case p_pulse_width:
 		bw_osc_pulse_set_pulse_width(&instance->osc_pulse, value);
 		break;
@@ -165,6 +189,7 @@ void bw_example_synth_set_parameter(bw_example_synth instance, int index, float 
 	case p_release:
 		bw_env_gen_set_release(&instance->env_gen, value);
 		break;
+	*/
 	}
 }
 

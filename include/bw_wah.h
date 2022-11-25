@@ -150,7 +150,9 @@ static inline void bw_wah_update_coeffs_audio(bw_wah_coeffs *BW_RESTRICT coeffs)
 }
 
 static inline float bw_wah_process1(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, float x) {
-	return bw_svf_process1_bp(&coeffs->svf_coeffs, &state->svf_state, x);
+	float v_lp, v_hp, v_bp;
+	bw_svf_process1(&coeffs->svf_coeffs, &state->svf_state, x, &v_lp, &v_bp, &v_hp);
+	return v_lp;
 }
 
 static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {

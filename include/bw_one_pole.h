@@ -242,6 +242,8 @@ static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT c
  *    Sets the current distance metric for sticky behavior.
  *  }}} */
 
+static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state);
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -437,6 +439,10 @@ static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *BW_RESTRICT
 
 static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_sticky_mode value) {
 	coeffs->sticky_mode = value;
+}
+
+static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state) {
+	return state->y_z1;
 }
 
 #ifdef __cplusplus

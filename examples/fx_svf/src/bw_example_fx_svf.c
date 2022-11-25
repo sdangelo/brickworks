@@ -66,6 +66,7 @@ void bw_example_fx_svf_process(bw_example_fx_svf instance, const float** x, floa
 }
 
 void bw_example_fx_svf_set_parameter(bw_example_fx_svf instance, int index, float value) {
+	instance->params[index] = value;
 	switch (index) {
 	case p_cutoff:
 		bw_svf_set_cutoff(&instance->svf_coeffs, (20e3f - 20.f) * value * value * value + 20.f);

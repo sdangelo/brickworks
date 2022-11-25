@@ -1,5 +1,6 @@
 CC=clang
 CFLAGS= \
+	-D__WASM__ \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../common/web \
 	-I${ROOT_DIR}/../../../include \
@@ -27,14 +28,6 @@ LDFLAGS= \
 
 ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SOURCES= \
-	${ROOT_DIR}/../../../src/bw_phase_gen.c \
-	${ROOT_DIR}/../../../src/bw_osc_pulse.c \
-	${ROOT_DIR}/../../../src/bw_osc_filt.c \
-	${ROOT_DIR}/../../../src/bw_svf.c \
-	${ROOT_DIR}/../../../src/bw_env_gen.c \
-	${ROOT_DIR}/../../../src/bw_vol.c \
-	${ROOT_DIR}/../../../src/bw_env_follow.c \
-	${ROOT_DIR}/../../../src/bw_one_pole.c \
 	${ROOT_DIR}/../src/bw_example_synth.c \
 	${ROOT_DIR}/../../common/web/walloc.c \
 	${ROOT_DIR}/../../common/web/wrapper.c

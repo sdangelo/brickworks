@@ -89,7 +89,7 @@ static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT c
  *
  *    #### bw_one_pole_reset_state()
  *  ```>>> */
-static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state);
+static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float y_z1);
 /*! <<<```
  *    Resets the given `state` to the initial state using the given `coeffs`.
  *  >>> */
@@ -114,20 +114,6 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
  *    buffer `y`.
- *  >>> */
-
-/*! ...
- *    #### bw_one_pole_set_init_val()
- *  ```>>> */
-static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
-/*! <<<```
- *    Sets the initial/quiescent `value` for the given `instance`.
- *
- *    In practice, when processing the first buffer after a reset, the past
- *    input and output are both assumed to have virtually been constant and of
- *    the specified `value`.
- *
- *    Default value: `0.f`.
  *  >>> */
 
 /*! ...
@@ -258,7 +244,6 @@ struct _bw_one_pole_coeffs {
 	float			st2;
 
 	// Parameters
-	float			init_val;
 	float			cutoff_up;
 	float			cutoff_down;
 	float			sticky_thresh;
@@ -277,7 +262,6 @@ struct _bw_one_pole_state {
 #include <bw_math.h>
 
 static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
-	coeffs->init_val = 0.f;
 	coeffs->cutoff_up = INFINITY;
 	coeffs->cutoff_down = INFINITY;
 	coeffs->sticky_thresh = 0.f;
@@ -292,8 +276,8 @@ static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coef
 	bw_one_pole_update_coeffs_ctrl(coeffs);
 }
 
-static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state) {
-	state->y_z1 = coeffs->init_val;
+static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float y_z1) {
+	state->y_z1 = y_z1;
 }
 
 static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
@@ -390,10 +374,6 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
 				y[i] = bw_one_pole_process1(coeffs, state, x[i]);
 		}
 	}
-}
-
-static inline void bw_one_pole_set_init_val(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->init_val = value;
 }
 
 static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {

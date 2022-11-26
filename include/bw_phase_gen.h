@@ -173,9 +173,8 @@ static inline void _bw_phase_gen_do_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_R
 
 static inline void bw_phase_gen_reset_coeffs(bw_phase_gen_coeffs *BW_RESTRICT coeffs) {
 	_bw_phase_gen_do_update_coeffs_ctrl(coeffs, 1);
-	bw_one_pole_set_init_val(&coeffs->portamento_coeffs, coeffs->portamento_target);
 	bw_one_pole_reset_coeffs(&coeffs->portamento_coeffs);
-	bw_one_pole_reset_state(&coeffs->portamento_coeffs, &coeffs->portamento_state);
+	bw_one_pole_reset_state(&coeffs->portamento_coeffs, &coeffs->portamento_state, coeffs->portamento_target);
 }
 
 static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state) {

@@ -196,12 +196,10 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 }
 
 static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs) {
-	bw_one_pole_set_init_val(&coeffs->smooth_cutoff_coeffs, coeffs->cutoff);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_cutoff_coeffs);
-	bw_one_pole_reset_state(&coeffs->smooth_cutoff_coeffs, &coeffs->smooth_cutoff_state);
-	bw_one_pole_set_init_val(&coeffs->smooth_Q_coeffs, coeffs->Q);
+	bw_one_pole_reset_state(&coeffs->smooth_cutoff_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_Q_coeffs);
-	bw_one_pole_reset_state(&coeffs->smooth_Q_coeffs, &coeffs->smooth_Q_state);
+	bw_one_pole_reset_state(&coeffs->smooth_Q_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
 	_bw_svf_do_update_coeffs(coeffs, 1);
 }
 

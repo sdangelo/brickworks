@@ -166,6 +166,7 @@ static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs) {
 
 static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
+	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	coeffs->t_k = 3.141592653589793f / sample_rate;
 }
 
@@ -191,7 +192,6 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 }
 
 static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs) {
-	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
 	_bw_svf_do_update_coeffs(coeffs, 1);

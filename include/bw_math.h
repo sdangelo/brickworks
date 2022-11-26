@@ -354,6 +354,14 @@ static inline float bw_omega_3log(float x);
  *  >>> */
 
 /*! ...
+ *    #### bw_omega_3lognr()
+ *  ```>>> */
+static inline float bw_omega_3lognr(float x);
+/*! <<<```
+ *    ...
+ *  >>> */
+
+/*! ...
  *    #### bw_sqrtf_2()
  *  ```>>> */
 static inline float bw_sqrtf_2(float x);
@@ -538,6 +546,15 @@ static inline float bw_omega_3log(float x) {
 	static const float d = 6.313183464296682e-1f;
 	x = bw_maxf(x, x1);
 	return x <= x2 ? d + x * (c + x * (b + x * a)) : x - bw_logf_3(x);
+}
+
+static inline float bw_omega_3lognr(float x) {
+	// omega(x) ~ x with relative error smaller than epsilon (2^-23) for x > 1.6e8)
+	// (need to avoid big arguments for bw_rcpf_2())
+	if (x > 1.6e8f)
+		return x;
+	float y = bw_omega_3log(x);
+	return y - (y - bw_expf_3(x - y)) * bw_rcpf_2(y + 1.f);
 }
 
 static inline float bw_sqrtf_2(float x) {

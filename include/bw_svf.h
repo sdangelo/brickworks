@@ -131,9 +131,8 @@ static inline void bw_svf_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
 
 struct _bw_svf_coeffs {
 	// Sub-components
-	bw_one_pole_coeffs	smooth_cutoff_coeffs;
+	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_cutoff_state;
-	bw_one_pole_coeffs	smooth_Q_coeffs;
 	bw_one_pole_state	smooth_Q_state;
 	
 	// Coefficients
@@ -158,19 +157,15 @@ struct _bw_svf_state {
 };
 
 static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs) {
-	bw_one_pole_init(&coeffs->smooth_cutoff_coeffs);
-	bw_one_pole_set_tau(&coeffs->smooth_cutoff_coeffs, 0.05f);
-	bw_one_pole_set_sticky_thresh(&coeffs->smooth_cutoff_coeffs, 1e-3f);
-	bw_one_pole_init(&coeffs->smooth_Q_coeffs);
-	bw_one_pole_set_tau(&coeffs->smooth_Q_coeffs, 0.05f);
-	bw_one_pole_set_sticky_thresh(&coeffs->smooth_Q_coeffs, 1e-3f);
+	bw_one_pole_init(&coeffs->smooth_coeffs);
+	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
+	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
 	coeffs->cutoff = 1e3f;
 	coeffs->Q = 0.5f;
 }
 
 static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	bw_one_pole_set_sample_rate(&coeffs->smooth_cutoff_coeffs, sample_rate);
-	bw_one_pole_set_sample_rate(&coeffs->smooth_Q_coeffs, sample_rate);
+	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	coeffs->t_k = 3.141592653589793f / sample_rate;
 }
 
@@ -181,11 +176,11 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 	const char Q_changed = force || coeffs->Q != Q_cur;
 	if (cutoff_changed || Q_changed) {
 		if (cutoff_changed) {
-			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_cutoff_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
+			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 			coeffs->t = bw_tanf_3(coeffs->t_k * cutoff_cur);
 		}
 		if (Q_changed) {
-			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_Q_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
+			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
 			coeffs->k = bw_rcpf_2(Q_cur);
 		}
 		const float kpt = coeffs->k + coeffs->t;
@@ -196,10 +191,9 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 }
 
 static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs) {
-	bw_one_pole_reset_coeffs(&coeffs->smooth_cutoff_coeffs);
-	bw_one_pole_reset_state(&coeffs->smooth_cutoff_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
-	bw_one_pole_reset_coeffs(&coeffs->smooth_Q_coeffs);
-	bw_one_pole_reset_state(&coeffs->smooth_Q_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
+	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
 	_bw_svf_do_update_coeffs(coeffs, 1);
 }
 

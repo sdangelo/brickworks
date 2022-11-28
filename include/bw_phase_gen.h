@@ -78,7 +78,7 @@ static inline void bw_phase_gen_set_sample_rate(bw_phase_gen_coeffs *BW_RESTRICT
  *
  *    #### bw_phase_gen_reset()
  *  ```>>> */
-static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state);
+static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float phase_0);
 /*! <<<```
  *    Resets the given `state` to the initial state using the given `coeffs`.
  *  >>> */
@@ -177,8 +177,8 @@ static inline void bw_phase_gen_reset_coeffs(bw_phase_gen_coeffs *BW_RESTRICT co
 	bw_one_pole_reset_state(&coeffs->portamento_coeffs, &coeffs->portamento_state, coeffs->portamento_target);
 }
 
-static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state) {
-	state->phase = 0.f;
+static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float phase_0) {
+	state->phase = phase_0;
 }
 
 static inline void bw_phase_gen_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_RESTRICT coeffs) {
@@ -207,30 +207,60 @@ static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTR
 
 static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float* y, float *y_phase_inc, int n_samples) {
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
-	if (x_mod != NULL) {
-		if (y_phase_inc != NULL)
-			for (int i = 0; i < n_samples; i++) {
-				bw_phase_gen_update_coeffs_audio(coeffs);
-				bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, y_phase_inc + i);
-			}
-		else
-			for (int i = 0; i < n_samples; i++) {
-				bw_phase_gen_update_coeffs_audio(coeffs);
-				float v_phase_inc;
-				bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, &v_phase_inc);
-			}
+	if (y != NULL) {
+		if (x_mod != NULL) {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, y_phase_inc + i);
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					float v_phase_inc;
+					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, &v_phase_inc);
+				}
+		} else {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					bw_phase_gen_process1(coeffs, state, y + i, y_phase_inc + i);
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					float v_phase_inc;
+					bw_phase_gen_process1(coeffs, state, y + i, &v_phase_inc);
+				}
+		}
 	} else {
-		if (y_phase_inc != NULL)
-			for (int i = 0; i < n_samples; i++) {
-				bw_phase_gen_update_coeffs_audio(coeffs);
-				bw_phase_gen_process1(coeffs, state, y + i, y_phase_inc + i);
-			}
-		else
-			for (int i = 0; i < n_samples; i++) {
-				bw_phase_gen_update_coeffs_audio(coeffs);
-				float v_phase_inc;
-				bw_phase_gen_process1(coeffs, state, y + i, &v_phase_inc);
-			}
+		if (x_mod != NULL) {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					float v;
+					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], &v, y_phase_inc + i);
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					float v, v_phase_inc;
+					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], &v, &v_phase_inc);
+				}
+		} else {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					float v;
+					bw_phase_gen_process1(coeffs, state, &v, y_phase_inc + i);
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					float v, v_phase_inc;
+					bw_phase_gen_process1(coeffs, state, &v, &v_phase_inc);
+				}
+		}
 	}
 }
 

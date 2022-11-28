@@ -26,8 +26,9 @@
 #endif
 
 #include <bw_math.h>
-#include <bw_noise_gen.h>
 #include <bw_phase_gen.h>
+#include <bw_osc_pulse.h>
+#include <bw_noise_gen.h>
 #include <bw_svf.h>
 #include <bw_osc_sin.h>
 #include <bw_vol.h>
@@ -57,12 +58,14 @@ enum {
 	p_n
 };
 
-#define BUFFER_SIZE	128
+//#define BUFFER_SIZE	128
 
 struct _bw_example_synth {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
+	bw_osc_pulse_coeffs	osc_pulse_coeffs;
+	bw_osc_pulse_state	osc_pulse_state;
 	bw_noise_gen_coeffs	noise_gen_coeffs;
 	bw_svf_coeffs		svf_coeffs;
 	bw_svf_state		svf_state;
@@ -88,7 +91,7 @@ struct _bw_example_synth {
 	float			level;
 
 	// Buffers
-	float			buf[BUFFER_SIZE];
+	//float			buf[BUFFER_SIZE];
 };
 
 bw_example_synth bw_example_synth_new() {
@@ -97,6 +100,7 @@ bw_example_synth bw_example_synth_new() {
 		return NULL;
 
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
+	bw_osc_pulse_init(&instance->osc_pulse_coeffs);
 	bw_noise_gen_init(&instance->noise_gen_coeffs, &instance->rand_state);
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
 	bw_svf_init(&instance->svf_coeffs);
@@ -126,6 +130,7 @@ void bw_example_synth_free(bw_example_synth instance) {
 
 void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_rate) {
 	bw_phase_gen_set_sample_rate(&instance->phase_gen_coeffs, sample_rate);
+	bw_osc_pulse_set_sample_rate(&instance->osc_pulse_coeffs, sample_rate);
 	bw_noise_gen_set_sample_rate(&instance->noise_gen_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf_coeffs, sample_rate);
@@ -140,21 +145,19 @@ void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_ra
 
 void bw_example_synth_reset(bw_example_synth instance) {
 	bw_phase_gen_reset_coeffs(&instance->phase_gen_coeffs);
-	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state);
+	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state, 0.f);
+	bw_osc_pulse_reset_coeffs(&instance->osc_pulse_coeffs);
+	bw_osc_pulse_reset_state(&instance->osc_pulse_coeffs, &instance->osc_pulse_state);
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
-	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state);
+	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, 0.f);
 	bw_svf_reset_coeffs(&instance->svf_coeffs);
 	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state);
 	bw_vol_reset_coeffs(&instance->vol_coeffs);
 	bw_env_follow_reset_coeffs(&instance->env_follow_coeffs);
 	bw_env_follow_reset_state(&instance->env_follow_coeffs, &instance->env_follow_state);
 	/*
-	bw_osc_pulse_reset(&instance->osc_pulse);
 	bw_osc_filt_reset(&instance->osc_filt);
-	bw_svf_reset(&instance->svf);
 	bw_env_gen_reset(&instance->env_gen);
-	bw_vol_reset(&instance->vol);
-	bw_env_follow_reset(&instance->env_follow);
 	*/
 	instance->note = -1;
 }
@@ -168,13 +171,25 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 	} else
 		;
 		//bw_env_gen_set_gate(&instance->env_gen, 0);
-
-	//bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, y[0], instance->buf, n_samples);
-	for (int i = 0; i < n_samples; i++)
-		y[0][i] = 0.f;
 	
-	if (instance->note != -1)
-		bw_noise_gen_process(&instance->noise_gen_coeffs, y[0], n_samples);
+	if (instance->note != -1) {
+		bw_phase_gen_update_coeffs_ctrl(&instance->phase_gen_coeffs);
+		bw_osc_pulse_update_coeffs_ctrl(&instance->osc_pulse_coeffs);
+		for (int i = 0; i < n_samples; i++) {
+			float phase, phase_inc;
+			bw_phase_gen_update_coeffs_audio(&instance->phase_gen_coeffs);
+			bw_phase_gen_process1(&instance->phase_gen_coeffs, &instance->phase_gen_state, &phase, &phase_inc);
+			bw_osc_pulse_update_coeffs_audio(&instance->osc_pulse_coeffs);
+			y[0][i] = bw_osc_pulse_process1_antialias(&instance->osc_pulse_coeffs, &instance->osc_pulse_state, phase, phase_inc);
+		}
+	} else {
+		bw_osc_pulse_reset_state(&instance->osc_pulse_coeffs, &instance->osc_pulse_state); // FIXME
+		bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, NULL, NULL, n_samples);
+		for (int i = 0; i < n_samples; i++)
+			y[0][i] = 0.f;
+	}
+			
+	//bw_noise_gen_process(&instance->noise_gen_coeffs, y[0], n_samples);
 	
 	bw_svf_process(&instance->svf_coeffs, &instance->svf_state, y[0], y[0], NULL, NULL, n_samples);
 	
@@ -217,6 +232,9 @@ void bw_example_synth_set_parameter(bw_example_synth instance, int index, float 
 	case p_portamento:
 		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, value);
 		break;
+	case p_pulse_width:
+		bw_osc_pulse_set_pulse_width(&instance->osc_pulse_coeffs, value);
+		break;
 	case p_cutoff:
 		bw_svf_set_cutoff(&instance->svf_coeffs, 20.f + (20e3f - 20.f) * value * value * value);
 		break;
@@ -224,9 +242,7 @@ void bw_example_synth_set_parameter(bw_example_synth instance, int index, float 
 		bw_svf_set_Q(&instance->svf_coeffs, 0.5f + 9.5f * value);
 		break;
 	/*
-	case p_pulse_width:
-		bw_osc_pulse_set_pulse_width(&instance->osc_pulse, value);
-		break;
+	
 	case p_attack:
 		bw_env_gen_set_attack(&instance->env_gen, value);
 		break;

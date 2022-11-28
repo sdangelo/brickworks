@@ -186,7 +186,6 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 		instance->level = instance->buf[i + n - 1];
 	}
 	*/
-	instance->level = 0.f;
 
 	if (instance->params[p_a440] >= 0.5f)
 		for (int i = 0; i < n_samples; i++) {
@@ -197,8 +196,7 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 		}
 	bw_vol_process(&instance->vol_coeffs, y[0], y[0], n_samples);
 	
-	for (int i = 0; i < n_samples; i++)
-		bw_env_follow_process1(&instance->env_follow_coeffs, &instance->env_follow_state, y[0][i]);
+	bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, y[0], NULL, n_samples);
 	instance->level = bw_env_follow_get_y_z1(&instance->env_follow_state);
 }
 

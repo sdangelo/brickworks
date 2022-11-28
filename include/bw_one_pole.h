@@ -345,33 +345,63 @@ static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeff
 
 static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_one_pole_update_coeffs_ctrl(coeffs);
-	
-	if (coeffs->mA1u != coeffs->mA1d) {
-		if (coeffs->st2 != 0.f) {
-			if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
+	if (y) {
+		if (coeffs->mA1u != coeffs->mA1d) {
+			if (coeffs->st2 != 0.f) {
+				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
+					for (int i = 0; i < n_samples; i++)
+						y[i] = bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
+				else
+					for (int i = 0; i < n_samples; i++)
+						y[i] = bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
+			}
+			else {
 				for (int i = 0; i < n_samples; i++)
-					y[i] = bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
-			else
-				for (int i = 0; i < n_samples; i++)
-					y[i] = bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
+					y[i] = bw_one_pole_process1_asym(coeffs, state, x[i]);
+			}
 		}
 		else {
-			for (int i = 0; i < n_samples; i++)
-				y[i] = bw_one_pole_process1_asym(coeffs, state, x[i]);
+			if (coeffs->st2 != 0.f) {
+				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
+					for (int i = 0; i < n_samples; i++)
+						y[i] = bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
+				else
+					for (int i = 0; i < n_samples; i++)
+						y[i] = bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
+			}
+			else {
+				for (int i = 0; i < n_samples; i++)
+					y[i] = bw_one_pole_process1(coeffs, state, x[i]);
+			}
 		}
-	}
-	else {
-		if (coeffs->st2 != 0.f) {
-			if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
+	} else {
+		if (coeffs->mA1u != coeffs->mA1d) {
+			if (coeffs->st2 != 0.f) {
+				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
+					for (int i = 0; i < n_samples; i++)
+						bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
+				else
+					for (int i = 0; i < n_samples; i++)
+						bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
+			}
+			else {
 				for (int i = 0; i < n_samples; i++)
-					y[i] = bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
-			else
-				for (int i = 0; i < n_samples; i++)
-					y[i] = bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
+					bw_one_pole_process1_asym(coeffs, state, x[i]);
+			}
 		}
 		else {
-			for (int i = 0; i < n_samples; i++)
-				y[i] = bw_one_pole_process1(coeffs, state, x[i]);
+			if (coeffs->st2 != 0.f) {
+				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
+					for (int i = 0; i < n_samples; i++)
+						bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
+				else
+					for (int i = 0; i < n_samples; i++)
+						bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
+			}
+			else {
+				for (int i = 0; i < n_samples; i++)
+					bw_one_pole_process1(coeffs, state, x[i]);
+			}
 		}
 	}
 }

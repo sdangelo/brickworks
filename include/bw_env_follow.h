@@ -155,10 +155,16 @@ static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRI
 
 static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_env_follow_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
-		bw_env_follow_update_coeffs_audio(coeffs);
-		y[i] = bw_env_follow_process1(coeffs, state, x[i]);
-	}
+	if (y)
+		for (int i = 0; i < n_samples; i++) {
+			bw_env_follow_update_coeffs_audio(coeffs);
+			y[i] = bw_env_follow_process1(coeffs, state, x[i]);
+		}
+	else
+		for (int i = 0; i < n_samples; i++) {
+			bw_env_follow_update_coeffs_audio(coeffs);
+			bw_env_follow_process1(coeffs, state, x[i]);
+		}
 }
 
 static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value) {

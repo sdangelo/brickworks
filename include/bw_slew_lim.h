@@ -217,20 +217,39 @@ static inline float bw_slew_lim_process1_down(const bw_slew_lim_coeffs *BW_RESTR
 
 static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
-	if (coeffs->max_rate_up != INFINITY) {
-		if (coeffs->max_rate_down != INFINITY)
-			for (int i = 0; i < n_samples; i++)
-				y[i] = bw_slew_lim_process1(coeffs, state, x[i]);
-		else
-			for (int i = 0; i < n_samples; i++)
-				y[i] = bw_slew_lim_process1_up(coeffs, state, x[i]);
+	if (y) {
+		if (coeffs->max_rate_up != INFINITY) {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int i = 0; i < n_samples; i++)
+					y[i] = bw_slew_lim_process1(coeffs, state, x[i]);
+			else
+				for (int i = 0; i < n_samples; i++)
+					y[i] = bw_slew_lim_process1_up(coeffs, state, x[i]);
+		} else {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int i = 0; i < n_samples; i++)
+					y[i] = bw_slew_lim_process1_down(coeffs, state, x[i]);
+			else {
+				for (int i = 0; i < n_samples; i++)
+					y[i] = x[i];
+				state->y_z1 = x[n_samples - 1];
+			}
+		}
 	} else {
-		if (coeffs->max_rate_down != INFINITY)
-			for (int i = 0; i < n_samples; i++)
-				y[i] = bw_slew_lim_process1_down(coeffs, state, x[i]);
-		else
-			for (int i = 0; i < n_samples; i++)
-				y[i] = x[i];
+		if (coeffs->max_rate_up != INFINITY) {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int i = 0; i < n_samples; i++)
+					bw_slew_lim_process1(coeffs, state, x[i]);
+			else
+				for (int i = 0; i < n_samples; i++)
+					bw_slew_lim_process1_up(coeffs, state, x[i]);
+		} else {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int i = 0; i < n_samples; i++)
+					bw_slew_lim_process1_down(coeffs, state, x[i]);
+			else
+				state->y_z1 = x[n_samples - 1];
+		}
 	}
 }
 

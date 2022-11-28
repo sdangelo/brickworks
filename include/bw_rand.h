@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -52,9 +57,9 @@ extern "C" {
 #endif
 
 /*! api {{{
- *    #### bw_rand_u32()
+ *    #### bw_randu32()
  *  ```>>> */
-uint32_t bw_rand_u32(uint64_t *state);
+static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state);
 /*! <<<```
  *    Returns a pseudo-random unsigned 32-bit integer in the range
  *    [`0`, `UINT32_MAX`].
@@ -64,9 +69,9 @@ uint32_t bw_rand_u32(uint64_t *state);
  *  >>> */
 
 /*! ...
- *    #### bw_rand_f()
+ *    #### bw_randf()
  *  ```>>> */
-float bw_rand_f(uint64_t *state);
+static inline float bw_randf(uint64_t *BW_RESTRICT state);
 /*! <<<```
  *    Returns a pseudo-random unsigned 32-bit floating point number in the range
  *    [`-1.f`, `1.f`].
@@ -74,6 +79,22 @@ float bw_rand_f(uint64_t *state);
  *    `state` is a pointer to a 64-bit unsigned integer storing the state
  *    between calls, and which gets updated by calls to this function.
  *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
+	// Permuted Congruential Generator,
+	// taken from https://nullprogram.com/blog/2017/09/21/
+	*state = *state * 0x9b60933458e17d7d + 0xd737232eeccdf7ed;
+	return *state >> (29 - (*state >> 61));
+}
+
+static inline float bw_randf(uint64_t *BW_RESTRICT state) {
+	return  (2.f / (float)UINT32_MAX) * (float)bw_randu32(state) - 1.f;
+}
 
 #ifdef __cplusplus
 }

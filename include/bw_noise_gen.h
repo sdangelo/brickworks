@@ -28,7 +28,7 @@
  *    <ul>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *          <li>Refactored API.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -50,40 +50,33 @@ extern "C" {
 #endif
 
 /*! api {{{
- *    #### bw_noise_gen
+ *    #### bw_noise_gen_coeffs
  *  ```>>> */
-typedef struct _bw_noise_gen bw_noise_gen;
+typedef struct _bw_noise_gen_coeffs bw_noise_gen_coeffs;
 /*! <<<```
- *    Instance object.
- *  >>> */
-
-/*! ...
+ *    Coefficients.
+ *
  *    #### bw_noise_gen_init()
  *  ```>>> */
-void bw_noise_gen_init(bw_noise_gen *instance, uint64_t *state);
+static inline void bw_noise_gen_init(bw_noise_gen_coeffs *BW_RESTRICT coeffs, uint64_t *BW_RESTRICT state);
 /*! <<<```
- *    Initializes the `instance` object and lets it use the given `state`
- *    pointer to obtain pseudo-random numbers.
- *  >>> */
-
-/*! ...
+ *    Initializes `coeffs` and lets it use the given `state` pointer to obtain
+ *    pseudo-random numbers.
+ *
  *    #### bw_noise_gen_set_sample_rate()
  *  ```>>> */
-void bw_noise_gen_set_sample_rate(bw_noise_gen *instance, float sample_rate);
+static inline void bw_noise_gen_set_sample_rate(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` value for the given `instance`.
+ *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
  *  >>> */
 
-/*! ...
- *    #### bw_noise_gen_reset()
- *    
- *    There is none (not needed).
- *  >>> */
+static inline float bw_noise_gen_process1(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+static inline float bw_noise_gen_process1_scaling(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
 
 /*! ...
  *    #### bw_noise_gen_process()
  *  ```>>> */
-void bw_noise_gen_process(bw_noise_gen *instance, float* y, int n_samples);
+static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` generate `n_samples` samples and puts them in
  *    the output buffer `y`.
@@ -92,7 +85,7 @@ void bw_noise_gen_process(bw_noise_gen *instance, float* y, int n_samples);
 /*! ...
  *    #### bw_noise_gen_set_sample_rate_scaling()
  *  ```>>> */
-void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen *instance, char value);
+static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
  *    Sets whether the output should be scaled (`value` non-`0`) or not (`0`)
  *    according to the sample rate by the given `instance`.
@@ -105,19 +98,52 @@ void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen *instance, char value);
  *    Default value: `0`.
  *  }}} */
 
-/* WARNING: the internal definition of this struct is not part of the public
- * API. Its content may change at any time in future versions. Please, do not
- * access its members directly. */
-struct _bw_noise_gen {
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+#include <bw_math.h>
+#include <bw_rand.h>
+ 
+struct _bw_noise_gen_coeffs {
 	// Coefficients
 	float		 scaling_k;
 
 	// Parameters
-	char		 sample_rate_scaling;
-
-	// State
 	uint64_t	*state;
+	char		 sample_rate_scaling;
 };
+
+static inline void bw_noise_gen_init(bw_noise_gen_coeffs *BW_RESTRICT coeffs, uint64_t *BW_RESTRICT state) {
+	coeffs->state = state;
+	coeffs->sample_rate_scaling = 0;
+}
+
+static inline void bw_noise_gen_set_sample_rate(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+	coeffs->scaling_k = 0.004761904761904762f * bw_sqrtf_2(sample_rate);
+}
+
+static inline float bw_noise_gen_process1(const bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+	return bw_randf(coeffs->state);
+}
+
+static inline float bw_noise_gen_process1_scaling(const bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+	return coeffs->scaling_k * bw_randf(coeffs->state);
+}
+
+static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, int n_samples) {
+	if (coeffs->sample_rate_scaling)
+		for (int i = 0; i < n_samples; i++)
+			y[i] = bw_noise_gen_process1(coeffs);
+	else
+		for (int i = 0; i < n_samples; i++)
+			y[i] = bw_noise_gen_process1_scaling(coeffs);
+}
+
+static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value) {
+	coeffs->sample_rate_scaling = value;
+}
 
 #ifdef __cplusplus
 }

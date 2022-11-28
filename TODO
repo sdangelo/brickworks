@@ -4,7 +4,6 @@ code:
 * audio rate optional pulse width/slope inputs?
 * one pole process const input? (return also if const out)
 * optimize triangle generation for constant pulse width
-* naming type suffixes math.h vs random.h
 * API for buffer fill, scale, offset, zero, copy...?
 * web examples construction/destruction
 * web effect multichannel in?

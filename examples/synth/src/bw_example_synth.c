@@ -26,6 +26,7 @@
 #endif
 
 #include <bw_math.h>
+#include <bw_noise_gen.h>
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
 #include <bw_vol.h>
@@ -60,6 +61,7 @@ struct _bw_example_synth {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
+	bw_noise_gen_coeffs	noise_gen_coeffs;
 	bw_phase_gen_coeffs	a440_phase_gen_coeffs;
 	bw_phase_gen_state	a440_phase_gen_state;
 	bw_vol_coeffs		vol_coeffs;
@@ -76,6 +78,7 @@ struct _bw_example_synth {
 	float			params[p_n];
 
 	// States
+	uint64_t		rand_state;
 	int			note;
 	float			level;
 
@@ -89,10 +92,14 @@ bw_example_synth bw_example_synth_new() {
 		return NULL;
 
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
+	bw_noise_gen_init(&instance->noise_gen_coeffs, &instance->rand_state);
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
 	bw_vol_init(&instance->vol_coeffs);
 
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
+	bw_noise_gen_set_sample_rate_scaling(&instance->noise_gen_coeffs, 1);
+	
+	instance->rand_state = 0xbaddecaf600dfeed;
 	/*
 	bw_osc_pulse_init(&instance->osc_pulse);
 	bw_osc_filt_init(&instance->osc_filt);
@@ -114,6 +121,7 @@ void bw_example_synth_free(bw_example_synth instance) {
 
 void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_rate) {
 	bw_phase_gen_set_sample_rate(&instance->phase_gen_coeffs, sample_rate);
+	bw_noise_gen_set_sample_rate(&instance->noise_gen_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
 	bw_vol_set_sample_rate(&instance->vol_coeffs, sample_rate);
 	/*
@@ -155,6 +163,10 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 	//bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, y[0], instance->buf, n_samples);
 	for (int i = 0; i < n_samples; i++)
 		y[0][i] = 0.f;
+	
+	if (instance->note != -1)
+		bw_noise_gen_process(&instance->noise_gen_coeffs, y[0], n_samples);
+	
 	/*
 	for (int i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = y[0] + i;

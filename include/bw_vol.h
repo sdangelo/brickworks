@@ -20,7 +20,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common bw_inline_slew_lim bw_math }}}
+ *  requires {{{ bw_config bw_common bw_slew_lim bw_math }}}
  *  description {{{
  *    Volume control for an arbitrary number of channels.
  *  }}}
@@ -28,7 +28,7 @@
  *    <ul>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *          <li>Refactored API.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -47,42 +47,40 @@
 extern "C" {
 #endif
 
-/*! api {{{
- *    #### bw_vol
- *  ```>>> */
-typedef struct _bw_vol bw_vol;
-/*! <<<```
- *    Instance object.
- *  >>> */
+#include <bw_common.h>
 
-/*! ...
+/*! api {{{
+ *    #### bw_vol_coeffs
+ *  ```>>> */
+typedef struct _bw_vol_coeffs bw_vol_coeffs;
+/*! <<<```
+ *    Coefficients.
+ *
  *    #### bw_vol_init()
  *  ```>>> */
-void bw_vol_init(bw_vol *instance);
+static inline void bw_vol_init(bw_vol_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes the `instance` object.
- *  >>> */
-
-/*! ...
+ *    Initializes `coeffs`.
+ *
  *    #### bw_vol_set_sample_rate()
  *  ```>>> */
-void bw_vol_set_sample_rate(bw_vol *instance, float sample_rate);
+static inline void bw_vol_set_sample_rate(bw_vol_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `instance`.
+ *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *
  *  >>> */
 
-/*! ...
- *    #### bw_vol_reset()
- *  ```>>> */
-void bw_vol_reset(bw_vol *instance);
-/*! <<<```
- *    Resets the given `instance` to its initial state.
- *  >>> */
+static inline void bw_vol_reset_coeffs(bw_vol_coeffs *BW_RESTRICT coeffs);
+
+static inline void bw_vol_update_coeffs_ctrl(bw_vol_coeffs *BW_RESTRICT coeffs);
+static inline void bw_vol_update_coeffs_audio(bw_vol_coeffs *BW_RESTRICT coeffs);
+
+static inline float bw_vol_process1(const bw_vol_coeffs *BW_RESTRICT coeffs, float x);
 
 /*! ...
  *    #### bw_vol_process()
  *  ```>>> */
-void bw_vol_process(bw_vol *instance, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from each of the
  *    `n_channels` input buffers and fills the corresponding `n_samples` samples
@@ -95,7 +93,7 @@ void bw_vol_process(bw_vol *instance, const float **x, float **y, int n_channels
 /*! ...
  *    #### bw_vol_set_volume()
  *  ```>>> */
-void bw_vol_set_volume(bw_vol *instance, float value);
+static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the volume parameter to the given `value` (range [`0.f`, `1.f`]) for
  *    the given `instance`.
@@ -106,28 +104,64 @@ void bw_vol_set_volume(bw_vol *instance, float value);
  *    Default value: `1.f`.
  *  }}} */
 
-/* WARNING: this definition is not part of the public API. Please, do not use
- * it. */
-#define _BW_VOL_BUFFER_SIZE	32
+/*** Implementation ***/
 
-/* WARNING: the internal definition of this struct is not part of the public
- * API. Its content may change at any time in future versions. Please, do not
- * access its members directly. */
-struct _bw_vol {
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+#include <bw_math.h>
+#include <bw_slew_lim.h>
+
+struct _bw_vol_coeffs {
+	// Sub-components
+	bw_slew_lim_coeffs	smooth_coeffs;
+	bw_slew_lim_state	smooth_state;
+	
 	// Coefficients
-	float	max_var;
+	float	k;
 
 	// Parameters
 	float	volume;
-
-	float	volume_cur;
-
-	// State
-	char	first_run;
-
-	// Buffers
-	float	buf[_BW_VOL_BUFFER_SIZE];
 };
+
+static inline void bw_vol_init(bw_vol_coeffs *BW_RESTRICT coeffs) {
+	bw_slew_lim_init(&coeffs->smooth_coeffs);
+	bw_slew_lim_set_max_rate(&coeffs->smooth_coeffs, 1.f / 0.2f);
+	coeffs->volume = 1.f;
+}
+
+static inline void bw_vol_set_sample_rate(bw_vol_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+	bw_slew_lim_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
+	bw_slew_lim_reset_coeffs(&coeffs->smooth_coeffs);
+}
+
+static inline void bw_vol_reset_coeffs(bw_vol_coeffs *BW_RESTRICT coeffs) {
+	bw_slew_lim_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
+}
+
+static inline void bw_vol_update_coeffs_ctrl(bw_vol_coeffs *BW_RESTRICT coeffs) {
+}
+
+static inline void bw_vol_update_coeffs_audio(bw_vol_coeffs *BW_RESTRICT coeffs) {
+	// tracking parameter changes is more trouble than it's worth
+	float v = bw_slew_lim_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
+	coeffs->k = v * v * v;
+}
+
+static inline float bw_vol_process1(const bw_vol_coeffs *BW_RESTRICT coeffs, float x) {
+	return coeffs->k * x;
+}
+
+static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples) {
+	for (int i = 0; i < n_samples; i++) {
+		bw_vol_update_coeffs_audio(coeffs);
+		y[i] = bw_vol_process1(coeffs, x[i]);
+	}
+}
+
+static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float value) {
+	coeffs->volume = value;
+}
 
 #ifdef __cplusplus
 }

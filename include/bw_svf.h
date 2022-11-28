@@ -127,6 +127,7 @@ static inline void bw_svf_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
+#include <bw_math.h>
 #include <bw_one_pole.h>
 
 struct _bw_svf_coeffs {

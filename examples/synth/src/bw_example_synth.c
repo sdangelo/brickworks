@@ -28,6 +28,7 @@
 #include <bw_math.h>
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
+#include <bw_vol.h>
 
 /*
 #include <bw_osc_pulse.h>
@@ -61,6 +62,7 @@ struct _bw_example_synth {
 	bw_phase_gen_state	phase_gen_state;
 	bw_phase_gen_coeffs	a440_phase_gen_coeffs;
 	bw_phase_gen_state	a440_phase_gen_state;
+	bw_vol_coeffs		vol_coeffs;
 	/*
 	bw_osc_pulse		osc_pulse;
 	bw_osc_filt		osc_filt;
@@ -88,6 +90,7 @@ bw_example_synth bw_example_synth_new() {
 
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
+	bw_vol_init(&instance->vol_coeffs);
 
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	/*
@@ -112,6 +115,7 @@ void bw_example_synth_free(bw_example_synth instance) {
 void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_rate) {
 	bw_phase_gen_set_sample_rate(&instance->phase_gen_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
+	bw_vol_set_sample_rate(&instance->vol_coeffs, sample_rate);
 	/*
 	bw_osc_pulse_set_sample_rate(&instance->osc_pulse, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf, sample_rate);
@@ -126,6 +130,7 @@ void bw_example_synth_reset(bw_example_synth instance) {
 	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state);
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state);
+	bw_vol_reset_coeffs(&instance->vol_coeffs);
 	/*
 	bw_osc_pulse_reset(&instance->osc_pulse);
 	bw_osc_filt_reset(&instance->osc_filt);
@@ -175,16 +180,15 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 			a440_y = bw_osc_sin_process1(a440_y);
 			y[0][i] += a440_y;
 		}
+	bw_vol_process(&instance->vol_coeffs, y[0], y[0], n_samples);
 }
 
 void bw_example_synth_set_parameter(bw_example_synth instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
-	/*
 	case p_volume:
-		bw_vol_set_volume(&instance->vol, value);
+		bw_vol_set_volume(&instance->vol_coeffs, value);
 		break;
-	*/
 	case p_portamento:
 		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, value);
 		break;

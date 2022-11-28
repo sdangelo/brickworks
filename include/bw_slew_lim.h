@@ -81,10 +81,10 @@ static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT
  *    Resets the given `state` to the initial state using the given `coeffs`.
  *  >>> */
 
-static inline void bw_slew_lim_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs);
+static inline void bw_slew_lim_reset_coeffs(bw_slew_lim_coeffs *BW_RESTRICT coeffs);
 
-static inline void bw_slew_lim_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs);
-static inline void bw_slew_lim_update_coeffs_audio(bw_one_pole_coeffs *BW_RESTRICT coeffs);
+static inline void bw_slew_lim_update_coeffs_ctrl(bw_slew_lim_coeffs *BW_RESTRICT coeffs);
+static inline void bw_slew_lim_update_coeffs_audio(bw_slew_lim_coeffs *BW_RESTRICT coeffs);
 
 static inline float bw_slew_lim_process1(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float x);
 static inline float bw_slew_lim_process1_up(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float x);
@@ -103,7 +103,7 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
 /*! ...
  *    #### bw_slew_lim_set_max_rate()
  *  ```>>> */
-static inline void bw_slew_lim_set_max_rate(bw_slew_lim *BW_RESTRICT coeffs, float value);
+static inline void bw_slew_lim_set_max_rate(bw_slew_lim_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets both the maximum increasing and decreasing variation rate to the
  *    given `value` (1/s) for the given `instance`.
@@ -120,7 +120,7 @@ static inline void bw_slew_lim_set_max_rate(bw_slew_lim *BW_RESTRICT coeffs, flo
 /*! ...
  *    #### bw_slew_lim_set_max_rate_up()
  *  ```>>> */
-static inline void bw_slew_lim_set_max_rate_up(bw_slew_lim *BW_RESTRICT coeffs, float value);
+static inline void bw_slew_lim_set_max_rate_up(bw_slew_lim_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the maximum increasing variation rate to the given `value` (1/s) for
  *    the given `instance`.
@@ -134,7 +134,7 @@ static inline void bw_slew_lim_set_max_rate_up(bw_slew_lim *BW_RESTRICT coeffs, 
 /*! ...
  *    #### bw_slew_lim_set_max_inc_rate()
  *  ```>>> */
-static inline void bw_slew_lim_set_max_rate_down(bw_slew_lim *BW_RESTRICT coeffs, float value);
+static inline void bw_slew_lim_set_max_rate_down(bw_slew_lim_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the maximum decreasing variation rate to the given `value` (1/s) for
  *    the given `instance`.
@@ -151,6 +151,8 @@ static inline float bw_slew_lim_get_y_z1(const bw_slew_lim_state *BW_RESTRICT st
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#include <bw_math.h>
 
 struct _bw_slew_lim_coeffs {
 	// Coefficients
@@ -170,7 +172,6 @@ struct _bw_slew_lim_state {
 };
 
 static inline void bw_slew_lim_init(bw_slew_lim_coeffs *BW_RESTRICT coeffs) {
-	coeffs->init_val = 0.f;
 	coeffs->max_inc = INFINITY;
 	coeffs->max_dec = INFINITY;
 }
@@ -179,21 +180,21 @@ static inline void bw_slew_lim_set_sample_rate(bw_slew_lim_coeffs *BW_RESTRICT c
 	coeffs->T = 1.f / sample_rate;
 }
 
-static inline void bw_slew_lim_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
-	bw_one_pole_update_coeffs_ctrl(coeffs);
+static inline void bw_slew_lim_reset_coeffs(bw_slew_lim_coeffs *BW_RESTRICT coeffs) {
+	bw_slew_lim_update_coeffs_ctrl(coeffs);
 }
 
 static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float y_z1) {
 	state->y_z1 = y_z1;
 }
 
-static inline void bw_slew_lim_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_slew_lim_update_coeffs_ctrl(bw_slew_lim_coeffs *BW_RESTRICT coeffs) {
 	// tracking parameter changes is more trouble than it's worth
 	coeffs->max_inc = coeffs->T * coeffs->max_rate_up;
 	coeffs->max_dec = coeffs->T * coeffs->max_rate_down;
 }
 
-static inline void bw_slew_lim_update_coeffs_audio(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_slew_lim_update_coeffs_audio(bw_slew_lim_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline float bw_slew_lim_process1(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float x) {
@@ -216,15 +217,15 @@ static inline float bw_slew_lim_process1_down(const bw_slew_lim_coeffs *BW_RESTR
 
 static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
-	if (instance->max_rate_up != INFINITY) {
-		if (instance->max_rate_down != INFINITY)
+	if (coeffs->max_rate_up != INFINITY) {
+		if (coeffs->max_rate_down != INFINITY)
 			for (int i = 0; i < n_samples; i++)
 				y[i] = bw_slew_lim_process1(coeffs, state, x[i]);
 		else
 			for (int i = 0; i < n_samples; i++)
 				y[i] = bw_slew_lim_process1_up(coeffs, state, x[i]);
 	} else {
-		if (instance->max_rate_down != INFINITY)
+		if (coeffs->max_rate_down != INFINITY)
 			for (int i = 0; i < n_samples; i++)
 				y[i] = bw_slew_lim_process1_down(coeffs, state, x[i]);
 		else
@@ -233,16 +234,16 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
 	}
 }
 
-static inline void bw_slew_lim_set_max_rate(bw_slew_lim *BW_RESTRICT coeffs, float value) {
+static inline void bw_slew_lim_set_max_rate(bw_slew_lim_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_slew_lim_set_max_rate_up(coeffs, value);
 	bw_slew_lim_set_max_rate_down(coeffs, value);
 }
 
-static inline void bw_slew_lim_set_max_rate_up(bw_slew_lim *BW_RESTRICT coeffs, float value) {
+static inline void bw_slew_lim_set_max_rate_up(bw_slew_lim_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->max_rate_up = value;
 }
 
-static inline void bw_slew_lim_set_max_rate_down(bw_slew_lim *BW_RESTRICT coeffs, float value) {
+static inline void bw_slew_lim_set_max_rate_down(bw_slew_lim_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->max_rate_down = value;
 }
 

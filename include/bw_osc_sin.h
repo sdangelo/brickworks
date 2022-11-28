@@ -19,15 +19,20 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Sinusoidal oscillator waveshaper.
  *
- *    This module only consists of the signal processing function.
+ *    This module only consists of signal processing functions.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Refactored API.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -44,15 +49,35 @@
 extern "C" {
 #endif
 
+#include <bw_common.h>
+
+static inline float bw_osc_sin_process1(float x);
+
 /*! api {{{
  *    #### bw_osc_sin_process()
  *  ```>>> */
-void bw_osc_sin_process(const float *x, float* y, int n_samples);
+static inline void bw_osc_sin_process(const float *x, float* y, int n_samples);
 /*! <<<```
  *    Turns `n_samples` samples of the normalized phase signal in the `x` buffer
  *    into a sinusoidal signal, filling the corresponding `n_samples` in the
  *    output buffer `y`.
  *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+#include <bw_math.h>
+
+static inline float bw_osc_sin_process1(float x) {
+	return bw_sinf_3(6.283185307179586f * x);
+}
+
+static inline void bw_osc_sin_process(const float *x, float* y, int n_samples) {
+	for (int i = 0; i < n_samples; i++)
+		y[i] = bw_osc_sin_process1(x[i]);
+}
 
 #ifdef __cplusplus
 }

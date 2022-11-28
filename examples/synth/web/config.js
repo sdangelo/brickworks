@@ -76,6 +76,12 @@ var parameters = [
 		defaultValue:	0.0
 	},
 	{
+		name:		"A440",
+		output:		false,
+		defaultValue:	0.0,
+		step:		1
+	},
+	{
 		name:		"Level",
 		output:		true,
 		defaultValue:	0.0

@@ -61,7 +61,7 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 	{ "Audio out", 1, 0, 0, IO_MONO }
 };
 
-#define NUM_PARAMETERS		11
+#define NUM_PARAMETERS		12
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 	{ "Volume", "Volume", "", 0, 0, 0, 0.5f },
@@ -74,6 +74,7 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 	{ "Decay", "Decay", "s", 0, 0, 0, 0.f },
 	{ "Sustain", "Sustain", "%", 0, 0, 0, 1.f },
 	{ "Release", "Release", "0", 0, 0, 0, 0.f },
+	{ "A440", "A440", "", 0, 0, 1, 0.f },
 	{ "Level", "Level", "", 1, 0, 0, 0.f }
 };
 

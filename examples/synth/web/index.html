@@ -75,7 +75,10 @@ window.addEventListener("load", async function (e) {
 		range.setAttribute("name", "p" + i);
 		range.setAttribute("min", "0");
 		range.setAttribute("max", "1");
-		range.setAttribute("step", "any");
+		if (!parameters[i].step)
+			range.setAttribute("step", "any");
+		else
+			range.setAttribute("step", 1 / parameters[i].step);
 		range.value = parameters[i].defaultValue;
 		if (parameters[i].output)
 			range.setAttribute("readonly", "true");

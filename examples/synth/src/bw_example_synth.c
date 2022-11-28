@@ -19,13 +19,15 @@
 
 #include "bw_example_synth.h"
 
-#include <bw_math.h>
-#include <bw_phase_gen.h>
 #ifdef __WASM__
 # include "walloc.h"
 #else
 # include <stdlib.h>
 #endif
+
+#include <bw_math.h>
+#include <bw_phase_gen.h>
+#include <bw_osc_sin.h>
 
 /*
 #include <bw_osc_pulse.h>
@@ -47,6 +49,7 @@ enum {
 	p_decay,
 	p_sustain,
 	p_release,
+	p_a440,
 	p_n
 };
 
@@ -56,6 +59,8 @@ struct _bw_example_synth {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
+	bw_phase_gen_coeffs	a440_phase_gen_coeffs;
+	bw_phase_gen_state	a440_phase_gen_state;
 	/*
 	bw_osc_pulse		osc_pulse;
 	bw_osc_filt		osc_filt;
@@ -82,6 +87,9 @@ bw_example_synth bw_example_synth_new() {
 		return NULL;
 
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
+	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
+
+	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	/*
 	bw_osc_pulse_init(&instance->osc_pulse);
 	bw_osc_filt_init(&instance->osc_filt);
@@ -103,6 +111,7 @@ void bw_example_synth_free(bw_example_synth instance) {
 
 void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_rate) {
 	bw_phase_gen_set_sample_rate(&instance->phase_gen_coeffs, sample_rate);
+	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
 	/*
 	bw_osc_pulse_set_sample_rate(&instance->osc_pulse, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf, sample_rate);
@@ -115,6 +124,8 @@ void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_ra
 void bw_example_synth_reset(bw_example_synth instance) {
 	bw_phase_gen_reset_coeffs(&instance->phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state);
+	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
+	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state);
 	/*
 	bw_osc_pulse_reset(&instance->osc_pulse);
 	bw_osc_filt_reset(&instance->osc_filt);
@@ -136,7 +147,9 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 		;
 		//bw_env_gen_set_gate(&instance->env_gen, 0);
 
-	bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, y[0], instance->buf, n_samples);
+	//bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, y[0], instance->buf, n_samples);
+	for (int i = 0; i < n_samples; i++)
+		y[0][i] = 0.f;
 	/*
 	for (int i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = y[0] + i;
@@ -154,6 +167,14 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 	}
 	*/
 	instance->level = 0.f;
+
+	if (instance->params[p_a440] >= 0.5f)
+		for (int i = 0; i < n_samples; i++) {
+			float a440_y, a440_y_phase_inc;
+			bw_phase_gen_process1(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, &a440_y, &a440_y_phase_inc);
+			a440_y = bw_osc_sin_process1(a440_y);
+			y[0][i] += a440_y;
+		}
 }
 
 void bw_example_synth_set_parameter(bw_example_synth instance, int index, float value) {

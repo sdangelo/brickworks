@@ -33,7 +33,7 @@
  *    <ul>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *          <li>Refactored API.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -52,69 +52,62 @@
 extern "C" {
 #endif
 
+#include <bw_common.h>
+
 /*! api {{{
- *    #### bw_osc_filt
+ *    #### bw_osc_filt_state
  *  ```>>> */
-typedef struct _bw_osc_filt bw_osc_filt;
+typedef struct _bw_osc_filt_state bw_osc_filt_state;
 /*! <<<```
- *    Instance object.
- *  >>> */
-
-/*! ...
- *    #### bw_osc_filt_init()
- *  ```>>> */
-void bw_osc_filt_init(bw_osc_filt *instance);
-/*! <<<```
- *    Initializes the `instance` object.
- *  >>> */
-
-/*! ...
- *    #### bw_osc_filt_set_sample_rate()
- *
- *    There is none (not needed).
+ *    State
  *  >>> */
 
 /*! ...
  *    #### bw_osc_filt_reset()
  *  ```>>> */
-void bw_osc_filt_reset(bw_osc_filt *instance);
+static inline void bw_osc_filt_reset_state(bw_osc_filt_state *BW_RESTRICT state);
 /*! <<<```
  *    Resets the given `instance` to its initial state.
  *  >>> */
 
+static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, float x);
+
 /*! ...
  *    #### bw_osc_filt_process()
  *  ```>>> */
-void bw_osc_filt_process(bw_osc_filt *instance, const float *x, float* y, int n_samples);
+static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
  *    buffer `y`.
- *  >>> */
-
-/*! ...
- *    #### bw_osc_filt_set_enabled()
- *  ```>>> */
-void bw_osc_filt_set_enabled(bw_osc_filt *instance, char value);
-/*! <<<```
- *    Sets whether the filter is enabled (`value` non-`0`) or bypassed (`0`)
- *    for the given `instance`.
- *
- *    Default value: non-`0`.
  *  }}} */
 
-/* WARNING: the internal definition of this struct is not part of the public
- * API. Its content may change at any time in future versions. Please, do not
- * access its members directly. */
-struct _bw_osc_filt {
-	// Parameters
-	char	enabled;
+/*** Implementation ***/
 
-	// State
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+struct _bw_osc_filt_state {
 	float	x_z1;
 	float	y_z1;
 };
 
+static inline void bw_osc_filt_reset_state(bw_osc_filt_state *BW_RESTRICT state) {
+	state->x_z1 = 0.f;
+	state->y_z1 = 0.f;
+}
+
+static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, float x) {
+	const float y = 1.371308261611209f * x + 0.08785458027104826f * state->x_z1 - 4.591628418822578e-1f * state->y_z1;
+	state->x_z1 = x;
+	state->y_z1 = y;
+	return y;
+}
+
+static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples) {
+	for (int i = 0; i < n_samples; i++)
+		y[i] = bw_osc_filt_process1(state, x[i]);
+}
 
 #ifdef __cplusplus
 }

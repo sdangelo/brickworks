@@ -1,6 +1,6 @@
 code:
 * blep etc in a module?
-* osc post filter init val? osc post filter and one pole init val from input?
+* osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
 * one pole process const input? (return also if const out)
 * optimize triangle generation for constant pulse width
@@ -16,6 +16,6 @@ build system:
 * make autodependencies (.d?)
 * make from... directories
 * order-only prerequisites to avoid multiple make updates? (https://interrupt.memfault.com/blog/gnu-make-guidelines#order-only-prerequisites)
-* clang + Ofast & bulk memory (maybe using old binaryen)
+* clang + Ofast & bulk memory (maybe using old binaryen) - or implement memset etc.
 * put common parts of Makefiles together somewhere/somehow (DRY)
 * recursive make?

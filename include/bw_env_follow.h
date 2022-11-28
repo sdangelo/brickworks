@@ -32,7 +32,7 @@
  *    <ul>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Refactored API to avoid dynamic memory allocation.</li>
+ *          <li>Refactored API.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -47,82 +47,131 @@
 #ifndef _BW_ENV_FOLLOW_H
 #define _BW_ENV_FOLLOW_H
 
-#include <bw_one_pole.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*! api {{{
- *    #### bw_env_follow
- *  ```>>> */
-typedef struct _bw_env_follow bw_env_follow;
-/*! <<<```
- *    Instance object.
- *  >>> */
+#include <bw_common.h>
 
-/*! ...
+/*! api {{{
+ *    #### bw_env_follow_coeffs
+ *  ```>>> */
+typedef struct _bw_env_follow_coeffs bw_env_follow_coeffs;
+/*! <<<```
+ *    Coefficients.
+ *
+ *    ### bw_env_follow_state
+ *  >>> */
+typedef struct _bw_env_follow_state bw_env_follow_state;
+/*! <<<```
+ *    State.
+ *
  *    #### bw_env_follow_init()
  *  ```>>> */
-void bw_env_follow_init(bw_env_follow *instance);
+static inline void bw_env_follow_init(bw_env_follow_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes the `instance` object.
- *  >>> */
-
-/*! ...
+ *    Initializes `coeffs`.
+ *
  *    #### bw_env_follow_set_sample_rate()
  *  ```>>> */
-void bw_env_follow_set_sample_rate(bw_env_follow *instance, float sample_rate);
+static inline void bw_env_follow_set_sample_rate(bw_env_follow_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `instance`.
+ *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *
+ *    #### bw_one_pole_reset_state()
+ *  ```>>> */
+static inline void bw_env_follow_reset_state(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state);
+/*! <<<```
+ *    Resets the given `state` to the initial state using the given `coeffs`.
  *  >>> */
 
-/*! ...
- *    #### bw_env_follow_reset()
- *  ```>>> */
-void bw_env_follow_reset(bw_env_follow *instance);
-/*! <<<```
- *    Resets the given `instance` to its initial state.
- *  >>> */
+static inline void bw_env_follow_reset_coeffs(bw_env_follow_coeffs *BW_RESTRICT coeffs);
+
+static inline void bw_env_follow_update_coeffs_ctrl(bw_env_follow_coeffs *BW_RESTRICT coeffs);
+static inline void bw_env_follow_update_coeffs_audio(bw_env_follow_coeffs *BW_RESTRICT coeffs);
+
+static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, float x);
 
 /*! ...
  *    #### bw_env_follow_process()
  *  ```>>> */
-void bw_env_follow_process(bw_env_follow *instance, const float *x, float *y, int n_samples);
+static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
  *    buffer `y`.
- *  >>> */
-
-/*! ...
- *    #### bw_env_follow_get_one_pole()
- *  ```>>> */
-bw_one_pole *bw_env_follow_get_one_pole(bw_env_follow *instance);
-/*! <<<```
- *    Returns a pointer to the internal one-pole filter of the given
- *    `instance`.
- *
- *    The returned pointer must not be used for any other purpose than setting
- *    parameters.
- *
- *    This is **NOT** a function that gets an output parameter as described in
- *    the [documentation for DSP modules](api#dsp).
- *
- *    This function is [reentrant](api#reentrant-function),
- *    [RT-safe](api#rt-safe-function),
- *    [**NOT** thread-safe](api#thread-safe-function), and has
- *    [no side effects](api#no-side-effects).
  *  }}} */
 
-/* WARNING: the internal definition of this struct is not part of the public
- * API. Its content may change at any time in future versions. Please, do not
- * access its members directly. */
-struct _bw_env_follow {
+static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_env_follow_set_release_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
+
+static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRICT state);
+
+/*** Implementation ***/
+
+#include <bw_math.h>
+#include <bw_one_pole.h>
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+struct _bw_env_follow_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	one_pole_coeffs;
+};
+
+struct _bw_env_follow_state {
 	bw_one_pole_state	one_pole_state;
 };
+
+static inline void bw_env_follow_init(bw_env_follow_coeffs *BW_RESTRICT coeffs) {
+	bw_one_pole_init(&coeffs->one_pole_coeffs);
+}
+
+static inline void bw_env_follow_set_sample_rate(bw_env_follow_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+	bw_one_pole_set_sample_rate(&coeffs->one_pole_coeffs, sample_rate);
+}
+
+static inline void bw_env_follow_reset_coeffs(bw_env_follow_coeffs *BW_RESTRICT coeffs) {
+	bw_one_pole_reset_coeffs(&coeffs->one_pole_coeffs);
+}
+
+static inline void bw_env_follow_reset_state(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state) {
+	bw_one_pole_reset_state(&coeffs->one_pole_coeffs, &state->one_pole_state, 0.f);
+}
+
+static inline void bw_env_follow_update_coeffs_ctrl(bw_env_follow_coeffs *BW_RESTRICT coeffs) {
+	bw_one_pole_update_coeffs_ctrl(&coeffs->one_pole_coeffs);
+}
+
+static inline void bw_env_follow_update_coeffs_audio(bw_env_follow_coeffs *BW_RESTRICT coeffs) {
+	bw_one_pole_update_coeffs_audio(&coeffs->one_pole_coeffs);
+}
+
+static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, float x) {
+	x = bw_absf(x);
+	return bw_one_pole_process1_asym(&coeffs->one_pole_coeffs, &state->one_pole_state, x);
+}
+
+static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+	bw_env_follow_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_env_follow_update_coeffs_audio(coeffs);
+		y[i] = bw_env_follow_process1(coeffs, state, x[i]);
+	}
+}
+
+static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_one_pole_set_tau_up(&coeffs->one_pole_coeffs, value);
+}
+
+static inline void bw_env_follow_set_release_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_one_pole_set_tau_down(&coeffs->one_pole_coeffs, value);
+}
+
+static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRICT state) {
+	return bw_one_pole_get_y_z1(&state->one_pole_state);
+}
 
 #ifdef __cplusplus
 }

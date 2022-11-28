@@ -30,6 +30,7 @@
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
 #include <bw_vol.h>
+#include <bw_env_follow.h>
 
 /*
 #include <bw_osc_pulse.h>
@@ -65,6 +66,8 @@ struct _bw_example_synth {
 	bw_phase_gen_coeffs	a440_phase_gen_coeffs;
 	bw_phase_gen_state	a440_phase_gen_state;
 	bw_vol_coeffs		vol_coeffs;
+	bw_env_follow_coeffs	env_follow_coeffs;
+	bw_env_follow_state	env_follow_state;
 	/*
 	bw_osc_pulse		osc_pulse;
 	bw_osc_filt		osc_filt;
@@ -95,9 +98,11 @@ bw_example_synth bw_example_synth_new() {
 	bw_noise_gen_init(&instance->noise_gen_coeffs, &instance->rand_state);
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
 	bw_vol_init(&instance->vol_coeffs);
+	bw_env_follow_init(&instance->env_follow_coeffs);
 
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	bw_noise_gen_set_sample_rate_scaling(&instance->noise_gen_coeffs, 1);
+	bw_env_follow_set_release_tau(&instance->env_follow_coeffs, 1.f);
 	
 	instance->rand_state = 0xbaddecaf600dfeed;
 	/*
@@ -105,11 +110,8 @@ bw_example_synth bw_example_synth_new() {
 	bw_osc_filt_init(&instance->osc_filt);
 	bw_svf_init(&instance->svf);
 	bw_env_gen_init(&instance->env_gen);
-	bw_vol_init(&instance->vol);
-	bw_env_follow_init(&instance->env_follow);
 
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse, 1);
-	bw_one_pole_set_cutoff_down(bw_env_follow_get_one_pole(&instance->env_follow), 1.f);
 	*/
 
 	return instance;
@@ -124,12 +126,11 @@ void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_ra
 	bw_noise_gen_set_sample_rate(&instance->noise_gen_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
 	bw_vol_set_sample_rate(&instance->vol_coeffs, sample_rate);
+	bw_env_follow_set_sample_rate(&instance->env_follow_coeffs, sample_rate);
 	/*
 	bw_osc_pulse_set_sample_rate(&instance->osc_pulse, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf, sample_rate);
 	bw_env_gen_set_sample_rate(&instance->env_gen, sample_rate);
-	bw_vol_set_sample_rate(&instance->vol, sample_rate);
-	bw_env_follow_set_sample_rate(&instance->env_follow, sample_rate);
 	*/
 }
 
@@ -139,6 +140,8 @@ void bw_example_synth_reset(bw_example_synth instance) {
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state);
 	bw_vol_reset_coeffs(&instance->vol_coeffs);
+	bw_env_follow_reset_coeffs(&instance->env_follow_coeffs);
+	bw_env_follow_reset_state(&instance->env_follow_coeffs, &instance->env_follow_state);
 	/*
 	bw_osc_pulse_reset(&instance->osc_pulse);
 	bw_osc_filt_reset(&instance->osc_filt);
@@ -193,6 +196,10 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 			y[0][i] += a440_y;
 		}
 	bw_vol_process(&instance->vol_coeffs, y[0], y[0], n_samples);
+	
+	for (int i = 0; i < n_samples; i++)
+		bw_env_follow_process1(&instance->env_follow_coeffs, &instance->env_follow_state, y[0][i]);
+	instance->level = bw_env_follow_get_y_z1(&instance->env_follow_state);
 }
 
 void bw_example_synth_set_parameter(bw_example_synth instance, int index, float value) {

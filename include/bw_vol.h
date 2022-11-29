@@ -20,7 +20,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common bw_slew_lim bw_math }}}
+ *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Volume control for an arbitrary number of channels.
  *  }}}
@@ -110,12 +110,12 @@ static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float va
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_math.h>
-#include <bw_slew_lim.h>
+#include <bw_one_pole.h>
 
 struct _bw_vol_coeffs {
 	// Sub-components
-	bw_slew_lim_coeffs	smooth_coeffs;
-	bw_slew_lim_state	smooth_state;
+	bw_one_pole_coeffs	smooth_coeffs;
+	bw_one_pole_state	smooth_state;
 	
 	// Coefficients
 	float	k;
@@ -125,18 +125,18 @@ struct _bw_vol_coeffs {
 };
 
 static inline void bw_vol_init(bw_vol_coeffs *BW_RESTRICT coeffs) {
-	bw_slew_lim_init(&coeffs->smooth_coeffs);
-	bw_slew_lim_set_max_rate(&coeffs->smooth_coeffs, 1.f / 0.2f);
+	bw_one_pole_init(&coeffs->smooth_coeffs);
+	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	coeffs->volume = 1.f;
 }
 
 static inline void bw_vol_set_sample_rate(bw_vol_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	bw_slew_lim_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
-	bw_slew_lim_reset_coeffs(&coeffs->smooth_coeffs);
+	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
+	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 }
 
 static inline void bw_vol_reset_coeffs(bw_vol_coeffs *BW_RESTRICT coeffs) {
-	bw_slew_lim_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
 }
 
 static inline void bw_vol_update_coeffs_ctrl(bw_vol_coeffs *BW_RESTRICT coeffs) {
@@ -144,7 +144,7 @@ static inline void bw_vol_update_coeffs_ctrl(bw_vol_coeffs *BW_RESTRICT coeffs) 
 
 static inline void bw_vol_update_coeffs_audio(bw_vol_coeffs *BW_RESTRICT coeffs) {
 	// tracking parameter changes is more trouble than it's worth
-	float v = bw_slew_lim_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
+	float v = bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
 	coeffs->k = v * v * v;
 }
 

@@ -29,6 +29,7 @@
 #include <bw_phase_gen.h>
 #include <bw_osc_saw.h>
 #include <bw_osc_pulse.h>
+#include <bw_osc_tri.h>
 #include <bw_osc_filt.h>
 #include <bw_noise_gen.h>
 #include <bw_svf.h>

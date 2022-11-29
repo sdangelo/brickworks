@@ -33,13 +33,10 @@
 #include <bw_osc_filt.h>
 #include <bw_noise_gen.h>
 #include <bw_svf.h>
+#include <bw_env_gen.h>
 #include <bw_osc_sin.h>
 #include <bw_vol.h>
 #include <bw_env_follow.h>
-
-/*
-#include <bw_env_gen.h>
-*/
 
 enum {
 	p_volume,

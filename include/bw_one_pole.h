@@ -235,6 +235,8 @@ static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT st
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
+#include <bw_math.h>
+
 struct _bw_one_pole_coeffs {
 	// Coefficients
 	float			Ttm2pi;
@@ -258,8 +260,6 @@ struct _bw_one_pole_state {
 #define _BW_ONE_POLE_PARAM_CUTOFF_UP		1
 #define _BW_ONE_POLE_PARAM_CUTOFF_DOWN		(1<<1)
 #define _BW_ONE_POLE_PARAM_STICKY_THRESH	(1<<2)
-
-#include <bw_math.h>
 
 static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	coeffs->cutoff_up = INFINITY;
@@ -454,6 +454,10 @@ static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT c
 static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state) {
 	return state->y_z1;
 }
+
+#undef _BW_ONE_POLE_PARAM_CUTOFF_UP
+#undef _BW_ONE_POLE_PARAM_CUTOFF_DOWN
+#undef _BW_ONE_POLE_PARAM_STICKY_THRESH
 
 #ifdef __cplusplus
 }

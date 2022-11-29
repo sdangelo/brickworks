@@ -27,6 +27,7 @@
 
 #include <bw_math.h>
 #include <bw_phase_gen.h>
+#include <bw_osc_saw.h>
 #include <bw_osc_pulse.h>
 #include <bw_osc_filt.h>
 #include <bw_noise_gen.h>
@@ -61,7 +62,6 @@ struct _bw_example_synth {
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
 	bw_osc_pulse_coeffs	osc_pulse_coeffs;
-	bw_osc_pulse_state	osc_pulse_state;
 	bw_osc_filt_state	osc_filt_state;	
 	bw_noise_gen_coeffs	noise_gen_coeffs;
 	bw_svf_coeffs		svf_coeffs;
@@ -170,10 +170,8 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 		//bw_env_gen_set_gate(&instance->env_gen, 0);
 	
 	if (instance->note != -1) {
-		if (instance->note_prev < 0) {
-			bw_osc_pulse_reset_state(&instance->osc_pulse_coeffs, &instance->osc_pulse_state);
+		if (instance->note_prev < 0)
 			bw_osc_filt_reset_state(&instance->osc_filt_state);
-		}
 		bw_phase_gen_update_coeffs_ctrl(&instance->phase_gen_coeffs);
 		bw_osc_pulse_update_coeffs_ctrl(&instance->osc_pulse_coeffs);
 		for (int i = 0; i < n_samples; i++) {
@@ -181,7 +179,7 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 			bw_phase_gen_update_coeffs_audio(&instance->phase_gen_coeffs);
 			bw_phase_gen_process1(&instance->phase_gen_coeffs, &instance->phase_gen_state, &phase, &phase_inc);
 			bw_osc_pulse_update_coeffs_audio(&instance->osc_pulse_coeffs);
-			y[0][i] = bw_osc_pulse_process1_antialias(&instance->osc_pulse_coeffs, &instance->osc_pulse_state, phase, phase_inc);
+			y[0][i] = bw_osc_pulse_process1_antialias(&instance->osc_pulse_coeffs, phase, phase_inc);
 		}
 		bw_osc_filt_process(&instance->osc_filt_state, y[0], y[0], n_samples);
 	} else {

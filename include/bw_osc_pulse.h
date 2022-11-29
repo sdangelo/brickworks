@@ -48,18 +48,14 @@
 extern "C" {
 #endif
 
+#include <bw_common.h>
+
 /*! api {{{
  *    #### bw_osc_pulse_coeffs
  *  ```>>> */
 typedef struct _bw_osc_pulse_coeffs bw_osc_pulse_coeffs;
 /*! <<<```
  *    Coefficients.
- *
- *    ### bw_one_pole_state
- *  >>> */
-typedef struct _bw_osc_pulse_state bw_osc_pulse_state;
-/*! <<<```
- *    State.
  *
  *    #### bw_osc_pulse_init()
  *  ```>>> */
@@ -72,12 +68,6 @@ static inline void bw_osc_pulse_init(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
 static inline void bw_osc_pulse_set_sample_rate(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
- *
- *    #### bw_osc_pulse_reset_state()
- *  ```>>> */
-static inline void bw_osc_pulse_reset_state(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state);
-/*! <<<```
- *    Resets the given `instance` to its initial state.
  *  >>> */
 
 static inline void bw_osc_pulse_reset_coeffs(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
@@ -85,13 +75,13 @@ static inline void bw_osc_pulse_reset_coeffs(bw_osc_pulse_coeffs *BW_RESTRICT co
 static inline void bw_osc_pulse_update_coeffs_ctrl(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
 static inline void bw_osc_pulse_update_coeffs_audio(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
 
-static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state, float x);
-static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state, float x, float x_phase_inc);
+static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x);
+static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc);
 
 /*! ...
  *    #### bw_osc_pulse_process()
  *  ```>>> */
-static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state, const float *x, const float *x_phase_inc, float *y, int n_samples);
+static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` containing the normalized phase signal and fills the
@@ -141,11 +131,6 @@ struct _bw_osc_pulse_coeffs {
 	float			pulse_width;
 };
 
-struct _bw_osc_pulse_state {
-	// empty, but we keep for potential forward API compatibility
-	char	unused;
-};
-
 static inline void bw_osc_pulse_init(bw_osc_pulse_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
@@ -162,9 +147,6 @@ static inline void bw_osc_pulse_reset_coeffs(bw_osc_pulse_coeffs *BW_RESTRICT co
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->pulse_width);
 }
 
-static inline void bw_osc_pulse_reset_state(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state) {
-}
-
 static inline void bw_osc_pulse_update_coeffs_ctrl(bw_osc_pulse_coeffs *BW_RESTRICT coeffs) {
 }
 
@@ -172,7 +154,7 @@ static inline void bw_osc_pulse_update_coeffs_audio(bw_osc_pulse_coeffs *BW_REST
 	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->pulse_width);
 }
 
-static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state, float x) {
+static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x) {
 	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state);
 	return bw_signf(pw - x);
 }
@@ -184,7 +166,7 @@ static inline float _bw_osc_pulse_blep_diff(float x) {
 		: x * (x * ((0.6666666666666666f - 0.08333333333333333f * x) * x - 2.f) + 2.666666666666667f) - 1.333333333333333f;
 }
 
-static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state, float x, float x_phase_inc) {
+static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc) {
 	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state);
 	const float pw_m_phase = pw - x;
 	float v = bw_copysignf(1.f, pw_m_phase); // pw = phase case should be properly compensated by the AA
@@ -206,16 +188,16 @@ static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *B
 	return v;
 }
 
-static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, bw_osc_pulse_state *BW_RESTRICT state, const float *x, const float *x_phase_inc, float *y, int n_samples) {
+static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples) {
 	if (coeffs->antialiasing)
 		for (int i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
-			y[i] = bw_osc_pulse_process1_antialias(coeffs, state, x[i], x_phase_inc[i]);
+			y[i] = bw_osc_pulse_process1_antialias(coeffs, x[i], x_phase_inc[i]);
 		}
 	else
 		for (int i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
-			y[i] = bw_osc_pulse_process1(coeffs, state, x[i]);
+			y[i] = bw_osc_pulse_process1(coeffs, x[i]);
 		}
 }
 

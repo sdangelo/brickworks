@@ -12,7 +12,7 @@ You can find information and documentation [on the official web page](https://ww
 
 ## Legal
 
-Copyright (C) 2021, 2022 Orastron srl unipersonale.
+Copyright (C) 2021, 2022 Orastron Srl unipersonale.
 
 Authors: Stefano D'Angelo, Paolo Marrone.
 

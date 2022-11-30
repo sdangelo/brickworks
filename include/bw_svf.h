@@ -151,10 +151,9 @@ struct _bw_svf_coeffs {
 };
 
 struct _bw_svf_state {
-	// State
-	float			hp_z1;
-	float			lp_z1;
-	float			bp_z1;
+	float	hp_z1;
+	float	lp_z1;
+	float	bp_z1;
 };
 
 static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs) {

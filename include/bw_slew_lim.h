@@ -167,7 +167,6 @@ struct _bw_slew_lim_coeffs {
 };
 
 struct _bw_slew_lim_state {
-	// State
 	float	y_z1;
 };
 

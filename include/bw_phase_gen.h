@@ -149,8 +149,7 @@ struct _bw_phase_gen_coeffs {
 };
 
 struct _bw_phase_gen_state {
-	// State
-	float		phase;
+	float	phase;
 };
 
 static inline void bw_phase_gen_init(bw_phase_gen_coeffs *BW_RESTRICT coeffs) {

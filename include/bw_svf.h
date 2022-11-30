@@ -159,7 +159,7 @@ struct _bw_svf_state {
 
 static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_init(&coeffs->smooth_coeffs);
-	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
+	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
 	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
 	coeffs->cutoff = 1e3f;
 	coeffs->Q = 0.5f;

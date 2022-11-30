@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Brickworks web synth example</title>
+    <script src="config.js"></script>
+    <script>
+var audioCtx;
+var midi;
+
+var Synth = {
+	node: null,
+	moduleAdded: false,
+	wasmBytes: null,
+
+	init: async function () {
+		if (!this.moduleAdded) {
+			await audioCtx.audioWorklet.addModule("processor.js");
+			this.moduleAdded = true;
+		}
+
+		if (!this.wasmBytes)
+			this.wasmBytes = await fetch("module.wasm")
+				.then((response) => response.arrayBuffer())
+				.then((bytes) => bytes);
+		if (!this.wasmBytes.byteLength) {
+			this.wasmBytes = null;
+			throw "could not fetch WebAssembly module";
+		}
+
+		if (!this.node)
+			this.node = new AudioWorkletNode(audioCtx, "BWExample",
+				{
+					numberOfInputs: 0,
+					numberOfOutputs: 1,
+					outputChannelCount: [ 1 ],
+					processorOptions: { wasmBytes: this.wasmBytes }
+				});
+		this.node.connect(audioCtx.destination);
+	},
+
+	noteOn: function (note, velocity) {
+		this.node.port.postMessage({ type: "noteOn", note: note, velocity: velocity });
+	},
+
+	noteOff: function (note) {
+		this.node.port.postMessage({ type: "noteOff", note: note });
+	}
+};
+
+var initState = 0; // 0 = not inited, 1 = in progress, 2 = inited
+
+window.addEventListener("load", async function (e) {
+	var start = document.getElementById("start");
+	var starting = document.getElementById("starting");
+	var main = document.getElementById("main");
+	var controls = document.getElementById("controls");
+
+	if (!navigator.requestMIDIAccess) {
+		alert("This won't work. Your browser doesn't support the Web MIDI API.");
+		return;
+	}
+
+	for (var i = 0; i < parameters.length; i++) {
+		var div = document.createElement("div");
+		controls.appendChild(div);
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "p" + i);
+		label.innerText = parameters[i].name;
+		div.appendChild(label);
+
+		var range = document.createElement("input");
+		range.setAttribute("type", "range");
+		range.setAttribute("id", "p" + i);
+		range.setAttribute("name", "p" + i);
+		range.setAttribute("min", "0");
+		range.setAttribute("max", "1");
+		if (!parameters[i].step)
+			range.setAttribute("step", "any");
+		else
+			range.setAttribute("step", 1 / parameters[i].step);
+		range.value = parameters[i].defaultValue;
+		if (parameters[i].output)
+			range.setAttribute("readonly", "true");
+		else {
+			let index = i;
+			range.addEventListener("input", function (e) {
+				var p = Synth.node.parameters.get(parameters[index].name);
+				p.setValueAtTime(e.target.value, 0);
+			});
+		}
+		div.appendChild(range);
+	}
+
+	start.addEventListener("click", async function () {
+		initState = 1;
+		start.disabled = true;
+		starting.hidden = false;
+
+		try {
+			if (!audioCtx)
+				audioCtx = new AudioContext();
+			midi = await navigator.requestMIDIAccess();
+			await Synth.init();
+
+			Synth.node.port.onmessage = function (e) { document.getElementById("p" + e.data.index).value = e.data.value; };
+
+			function onMIDIMessage(e) {
+				switch (e.data[0] & 0xf0) {
+				case 0x90:
+					Synth.noteOn(e.data[1], e.data[2]);
+					break;
+				case 0x80:
+					Synth.noteOff(e.data[1]);
+					break;
+				}
+			}
+			midi.inputs.forEach((entry) => { entry.onmidimessage = onMIDIMessage; });
+
+			initState = 2;
+			start.hidden = true;
+			starting.hidden = true;
+			main.hidden = false;
+		} catch (err) {
+			alert("Colud not initialize: " + err);
+
+			initState = 0;
+			start.disabled = false;
+			starting.hidden = true;
+		}
+	});
+});
+    </script>
+  </head>
+  <body>
+    <h1>Brickworks web synth example</h1>
+    <input id="start" type="button" value="Start">
+    <p id="starting" hidden>Starting...</p>
+    <div id="main" hidden>
+      <p>Just play notes on your MIDI device.</p>
+      <div id="controls">
+      </div>
+    </div>
+  </body>
+</html>

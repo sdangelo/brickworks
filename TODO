@@ -9,6 +9,7 @@ code:
 * web effect multichannel in?
 * check const restrict etc.
 * define BW_RESTRICT to __restrict or similar when the compiler supports it
+* empty functions etc. to keep consistency and forward compatibility?
 
 build system:
 * make makefiles handle paths with spaces etc

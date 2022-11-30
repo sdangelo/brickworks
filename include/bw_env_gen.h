@@ -194,6 +194,8 @@ static inline bw_env_gen_phase bw_env_gen_get_phase(bw_env_gen_state *state);
  *    ...
  *  }}} */
 
+static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state);
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -321,8 +323,12 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
 static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, float* y, int n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	bw_env_gen_update_state_ctrl(coeffs, state);
-	for (int i = 0; i < n_samples; i++)
-		y[i] = bw_env_gen_process1(coeffs, state);
+	if (y != NULL)
+		for (int i = 0; i < n_samples; i++)
+			y[i] = bw_env_gen_process1(coeffs, state);
+	else
+		for (int i = 0; i < n_samples; i++)
+			bw_env_gen_process1(coeffs, state);
 }
 
 static inline void bw_env_gen_set_gate(bw_env_gen_coeffs *BW_RESTRICT coeffs, char value) {
@@ -359,6 +365,10 @@ static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs,
 
 static inline bw_env_gen_phase bw_env_gen_get_phase(bw_env_gen_state *state) {
 	return state->phase;
+}
+
+static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state) {
+	return state->y_z1;
 }
 
 #undef _BW_ENV_GEN_PARAM_ATTACK

@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>bw_example_synth</string>
+    <string>bw_example_synth_simple</string>
 
     <key>CFBundleExecutable</key>
-    <string>bw_example_synth</string>
+    <string>bw_example_synth_simple</string>
 
 </dict>
 </plist>

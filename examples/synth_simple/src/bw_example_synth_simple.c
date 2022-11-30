@@ -17,7 +17,7 @@
  * File author: Stefano D'Angelo
  */
 
-#include "bw_example_synth.h"
+#include "bw_example_synth_simple.h"
 
 #ifdef __WASM__
 # include "walloc.h"
@@ -50,7 +50,7 @@ enum {
 
 #define BUFFER_SIZE 	128
 
-struct _bw_example_synth {
+struct _bw_example_synth_simple {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
@@ -75,8 +75,8 @@ struct _bw_example_synth {
 	float			buf[BUFFER_SIZE];
 };
 
-bw_example_synth bw_example_synth_new() {
-	bw_example_synth instance = (bw_example_synth)malloc(sizeof(struct _bw_example_synth));
+bw_example_synth_simple bw_example_synth_simple_new() {
+	bw_example_synth_simple instance = (bw_example_synth_simple)malloc(sizeof(struct _bw_example_synth_simple));
 	if (instance == NULL)
 		return NULL;
 
@@ -95,11 +95,11 @@ bw_example_synth bw_example_synth_new() {
 	return instance;
 }
 
-void bw_example_synth_free(bw_example_synth instance) {
+void bw_example_synth_simple_free(bw_example_synth_simple instance) {
 	free(instance);
 }
 
-void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_rate) {
+void bw_example_synth_simple_set_sample_rate(bw_example_synth_simple instance, float sample_rate) {
 	bw_phase_gen_set_sample_rate(&instance->phase_gen_coeffs, sample_rate);
 	bw_osc_pulse_set_sample_rate(&instance->osc_pulse_coeffs, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf_coeffs, sample_rate);
@@ -108,7 +108,7 @@ void bw_example_synth_set_sample_rate(bw_example_synth instance, float sample_ra
 	bw_env_follow_set_sample_rate(&instance->env_follow_coeffs, sample_rate);
 }
 
-void bw_example_synth_reset(bw_example_synth instance) {
+void bw_example_synth_simple_reset(bw_example_synth_simple instance) {
 	bw_phase_gen_reset_coeffs(&instance->phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->osc_pulse_coeffs);
@@ -123,7 +123,7 @@ void bw_example_synth_reset(bw_example_synth instance) {
 	instance->note = -1;
 }
 
-void bw_example_synth_process(bw_example_synth instance, const float** x, float** y, int n_samples) {
+void bw_example_synth_simple_process(bw_example_synth_simple instance, const float** x, float** y, int n_samples) {
 	char gate = instance->note >= 0 ? 1 : 0;
 	bw_env_gen_set_gate(&instance->env_gen_coeffs, gate);
 	if (instance->note >= 0)
@@ -146,7 +146,7 @@ void bw_example_synth_process(bw_example_synth instance, const float** x, float*
 	}
 }
 
-void bw_example_synth_set_parameter(bw_example_synth instance, int index, float value) {
+void bw_example_synth_simple_set_parameter(bw_example_synth_simple instance, int index, float value) {
 	if (instance->params[index] == value)
 		return;
 	instance->params[index] = value;
@@ -181,15 +181,15 @@ void bw_example_synth_set_parameter(bw_example_synth instance, int index, float 
 	}
 }
 
-float bw_example_synth_get_parameter(bw_example_synth instance, int index) {
+float bw_example_synth_simple_get_parameter(bw_example_synth_simple instance, int index) {
 	return index < p_n ? instance->params[index] : bw_clipf(bw_env_follow_get_y_z1(&instance->env_follow_state), 0.f, 1.f);
 }
 
-void bw_example_synth_note_on(bw_example_synth instance, char note, char velocity) {
+void bw_example_synth_simple_note_on(bw_example_synth_simple instance, char note, char velocity) {
 	instance->note = note;
 }
 
-void bw_example_synth_note_off(bw_example_synth instance, char note) {
+void bw_example_synth_simple_note_off(bw_example_synth_simple instance, char note) {
 	if (note == instance->note)
 		instance->note = -1;
 }

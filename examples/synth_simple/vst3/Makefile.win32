@@ -24,7 +24,7 @@ ARCH=x86_64
 
 ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SOURCES= \
-	${ROOT_DIR}/../src/bw_example_synth.c \
+	${ROOT_DIR}/../src/bw_example_synth_simple.c \
 	\
 	${ROOT_DIR}/../../common/vst3/entry.cpp \
 	${ROOT_DIR}/../../common/vst3/plugin.cpp \
@@ -53,39 +53,39 @@ SOURCES= \
 	${VST3_SDK_DIR}/public.sdk/source/vst/vstbus.cpp \
 	${VST3_SDK_DIR}/public.sdk/source/vst/vsteditcontroller.cpp \
 	${VST3_SDK_DIR}/public.sdk/source/vst/vstparameters.cpp
-DLL_DIR=build/bw_example_synth.vst3/Contents/${ARCH}-win
+DLL_DIR=build/bw_example_synth_simple.vst3/Contents/${ARCH}-win
 USER_PREFIX=$(shell echo '${LOCALAPPDATA}' | sed 's:\\:/:g')
 
-all: build/bw_example_synth.vst3/desktop.ini build/bw_example_synth.vst3/Plugin.ico build/bw_example_synth.vst3/Contents/Resources ${DLL_DIR}/bw_example_synth.vst3
+all: build/bw_example_synth_simple.vst3/desktop.ini build/bw_example_synth_simple.vst3/Plugin.ico build/bw_example_synth_simple.vst3/Contents/Resources ${DLL_DIR}/bw_example_synth_simple.vst3
 
-${DLL_DIR}/bw_example_synth.vst3: ${SOURCES}
+${DLL_DIR}/bw_example_synth_simple.vst3: ${SOURCES}
 	mkdir -p ${DLL_DIR}
 	${CXX} $^ ${CXXFLAGS} ${LDFLAGS} -o $@
 
-build/bw_example_synth.vst3/desktop.ini: build/bw_example_synth.vst3 ${ROOT_DIR}/bw_example_synth.vst3/desktop.ini
-	cp ${ROOT_DIR}/bw_example_synth.vst3/desktop.ini build/bw_example_synth.vst3
+build/bw_example_synth_simple.vst3/desktop.ini: build/bw_example_synth_simple.vst3 ${ROOT_DIR}/bw_example_synth_simple.vst3/desktop.ini
+	cp ${ROOT_DIR}/bw_example_synth_simple.vst3/desktop.ini build/bw_example_synth_simple.vst3
 
-build/bw_example_synth.vst3/Plugin.ico: build/bw_example_synth.vst3 ${ROOT_DIR}/bw_example_synth.vst3/Plugin.ico
-	cp ${ROOT_DIR}/bw_example_synth.vst3/Plugin.ico build/bw_example_synth.vst3
+build/bw_example_synth_simple.vst3/Plugin.ico: build/bw_example_synth_simple.vst3 ${ROOT_DIR}/bw_example_synth_simple.vst3/Plugin.ico
+	cp ${ROOT_DIR}/bw_example_synth_simple.vst3/Plugin.ico build/bw_example_synth_simple.vst3
 
-build/bw_example_synth.vst3/Contents/Resources: build/bw_example_synth.vst3/Contents ${ROOT_DIR}/bw_example_synth.vst3/Contents/Resources
-	cp -R ${ROOT_DIR}/bw_example_synth.vst3/Contents/Resources build/bw_example_synth.vst3/Contents
+build/bw_example_synth_simple.vst3/Contents/Resources: build/bw_example_synth_simple.vst3/Contents ${ROOT_DIR}/bw_example_synth_simple.vst3/Contents/Resources
+	cp -R ${ROOT_DIR}/bw_example_synth_simple.vst3/Contents/Resources build/bw_example_synth_simple.vst3/Contents
 
-build/bw_example_synth.vst3/Contents: build/bw_example_synth.vst3
+build/bw_example_synth_simple.vst3/Contents: build/bw_example_synth_simple.vst3
 	mkdir -p $@
 
-build/bw_example_synth.vst3:
+build/bw_example_synth_simple.vst3:
 	mkdir -p $@
 
 install-user: all
 	mkdir -p ${USER_PREFIX}/Programs/Common/VST3
-	@echo mkdir -p -m 0755 `find build/bw_example_synth.vst3 -type d | sed s?^build/?${USER_PREFIX}/Programs/Common/VST3/?g`
-	@mkdir -p -m 0755 `find build/bw_example_synth.vst3 -type d | sed s?^build/?${USER_PREFIX}/Programs/Common/VST3/?g`
-	@for f in `find build/bw_example_synth.vst3 -type f | sed s?^build/??g`; do \
+	@echo mkdir -p -m 0755 `find build/bw_example_synth_simple.vst3 -type d | sed s?^build/?${USER_PREFIX}/Programs/Common/VST3/?g`
+	@mkdir -p -m 0755 `find build/bw_example_synth_simple.vst3 -type d | sed s?^build/?${USER_PREFIX}/Programs/Common/VST3/?g`
+	@for f in `find build/bw_example_synth_simple.vst3 -type f | sed s?^build/??g`; do \
 		d=`dirname $$f`; \
 		echo install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${USER_PREFIX}/Programs/Common/VST3/$$d; \
 		install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${USER_PREFIX}/Programs/Common/VST3/$$d; \
 	done
 
 clean:
-	rm -fr build/bw_example_synth.vst3
+	rm -fr build/bw_example_synth_simple.vst3

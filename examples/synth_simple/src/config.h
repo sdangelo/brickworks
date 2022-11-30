@@ -49,7 +49,7 @@ struct config_parameter {
 #define COMPANY_WEBSITE		"https://www.orastron.com/"
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
-#define PLUGIN_NAME		"bw_example_synth"
+#define PLUGIN_NAME		"bw_example_synth_simple"
 #define PLUGIN_VERSION		"0.2.0"
 
 #define NUM_BUSES_IN		0
@@ -79,17 +79,17 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 
 // Internal API
 
-#include "bw_example_synth.h"
+#include "bw_example_synth_simple.h"
 
-#define P_TYPE				bw_example_synth
-#define P_NEW				bw_example_synth_new
-#define P_FREE				bw_example_synth_free
-#define P_SET_SAMPLE_RATE		bw_example_synth_set_sample_rate
-#define P_RESET				bw_example_synth_reset
-#define P_PROCESS			bw_example_synth_process
-#define P_SET_PARAMETER			bw_example_synth_set_parameter
-#define P_GET_PARAMETER			bw_example_synth_get_parameter
-#define P_NOTE_ON			bw_example_synth_note_on
-#define P_NOTE_OFF			bw_example_synth_note_off
+#define P_TYPE				bw_example_synth_simple
+#define P_NEW				bw_example_synth_simple_new
+#define P_FREE				bw_example_synth_simple_free
+#define P_SET_SAMPLE_RATE		bw_example_synth_simple_set_sample_rate
+#define P_RESET				bw_example_synth_simple_reset
+#define P_PROCESS			bw_example_synth_simple_process
+#define P_SET_PARAMETER			bw_example_synth_simple_set_parameter
+#define P_GET_PARAMETER			bw_example_synth_simple_get_parameter
+#define P_NOTE_ON			bw_example_synth_simple_note_on
+#define P_NOTE_OFF			bw_example_synth_simple_note_off
 
 #endif

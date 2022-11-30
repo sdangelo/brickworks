@@ -19,7 +19,7 @@ INSTALL_PREFIX=/usr/local
 
 ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SOURCES= \
-	${ROOT_DIR}/../src/bw_example_synth.c \
+	${ROOT_DIR}/../src/bw_example_synth_simple.c \
 	\
 	${ROOT_DIR}/../../common/vst3/entry.cpp \
 	${ROOT_DIR}/../../common/vst3/plugin.cpp \
@@ -48,25 +48,25 @@ SOURCES= \
 	${VST3_SDK_DIR}/public.sdk/source/vst/vstbus.cpp \
 	${VST3_SDK_DIR}/public.sdk/source/vst/vsteditcontroller.cpp \
 	${VST3_SDK_DIR}/public.sdk/source/vst/vstparameters.cpp
-SO_DIR=build/bw_example_synth.vst3/Contents/$(shell uname -m)-linux
+SO_DIR=build/bw_example_synth_simple.vst3/Contents/$(shell uname -m)-linux
 
-all: build/bw_example_synth.vst3/Contents/Resources ${SO_DIR}/bw_example_synth.so
+all: build/bw_example_synth_simple.vst3/Contents/Resources ${SO_DIR}/bw_example_synth_simple.so
 
-${SO_DIR}/bw_example_synth.so: ${SOURCES}
+${SO_DIR}/bw_example_synth_simple.so: ${SOURCES}
 	mkdir -p ${SO_DIR}
 	${CXX} $^ ${CXXFLAGS} ${LDFLAGS} -o $@
 
-build/bw_example_synth.vst3/Contents/Resources: build/bw_example_synth.vst3/Contents ${ROOT_DIR}/bw_example_synth.vst3/Contents/Resources
-	cp -R ${ROOT_DIR}/bw_example_synth.vst3/Contents/Resources build/bw_example_synth.vst3/Contents
+build/bw_example_synth_simple.vst3/Contents/Resources: build/bw_example_synth_simple.vst3/Contents ${ROOT_DIR}/bw_example_synth_simple.vst3/Contents/Resources
+	cp -R ${ROOT_DIR}/bw_example_synth_simple.vst3/Contents/Resources build/bw_example_synth_simple.vst3/Contents
 
-build/bw_example_synth.vst3/Contents:
+build/bw_example_synth_simple.vst3/Contents:
 	mkdir -p $@
 
 install-user: all
 	mkdir -p ${HOME}/.vst3
-	@echo mkdir -p -m 0755 `find build/bw_example_synth.vst3 -type d | sed s:^build/:${HOME}/.vst3/:g`
-	@mkdir -p -m 0755 `find build/bw_example_synth.vst3 -type d | sed s:^build/:${HOME}/.vst3/:g`
-	@for f in `find build/bw_example_synth.vst3 -type f | sed s:^build/::g`; do \
+	@echo mkdir -p -m 0755 `find build/bw_example_synth_simple.vst3 -type d | sed s:^build/:${HOME}/.vst3/:g`
+	@mkdir -p -m 0755 `find build/bw_example_synth_simple.vst3 -type d | sed s:^build/:${HOME}/.vst3/:g`
+	@for f in `find build/bw_example_synth_simple.vst3 -type f | sed s:^build/::g`; do \
 		d=`dirname $$f`; \
 		echo install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${HOME}/.vst3/$$d; \
 		install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${HOME}/.vst3/$$d; \
@@ -74,13 +74,13 @@ install-user: all
 
 install: all
 	mkdir -p ${INSTALL_PREFIX}/lib/vst3
-	@echo mkdir -p -m 0755 `find build/bw_example_synth.vst3 -type d | sed s:^build/:${INSTALL_PREFIX}/vst3/:g`
-	@mkdir -p -m 0755 `find build/bw_example_synth.vst3 -type d | sed s:^build/:${INSTALL_PREFIX}/vst3/:g`
-	@for f in `find build/bw_example_synth.vst3 -type f | sed s:^build/::g`; do \
+	@echo mkdir -p -m 0755 `find build/bw_example_synth_simple.vst3 -type d | sed s:^build/:${INSTALL_PREFIX}/vst3/:g`
+	@mkdir -p -m 0755 `find build/bw_example_synth_simple.vst3 -type d | sed s:^build/:${INSTALL_PREFIX}/vst3/:g`
+	@for f in `find build/bw_example_synth_simple.vst3 -type f | sed s:^build/::g`; do \
 		d=`dirname $$f`; \
 		echo install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${INSTALL_PREFIX}/vst3/$$d; \
 		install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${INSTALL_PREFIX}/vst3/$$d; \
 	done
 
 clean:
-	rm -fr build/bw_example_synth.vst3
+	rm -fr build/bw_example_synth_simple.vst3

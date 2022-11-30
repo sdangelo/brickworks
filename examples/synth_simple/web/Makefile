@@ -28,7 +28,7 @@ LDFLAGS= \
 
 ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SOURCES= \
-	${ROOT_DIR}/../src/bw_example_synth.c \
+	${ROOT_DIR}/../src/bw_example_synth_simple.c \
 	${ROOT_DIR}/../../common/web/walloc.c \
 	${ROOT_DIR}/../../common/web/wrapper.c
 

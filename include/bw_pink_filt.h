@@ -61,6 +61,8 @@ typedef struct _bw_pink_filt_state bw_pink_filt_state;
  *    State
  *  >>> */
 
+static inline void bw_pink_filt_init(bw_pink_filt_coeffs *BW_RESTRICT coeffs);
+
 static inline void bw_pink_filt_set_sample_rate(bw_pink_filt_coeffs *BW_RESTRICT coeffs, float sample_rate);
 
 /*! ...
@@ -73,15 +75,21 @@ static inline void bw_pink_filt_reset_state(const bw_pink_filt_coeffs *BW_RESTRI
 
 static inline float bw_pink_filt_process1(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x);
 
+static inline float bw_pink_filt_process1_scaling(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x);
+
 /*! ...
  *    #### bw_pink_filt_process()
  *  ```>>> */
-static inline void bw_pink_filt_process(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
+static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
 /*! <<<```
  *    Lets the given `instance` process `n_samples` samples from the input
  *    buffer `x` and fills the corresponding `n_samples` samples in the output
  *    buffer `y`.
  *  }}} */
+
+static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value);
+
+static inline float bw_pink_filt_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs);
 
 /*** Implementation ***/
 
@@ -90,7 +98,10 @@ static inline void bw_pink_filt_process(const bw_pink_filt_coeffs *BW_RESTRICT c
 
 struct _bw_pink_filt_coeffs {
 	// Coefficients
-	float	k;
+	float	scaling_k;
+	
+	// Parameters
+	float	sample_rate_scaling;
 };
 
 struct _bw_pink_filt_state {
@@ -100,8 +111,12 @@ struct _bw_pink_filt_state {
 	float	s4_z1;
 };
 
+static inline void bw_pink_filt_init(bw_pink_filt_coeffs *BW_RESTRICT coeffs) {
+	coeffs->sample_rate_scaling = 0;
+}
+
 static inline void bw_pink_filt_set_sample_rate(bw_pink_filt_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	coeffs->k = bw_sqrtf_2(44100.f / sample_rate);
+	coeffs->scaling_k = 210.f / bw_sqrtf_2(sample_rate);
 }
 
 static inline void bw_pink_filt_reset_state(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state) {
@@ -120,12 +135,28 @@ static inline float bw_pink_filt_process1(const bw_pink_filt_coeffs *BW_RESTRICT
 	state->s3_z1 = 0.9687905029568185f * s3 - 0.265076791546676f * s2;
 	const float s4 = 0.3882183163519794f * s3 + state->s4_z1;
 	state->s4_z1 = 0.6573784623288251f * s4 - 0.04559677868080467 * s3;
-	return coeffs->k * s4;
+	return s4;
 }
 
-static inline void bw_pink_filt_process(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples) {
-	for (int i = 0; i < n_samples; i++)
-		y[i] = bw_pink_filt_process1(coeffs, state, x[i]);
+static inline float bw_pink_filt_process1_scaling(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x) {
+	return coeffs->scaling_k * bw_pink_filt_process1(coeffs, state, x);
+}
+
+static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples) {
+	if (coeffs->sample_rate_scaling)
+		for (int i = 0; i < n_samples; i++)
+			y[i] = bw_pink_filt_process1_scaling(coeffs, state, x[i]);
+	else
+		for (int i = 0; i < n_samples; i++)
+			y[i] = bw_pink_filt_process1(coeffs, state, x[i]);
+}
+
+static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value) {
+	coeffs->sample_rate_scaling = value;
+}
+
+static inline float bw_pink_filt_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+	return coeffs->scaling_k;
 }
 
 #ifdef __cplusplus

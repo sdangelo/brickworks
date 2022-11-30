@@ -103,12 +103,14 @@ static inline void bw_osc_tri_set_antialiasing(bw_osc_tri_coeffs *BW_RESTRICT co
  *  >>> */
 
 /*! ...
- *    #### bw_osc_tri_set_tri_width()
+ *    #### bw_osc_tri_set_slope()
  *  ```>>> */
 static inline void bw_osc_tri_set_slope(bw_osc_tri_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the slope (increasing time over period) to `value` (range [`0.f`,
  *    `1.f`]) for the given `instance`.
+ * 
+ *    NOT TOO CLOSE TO TO 0.f and 1.f!!!
  *
  *    Default value: `0.5f`.
  *  }}} */

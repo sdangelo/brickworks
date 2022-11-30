@@ -41,28 +41,141 @@ var parameters = [
 		defaultValue:	0.0
 	},
 	{
-		name:		"Pulse width",
+		name:		"Modulation mix",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"VCO1 modulation",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"VCO1 coarse",
+		output:		false,
+		defaultValue:	0.5,
+		step:		6
+	},
+	{
+		name:		"VCO1 fine",
 		output:		false,
 		defaultValue:	0.5
 	},
 	{
-		name:		"Keyboard control",
+		name:		"VCO1 waveform",
+		output:		false,
+		defaultValue:	0.5,
+		step:		2
+	},
+	{
+		name:		"VCO1 pulse width/slope",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"VCO1 volume",
+		output:		false,
+		defaultValue:	1.0
+	},
+	{
+		name:		"VCO2 modulation",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"VCO2 coarse",
+		output:		false,
+		defaultValue:	0.5,
+		step:		6
+	},
+	{
+		name:		"VCO2 fine",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"VCO2 waveform",
+		output:		false,
+		defaultValue:	0.5,
+		step:		2
+	},
+	{
+		name:		"VCO2 pulse width/slope",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"VCO2 volume",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"VCO3 keyboard control",
+		output:		false,
+		defaultValue:	1.0,
+		step:		1
+	},
+	{
+		name:		"VCO3 coarse",
+		output:		false,
+		defaultValue:	0.5,
+		step:		6
+	},
+	{
+		name:		"VCO3 fine",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"VCO3 waveform",
+		output:		false,
+		defaultValue:	0.5,
+		step:		2
+	},
+	{
+		name:		"VCO3 pulse width/slope",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"VCO3 volume",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"Noise color",
+		output:		false,
+		defaultValue:	0.0,
+		step:		1
+	},
+	{
+		name:		"Noise volume",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"VCF modulation",
+		output:		false,
+		defaultValue:	0.0
+	},
+	{
+		name:		"VCF keyboard control",
 		output:		false,
 		defaultValue:	0.0,
 		step:		3
 	},
 	{
-		name:		"Cutoff",
+		name:		"VCF cutoff",
 		output:		false,
 		defaultValue:	1.0
 	},
 	{
-		name:		"Q",
+		name:		"VCF Q",
 		output:		false,
 		defaultValue:	0.0
 	},
 	{
-		name:		"Contour",
+		name:		"VCF contour",
 		output:		false,
 		defaultValue:	0.0
 	},
@@ -87,22 +200,22 @@ var parameters = [
 		defaultValue:	0.0
 	},
 	{
-		name:		"Attack",
+		name:		"VCA dttack",
 		output:		false,
 		defaultValue:	0.0
 	},
 	{
-		name:		"Decay",
+		name:		"VCA decay",
 		output:		false,
 		defaultValue:	0.0
 	},
 	{
-		name:		"Sustain",
+		name:		"VCA sustain",
 		output:		false,
 		defaultValue:	1.0
 	},
 	{
-		name:		"Release",
+		name:		"VCA release",
 		output:		false,
 		defaultValue:	0.0
 	},

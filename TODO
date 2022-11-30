@@ -10,6 +10,10 @@ code:
 * check const restrict etc.
 * define BW_RESTRICT to __restrict or similar when the compiler supports it
 * empty functions etc. to keep consistency and forward compatibility?
+* float in [-1,1] for velocity, pitch bend, mod wheel
+* vst3 pitch bend, mod wheel
+* velocity = 0 -> note off?
+* should clip slope in triangle?
 
 build system:
 * make makefiles handle paths with spaces etc

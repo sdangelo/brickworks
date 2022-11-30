@@ -98,6 +98,8 @@ static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_
  *    Default value: `0`.
  *  }}} */
 
+static inline float bw_noise_gen_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -143,6 +145,10 @@ static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs,
 
 static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value) {
 	coeffs->sample_rate_scaling = value;
+}
+
+static inline float bw_noise_gen_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+	return coeffs->scaling_k;
 }
 
 #ifdef __cplusplus

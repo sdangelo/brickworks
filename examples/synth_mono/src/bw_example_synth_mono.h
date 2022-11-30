@@ -35,6 +35,8 @@ void bw_example_synth_mono_set_parameter(bw_example_synth_mono instance, int ind
 float bw_example_synth_mono_get_parameter(bw_example_synth_mono instance, int index);
 void bw_example_synth_mono_note_on(bw_example_synth_mono instance, char note, char velocity);
 void bw_example_synth_mono_note_off(bw_example_synth_mono instance, char note);
+void bw_example_synth_mono_pitch_bend(bw_example_synth_mono instance, int value);
+void bw_example_synth_mono_mod_wheel(bw_example_synth_mono instance, char value);
 
 #ifdef __cplusplus
 }

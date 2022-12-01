@@ -243,10 +243,22 @@ void bw_example_synth_mono_reset(bw_example_synth_mono instance) {
 }
 
 void bw_example_synth_mono_process(bw_example_synth_mono instance, const float** x, float** y, int n_samples) {
+	// FIXME: control-rate modulations are asynchronous here...
+	// it's all good as long as hosts gives us buffers whose length is a multiple of 32,
+	// otherwise it's probably still ok but a bit "swingy"
+	
 	bw_env_gen_set_gate(&instance->vcf_env_gen_coeffs, instance->gate);
 	bw_env_gen_set_gate(&instance->vca_env_gen_coeffs, instance->gate);
 	
 	int n = instance->params[p_vco3_kbd] >= 0.5f ? instance->note : 0;
+	bw_phase_gen_set_frequency(&instance->vco1_phase_gen_coeffs, 440.f *
+		bw_pow2f_3(6.f * instance->params[p_vco1_coarse] - 3.f
+			+ 2.f * instance->pitch_bend - 1.f
+			+ 8.333333333333333e-2f * ((instance->note - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco1_fine]) - 2.f)));
+	bw_phase_gen_set_frequency(&instance->vco2_phase_gen_coeffs, 440.f *
+		bw_pow2f_3(6.f * instance->params[p_vco2_coarse] - 3.f
+			+ 2.f * instance->pitch_bend - 1.f
+			+ 8.333333333333333e-2f * ((instance->note - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco2_fine]) - 2.f)));
 	bw_phase_gen_set_frequency(&instance->vco3_phase_gen_coeffs, 440.f *
 		bw_pow2f_3(6.f * instance->params[p_vco3_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
@@ -275,18 +287,59 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		else
 			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state);
 		
-		for (int i = 0; i < n; i++)
-			instance->buf[1][i] = out[i] + instance->params[p_mod_mix] * (instance->buf[0][i] - out[i]);
+		// TODO: mod wheel
+		for (int j = 0; j < n; j++)
+			instance->buf[1][j] = out[j] + instance->params[p_mod_mix] * (instance->buf[0][j] - out[j]);
+		const float vcf_mod = 0.3f * instance->params[p_vcf_mod] * instance->buf[1][0];
 		
-		// TODO: vco1, vco2, mix
+		for (int j = 0; j < n; j++)
+			instance->buf[2][j] = instance->params[p_vco1_mod] * instance->buf[1][j];
+		bw_phase_gen_process(&instance->vco1_phase_gen_coeffs, &instance->vco1_phase_gen_state, instance->buf[2], instance->buf[2], instance->buf[3], n);
+		if (instance->params[p_vco1_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
+			bw_osc_tri_process(&instance->vco1_tri_coeffs, instance->buf[2], instance->buf[3], instance->buf[2], n);
+			bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);
+		} else if (instance->params[p_vco1_waveform] >= (1.f / 4.f)) {
+			bw_osc_pulse_process(&instance->vco1_pulse_coeffs, instance->buf[2], instance->buf[3], instance->buf[2], n);
+			bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
+		} else {
+			bw_osc_saw_process(&instance->vco_saw_coeffs, instance->buf[2], instance->buf[3], instance->buf[2], n);
+			bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);
+			bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
+		}
+		
+		for (int j = 0; j < n; j++)
+			instance->buf[1][j] = instance->params[p_vco2_mod] * instance->buf[1][j];
+		bw_phase_gen_process(&instance->vco2_phase_gen_coeffs, &instance->vco2_phase_gen_state, instance->buf[1], instance->buf[1], instance->buf[3], n);
+		if (instance->params[p_vco2_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
+			bw_osc_tri_process(&instance->vco2_tri_coeffs, instance->buf[1], instance->buf[3], instance->buf[1], n);
+			bw_osc_pulse_reset_coeffs(&instance->vco2_pulse_coeffs);
+		} else if (instance->params[p_vco2_waveform] >= (1.f / 4.f)) {
+			bw_osc_pulse_process(&instance->vco2_pulse_coeffs, instance->buf[1], instance->buf[3], instance->buf[1], n);
+			bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
+		} else {
+			bw_osc_saw_process(&instance->vco_saw_coeffs, instance->buf[1], instance->buf[3], instance->buf[1], n);
+			bw_osc_pulse_reset_coeffs(&instance->vco2_pulse_coeffs);
+			bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
+		}
+		
+		bw_vol_process(&instance->vco1_vol_coeffs, instance->buf[2], instance->buf[2], n);
+		bw_vol_process(&instance->vco2_vol_coeffs, instance->buf[1], instance->buf[1], n);
+		bw_vol_process(&instance->vco3_vol_coeffs, out, out, n);
+		bw_vol_process(&instance->noise_vol_coeffs, instance->buf[0], instance->buf[0], n);
+		for (int j = 0; j < n; j++)
+			out[j] = out[j] + instance->buf[1][j] + instance->buf[2][j];
 		
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		
-		// TODO: mix noise here
-
-		// TODO: modulation
+		if (instance->params[p_noise_color] >= 0.5f)
+			for (int j = 0; j < n; j++)
+				out[j] = out[j] + 3.f * instance->buf[0][j];
+		else
+			for (int j = 0; j < n; j++)
+				out[j] = out[j] + 0.01f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * instance->buf[0][j];
+		
 		bw_env_gen_process(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, NULL, n);
-		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * bw_env_gen_get_y_z1(&instance->vcf_env_gen_state);
+		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * bw_env_gen_get_y_z1(&instance->vcf_env_gen_state) + vcf_mod;
 		float cutoff = 20.f + (20e3f - 20.f) * v * v * v;
 		if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
 			cutoff *= bw_pow2f_3(8.333333333333333e-2f * (instance->note - 60));

@@ -566,6 +566,12 @@ static inline float bw_sqrtf_2(float x) {
 	return v.f;
 }
 
+static inline float bw_tanhf_3(float x) {
+	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
+	const float axm = bw_absf(xm);
+	return xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
+}
+
 #ifdef __cplusplus
 }
 #endif

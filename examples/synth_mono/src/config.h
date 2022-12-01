@@ -119,5 +119,7 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 #define P_GET_PARAMETER			bw_example_synth_mono_get_parameter
 #define P_NOTE_ON			bw_example_synth_mono_note_on
 #define P_NOTE_OFF			bw_example_synth_mono_note_off
+#define P_PITCH_BEND			bw_example_synth_mono_pitch_bend
+#define P_MOD_WHEEL			bw_example_synth_mono_mod_wheel
 
 #endif

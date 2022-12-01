@@ -291,9 +291,8 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		else
 			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state);
 		
-		// TODO: mod wheel
 		for (int j = 0; j < n; j++)
-			instance->buf[1][j] = out[j] + instance->params[p_mod_mix] * (instance->buf[0][j] - out[j]);
+			instance->buf[1][j] = instance->mod_wheel * (out[j] + instance->params[p_mod_mix] * (instance->buf[0][j] - out[j]));
 		const float vcf_mod = 0.3f * instance->params[p_vcf_mod] * instance->buf[1][0];
 		
 		for (int j = 0; j < n; j++)

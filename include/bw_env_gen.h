@@ -246,6 +246,8 @@ static inline void bw_env_gen_init(bw_env_gen_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_env_gen_set_sample_rate(bw_env_gen_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
+	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	coeffs->T = 1.f / sample_rate;
 }
 

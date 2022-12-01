@@ -200,7 +200,7 @@ var parameters = [
 		defaultValue:	0.0
 	},
 	{
-		name:		"VCA dttack",
+		name:		"VCA attack",
 		output:		false,
 		defaultValue:	0.0
 	},

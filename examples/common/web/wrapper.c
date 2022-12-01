@@ -151,3 +151,15 @@ void wrapper_note_off(wrapper w, int note) {
 	P_NOTE_OFF(w->instance, note);
 #endif
 }
+
+void wrapper_pitch_bend(wrapper w, int bend) {
+#ifdef P_PITCH_BEND
+	P_PITCH_BEND(w->instance, bend);
+#endif
+}
+
+void wrapper_mod_wheel(wrapper w, int wheel) {
+#ifdef P_MOD_WHEEL
+	P_MOD_WHEEL(w->instance, wheel);
+#endif
+}

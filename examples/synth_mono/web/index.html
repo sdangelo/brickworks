@@ -44,6 +44,14 @@ var Synth = {
 
 	noteOff: function (note) {
 		this.node.port.postMessage({ type: "noteOff", note: note });
+	},
+
+	pitchBend: function (bend) {
+		this.node.port.postMessage({ type: "pitchBend", pitchBend: bend });
+	},
+
+	modWheel: function (wheel) {
+		this.node.port.postMessage({ type: "modWheel", modWheel: wheel });
 	}
 };
 
@@ -112,6 +120,13 @@ window.addEventListener("load", async function (e) {
 					break;
 				case 0x80:
 					Synth.noteOff(e.data[1]);
+					break;
+				case 0xe0:
+					Synth.pitchBend(e.data[2] << 8 | e.data[1]);
+					break;
+				case 0xb0:
+					if (e.data[1] == 1)
+						Synth.modWheel(e.data[2]);
 					break;
 				}
 			}

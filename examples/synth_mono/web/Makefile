@@ -23,6 +23,8 @@ LDFLAGS= \
 	-Wl,--export=wrapper_set_parameter \
 	-Wl,--export=wrapper_note_on \
 	-Wl,--export=wrapper_note_off \
+	-Wl,--export=wrapper_pitch_bend \
+	-Wl,--export=wrapper_mod_wheel \
 	-Wl,-z,stack-size=$$((8*1024*1024)) \
 	-nostdlib
 

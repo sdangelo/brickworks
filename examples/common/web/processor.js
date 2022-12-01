@@ -65,6 +65,12 @@ class BWExample extends AudioWorkletProcessor {
 			case "noteOff":
 				self.module.wrapper_note_off(self.instance, e.data.note);
 				break;
+			case "pitchBend":
+				self.module.wrapper_pitch_bend(self.instance, e.data.pitchBend);
+				break;
+			case "modWheel":
+				self.module.wrapper_mod_wheel(self.instance, e.data.modWheel);
+				break;
 			}
 		};
 	}

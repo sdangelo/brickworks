@@ -356,17 +356,17 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		// otherwise no kbd control
 		bw_svf_set_cutoff(&instance->vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 		bw_svf_process(&instance->vcf_coeffs, &instance->vcf_state, out, out, NULL, NULL, n);
-
+		
 		bw_env_gen_process(&instance->vca_env_gen_coeffs, &instance->vca_env_gen_state, instance->buf[0], n);
 		for (int j = 0; j < n; j++)
 			out[j] *= instance->buf[0][j];
-
+		
 		bw_phase_gen_process(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, NULL, instance->buf[0], NULL, n);
 		bw_osc_sin_process(instance->buf[0], instance->buf[0], n);
 		if (instance->params[p_a440] >= 0.5f)
 			for (int j = 0; j < n; j++)
 				out[j] += instance->buf[0][j];
-
+		
 		bw_vol_process(&instance->vol_coeffs, out, out, n);
 		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);
 	}
@@ -470,7 +470,7 @@ void bw_example_synth_mono_note_off(bw_example_synth_mono instance, char note) {
 }
 
 void bw_example_synth_mono_pitch_bend(bw_example_synth_mono instance, int value) {
-	instance->pitch_bend = (value - 0x4000) / (float)0x4000;
+	instance->pitch_bend = (value - 0x2000) / (float)0x4000;
 }
 
 void bw_example_synth_mono_mod_wheel(bw_example_synth_mono instance, char value) {

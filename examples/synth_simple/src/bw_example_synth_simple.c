@@ -187,7 +187,7 @@ float bw_example_synth_simple_get_parameter(bw_example_synth_simple instance, in
 
 void bw_example_synth_simple_note_on(bw_example_synth_simple instance, char note, char velocity) {
 	if (velocity == 0) 
-		bw_example_synth_mono_note_off(instance, note);
+		bw_example_synth_simple_note_off(instance, note);
 	else
 		instance->note = note;
 }

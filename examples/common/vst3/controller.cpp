@@ -21,6 +21,8 @@
 
 #include "pluginterfaces/base/conststringtable.h"
 #include "base/source/fstreamer.h"
+#include "pluginterfaces/vst/ivstmidicontrollers.h"
+#include "common.h"
 
 tresult PLUGIN_API Controller::initialize(FUnknown *context) {
 	tresult r = EditController::initialize(context);
@@ -40,6 +42,32 @@ tresult PLUGIN_API Controller::initialize(FUnknown *context) {
 			0,
 			config_parameters[i].shortName ? ConstStringTable::instance()->getString(config_parameters[i].shortName) : nullptr
 		);
+
+#ifdef P_PITCH_BEND
+	parameters.addParameter(
+			ConstStringTable::instance()->getString("MIDI Pitch Bend"),
+			nullptr,
+			0,
+			0.5f,
+			ParameterInfo::kCanAutomate,
+			TAG_PITCH_BEND,
+			0,
+			nullptr
+		);
+#endif
+
+#ifdef P_MOD_WHEEL
+	parameters.addParameter(
+			ConstStringTable::instance()->getString("MIDI Mod Wheel"),
+			nullptr,
+			0,
+			0.5f,
+			ParameterInfo::kCanAutomate,
+			TAG_MOD_WHEEL,
+			0,
+			nullptr
+		);
+#endif
 
 	return kResultTrue;
 }
@@ -61,3 +89,26 @@ tresult PLUGIN_API Controller::setComponentState(IBStream *state) {
 
 	return kResultTrue;
 }
+
+#if defined(P_PITCH_BEND) || defined(P_MOD_WHEEL)
+tresult PLUGIN_API Controller::getMidiControllerAssignment(int32 busIndex, int16 channel, CtrlNumber midiControllerNumber, ParamID& id) {
+	if (busIndex != 0)
+		return kResultFalse;
+
+#ifdef P_PITCH_BEND
+	if (midiControllerNumber == Vst::kPitchBend) {
+		id = TAG_PITCH_BEND;
+		return kResultTrue;
+	}
+#endif
+
+#ifdef P_MOD_WHEEL
+	if (midiControllerNumber == Vst::kCtrlModWheel) {
+		id = TAG_MOD_WHEEL;
+		return kResultTrue;
+	}
+#endif
+
+	return kResultFalse;
+}
+#endif

@@ -46,6 +46,7 @@
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "pluginterfaces/vst/ivstevents.h"
 #include "base/source/fstreamer.h"
+#include "common.h"
 
 #include <algorithm>
 
@@ -230,8 +231,22 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 			int32 o;
 			if (q->getPoint(q->getPointCount() - 1, o, v) == kResultTrue) {
 				int32 pi = q->getParameterId();
-				parameters[pi] = v;
-				P_SET_PARAMETER(instance, pi, std::min(std::max(static_cast<float>(v), 0.f), 1.f));
+				switch (pi) {
+#ifdef P_PITCH_BEND
+				case TAG_PITCH_BEND:
+					P_PITCH_BEND(instance, static_cast<int>(16383.f * std::min(std::max(static_cast<float>(v), 0.f), 1.f)));
+					break;
+#endif
+#ifdef P_MOD_WHEEL
+				case TAG_MOD_WHEEL:
+					P_MOD_WHEEL(instance, static_cast<char>(127.f * std::min(std::max(static_cast<float>(v), 0.f), 1.f)));
+					break;
+#endif
+				default:
+					parameters[pi] = v;
+					P_SET_PARAMETER(instance, pi, std::min(std::max(static_cast<float>(v), 0.f), 1.f));
+					break;
+				}
 			}
 		}
 	}

@@ -28,7 +28,11 @@
 using namespace Steinberg;
 using namespace Steinberg::Vst;
 
+#if defined(P_PITCH_BEND) || defined(P_MOD_WHEEL)
+class Controller : EditController, IMidiMapping {
+#else
 class Controller : EditController {
+#endif
 public:
 	static FUnknown *createInstance(void *context) {
 		return (IEditController *) new Controller();
@@ -36,6 +40,15 @@ public:
 
 	tresult PLUGIN_API initialize(FUnknown *context) SMTG_OVERRIDE;
 	tresult PLUGIN_API setComponentState(IBStream *state) SMTG_OVERRIDE;
+#if defined(P_PITCH_BEND) || defined(P_MOD_WHEEL)
+	tresult PLUGIN_API getMidiControllerAssignment(int32 busIndex, int16 channel, CtrlNumber midiControllerNumber, ParamID& id) SMTG_OVERRIDE;
+
+	OBJ_METHODS (Controller, EditController)
+	DEFINE_INTERFACES
+		DEF_INTERFACE (IMidiMapping)
+	END_DEFINE_INTERFACES (EditController)
+	REFCOUNT_METHODS (EditController)
+#endif
 
 private:
 

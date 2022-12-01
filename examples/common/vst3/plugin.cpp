@@ -246,10 +246,10 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 				continue;
 			switch (e.type) {
 				case Event::kNoteOnEvent:
-					P_NOTE_ON(instance, e.noteOn.pitch, e.noteOn.velocity);
+					P_NOTE_ON(instance, e.noteOn.pitch, 127.f * e.noteOn.velocity);
 					break;
 				case Event::kNoteOffEvent:
-					P_NOTE_OFF(instance, e.noteOn.pitch);
+					P_NOTE_OFF(instance, e.noteOff.pitch);
 					break;
 			}
 		}

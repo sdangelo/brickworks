@@ -101,7 +101,7 @@ struct _bw_example_synth_mono {
 	bw_osc_pulse_coeffs	vco3_pulse_coeffs;
 	bw_osc_tri_coeffs	vco3_tri_coeffs;
 	bw_vol_coeffs		vco3_vol_coeffs;
-	bw_osc_filt_state	osc_filt_state;	
+	bw_osc_filt_state	osc_filt_state;
 	bw_noise_gen_coeffs	noise_gen_coeffs;
 	bw_pink_filt_coeffs	pink_filt_coeffs;
 	bw_pink_filt_state	pink_filt_state;
@@ -216,14 +216,17 @@ void bw_example_synth_mono_reset(bw_example_synth_mono instance) {
 	bw_phase_gen_reset_state(&instance->vco1_phase_gen_coeffs, &instance->vco1_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
+	bw_vol_reset_coeffs(&instance->vco1_vol_coeffs);
 	bw_phase_gen_reset_coeffs(&instance->vco2_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->vco2_phase_gen_coeffs, &instance->vco2_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco2_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
+	bw_vol_reset_coeffs(&instance->vco2_vol_coeffs);
 	bw_phase_gen_reset_coeffs(&instance->vco3_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->vco3_phase_gen_coeffs, &instance->vco3_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco3_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco3_tri_coeffs);
+	bw_vol_reset_coeffs(&instance->vco3_vol_coeffs);
 	bw_osc_filt_reset_state(&instance->osc_filt_state);
 	bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state);
 	bw_vol_reset_coeffs(&instance->noise_vol_coeffs);
@@ -451,8 +454,12 @@ static void update_note_gate(bw_example_synth_mono instance) {
 }
 
 void bw_example_synth_mono_note_on(bw_example_synth_mono instance, char note, char velocity) {
-	instance->notes_pressed[note] = 1;
-	update_note_gate(instance);
+	if (velocity == 0)
+		bw_example_synth_mono_note_off(instance, note);
+	else {
+		instance->notes_pressed[note] = 1;
+		update_note_gate(instance);
+	}
 }
 
 void bw_example_synth_mono_note_off(bw_example_synth_mono instance, char note) {

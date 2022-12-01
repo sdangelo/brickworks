@@ -208,6 +208,10 @@ void bw_example_synth_mono_set_sample_rate(bw_example_synth_mono instance, float
 }
 
 void bw_example_synth_mono_reset(bw_example_synth_mono instance) {
+	const float v = instance->params[p_vcf_cutoff];
+	const float cutoff = 20.f + (20e3f - 20.f) * v * v * v;
+	bw_svf_set_cutoff(&instance->vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
+	
 	bw_phase_gen_reset_coeffs(&instance->vco1_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->vco1_phase_gen_coeffs, &instance->vco1_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);

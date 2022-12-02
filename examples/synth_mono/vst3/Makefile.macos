@@ -4,6 +4,7 @@ CXX=clang++
 CXXFLAGS= \
 	-std=c++11 \
 	-DRELEASE=1 \
+	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../common/vst3 \
 	-I${ROOT_DIR}/../../../include \

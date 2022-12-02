@@ -3,7 +3,7 @@ VST3_SDK_DIR=${ROOT_DIR}/../../../../VST_SDK/vst3sdk
 CXX=g++
 CXXFLAGS= \
 	-DRELEASE=1 \
-	-I${ROOT_DIR}/src \
+	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../common/vst3 \
 	-I${ROOT_DIR}/../../../include \

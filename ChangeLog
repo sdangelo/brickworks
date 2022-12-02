@@ -9,6 +9,7 @@
   * Added BW_RESTRICT and removed BW_MALLOC, BW_REALLOC, and BW_FREE from
     bw_common.
   * Added new monophonic synth example bw_example_synth_mono.
+  * Added new bw_omega_3lognr() and bw_tanhf_3() fast math routines.
   * Using bw_one_pole for smoothing bw_vol.
   * Simplified and rewritten example synth, renamed as
     bw_example_synth_simple.

@@ -1,14 +1,23 @@
 0.2.0
 -----
-  * Refactored API of DSP modules.
-  * Removed bw_inline_one_pole (functionality implemented by bw_one_pole).
+  * Refactored API of DSP modules for better flexibility and performance.
+  * Removed bw_inline_one_pole and bw_inline_slew_rate (functionality
+    implemented by bw_one_pole and bw_slew_rate, respectively).
   * Added bw_wah and bw_example_fx_wah.
+  * Added bw_satur and bw_example_fx_satur.
+  * Added bw_pink_filt.
   * Added BW_RESTRICT and removed BW_MALLOC, BW_REALLOC, and BW_FREE from
     bw_common.
+  * Added new monophonic synth example bw_example_synth_mono.
+  * Using bw_one_pole for smoothing bw_vol.
+  * Simplified and rewritten example synth, renamed as
+    bw_example_synth_simple.
   * Renamed bw_example_fx to bw_example_fx_svf are removed output "Level"
     parameter from it.
   * Using correct "Fx|Filter" VST3 subcategory for bw_example_fx_svf.
+  * Correctly handling note on events with velocity 0 as note offs.
   * Using official logo as VST3 plugin icon.
+  * Minor performance improvements in bw_svf.
   * Fixed potential bug when setting parameters in examples.
 
 0.1.0

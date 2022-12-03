@@ -24,9 +24,6 @@
  *  description {{{
  *    Envelope follower made of a full-wave rectifier followed by
  *    [bw_one_pole](bw_one_pole) one-pole filter (6 dB/oct).
- *
- *    Unlike other dsp modules, you can directly access the parameters of the
- *    internal one-pole filter via the `bw_env_follow_get_one_pole()` function.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -58,54 +55,93 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_env_follow_coeffs bw_env_follow_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and input parameter values.
  *
- *    ### bw_env_follow_state
- *  >>> */
+ *    #### bw_env_follow_state
+ *  ```>>> */
 typedef struct _bw_env_follow_state bw_env_follow_state;
 /*! <<<```
- *    State.
+ *    Internal state and output parameter values.
  *
  *    #### bw_env_follow_init()
  *  ```>>> */
 static inline void bw_env_follow_init(bw_env_follow_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_env_follow_set_sample_rate()
  *  ```>>> */
 static inline void bw_env_follow_set_sample_rate(bw_env_follow_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    #### bw_one_pole_reset_state()
+ *    #### bw_env_follow_reset_coeffs()
+ *  ```>>> */
+static inline void bw_env_follow_reset_coeffs(bw_env_follow_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
+ *
+ *    #### bw_env_follow_reset_state()
  *  ```>>> */
 static inline void bw_env_follow_reset_state(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_env_follow_reset_coeffs(bw_env_follow_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_env_follow_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_env_follow_update_coeffs_ctrl(bw_env_follow_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_env_follow_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_env_follow_update_coeffs_audio(bw_env_follow_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_env_follow_process1()
+ *  ```>>> */
 static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, float x);
-
-/*! ...
+/*! <<<```
+ *    Processes one input sample `x` using `coeffs` and updating `state` (audio
+ *    rate only). Returns the corresponding output sample.
+ *
  *    #### bw_env_follow_process()
  *  ```>>> */
 static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
- *  }}} */
-
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating both
+ *    `coeffs` and `state` (control and audio rate).
+ *
+ *    `y` may be `NULL`.
+ *
+ *    #### bw_env_follow_set_attack_tau()
+ *  ```>>> */
 static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the upgoing (attack)
+ *    <a href="https://en.wikipedia.org/wiki/Time_constant" target="_blank">time
+ *    constant</a> in `coeffs` of the one-pole filter to `value` (s).
+ *
+ *    Default value: `0.f`.
+ *
+ *    #### bw_env_follow_set_release_tau()
+ *  ```>>> */
 static inline void bw_env_follow_set_release_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
-
+/*! <<<```
+ *    Sets the downgoing (release)
+ *    <a href="https://en.wikipedia.org/wiki/Time_constant" target="_blank">time
+ *    constant</a> in `coeffs` of the one-pole filter to `value` (s).
+ *
+ *    Default value: `0.f`.
+ *
+ *    #### bw_env_follow_get_y_z1()
+ *  ```>>> */
 static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRICT state);
+/*! <<<```
+ *    Returns the last output sample stored in `state`.
+ *  }}} */
 
 /*** Implementation ***/
 
@@ -155,7 +191,7 @@ static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRI
 
 static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_env_follow_update_coeffs_ctrl(coeffs);
-	if (y)
+	if (y != NULL)
 		for (int i = 0; i < n_samples; i++) {
 			bw_env_follow_update_coeffs_audio(coeffs);
 			y[i] = bw_env_follow_process1(coeffs, state, x[i]);

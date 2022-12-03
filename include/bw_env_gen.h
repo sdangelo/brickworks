@@ -24,7 +24,7 @@
  *  description {{{
  *    Linear ADSR envelope generator.
  *
- *    * In the off state (gate off and possible previous release phase ended),
+ *    * In the off phase (gate off and possible previous release phase ended),
  *      the output is `0.f`;
  *    * in the attack phase the output increases from `0.f` to `1.f`;
  *    * in the decay phase the output decreases from `1.f` to the given sustain
@@ -67,13 +67,13 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_env_gen_coeffs bw_env_gen_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and input parameter values.
  *
- *    ### bw_env_gen_state
+ *    #### bw_env_gen_state
  *  ```>>> */
 typedef struct _bw_env_gen_state bw_env_gen_state;
 /*! <<<```
- *    State.
+ *    Internal state and output parameter values.
  *
  *    #### bw_env_gen_phase
  *  ```>>> */
@@ -85,113 +85,128 @@ typedef enum {
 	bw_env_gen_phase_release
 } bw_env_gen_phase;
 /*! <<<```
- *    Phase:
- *     * `bw_env_gen_phase_off`: ...
- *     * `bw_env_gen_phase_attack`: ...
- *     * `bw_env_gen_phase_decay`: ...
- *     * `bw_env_gen_phase_sustain`: ...
- *     * `bw_env_gen_phase_release`: ...
+ *    Envelope generator phase:
+ *     * `bw_env_gen_phase_off`: off phase;
+ *     * `bw_env_gen_phase_attack`: attack phase;
+ *     * `bw_env_gen_phase_decay`: decay phase;
+ *     * `bw_env_gen_phase_sustain`: sustain phase;
+ *     * `bw_env_gen_phase_release`: release phase.
  *
  *    #### bw_env_gen_init()
  *  ```>>> */
 static inline void bw_env_gen_init(bw_env_gen_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_env_gen_set_sample_rate()
  *  ```>>> */
 static inline void bw_env_gen_set_sample_rate(bw_env_gen_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `instance`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_env_gen_reset_coeffs()
+ *  ```>>> */
+static inline void bw_env_gen_reset_coeffs(bw_env_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_env_gen_reset_state()
  *  ```>>> */
 static inline void bw_env_gen_reset_state(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_env_gen_reset_coeffs(bw_env_gen_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_env_gen_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_env_gen_update_coeffs_ctrl(bw_env_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_env_gen_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_env_gen_update_coeffs_audio(bw_env_gen_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_env_gen_update_state_ctrl()
+ *  ```>>> */
 static inline void bw_env_gen_update_state_ctrl(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state);
-
+/*! <<<```
+ *    Triggers control-rate update of the internal `state` using `coeffs`.
+ *
+ *    #### bw_env_gen_process1()
+ *  ```>>> */
 static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state);
-
-/*! ...
+/*! <<<```
+ *    Generates and returns one sample using `coeffs` and updating `state`
+ *    (audio rate only).
+ *
  *    #### bw_env_gen_process()
  *  ```>>> */
 static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, float* y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` generate `n_samples` samples and puts them in
- *    the output buffer `y`.
- *  >>> */
-
-/*! ...
+ *    Generates and fills the first `n_samples` of the output buffer `y`, while
+ *    using and updating both `coeffs` and `state` (control and audio rate).
+ *
+ *    `y` may be `NULL`.
+ *
  *    #### bw_env_gen_set_gate()
  *  ```>>> */
 static inline void bw_env_gen_set_gate(bw_env_gen_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
- *    Sets the input gate to be either off (`0`) or on (non-`0`) for the given
- *    `instance`.
+ *    Sets the input gate to be either off (`0`) or on (non-`0`) in `coeffs`.
  *
  *    Default value: `0` (off).
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_env_gen_set_attack()
  *  ```>>> */
 static inline void bw_env_gen_set_attack(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the attack time to `value` (s) for the given `instance`.
+ *    Sets the attack time to `value` (s) in `coeffs`.
  *
  *    `value` must be smaller than `1e9f`.
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_env_gen_set_decay()
  *  ```>>> */
 static inline void bw_env_gen_set_decay(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the decay time to `value` (s) for the given `instance`.
+ *    Sets the decay time to `value` (s) in `coeffs`.
  *
  *    `value` must be smaller than `1e9f`.
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_env_gen_set_sustain()
  *  ```>>> */
 static inline void bw_env_gen_set_sustain(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the sustain level to `value` for the given `instance`.
+ *    Sets the sustain level to `value` in `coeffs`.
  *
  *    Default value: `1.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_env_gen_set_release()
  *  ```>>> */
 static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the release time to `value` (s) for the given `instance`.
+ *    Sets the release time to `value` (s) in `coeffs`.
  *
  *    `value` must be smaller than `1e9f`.
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_env_gen_get_phase()
  *  ```>>> */
 static inline bw_env_gen_phase bw_env_gen_get_phase(bw_env_gen_state *state);
 /*! <<<```
- *    ...
+ *    Returns the current envelope generator phase as stored in `state`.
+ *
+ *    #### bw_env_gen_get_y_z1()
+ *  ```>>> */
+static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state);
+/*! <<<```
+ *    Returns the last output sample stored in `state`.
  *  }}} */
 
 static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state);

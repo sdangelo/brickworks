@@ -261,8 +261,6 @@ static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT st
  *    Returns the last output sample stored in `state`.
  *  }}} */
 
-
-
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may

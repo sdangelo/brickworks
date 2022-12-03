@@ -20,6 +20,7 @@
   * Using official logo as VST3 plugin icon.
   * Minor performance improvements in bw_svf.
   * Fixed potential bug when setting parameters in examples.
+  * Fixed missing initialization of sticky mode in bw_one_pole.
 
 0.1.0
 -----

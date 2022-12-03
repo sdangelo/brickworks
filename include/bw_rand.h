@@ -65,10 +65,8 @@ static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state);
  *    [`0`, `UINT32_MAX`].
  *
  *    `state` is a pointer to a 64-bit unsigned integer storing the state
- *    between calls, and which gets updated by calls to this function.
- *  >>> */
-
-/*! ...
+ *    between calls and which gets updated by this function.
+ *
  *    #### bw_randf()
  *  ```>>> */
 static inline float bw_randf(uint64_t *BW_RESTRICT state);
@@ -77,7 +75,7 @@ static inline float bw_randf(uint64_t *BW_RESTRICT state);
  *    [`-1.f`, `1.f`].
  *
  *    `state` is a pointer to a 64-bit unsigned integer storing the state
- *    between calls, and which gets updated by calls to this function.
+ *    between calls and which gets updated by this function.
  *  }}} */
 
 /*** Implementation ***/

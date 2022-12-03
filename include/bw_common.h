@@ -29,8 +29,8 @@
  *    <ul>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Removed BW_MALLOC, BW_REALLOC, and BW_FREE.</li>
- *          <li>Added BW_RESTRICT.</li>
+ *          <li>Removed <code>BW_MALLOC</code>, <code>BW_REALLOC</code>, and <code>BW_FREE</code>.</li>
+ *          <li>Added <code>BW_RESTRICT</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -55,16 +55,16 @@
  *    the command line.
  *  >>> */
 #include <bw_config.h>
-
 /*! ...
+ *
  *    #### NULL
  *    If `NULL` is not defined, then `stddef.h` is `#include`d.
  *  >>> */
 #ifndef NULL
 # include <stddef.h>
 #endif
-
 /*! ...
+ *
  *    #### Exact-width integer types
  *    If <code class="hljs">(u)int{8,16,32,64}_t</code>,
  *    `INT{8,16,32,64}_{MIN,MAX}`, and `UINT{8,16,32,64}_MAX` are not defined,
@@ -74,15 +74,19 @@
 #ifndef INT32_MAX
 # include <stdint.h>
 #endif
-
 /*! ...
+ *
  *    #### INFINITY
  *    If `INFINITY` is not defined, then `math.h` is `#include`d.
  *  >>> */
 #ifndef INFINITY
 # include <math.h>
 #endif
-
+/*! ...
+ *
+ *    #### BW_RESTRICT
+ *    If `BW_RESTRICT` is not defined, then it is defined as `restrict` if C99 is supported.
+ *  >>> */
 #ifndef BW_RESTRICT
 # if defined(__STDC__) && (__STDC_VERSION__ >= 199901L)
 #  define BW_RESTRICT restrict
@@ -90,7 +94,6 @@
 #  define BW_RESTRICT
 # endif
 #endif
-
 /*! ... }}} */
 
 #endif

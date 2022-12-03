@@ -81,11 +81,11 @@
 #ifndef _BW_MATH_H
 #define _BW_MATH_H
 
-#include <bw_common.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_signfilli32()
@@ -93,83 +93,63 @@ extern "C" {
 static inline int32_t bw_signfilli32(int32_t x);
 /*! <<<```
  *    Returns `~0` if `x` is negative, `0` otherwise.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_mini32()
  *  ```>>> */
 static inline int32_t bw_mini32(int32_t a, int32_t b);
 /*! <<<```
  *    Returns the minimum of `a` and `b`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_maxi32()
  *  ```>>> */
 static inline int32_t bw_maxi32(int32_t a, int32_t b);
 /*! <<<```
  *    Returns the maximum of `a` and `b`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_clipi32()
  *  ```>>> */
 static inline int32_t bw_clipi32(int32_t x, int32_t m, int32_t M);
 /*! <<<```
  *    Returns `x` unless it is smaller than `m`, in which case it returns `m`,
  *    or bigger than `M`, in which case it returns `M`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_minu32()
  *  ```>>> */
 static inline uint32_t bw_minu32(uint32_t a, uint32_t b);
 /*! <<<```
  *    Returns the minimum of `a` and `b`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_maxu32()
  *  ```>>> */
 static inline uint32_t bw_maxu32(uint32_t a, uint32_t b);
 /*! <<<```
  *    Returns the maximum of `a` and `b`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_clipu32()
  *  ```>>> */
 static inline uint32_t bw_clipu32(uint32_t x, uint32_t m, uint32_t M);
 /*! <<<```
  *    Returns `x` unless it is smaller than `m`, in which case it returns `m`,
  *    or bigger than `M`, in which case it returns `M`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_copysignf()
  *  ```>>> */
 static inline float bw_copysignf(float x, float y);
 /*! <<<```
  *    Returns a value that has the absolute value of `x` and the sign of `y`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_signf()
  *  ```>>> */
 static inline float bw_signf(float x);
 /*! <<<```
  *    Returns `1.f` if `x > 0.f`, `-1.f` if `x < 0.f` and `0.f` if `x == 0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_absf()
  *  ```>>> */
 static inline float bw_absf(float x);
 /*! <<<```
  *    Returns the absolute value of `x`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_min0xf()
  *  ```>>> */
 static inline float bw_min0xf(float x);
@@ -177,9 +157,7 @@ static inline float bw_min0xf(float x);
  *    Returns the minimum of `0.f` and `x`.
  *
  *    `x` must be finite.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_max0xf()
  *  ```>>> */
 static inline float bw_max0xf(float x);
@@ -187,9 +165,7 @@ static inline float bw_max0xf(float x);
  *    Returns the maximum of `0.f` and `x`.
  *
  *    `x` must be finite.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_minf()
  *  ```>>> */
 static inline float bw_minf(float a, float b);
@@ -197,9 +173,7 @@ static inline float bw_minf(float a, float b);
  *    Returns the minimum of `a` and `b`.
  *
  *    `a` and `b` must be finite.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_maxf()
  *  ```>>> */
 static inline float bw_maxf(float a, float b);
@@ -207,9 +181,7 @@ static inline float bw_maxf(float a, float b);
  *    Returns the maximum of `a` and `b`.
  *
  *    `a` and `b` must be finite.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_clipf()
  *  ```>>> */
 static inline float bw_clipf(float x, float m, float M);
@@ -218,18 +190,14 @@ static inline float bw_clipf(float x, float m, float M);
  *    or bigger than `M`, in which case it returns `M`.
  *
  *    `x`, `m`, and `M` must be finite.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_truncf()
  *  ```>>> */
 static inline float bw_truncf(float x);
 /*! <<<```
  *    Returns `x` with its fractional part set to zero (i.e., rounded towards
  *    zero).
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_roundf()
  *  ```>>> */
 static inline float bw_roundf(float x);
@@ -238,18 +206,14 @@ static inline float bw_roundf(float x);
  *
  *    Halfway cases are rounded away from zero. E.g., `bw_roundf(0.5f)` gives
  *    `1.f` and `bw_roundf(-0.5f)` gives `-1.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_floorf()
  *  ```>>> */
 static inline float bw_floorf(float x);
 /*! <<<```
  *    Returns the biggest integer lower or equal than `x` (i.e., `x` is rounded
  *    down).
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_rcpf_2()
  *  ```>>> */
 static inline float bw_rcpf_2(float x);
@@ -260,9 +224,7 @@ static inline float bw_rcpf_2(float x);
  *    range: |`x`| in [2^-90, 2^90].
  *
  *    Relative error < 0.0013%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_sinf_3()
  *  ```>>> */
 static inline float bw_sinf_3(float x);
@@ -271,9 +233,7 @@ static inline float bw_sinf_3(float x);
  *    radians.
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_cosf_3()
  *  ```>>> */
 static inline float bw_cosf_3(float x);
@@ -282,10 +242,8 @@ static inline float bw_cosf_3(float x);
  *    radians.
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
- *  >>> */
-
-/*! ...
- *    #### bw_tanf_div_3()
+ *
+ *    #### bw_tanf_3()
  *  ```>>> */
 static inline float bw_tanf_3(float x);
 /*! <<<```
@@ -297,9 +255,7 @@ static inline float bw_tanf_3(float x);
  *    integer number.
  *
  *    Absolute error < 0.06, relative error < 0.8%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_log2f_3()
  *  ```>>> */
 static inline float bw_log2f_3(float x);
@@ -307,9 +263,7 @@ static inline float bw_log2f_3(float x);
  *    Returns an approximation of the base-2 logarithm of `x`.
  * 
  *    Absolute error < 0.0055, relative error < 1.5%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_logf_3()
  *  ```>>> */
 static inline float bw_logf_3(float x);
@@ -317,9 +271,7 @@ static inline float bw_logf_3(float x);
  *    Returns an approximation of the natural logarithm of `x`.
  * 
  *    Absolute error < 0.0039, relative error < 1.5%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_pow2f_3()
  *  ```>>> */
 static inline float bw_pow2f_3(float x);
@@ -327,9 +279,7 @@ static inline float bw_pow2f_3(float x);
  *    Returns an approximation of 2 raised to the power of `x`.
  * 
  *    Relative error < 0.062%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_expf_3()
  *  ```>>> */
 static inline float bw_expf_3(float x);
@@ -337,9 +287,7 @@ static inline float bw_expf_3(float x);
  *    Returns an approximation of e (Euler's number) raised to the power of `x`.
  * 
  *    Relative error < 0.062%.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_omega_3log()
  *  ```>>> */
 static inline float bw_omega_3log(float x);
@@ -348,20 +296,20 @@ static inline float bw_omega_3log(float x);
  *    href="https://en.wikipedia.org/wiki/Wright_omega_function"
  *    target="_blank">Wright omega function</a>.
  *
- *    Absolute error < 0.027, relative error < 12% for non-negative input and
+ *    Absolute error < 0.27, relative error < 14.6% for non-negative input and
  *    decreasing with increasing input, goes rapidly to 100% for progressively
  *    more negative input.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_omega_3lognr()
  *  ```>>> */
 static inline float bw_omega_3lognr(float x);
 /*! <<<```
- *    ...
- *  >>> */
-
-/*! ...
+ *    Returns an approximation of `omega(x)`, where `omega` is the <a
+ *    href="https://en.wikipedia.org/wiki/Wright_omega_function"
+ *    target="_blank">Wright omega function</a>.
+ *
+ *    Absolute error < 0.045, relative error < 3.7%.
+ *
  *    #### bw_sqrtf_2()
  *  ```>>> */
 static inline float bw_sqrtf_2(float x);
@@ -369,6 +317,14 @@ static inline float bw_sqrtf_2(float x);
  *    Returns an approximation of the square root of `x`.
  * 
  *    Relative error < 0.0007%.
+ *
+ *    #### bw_tanhf_3()
+ *  ```>>> */
+static inline float bw_tanhf_3(float x);
+/*! <<<```
+ *    Returns an approximation of the hyperbolic tangent of `x`.
+ *
+ *    Absolute error < 0.035, relative error < 6.5%.
  *  }}} */
 
 /*** Implementation ***/

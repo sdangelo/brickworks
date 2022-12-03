@@ -206,7 +206,7 @@ static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *stat
  *  ```>>> */
 static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state);
 /*! <<<```
- *    Returns the last output sample stored in `state`.
+ *    Returns the last output sample as stored in `state`.
  *  }}} */
 
 /*** Implementation ***/

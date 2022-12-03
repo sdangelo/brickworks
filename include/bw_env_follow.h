@@ -140,7 +140,7 @@ static inline void bw_env_follow_set_release_tau(bw_env_follow_coeffs *BW_RESTRI
  *  ```>>> */
 static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRICT state);
 /*! <<<```
- *    Returns the last output sample stored in `state`.
+ *    Returns the last output sample as stored in `state`.
  *  }}} */
 
 /*** Implementation ***/

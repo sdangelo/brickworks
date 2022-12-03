@@ -258,7 +258,7 @@ static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT c
  *  ```>>> */
 static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state);
 /*! <<<```
- *    Returns the last output sample stored in `state`.
+ *    Returns the last output sample as stored in `state`.
  *  }}} */
 
 /*** Implementation ***/

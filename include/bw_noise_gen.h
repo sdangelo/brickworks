@@ -23,6 +23,10 @@
  *  requires {{{ bw_config bw_common bw_math bw_rand }}}
  *  description {{{
  *    Generator of white noise with uniform distribution.
+ *
+ *    This module has no internal state, rather its state is stored into a
+ *    `uint64_t` value to which the API user supplies a pointer (as in
+ *    [bw\_rand](bw_rand)).
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -54,51 +58,59 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_noise_gen_coeffs bw_noise_gen_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    #### bw_noise_gen_init()
  *  ```>>> */
 static inline void bw_noise_gen_init(bw_noise_gen_coeffs *BW_RESTRICT coeffs, uint64_t *BW_RESTRICT state);
 /*! <<<```
- *    Initializes `coeffs` and lets it use the given `state` pointer to obtain
- *    pseudo-random numbers.
+ *    Initializes input parameter values and sets the `state` pointer to obtain
+ *    pseudo-random numbers in `coeffs`.
  *
  *    #### bw_noise_gen_set_sample_rate()
  *  ```>>> */
 static inline void bw_noise_gen_set_sample_rate(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
- *  >>> */
-
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_noise_gen_process1\*()
+ *  ```>>> */
 static inline float bw_noise_gen_process1(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
 static inline float bw_noise_gen_process1_scaling(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
-
-/*! ...
- *    #### bw_noise_gen_process()
+/*! <<<```
+ *    These functions generates and return one sample using `coeffs`, where:
+ *     * `bw_noise_gen_process1()` assumes that sample rate scaling is disabled;
+ *     * `bw_noise_gen_process1_scaling()` assumes that sample rate scaling is
+ *       enabled.
+ *
+ *    #### bw_env_gen_process()
  *  ```>>> */
 static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` generate `n_samples` samples and puts them in
- *    the output buffer `y`.
- *  >>> */
-
-/*! ...
+ *    Generates and fills the first `n_samples` of the output buffer `y` using
+ *    `coeffs`.
+ *
  *    #### bw_noise_gen_set_sample_rate_scaling()
  *  ```>>> */
 static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
  *    Sets whether the output should be scaled (`value` non-`0`) or not (`0`)
- *    according to the sample rate by the given `instance`.
+ *    according to the sample rate in `coeffs`.
  *
- *    In order to maintain the perceived loudness at different sample rates, a
- *    white noise signal with uniform distribution should be accordingly scaled.
- *    In this module the 44100 Hz sample rate is used as a reference (that is,
- *    the scaling factor at that sample rate is `1.f`).
+ *    In order to maintain the same perceived loudness at different sample
+ *    rates, a white noise signal with uniform distribution should be
+ *    accordingly scaled. The 44100 Hz sample rate is used as a reference (that
+ *    is, the scaling factor at that sample rate is `1.f`).
  *
- *    Default value: `0`.
- *  }}} */
-
+ *    Default value: `0` (off).
+ *
+ *    #### bw_noise_gen_get_scaling_k()
+ *  ```>>> */
 static inline float bw_noise_gen_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Returns the sample rate scaling factor that is applied or would be applied
+ *    if sample rate scaling were enabled, as stored in `coeffs`.
+ *  }}} */
 
 /*** Implementation ***/
 

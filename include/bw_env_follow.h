@@ -55,13 +55,13 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_env_follow_coeffs bw_env_follow_coeffs;
 /*! <<<```
- *    Coefficients and input parameter values.
+ *    Coefficients and related.
  *
  *    #### bw_env_follow_state
  *  ```>>> */
 typedef struct _bw_env_follow_state bw_env_follow_state;
 /*! <<<```
- *    Internal state and output parameter values.
+ *    Internal state and related.
  *
  *    #### bw_env_follow_init()
  *  ```>>> */

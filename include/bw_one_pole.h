@@ -55,13 +55,13 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_one_pole_coeffs bw_one_pole_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
- *    ### bw_one_pole_state
- *  >>> */
+ *    #### bw_one_pole_state
+ *  ```>>> */
 typedef struct _bw_one_pole_state bw_one_pole_state;
 /*! <<<```
- *    State.
+ *    Internal state and related.
  *
  *    #### bw_one_pole_sticky_mode
  *  ```>>> */
@@ -79,138 +79,164 @@ typedef enum {
  *  ```>>> */
 static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_one_pole_set_sample_rate()
  *  ```>>> */
 static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_one_pole_reset_coeffs()
+ *  ```>>> */
+static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_one_pole_reset_state()
  *  ```>>> */
 static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float y_z1);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/equilibrium value `y_z1`.
+ *
+ *    #### bw_one_pole_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_one_pole_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_one_pole_update_coeffs_audio(bw_one_pole_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_one_pole_process1\*()
+ *  ```>>> */
 static inline float bw_one_pole_process1(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 static inline float bw_one_pole_process1_asym(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
-
-/*! ...
+/*! <<<```
+ *    These function process one input sample `x` using `coeffs` and updating
+ *   `state` (audio rate only). They return the corresponding output sample.
+ *
+ *    In particular:
+ *     * `bw_one_pole_process1()` assumes that upgoing and downgoing cutoff/tau
+ *       are equal and the target-reach threshold is `0.f`;
+ *     * `bw_one_pole_process1_sticky_abs()` assumes that upgoing and downgoing
+ *       cutoff/tau are equal, that the target-reach threshold is not `0.f`,
+ *       and that the distance metric for sticky behavior is set to
+ *       `bw_one_pole_sticky_mode_abs`;
+ *     * `bw_one_pole_process1_sticky_rel()` assumes that upgoing and downgoing
+ *       cutoff/tau are equal, that the target-reach threshold is not `0.f`,
+ *       and that the distance metric for sticky behavior is set to
+ *       `bw_one_pole_sticky_mode_rel`;
+ *     * `bw_one_pole_process1_asym()` assumes that upgoing and downgoing
+ *       cutoff/tau are different and the target-reach threshold is `0.f`;
+ *     * `bw_one_pole_process1_asym_sticky_abs()` assumes that upgoing and
+ *       downgoing cutoff/tau are different, that the target-reach threshold is
+ *       not `0.f`, and that the distance metric for sticky behavior is set to
+ *       `bw_one_pole_sticky_mode_abs`;
+ *     * `bw_one_pole_process1_asym_sticky_rel()` assumes that upgoing and
+ *       downgoing cutoff/tau are different, that the target-reach threshold is
+ *       not `0.f`, and that the distance metric for sticky behavior is set to
+ *       `bw_one_pole_sticky_mode_rel`.
+ *
  *    #### bw_one_pole_process()
  *  ```>>> */
 static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
- *  >>> */
-
-/*! ...
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating both
+ *    `coeffs` and `state` (control and audio rate).
+ *
+ *    `y` may be `NULL`.
+ *
  *    #### bw_one_pole_set_cutoff()
  *  ```>>> */
 static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets both the upgoing (attack) and downgoing (decay) cutoff frequency to
- *    the given `value` (Hz) for the given `instance`.
+ *    the given `value` (Hz) in `coeffs`.
  *
  *    This is equivalent to calling both `bw_one_pole_set_cutoff_up()` and
- *    `bw_one_pole_set_cutoff_down()` with same `instance` and `value` or
- *    calling `bw_one_pole_set_tau()` with same `instance` and
+ *    `bw_one_pole_set_cutoff_down()` with same `coeffs` and `value` or calling
+ *    `bw_one_pole_set_tau()` with same `coeffs` and
  *    value = 1 / (2 * pi * `value`) (net of numerical errors).
  *
  *    Default value: `INFINITY`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_cutoff_up()
  *  ```>>> */
 static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the upgoing (attack) cutoff frequency to the given `value` (Hz) for
- *    the given `instance`.
+ *    Sets the upgoing (attack) cutoff frequency to the given `value` (Hz) in
+ *    `coeffs`.
  *
  *    This is equivalent to calling `bw_one_pole_set_tau_up()` with same
- *    `instance` and value = 1 / (2 * pi * `value`) (net of numerical errors).
+ *    `coeffs` and value = 1 / (2 * pi * `value`) (net of numerical errors).
  *
  *    Default value: `INFINITY`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_cutoff_down()
  *  ```>>> */
 static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the downgoing (attack) cutoff frequency to the given `value` (Hz)
- *    for the given `instance`.
+ *    Sets the downgoing (attack) cutoff frequency to the given `value` (Hz) in
+ *    `coeffs`.
  *
  *    This is equivalent to calling `bw_one_pole_set_tau_down()` with same
- *    `instance` and value = 1 / (2 * pi * `value`) (net of numerical errors).
+ *    `coeffs` and value = 1 / (2 * pi * `value`) (net of numerical errors).
  *
  *    Default value: `INFINITY`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_tau()
  *  ```>>> */
 static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets both the upgoing (attack) and downgoing (decay) time constant to the
- *    given `value` (s) for the given `instance`.
+ *    given `value` (s) in `coeffs`.
  *
  *    This is equivalent to calling both `bw_one_pole_set_tau_up()` and
- *    `bw_one_pole_set_tau_down()` with same `instance` and `value` or calling
- *    `bw_one_pole_set_cutoff()` with same `instance` and
+ *    `bw_one_pole_set_tau_down()` with same `coeffs` and `value` or calling
+ *    `bw_one_pole_set_cutoff()` with same `coeffs` and
  *    value = 1 / (2 * pi * `value`) (net of numerical errors).
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_tau_up()
  *  ```>>> */
 static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the upgoing (attack) time constant to the given `value` (s) for the
- *    given `instance`.
+ *    Sets the upgoing (attack) time constant to the given `value` (s) in
+ *    `coeffs`.
  *
  *    This is equivalent to calling `bw_one_pole_set_cutoff_up()` with same
- *    `instance` and value = 1 / (2 * pi * `value`) (net of numerical errors).
+ *    `coeffs` and value = 1 / (2 * pi * `value`) (net of numerical errors).
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_tau_down()
  *  ```>>> */
 static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the downgoing (decay) time constant to the given `value` (s) for the
- *    given `instance`.
+ *    Sets the downgoing (decay) time constant to the given `value` (s) in
+ *    `coeffs`.
  *
  *    This is equivalent to calling `bw_one_pole_set_cutoff_down()` with same
- *    `instance` and value = 1 / (2 * pi * `value`) (net of numerical errors).
+ *    `coeffs` and value = 1 / (2 * pi * `value`) (net of numerical errors).
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_sticky_thresh()
  *  ```>>> */
 static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the target-reach threshold specified by `value` for the given
- *    `instance`.
+ *    Sets the target-reach threshold specified by `value` in `coeffs`.
  *
  *    When the difference between the output and the input would fall under such
  *    threshold according to the current distance metric (see
@@ -218,17 +244,24 @@ static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *BW_RESTRICT
  *    to the input value.
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_one_pole_set_sticky_mode()
  *  ```>>> */
 static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_sticky_mode value);
 /*! <<<```
- *    Sets the current distance metric for sticky behavior.
+ *    Sets the current distance metric for sticky behavior to `value` in
+ *    `coeffs`.
+ *
+ *    Default value: `bw_one_pole_sticky_mode_abs`.
+ *
+ *    #### bw_one_pole_get_y_z1()
+ *  ```>>> */
+static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state);
+/*! <<<```
+ *    Returns the last output sample stored in `state`.
  *  }}} */
 
-static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state);
+
 
 /*** Implementation ***/
 
@@ -265,6 +298,7 @@ static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	coeffs->cutoff_up = INFINITY;
 	coeffs->cutoff_down = INFINITY;
 	coeffs->sticky_thresh = 0.f;
+	coeffs->sticky_mode = bw_one_pole_sticky_mode_abs;
 }
 
 static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT coeffs, float sample_rate) {
@@ -345,7 +379,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeff
 
 static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_one_pole_update_coeffs_ctrl(coeffs);
-	if (y) {
+	if (y != NULL) {
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)

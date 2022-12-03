@@ -67,13 +67,13 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_env_gen_coeffs bw_env_gen_coeffs;
 /*! <<<```
- *    Coefficients and input parameter values.
+ *    Coefficients and related.
  *
  *    #### bw_env_gen_state
  *  ```>>> */
 typedef struct _bw_env_gen_state bw_env_gen_state;
 /*! <<<```
- *    Internal state and output parameter values.
+ *    Internal state and related.
  *
  *    #### bw_env_gen_phase
  *  ```>>> */
@@ -198,18 +198,16 @@ static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_env_gen_get_phase()
  *  ```>>> */
-static inline bw_env_gen_phase bw_env_gen_get_phase(bw_env_gen_state *state);
+static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *state);
 /*! <<<```
  *    Returns the current envelope generator phase as stored in `state`.
  *
  *    #### bw_env_gen_get_y_z1()
  *  ```>>> */
-static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state);
+static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state);
 /*! <<<```
  *    Returns the last output sample stored in `state`.
  *  }}} */
-
-static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state);
 
 /*** Implementation ***/
 
@@ -380,11 +378,11 @@ static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs,
 	}
 }
 
-static inline bw_env_gen_phase bw_env_gen_get_phase(bw_env_gen_state *state) {
+static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *state) {
 	return state->phase;
 }
 
-static inline float bw_env_gen_get_y_z1(bw_env_gen_state *state) {
+static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state) {
 	return state->y_z1;
 }
 

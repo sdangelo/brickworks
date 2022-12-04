@@ -25,7 +25,7 @@
  *    Antialiased tanh-based saturation with parametric bias and gain
  *    (compensation) and output bias removal.
  *
- *    In other words this implements
+ *    In other words this implements (approximately)
  *
  *    > y(n) = tanh(gain \* x(n) + bias) - tanh(bias)
  *

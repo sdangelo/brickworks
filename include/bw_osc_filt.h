@@ -24,10 +24,11 @@
  *  description {{{
  *    Post-filter to decolorate oscillator waveshapers when antialiasing is on.
  *
- *    This filter can be added in series of oscillator waveshapers that use
- *    PolyBLEP antialiasing (i.e., [bw_osc_saw](bw_osc_saw),
- *    [bw_osc_pulse](bw_osc_pulse), [bw_osc_tri](bw_osc_tri)) to compensate for
- *    high-frequency attenuation.
+ *    This <a href="https://en.wikipedia.org/wiki/Linear_time-invariant_system"
+ *    target="_blank">linear time-invariant filter</a> can be added in series of
+ *    oscillator waveshapers that use PolyBLEP antialiasing
+ *    (i.e., [bw_osc_saw](bw_osc_saw), [bw_osc_pulse](bw_osc_pulse),
+ *    [bw_osc_tri](bw_osc_tri)) to compensate for high-frequency attenuation.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -59,27 +60,28 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_osc_filt_state bw_osc_filt_state;
 /*! <<<```
- *    State
- *  >>> */
-
-/*! ...
+ *    Internal state and related.
+ *
  *    #### bw_osc_filt_reset()
  *  ```>>> */
 static inline void bw_osc_filt_reset_state(bw_osc_filt_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `instance` to its initial state.
- *  >>> */
-
+ *    Resets the given `state` to its initial values.
+ *
+ *    #### bw_osc_filt_process1()
+ *  ```>>> */
 static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, float x);
-
-/*! ...
+/*! <<<```
+ *    Processes one input sample `x` usign and updating `state`. Returns the
+ *    corresponding output sample.
+ *
  *    #### bw_osc_filt_process()
  *  ```>>> */
 static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating
+ *    `state`.
  *  }}} */
 
 /*** Implementation ***/

@@ -23,8 +23,9 @@
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Sinusoidal oscillator waveshaper.
- *
- *    This module only consists of signal processing functions.
+ * 
+ *    It turns a normalized phase signal, such as that geneated by
+ *    [bw\_phase\_gen](bw_phase_gen), into a sinusoidal wave.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -51,16 +52,22 @@ extern "C" {
 
 #include <bw_common.h>
 
-static inline float bw_osc_sin_process1(float x);
-
 /*! api {{{
+ *    #### bw_osc_sin_process1()
+ *  ```>>> */
+static inline float bw_osc_sin_process1(float x);
+/*! <<<```
+ *    Processes one input sample `x`, indicating the normalized phase, and
+ *    returns the corresponding output
+ *    sample.
+ *
  *    #### bw_osc_sin_process()
  *  ```>>> */
 static inline void bw_osc_sin_process(const float *x, float* y, int n_samples);
 /*! <<<```
- *    Turns `n_samples` samples of the normalized phase signal in the `x` buffer
- *    into a sinusoidal signal, filling the corresponding `n_samples` in the
- *    output buffer `y`.
+ *    Processes the first `n_samples` of the input buffer `x`, containing the
+ *    normalized phase signal, and fills the first `n_samples` of the output
+ *    buffer `y`.
  *  }}} */
 
 /*** Implementation ***/

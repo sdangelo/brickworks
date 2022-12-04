@@ -24,6 +24,9 @@
  *  description {{{
  *    Triangle oscillator waveshaper with variable slope (increasing time over
  *    period) and PolyBLEP antialiasing.
+ *
+ *    It turns a normalized phase signal, such as that geneated by
+ *    [bw\_phase\_gen](bw_phase_gen), into a triangle wave.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -55,62 +58,78 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_osc_tri_coeffs bw_osc_tri_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    #### bw_osc_tri_init()
  *  ```>>> */
 static inline void bw_osc_tri_init(bw_osc_tri_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes the `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_osc_tri_set_sample_rate()
  *  ```>>> */
 static inline void bw_osc_tri_set_sample_rate(bw_osc_tri_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
- *  >>> */
-
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_osc_tri_reset_coeffs()
+ *  ```>>> */
 static inline void bw_osc_tri_reset_coeffs(bw_osc_tri_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
+ *
+ *    #### bw_osc_tri_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_osc_tri_update_coeffs_ctrl(bw_osc_tri_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_osc_tri_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_osc_tri_update_coeffs_audio(bw_osc_tri_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_osc_pulse_process1\*()
+ *  ```>>> */
 static inline float bw_osc_tri_process1(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x);
 static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc);
-
-/*! ...
+/*! <<<```
+ *    These function process one input sample `x`, indicating the normalized
+ *    phase, using `coeffs`. They return the corresponding output sample.
+ *
+ *    In particular:
+ *     * `bw_osc_tri_process1()` assumes that antialiasing is disabled;
+ *     * `bw_osc_tri_process1_antialias()` assumes that antialiasing is enabled
+ *       and requires the corresponding phase increment value to be passed via
+ *       `x_phase_inc`.
+ *
  *    #### bw_osc_tri_process()
  *  ```>>> */
 static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` containing the normalized phase signal and fills the
- *    corresponding `n_samples` samples in the output buffer `y`.
+ *    Processes the first `n_samples` of the input buffer `x`, containing the
+ *    normalized phase signal, and fills the first `n_samples` of the output
+ *    buffer `y`, while using and updating `coeffs`.
  *
- *    If antialiasing is on, `x_phase_inc` must contain phase increment values,
- *    otherwise it is ignored and can be `NULL`.
- *  >>> */
-
-/*! ...
+ *    If antialiasing is enabled, `x_phase_inc` must contain phase increment
+ *    values, otherwise it is ignored and can be `NULL`.
+ *
  *    #### bw_osc_tri_set_antialiasing()
  *  ```>>> */
 static inline void bw_osc_tri_set_antialiasing(bw_osc_tri_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
- *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) for the
- *    given `instance`.
+ *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) in
+ *    `coeffs`.
  *
- *    Default value: `0`.
- *  >>> */
-
-/*! ...
+ *    Default value: `0` (off).
+ *
  *    #### bw_osc_tri_set_slope()
  *  ```>>> */
 static inline void bw_osc_tri_set_slope(bw_osc_tri_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the slope (increasing time over period) to `value` (range [`0.f`,
- *    `1.f`]) for the given `instance`.
- * 
- *    NOT TOO CLOSE TO TO 0.f and 1.f!!!
+ *    Sets the slope (increasing time over period) to `value` (range [`0.001f`,
+ *    `0.999f`]) in `coeffs`.
  *
  *    Default value: `0.5f`.
  *  }}} */

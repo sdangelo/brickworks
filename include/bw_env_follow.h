@@ -103,8 +103,8 @@ static inline void bw_env_follow_update_coeffs_audio(bw_env_follow_coeffs *BW_RE
  *  ```>>> */
 static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, float x);
 /*! <<<```
- *    Processes one input sample `x` using `coeffs` and updating `state` (audio
- *    rate only). Returns the corresponding output sample.
+ *    Processes one input sample `x` using `coeffs`, while using and updating
+ *    `state` (audio rate only). Returns the corresponding output sample.
  *
  *    #### bw_env_follow_process()
  *  ```>>> */

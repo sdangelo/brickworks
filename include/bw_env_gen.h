@@ -138,8 +138,8 @@ static inline void bw_env_gen_update_state_ctrl(const bw_env_gen_coeffs *BW_REST
  *  ```>>> */
 static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state);
 /*! <<<```
- *    Generates and returns one sample using `coeffs` and updating `state`
- *    (audio rate only).
+ *    Generates and returns one sample using `coeffs`, while using and updating
+ *    `state` (audio rate only).
  *
  *    #### bw_env_gen_process()
  *  ```>>> */

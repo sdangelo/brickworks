@@ -23,6 +23,9 @@
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Sawtooth oscillator waveshaper with PolyBLEP antialiasing.
+ *
+ *    It turns a normalized phase signal, such as that geneated by
+ *    [bw\_phase\_gen](bw_phase_gen), into a sawtooth wave.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -54,37 +57,47 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_osc_saw_coeffs bw_osc_saw_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    #### bw_osc_saw_init()
  *  ```>>> */
 static inline void bw_osc_saw_init(bw_osc_saw_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes the `coeffs`.
- *  >>> */
-
+ *    Initializes input parameter values in `coeffs`.
+ *
+ *    #### bw_osc_saw_process1\*()
+ *  ```>>> */
 static inline float bw_osc_saw_process1(const bw_osc_saw_coeffs *BW_RESTRICT coeffs, float x);
 static inline float bw_osc_saw_process1_antialias(const bw_osc_saw_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc);
-
-/*! ...
+/*! <<<```
+ *    These function process one input sample `x`, indicating the normalized
+ *    phase, using `coeffs`. They return the corresponding output sample.
+ *
+ *    In particular:
+ *     * `bw_osc_saw_process1()` assumes that antialiasing is disabled;
+ *     * `bw_osc_saw_process1_antialias()` assumes that antialiasing is enabled
+ *       and requires the corresponding phase increment value to be passed via
+ *       `x_phase_inc`.
+ *
  *    #### bw_osc_saw_process()
  *  ```>>> */
 static inline void bw_osc_saw_process(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` containing the normalized phase signal and fills the
- *    corresponding `n_samples` samples in the output buffer `y`.
- *  >>> */
-
-/*! ...
+ *    Processes the first `n_samples` of the input buffer `x`, containing the
+ *    normalized phase signal, and fills the first `n_samples` of the output
+ *    buffer `y`, while using and updating `coeffs`.
+ *
+ *    If antialiasing is enabled, `x_phase_inc` must contain phase increment
+ *    values, otherwise it is ignored and can be `NULL`.
+ *
  *    #### bw_osc_saw_set_antialiasing()
  *  ```>>> */
 static inline void bw_osc_saw_set_antialiasing(bw_osc_saw_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
- *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) for the
- *    given `instance`.
+ *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) in
+ *    `coeffs`.
  *
- *    Default value: `0`.
+ *    Default value: `0` (off).
  *  }}} */
 
 /*** Implementation ***/

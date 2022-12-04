@@ -22,9 +22,18 @@
  *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
  *  description {{{
- *    tanh()-based saturation.
+ *    Antialiased tanh-based saturation with parametric bias and gain
+ *    (compensation) and output bias removal.
  *
- *    ...
+ *    In other words this implements
+ *
+ *    > y(n) = tanh(gain \* x(n) + bias) - tanh(bias)
+ *
+ *    with antialiasing and optionally dividing the output by gain.
+ *
+ *    As a side effect, antialiasing causes attenuation at higher frequencies
+ *    (about 3 dB at 0.5 × Nyquist frequency and rapidly increasing at higher
+ *    frequencies).
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -51,80 +60,96 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_satur_coeffs bw_satur_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    ### bw_satur_state
  *  ```>>> */
 typedef struct _bw_satur_state bw_satur_state;
 /*! <<<```
- *    State.
+ *    Internal state and related.
  *
  *    #### bw_satur_init()
  *  ```>>> */
 static inline void bw_satur_init(bw_satur_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_satur_set_sample_rate()
  *  ```>>> */
 static inline void bw_satur_set_sample_rate(bw_satur_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_satur_reset_coeffs()
+ *  ```>>> */
+static inline void bw_satur_reset_coeffs(bw_satur_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_satur_reset_state()
  *  ```>>> */
 static inline void bw_satur_reset_state(const bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_satur_reset_coeffs(bw_satur_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_satur_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_satur_update_coeffs_ctrl(bw_satur_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_satur_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_satur_update_coeffs_audio(bw_satur_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_satur_process1()
+ *  ```>>> */
 static inline float bw_satur_process1(const bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state *BW_RESTRICT state, float x);
-
 static inline float bw_satur_process1_comp(const bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state *BW_RESTRICT state, float x);
-
-/*! ...
+/*! <<<```
+ *    These function process one input sample `x` using `coeffs`, while using
+ *    and updating `state`. They return the corresponding output sample.
+ *
+ *    In particular:
+ *     * `bw_satur_process1()` assumes that gain compensation is disabled;
+ *     * `bw_satur_process1_comp()` assumes that gain compensation is enabled.
+ *
  *    #### bw_satur_process()
  *  ```>>> */
 static inline void bw_satur_process(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
- *  >>> */
-
-/*! ...
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating both
+ *    `coeffs` and `state` (control and audio rate).
+ *
  *    #### bw_satur_set_bias()
  *  ```>>> */
 static inline void bw_satur_set_bias(bw_satur_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    ...
+ *    Sets the input bias `value` in `coeffs`.
  *
  *    Default value: `0.f`.
- *  >>> */
-
-/*! ...
- *    #### bw_satur_set_bias()
+ *
+ *    #### bw_satur_set_gain()
  *  ```>>> */
 static inline void bw_satur_set_gain(bw_satur_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    ...
+ *    Sets the gain `value` in `coeffs`.
+ *
+ *    Do not set it to `0.f`, obviously.
  *
  *    Default value: `1.f`.
- *  >>> */
- 
-/*! ...
- *    #### bw_satur_set_bias()
+ *
+ *    #### bw_satur_set_gain_compensation()
  *  ```>>> */
 static inline void bw_satur_set_gain_compensation(bw_satur_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
- *    ...
+ *    Sets whether the output should be divided by gain (`value` non-`0`) or not
+ *    (`0`).
  *
- *    Default value: `1`.
+ *    Default value: `1` (on).
  *  }}} */
 
 /*** Implementation ***/

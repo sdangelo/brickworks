@@ -51,57 +51,71 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_wah_coeffs bw_wah_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    ### bw_svf_state
  *  ```>>> */
 typedef struct _bw_wah_state bw_wah_state;
 /*! <<<```
- *    State.
+ *    Internal state and related.
  *
  *    #### bw_wah_init()
  *  ```>>> */
 static inline void bw_wah_init(bw_wah_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_wah_set_sample_rate()
  *  ```>>> */
 static inline void bw_wah_set_sample_rate(bw_wah_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_wah_reset_state()
+ *  ```>>> */
+static inline void bw_wah_reset_coeffs(bw_wah_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_wah_reset_state()
  *  ```>>> */
 static inline void bw_wah_reset_state(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_wah_reset_coeffs(bw_wah_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_wah_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_wah_update_coeffs_ctrl(bw_wah_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_wah_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_wah_update_coeffs_audio(bw_wah_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_wah_process1()
+ *  ```>>> */
 static inline float bw_wah_process1(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, float x);
-
-/*! ...
- *    #### bw_wah_process()
+/*! <<<```
+ *    Processes one input sample `x` using `coeffs`, while using and updating
+ *    `state`. Returns the corresponding output sample.
+ *
+ *    #### bw_env_follow_process()
  *  ```>>> */
 static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
- *  >>> */
-
-/*! ...
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating both
+ *    `coeffs` and `state` (control and audio rate).
+ *
  *    #### bw_wah_set_wah()
  *  ```>>> */
 static inline void bw_wah_set_wah(bw_wah_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the wah pedal position to the given `value` in [`0.f` (low cutoff),
- *    `1.f` (high cutoff)].
+ *    `1.f` (high cutoff)] in `coeffs`.
  *
  *    Default value: `0.5f`.
  *  }}} */

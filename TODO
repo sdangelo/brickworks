@@ -13,6 +13,7 @@ code:
 * float in [-1,1] for velocity, pitch bend, mod wheel
 * should clip slope in triangle?
 * fix vst3 mapped values (visible in Ableton Live) and short names
+* bw_vol set volume in dB?
 
 build system:
 * make makefiles handle paths with spaces etc

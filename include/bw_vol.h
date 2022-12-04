@@ -22,7 +22,7 @@
  *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
- *    Volume control for an arbitrary number of channels.
+ *    Volume control.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -54,49 +54,59 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_vol_coeffs bw_vol_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    #### bw_vol_init()
  *  ```>>> */
 static inline void bw_vol_init(bw_vol_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_vol_set_sample_rate()
  *  ```>>> */
 static inline void bw_vol_set_sample_rate(bw_vol_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *  >>> */
-
+ *    #### bw_vol_reset_coeffs()
+ *  ```>>> */
 static inline void bw_vol_reset_coeffs(bw_vol_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
+ *
+ *    #### bw_vol_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_vol_update_coeffs_ctrl(bw_vol_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_vol_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_vol_update_coeffs_audio(bw_vol_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_vol_process1()
+ *  ```>>> */
 static inline float bw_vol_process1(const bw_vol_coeffs *BW_RESTRICT coeffs, float x);
-
-/*! ...
+/*! <<<```
+ *    Processes one input sample `x` using `coeffs` and returns the
+ *    corresponding output sample.
+ *
  *    #### bw_vol_process()
  *  ```>>> */
 static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from each of the
- *    `n_channels` input buffers and fills the corresponding `n_samples` samples
- *    in each of the `n_channels` output buffers.
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating
+ *    `coeffs` (control and audio rate).
  *
- *    `x` is an array of `n_channels` input buffers and similarly `y` is an
- *    array of `n_channels` output buffers.
- *  >>> */
-
-/*! ...
  *    #### bw_vol_set_volume()
  *  ```>>> */
 static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the volume parameter to the given `value` (range [`0.f`, `1.f`]) for
- *    the given `instance`.
+ *    Sets the volume parameter to the given `value` (range [`0.f`, `1.f`]) in
+ *    `coeffs`.
  *
  *    This parameter is not linearly mapped, but the range extremes correspond
  *    to silence (gain = `0.f`) and bypass (gain = `1.f`).

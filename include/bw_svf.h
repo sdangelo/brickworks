@@ -55,69 +55,85 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_svf_coeffs bw_svf_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    ### bw_svf_state
  *  ```>>> */
 typedef struct _bw_svf_state bw_svf_state;
 /*! <<<```
- *    State.
+ *    Internal state and related.
  *
  *    #### bw_svf_init()
  *  ```>>> */
 static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_svf_set_sample_rate()
  *  ```>>> */
 static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_svf_reset_coeffs()
+ *  ```>>> */
+static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_svf_reset_state()
  *  ```>>> */
 static inline void bw_svf_reset_state(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_svf_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_svf_update_coeffs_ctrl(bw_svf_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_svf_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_svf_process1()
+ *  ```>>> */
 static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp);
-
-/*! ...
+/*! <<<```
+ *    Processes one input sample `x` using `coeffs`, while using and updating
+ *    `state`. The lowpass, bandpass, and highpass output samples are put into
+ *    `y_lp`, `y_bp`, and `y_hp` respectively.
+ *
  *    #### bw_svf_process()
  *  ```>>> */
 static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, const float *x, float *y_lp, float *y_bp, float *y_hp, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffers `y_lp` (lowpass), `y_bp` (bandpass), and `y_hp` (highpass), if
- *    they are not `NULL`.
- *  >>> */
-
-/*! ...
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffers `y_lp` (lowpass), `y_bp`
+ *    (bandpass), and `y_hp` (highpass), if they are not `NULL`, while using and
+ *    updating both `coeffs` and `state` (control and audio rate).
+ *
  *    #### bw_svf_set_cutoff()
  *  ```>>> */
 static inline void bw_svf_set_cutoff(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the cutoff frequency to the given `value` (Hz) for the given
- *    `instance`.
+ *    Sets the cutoff frequency to the given `value` (Hz) in `coeffs`.
+ *
+ *    `value` must be positive and smaller than the Nyquist frequency (half the
+ *    sample rate).
  *
  *    Default value: `1e3f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_svf_set_Q()
  *  ```>>> */
 static inline void bw_svf_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the quality factor to the given `value` (Hz) for the given
- *    `instance`.
+ *    Sets the quality factor to the given `value` (Hz) in `coeffs`.
+ *
+ *    `value` must be equal or bigger than `0.5f`.
  *
  *    Default value: `0.5f`.
  *  }}} */

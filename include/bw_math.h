@@ -225,12 +225,30 @@ static inline float bw_rcpf_2(float x);
  *
  *    Relative error < 0.0013%.
  *
+ *    #### bw_sin2pif_3()
+ *  ```>>> */
+static inline float bw_sin2pif_3(float x);
+/*! <<<```
+ *    Returns an approximation of the sine of 2 * pi * `x`, where `x` is given
+ *    in radians.
+ * 
+ *    Absolute error < 0.011, relative error < 1.7%.
+ *
  *    #### bw_sinf_3()
  *  ```>>> */
 static inline float bw_sinf_3(float x);
 /*! <<<```
  *    Returns an approximation of the sine of `x`, where `x` is given in
  *    radians.
+ * 
+ *    Absolute error < 0.011, relative error < 1.7%.
+ *
+ *    #### bw_cos2pif_3()
+ *  ```>>> */
+static inline float bw_cos2pif_3(float x); 
+/*! <<<```
+ *    Returns an approximation of the cosine of 2 * pi * `x`, where `x` is given
+ *    in radians.
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
  *
@@ -242,6 +260,19 @@ static inline float bw_cosf_3(float x);
  *    radians.
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
+ *
+ *    #### bw_tan2pif_3()
+ *  ```>>> */
+static inline float bw_tan2pif_3(float x);
+/*! <<<```
+ *    Returns an approximation of the tangent of 2 * pi * `x`, where `x` is
+ *    given in radians.
+ * 
+ *    Not guaranteed to work for `x` too close to singularities. Safe
+ *    range: `x` in [-1/4 + 5e-4f / pi, 1/4 - 5e-4f / pi] + k / 2, where k is
+ *    any integer number.
+ *
+ *    Absolute error < 0.06, relative error < 0.8%.
  *
  *    #### bw_tanf_3()
  *  ```>>> */
@@ -450,8 +481,7 @@ static inline float bw_rcpf_2(float x) {
 	return v.f;
 }
 
-static inline float bw_sinf_3(float x) {
-	x = 0.1591549430918953f * x;
+static inline float bw_sin2pif_3(float x) {
 	x = x - bw_floorf(x);
 	float xp1 = x + x - 1.f;
 	float xp2 = bw_absf(xp1);
@@ -459,12 +489,25 @@ static inline float bw_sinf_3(float x) {
 	return -bw_copysignf(1.f, xp1) * (xp + xp * xp * (-0.05738534102710938f - 0.1107398163618408f * xp));
 }
 
+static inline float bw_sinf_3(float x) {
+	return bw_sin2pif_3(0.1591549430918953f * x);
+}
+
+static inline float bw_cos2pif_3(float x) {
+	return bw_sin2pif_3(x + 0.25f);
+}
+
 static inline float bw_cosf_3(float x) {
-	return bw_sinf_3(x + 1.570796326794896f);
+	return bw_cos2pif_3(0.1591549430918953f * x);
+}
+
+static inline float bw_tan2pif_3(float x) {
+	return bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
 }
 
 static inline float bw_tanf_3(float x) {
-	return bw_sinf_3(x) * bw_rcpf_2(bw_cosf_3(x));
+	x = 0.1591549430918953f * x;
+	return bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
 }
 
 static inline float bw_log2f_3(float x) {

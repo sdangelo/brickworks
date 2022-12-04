@@ -337,12 +337,11 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		
-		if (instance->params[p_noise_color] >= 0.5f)
-			for (int j = 0; j < n; j++)
-				out[j] = out[j] + 3.f * instance->buf[0][j];
-		else
-			for (int j = 0; j < n; j++)
-				out[j] = out[j] + 0.01f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * instance->buf[0][j];
+		const float k = instance->params[p_noise_color] >= 0.5f
+			? 3.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
+			: 0.01f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
+		for (int j = 0; j < n; j++)
+			out[j] = out[j] + 3.f * instance->buf[0][j];
 		
 		bw_env_gen_process(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, NULL, n);
 		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * bw_env_gen_get_y_z1(&instance->vcf_env_gen_state) + vcf_mod;

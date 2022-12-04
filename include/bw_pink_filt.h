@@ -120,7 +120,7 @@ static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_
  *
  *    #### bw_pink_filt_get_scaling_k()
  *  ```>>> */
-static inline float bw_pink_filt_get_scaling_k(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+static inline float bw_pink_filt_get_scaling_k(const bw_pink_filt_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the sample rate scaling factor that is applied or would be applied
  *    if sample rate scaling were enabled, as stored in `coeffs`.
@@ -190,7 +190,7 @@ static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_
 	coeffs->sample_rate_scaling = value;
 }
 
-static inline float bw_pink_filt_get_scaling_k(const bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+static inline float bw_pink_filt_get_scaling_k(const bw_pink_filt_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->scaling_k;
 }
 

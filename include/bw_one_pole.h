@@ -122,8 +122,7 @@ static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeff
 static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x);
 /*! <<<```
  *    These function process one input sample `x` using `coeffs`, while using
- *    and updating `state` (audio rate only). They return the corresponding
- *    output sample.
+ *    and updating `state`. They return the corresponding output sample.
  *
  *    In particular:
  *     * `bw_one_pole_process1()` assumes that upgoing and downgoing cutoff/tau

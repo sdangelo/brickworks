@@ -104,7 +104,7 @@ static inline void bw_env_follow_update_coeffs_audio(bw_env_follow_coeffs *BW_RE
 static inline float bw_env_follow_process1(const bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state *BW_RESTRICT state, float x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
- *    `state` (audio rate only). Returns the corresponding output sample.
+ *    `state`. Returns the corresponding output sample.
  *
  *    #### bw_env_follow_process()
  *  ```>>> */
@@ -120,9 +120,8 @@ static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeff
  *  ```>>> */
 static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the upgoing (attack)
- *    <a href="https://en.wikipedia.org/wiki/Time_constant" target="_blank">time
- *    constant</a> in `coeffs` of the one-pole filter to `value` (s).
+ *    Sets the upgoing (attack) time constant in `coeffs` of the one-pole filter
+ *    to `value` (s).
  *
  *    Default value: `0.f`.
  *
@@ -130,9 +129,8 @@ static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRIC
  *  ```>>> */
 static inline void bw_env_follow_set_release_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the downgoing (release)
- *    <a href="https://en.wikipedia.org/wiki/Time_constant" target="_blank">time
- *    constant</a> in `coeffs` of the one-pole filter to `value` (s).
+ *    Sets the downgoing (release) time constant in `coeffs` of the one-pole
+ *    filter to `value` (s).
  *
  *    Default value: `0.f`.
  *

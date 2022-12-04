@@ -56,71 +56,90 @@ extern "C" {
  *  ```>>> */
 typedef struct _bw_phase_gen_coeffs bw_phase_gen_coeffs;
 /*! <<<```
- *    Coefficients.
+ *    Coefficients and related.
  *
  *    ### bw_phase_gen_state
  *  ```>>> */
 typedef struct _bw_phase_gen_state bw_phase_gen_state;
 /*! <<<```
- *    State.
+ *    Internal state and related.
  *
  *    #### bw_phase_gen_init()
  *  ```>>> */
 static inline void bw_phase_gen_init(bw_phase_gen_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    Initializes `coeffs`.
+ *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_phase_gen_set_sample_rate()
  *  ```>>> */
 static inline void bw_phase_gen_set_sample_rate(bw_phase_gen_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
- *    Sets the `sample_rate` (Hz) value for the given `coeffs`.
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    #### bw_phase_gen_reset()
+ *    #### bw_phase_gen_reset_coeffs()
+ *  ```>>> */
+static inline void bw_phase_gen_reset_coeffs(bw_phase_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Resets coefficients in `coeffs` to assume their target values.
+ *
+ *    #### bw_phase_gen_reset_state()
  *  ```>>> */
 static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float phase_0);
 /*! <<<```
- *    Resets the given `state` to the initial state using the given `coeffs`.
- *  >>> */
-
-static inline void bw_phase_gen_reset_coeffs(bw_phase_gen_coeffs *BW_RESTRICT coeffs);
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_phase_gen_update_coeffs_ctrl()
+ *  ```>>> */
 static inline void bw_phase_gen_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_phase_gen_update_coeffs_audio()
+ *  ```>>> */
 static inline void bw_phase_gen_update_coeffs_audio(bw_phase_gen_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_phase_gen_process1\*()
+ *  ```>>> */
 static inline void bw_phase_gen_process1(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float *y, float *y_phase_inc);
 static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float x_mod, float *y, float *y_phase_inc);
-
-/*! ...
+/*! <<<```
+ *    These functions generate and return one sample using `coeffs`, while using
+ *    and updating `state`, and put the corresponding phase increment value in
+ *    `y_phase_inc`.
+ *
+ *    In particular:
+ *     * `bw_phase_gen_process1()` does not apply exponential frequency
+ *       modulation;
+ *     * `bw_phase_gen_process1_mod()` applies exponential frequency modulation
+ *       using `x_mod` as modulation input (scale `1.f`/octave).
+ *
  *    #### bw_phase_gen_process()
  *  ```>>> */
 static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float* y, float *y_phase_inc, int n_samples);
 /*! <<<```
- *    Lets the given `instance` generate `n_samples` samples and puts them in
- *    the output buffer `y`.
+ *    Generates and fills the first `n_samples` of the output buffer `y`, while
+ *    using and updating both `coeffs` and `state` (control and audio rate).
  *
  *    If `x_mod` is not `NULL`, it is used as a source of exponential frequency
  *    modulation (scale `1.f`/octave).
  *
  *    If `y_inc` is not `NULL`, it is filled with phase increment values.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_phase_gen_set_frequency()
  *  ```>>> */
 static inline void bw_phase_gen_set_frequency(bw_phase_gen_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the base frequency to `value` (Hz) for the given `instance`.
+ *    Sets the base frequency to `value` (Hz) in `coeffs`.
  *    
  *    Default value: `1.f`.
- *  >>> */
-
-/*! ...
+ *
  *    #### bw_phase_gen_set_portamento_tau()
  *  ```>>> */
 static inline void bw_phase_gen_set_portamento_tau(bw_phase_gen_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the portamento time constant `value` (s) for the given `instance`.
+ *    Sets the portamento time constant `value` (s) in `coeffs`.
  *
  *    Default value: `0.f`.
  *  }}} */

@@ -24,7 +24,12 @@
  *  description {{{
  *    Pinking filter.
  *
- *    ...
+ *    This is a
+ *    <a href="https://en.wikipedia.org/wiki/Linear_time-invariant_system"
+ *    target="_blank">linear time-invariant filter</a> approximately attenuating
+ *    3 dB/oct from about 0.000046 × Nyquist frequency to about 0.9 × Nyquist
+ *    frequency. It can be used to turn white noise into pink noise (hence the
+ *    name).
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -58,38 +63,68 @@ typedef struct _bw_pink_filt_coeffs bw_pink_filt_coeffs;
  *  ```>>> */
 typedef struct _bw_pink_filt_state bw_pink_filt_state;
 /*! <<<```
- *    State
- *  >>> */
-
+ *    Internal state and related.
+ *
+ *    #### bw_pink_filt_init()
+ *  ```>>> */
 static inline void bw_pink_filt_init(bw_pink_filt_coeffs *BW_RESTRICT coeffs);
-
+/*! <<<```
+ *    Initializes input parameter values in `coeffs`.
+ *
+ *    #### bw_pink_filt_set_sample_rate()
+ *  ```>>> */
 static inline void bw_pink_filt_set_sample_rate(bw_pink_filt_coeffs *BW_RESTRICT coeffs, float sample_rate);
-
-/*! ...
- *    #### bw_pink_filt_reset()
+/*! <<<```
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
+ *    #### bw_pink_filt_reset_state()
  *  ```>>> */
 static inline void bw_pink_filt_reset_state(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state);
 /*! <<<```
- *    Resets the given `instance` to its initial state.
- *  >>> */
-
+ *    Resets the given `state` to its initial values using the given `coeffs`.
+ *
+ *    #### bw_pink_filt_process1()
+ *  ```>>> */
 static inline float bw_pink_filt_process1(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x);
-
 static inline float bw_pink_filt_process1_scaling(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x);
-
-/*! ...
+/*! <<<```
+ *    These function process one input sample `x` using `coeffs`, while using
+ *    and updating `state`. They return the corresponding output sample.
+ *
+ *    In particular:
+ *     * `bw_pink_filt_process1()` assumes that sample rate scaling is disabled;
+ *     * `bw_pink_filt_process1_scaling()` assumes that sample rate scaling is
+ *       enabled.
+ *
  *    #### bw_pink_filt_process()
  *  ```>>> */
 static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
- *  }}} */
-
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating both
+ *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_pink_filt_set_sample_rate_scaling()
+ *  ```>>> */
 static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value);
-
-static inline float bw_pink_filt_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Sets whether the output should be scaled (`value` non-`0`) or not (`0`)
+ *    according to the sample rate in `coeffs`.
+ *
+ *    In order to keep the magnitude response consistent at different sample
+ *    rates, the output of this filter should be accordingly scaled. The 44100
+ *    Hz sample rate is used as a reference (that is, the scaling factor at that
+ *    sample rate is `1.f`).
+ *
+ *    Default value: `0` (off).
+ *
+ *    #### bw_pink_filt_get_scaling_k()
+ *  ```>>> */
+static inline float bw_pink_filt_get_scaling_k(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Returns the sample rate scaling factor that is applied or would be applied
+ *    if sample rate scaling were enabled, as stored in `coeffs`.
+ *  }}} */
 
 /*** Implementation ***/
 
@@ -155,7 +190,7 @@ static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_
 	coeffs->sample_rate_scaling = value;
 }
 
-static inline float bw_pink_filt_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+static inline float bw_pink_filt_get_scaling_k(const bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->scaling_k;
 }
 

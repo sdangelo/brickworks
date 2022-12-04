@@ -78,12 +78,12 @@ static inline void bw_noise_gen_set_sample_rate(bw_noise_gen_coeffs *BW_RESTRICT
 static inline float bw_noise_gen_process1(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
 static inline float bw_noise_gen_process1_scaling(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    These functions generates and return one sample using `coeffs`, where:
+ *    These functions generate and return one sample using `coeffs`, where:
  *     * `bw_noise_gen_process1()` assumes that sample rate scaling is disabled;
  *     * `bw_noise_gen_process1_scaling()` assumes that sample rate scaling is
  *       enabled.
  *
- *    #### bw_env_gen_process()
+ *    #### bw_noise_gen_process()
  *  ```>>> */
 static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, int n_samples);
 /*! <<<```
@@ -106,7 +106,7 @@ static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_
  *
  *    #### bw_noise_gen_get_scaling_k()
  *  ```>>> */
-static inline float bw_noise_gen_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs);
+static inline float bw_noise_gen_get_scaling_k(const bw_noise_gen_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the sample rate scaling factor that is applied or would be applied
  *    if sample rate scaling were enabled, as stored in `coeffs`.
@@ -159,7 +159,7 @@ static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_
 	coeffs->sample_rate_scaling = value;
 }
 
-static inline float bw_noise_gen_get_scaling_k(bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
+static inline float bw_noise_gen_get_scaling_k(const bw_noise_gen_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->scaling_k;
 }
 

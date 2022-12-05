@@ -116,12 +116,14 @@ static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_s
  *
  *    ...
  *
- *    #### bw_comp_set_bias()
+ *    #### bw_comp_set_...()
  *  ```>>> */
-static inline void bw_comp_set_thresh(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_thresh_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_thresh_dBFS(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
 static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
 static inline void bw_comp_set_attack_tau(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
 static inline void bw_comp_set_release_tau(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_gain_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
 static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the input bias `value` in `coeffs`.
@@ -219,8 +221,12 @@ static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_s
 	}
 }
 
-static inline void bw_comp_set_thresh(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_comp_set_thresh_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->thresh = value;
+}
+
+static inline void bw_comp_set_thresh_dBFS(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
+	coeffs->thresh = bw_lin2dBf_3(value);
 }
 
 static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
@@ -233,6 +239,10 @@ static inline void bw_comp_set_attack_tau(bw_comp_coeffs *BW_RESTRICT coeffs, fl
 
 static inline void bw_comp_set_release_tau(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_env_follow_set_release_tau(&coeffs->env_follow_coeffs, value);
+}
+
+static inline void bw_comp_set_gain_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_vol_set_volume_lin(&coeffs->vol_coeffs, value);
 }
 
 static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {

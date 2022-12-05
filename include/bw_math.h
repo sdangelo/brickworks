@@ -48,7 +48,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    A collection of mathematical routines that strive to be better suited to
@@ -69,6 +69,18 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.3.0</strong>:
+ *        <ul>
+ *          <li>Added bw_log10f_3(), bw_pow10f_3(), bw_dB2linf_3(), and
+ *              bw_lin2dBf_3().</li>
+ *        </ul>
+ *      </li>
+ *      <li>Version <strong>0.2.0</strong>:
+ *        <ul>
+ *          <li>Added bw_sin2pif_3(), bw_cos2pif_3(), bw_tan2pif_3(),
+ *              bw_omega_3lognr(), and bw_tanhf_3().</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.1.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -303,6 +315,14 @@ static inline float bw_logf_3(float x);
  * 
  *    Absolute error < 0.0039, relative error < 1.5%.
  *
+ *    #### bw_log10f_3()
+ *  ```>>> */
+static inline float bw_log10f_3(float x);
+/*! <<<```
+ *    Returns an approximation of the base-10 logarithm of `x`.
+ * 
+ *    Absolute error < 0.0017, relative error < 1.5%.
+ *
  *    #### bw_pow2f_3()
  *  ```>>> */
 static inline float bw_pow2f_3(float x);
@@ -319,6 +339,32 @@ static inline float bw_expf_3(float x);
  * 
  *    Relative error < 0.062%.
  *
+ *    #### bw_pow10f_3() 
+ *  ```>>> */
+static inline float bw_pow10f_3(float x);
+/*! <<<```
+ *    Returns an approximation of 10 raised to the power of `x`.
+ * 
+ *    Relative error < 0.062%.
+ *
+ *    #### bw_dB2linf_3()
+ *  ```>>> */
+static inline float bw_dB2linf_3(float x);
+/*! <<<```
+ *    Returns an approximation of 10 raised to the power of `x` / 20 (dB to
+ *    linear ratio conversion).
+ *
+ *    Relative error < 0.062%.
+ *
+ *    #### bw_lin2dBf_3()
+ *  ```>>> */
+static inline float bw_lin2dBf_3(float x);
+/*! <<<```
+ *    Returns an approximation of 20 times the base-10 logarithm of `x` (linear
+ *    ratio to dB conversion).
+ *
+ *    Absolute error < 0.032, relative error < 1.5%.
+ * 
  *    #### bw_omega_3log()
  *  ```>>> */
 static inline float bw_omega_3log(float x);
@@ -521,6 +567,10 @@ static inline float bw_logf_3(float x) {
 	return 0.693147180559945f * bw_log2f_3(x);
 }
 
+static inline float bw_log10f_3(float x) {
+	return 0.3010299956639811f * bw_log2f_3(x);
+}
+
 static inline float bw_pow2f_3(float x) {
 	if (x < -126.f)
 		return 0.f;
@@ -534,6 +584,18 @@ static inline float bw_pow2f_3(float x) {
 
 static inline float bw_expf_3(float x) {
 	return bw_pow2f_3(1.442695040888963f * x);
+}
+
+static inline float bw_pow10f_3(float x) {
+	return 3.321928094887363f * bw_pow2f_3(x);
+}
+
+static inline float bw_dB2linf_3(float x) {
+	return bw_pow2f_3(0.1660964047443682f * x);
+}
+
+static inline float bw_lin2dBf_3(float x) {
+	return 20.f * bw_log10f_3(x);
 }
 
 static inline float bw_omega_3log(float x) {

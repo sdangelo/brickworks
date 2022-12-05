@@ -166,11 +166,11 @@ bw_example_synth_mono bw_example_synth_mono_new() {
 	bw_osc_tri_set_antialiasing(&instance->vco1_tri_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco2_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco2_tri_coeffs, 1);
-	bw_vol_set_volume(&instance->vco2_vol_coeffs, 0.f);
+	bw_vol_set_volume_lin(&instance->vco2_vol_coeffs, 0.f);
 	bw_osc_pulse_set_antialiasing(&instance->vco3_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco3_tri_coeffs, 1);
-	bw_vol_set_volume(&instance->vco3_vol_coeffs, 0.f);
-	bw_vol_set_volume(&instance->noise_vol_coeffs, 0.f);
+	bw_vol_set_volume_lin(&instance->vco3_vol_coeffs, 0.f);
+	bw_vol_set_volume_lin(&instance->noise_vol_coeffs, 0.f);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	bw_env_follow_set_release_tau(&instance->env_follow_coeffs, 1.f);
 	
@@ -377,7 +377,7 @@ void bw_example_synth_mono_set_parameter(bw_example_synth_mono instance, int ind
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:
-		bw_vol_set_volume(&instance->vol_coeffs, value);
+		bw_vol_set_volume_lin(&instance->vol_coeffs, value * value * value);
 		break;
 	case p_portamento:
 		bw_phase_gen_set_portamento_tau(&instance->vco1_phase_gen_coeffs, value);
@@ -389,24 +389,24 @@ void bw_example_synth_mono_set_parameter(bw_example_synth_mono instance, int ind
 		bw_osc_tri_set_slope(&instance->vco1_tri_coeffs, bw_clipf(value, 0.001f, 0.999f));
 		break;
 	case p_vco1_volume:
-		bw_vol_set_volume(&instance->vco1_vol_coeffs, value);
+		bw_vol_set_volume_lin(&instance->vco1_vol_coeffs, value * value * value);
 		break;
 	case p_vco2_pw_slope:
 		bw_osc_pulse_set_pulse_width(&instance->vco2_pulse_coeffs, value);
 		bw_osc_tri_set_slope(&instance->vco2_tri_coeffs, bw_clipf(value, 0.001f, 0.999f));
 		break;
 	case p_vco2_volume:
-		bw_vol_set_volume(&instance->vco2_vol_coeffs, value);
+		bw_vol_set_volume_lin(&instance->vco2_vol_coeffs, value * value * value);
 		break;
 	case p_vco3_pw_slope:
 		bw_osc_pulse_set_pulse_width(&instance->vco3_pulse_coeffs, value);
 		bw_osc_tri_set_slope(&instance->vco3_tri_coeffs, bw_clipf(value, 0.001f, 0.999f));
 		break;
 	case p_vco3_volume:
-		bw_vol_set_volume(&instance->vco3_vol_coeffs, value);
+		bw_vol_set_volume_lin(&instance->vco3_vol_coeffs, value * value * value);
 		break;
 	case p_noise_volume:
-		bw_vol_set_volume(&instance->noise_vol_coeffs, value);
+		bw_vol_set_volume_lin(&instance->noise_vol_coeffs, value * value * value);
 		break;
 	case p_vcf_Q:
 		bw_svf_set_Q(&instance->vcf_coeffs, 0.5f + 9.5f * value);

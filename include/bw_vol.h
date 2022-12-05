@@ -28,7 +28,8 @@
  *    <ul>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
- *          <li>Added bw_vol_set_volume_dB().</li>
+ *          <li>Changed volume parameter API to express values in linear gain
+ *              and dB.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
@@ -106,19 +107,16 @@ static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float
  *    first `n_samples` of the output buffer `y`, while using and updating
  *    `coeffs` (control and audio rate).
  *
- *    #### bw_vol_set_volume()
+ *    #### bw_vol_set_volume_lin()
  *  ```>>> */
-static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_vol_set_volume_lin(bw_vol_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the volume parameter to the given `value` (range [`0.f`, `1.f`]) in
+ *    Sets the volume parameter to the given `value` (linear gain) in
  *    `coeffs`.
- *
- *    This parameter is not linearly mapped, but the range extremes correspond
- *    to silence (gain = `0.f`) and bypass (gain = `1.f`).
  *
  *    Default value: `1.f`.
  *
- *    #### bw_vol_set_volume()
+ *    #### bw_vol_set_volume_dB()
  *  ```>>> */
 static inline void bw_vol_set_volume_dB(bw_vol_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
@@ -177,12 +175,12 @@ static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float
 	}
 }
 
-static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->volume = value * value * value;
+static inline void bw_vol_set_volume_lin(bw_vol_coeffs *BW_RESTRICT coeffs, float value) {
+	coeffs->volume = value;
 }
 
 static inline void bw_vol_set_volume_dB(bw_vol_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->volume = bw_pow2f_3(0.1660964047443682f * x);
+	coeffs->volume = bw_dB2linf_3(value);
 }
 
 #ifdef __cplusplus

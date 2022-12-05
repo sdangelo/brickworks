@@ -152,7 +152,7 @@ void bw_example_synth_simple_set_parameter(bw_example_synth_simple instance, int
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:
-		bw_vol_set_volume(&instance->vol_coeffs, value);
+		bw_vol_set_volume_lin(&instance->vol_coeffs, value * value * value);
 		break;
 	case p_portamento:
 		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, value);

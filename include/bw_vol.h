@@ -19,13 +19,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Volume control.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.3.0</strong>:
+ *        <ul>
+ *          <li>Added bw_vol_set_volume_dB().</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -112,6 +117,14 @@ static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float va
  *    to silence (gain = `0.f`) and bypass (gain = `1.f`).
  *
  *    Default value: `1.f`.
+ *
+ *    #### bw_vol_set_volume()
+ *  ```>>> */
+static inline void bw_vol_set_volume_dB(bw_vol_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the volume parameter to the given `value` (dB) in `coeffs`.
+ *
+ *    Default value: `0.f`.
  *  }}} */
 
 /*** Implementation ***/
@@ -126,9 +139,6 @@ struct _bw_vol_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_state;
-	
-	// Coefficients
-	float	k;
 
 	// Parameters
 	float	volume;
@@ -153,13 +163,11 @@ static inline void bw_vol_update_coeffs_ctrl(bw_vol_coeffs *BW_RESTRICT coeffs) 
 }
 
 static inline void bw_vol_update_coeffs_audio(bw_vol_coeffs *BW_RESTRICT coeffs) {
-	// tracking parameter changes is more trouble than it's worth
-	float v = bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
-	coeffs->k = v * v * v;
+	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->volume);
 }
 
 static inline float bw_vol_process1(const bw_vol_coeffs *BW_RESTRICT coeffs, float x) {
-	return coeffs->k * x;
+	return bw_one_pole_get_y_z1(&coeffs->smooth_state) * x;
 }
 
 static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples) {
@@ -170,7 +178,11 @@ static inline void bw_vol_process(bw_vol_coeffs *BW_RESTRICT coeffs, const float
 }
 
 static inline void bw_vol_set_volume(bw_vol_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->volume = value;
+	coeffs->volume = value * value * value;
+}
+
+static inline void bw_vol_set_volume_dB(bw_vol_coeffs *BW_RESTRICT coeffs, float value) {
+	coeffs->volume = bw_pow2f_3(0.1660964047443682f * x);
 }
 
 #ifdef __cplusplus

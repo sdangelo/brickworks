@@ -20,7 +20,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
+ *  requires {{{ bw_config bw_common bw_env_follow bw_one_pole bw_math bw_vol }}}
  *  description {{{
  *    Feedforward compressor/limiter with independent sidechain input.
  *  }}}
@@ -108,7 +108,7 @@ static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_comp_process()
  *  ```>>> */
-static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float y, int n_samples);
+static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -156,7 +156,8 @@ static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_math.h>
-#include <bw_one_pole.h>
+#include <bw_env_follow.h>
+#include <bw_vol.h>
 
 struct _bw_comp_coeffs {
 	// Sub-components
@@ -208,12 +209,12 @@ static inline void bw_comp_update_coeffs_audio(bw_comp_coeffs *BW_RESTRICT coeff
 }
 
 static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x, float x_sc) {
-	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &coeffs->env_follow_state, x_sc);
-	const float y = env > coeffs->thresh ? coeffs->kc * bw_log2f_3(coeffs->thresh / env) * x : x;
+	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
+	const float y = env > coeffs->thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(coeffs->thresh * bw_rcpf_2(env))) * x : x;
 	return bw_vol_process1(&coeffs->vol_coeffs, y);
 }
 
-static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float y, int n_samples) {
+static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, int n_samples) {
 	bw_comp_update_coeffs_ctrl(coeffs);
 	for (int i = 0; i < n_samples; i++) {
 		bw_comp_update_coeffs_audio(coeffs);
@@ -226,7 +227,7 @@ static inline void bw_comp_set_thresh_lin(bw_comp_coeffs *BW_RESTRICT coeffs, fl
 }
 
 static inline void bw_comp_set_thresh_dBFS(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->thresh = bw_lin2dBf_3(value);
+	coeffs->thresh = bw_dB2linf_3(value);
 }
 
 static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {

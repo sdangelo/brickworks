@@ -17,8 +17,8 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_SYNTH_SIMPLE_H
-#define _BW_EXAMPLE_SYNTH_SIMPLE_H
+#ifndef _BW_EXAMPLE_SYNTH_MONO_H
+#define _BW_EXAMPLE_SYNTH_MONO_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -17,8 +17,8 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_FX_H
-#define _BW_EXAMPLE_FX_H
+#ifndef _BW_EXAMPLE_FX_SATUR_H
+#define _BW_EXAMPLE_FX_SATUR_H
 
 #ifdef __cplusplus
 extern "C" {

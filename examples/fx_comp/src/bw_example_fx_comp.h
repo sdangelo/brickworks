@@ -17,22 +17,22 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_FX_WAH_H
-#define _BW_EXAMPLE_FX_WAH_H
+#ifndef _BW_EXAMPLE_FX_COMP_H
+#define _BW_EXAMPLE_FX_COMP_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_wah* bw_example_fx_wah;
+typedef struct _bw_example_fx_comp* bw_example_fx_comp;
 
-bw_example_fx_wah bw_example_fx_wah_new();
-void bw_example_fx_wah_free(bw_example_fx_wah instance);
-void bw_example_fx_wah_set_sample_rate(bw_example_fx_wah instance, float sample_rate);
-void bw_example_fx_wah_reset(bw_example_fx_wah instance);
-void bw_example_fx_wah_process(bw_example_fx_wah instance, const float** x, float** y, int n_samples);
-void bw_example_fx_wah_set_parameter(bw_example_fx_wah instance, int index, float value);
-float bw_example_fx_wah_get_parameter(bw_example_fx_wah instance, int index);
+bw_example_fx_comp bw_example_fx_comp_new();
+void bw_example_fx_comp_free(bw_example_fx_comp instance);
+void bw_example_fx_comp_set_sample_rate(bw_example_fx_comp instance, float sample_rate);
+void bw_example_fx_comp_reset(bw_example_fx_comp instance);
+void bw_example_fx_comp_process(bw_example_fx_comp instance, const float** x, float** y, int n_samples);
+void bw_example_fx_comp_set_parameter(bw_example_fx_comp instance, int index, float value);
+float bw_example_fx_comp_get_parameter(bw_example_fx_comp instance, int index);
 
 #ifdef __cplusplus
 }

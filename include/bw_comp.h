@@ -207,7 +207,8 @@ static inline void bw_comp_update_coeffs_audio(bw_comp_coeffs *BW_RESTRICT coeff
 
 static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x, float x_sc) {
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &coeffs->env_follow_state, x_sc);
-	return env > coeffs->thresh ? coeffs->kc * bw_log2f_3(coeffs->thresh / env) * x : x;
+	const float y = env > coeffs->thresh ? coeffs->kc * bw_log2f_3(coeffs->thresh / env) * x : x;
+	return bw_vol_process1(&coeffs->vol_coeffs, y);
 }
 
 static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float y, int n_samples) {

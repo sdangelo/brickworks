@@ -13,11 +13,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
+ * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
  * File author: Stefano D'Angelo, Paolo Marrone
  *
- * This file contains code from sse2neon (https://github.com/DLTcollab/sse2neon/),
- * which is released under the following licensing conditions.
+ * This file contains code from sse2neon
+ * (https://github.com/DLTcollab/sse2neon/), which is released under the
+ * following licensing conditions.
  *
  * sse2neon is freely redistributable under the MIT License.
  *

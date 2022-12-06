@@ -133,8 +133,10 @@ static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float v
 /*! <<<```
  *    Sets the copmpression ratio `value` in `coeffs`.
  *
- *    `value` is actually the outcome of the division in the compression ratio,
+ *    `value` is actually the slope of the gain curve above the threshold,
  *    hence `1.f` means no compression and `0.f` is a hard limit.
+ *
+ *    Valid range: [`0.f`, `1.f`].
  *
  *    Default value: `1.f`.
  *

@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.2.1 }}}
  *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Pinking filter.
@@ -34,6 +34,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.2.1</strong>:
+ *        <ul>
+ *          <li>Added missing documentation for
+ *              <code>bw_pink_filt_coeffs</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -57,9 +63,13 @@ extern "C" {
 
 #include <bw_common.h>
 
-typedef struct _bw_pink_filt_coeffs bw_pink_filt_coeffs;
-
 /*! api {{{
+ *    #### bw_pink_filt_coeffs
+ *  ```>>> */
+typedef struct _bw_pink_filt_coeffs bw_pink_filt_coeffs;
+/*! <<<```
+ *    Coefficients and related.
+ *
  *    #### bw_pink_filt_state
  *  ```>>> */
 typedef struct _bw_pink_filt_state bw_pink_filt_state;

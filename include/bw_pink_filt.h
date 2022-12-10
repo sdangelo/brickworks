@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.1 }}}
+ *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Pinking filter.
@@ -34,8 +34,10 @@
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>0.2.1</strong>:
+ *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
+ *          <li>Fixed <code>bw_pink_filt_set_sample_rate_scaling()</code>
+ *              definition.</li>
  *          <li>Added missing documentation for
  *              <code>bw_pink_filt_coeffs</code>.</li>
  *        </ul>
@@ -117,7 +119,7 @@ static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_pink_filt_set_sample_rate_scaling()
  *  ```>>> */
-static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value);
+static inline void bw_pink_filt_set_sample_rate_scaling(bw_pink_filt_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
  *    Sets whether the output should be scaled (`value` non-`0`) or not (`0`)
  *    according to the sample rate in `coeffs`.
@@ -197,7 +199,7 @@ static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs,
 			y[i] = bw_pink_filt_process1(coeffs, state, x[i]);
 }
 
-static inline void bw_pink_filt_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_pink_filt_set_sample_rate_scaling(bw_pink_filt_coeffs *BW_RESTRICT coeffs, char value) {
 	coeffs->sample_rate_scaling = value;
 }
 

@@ -15,6 +15,7 @@ code:
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
 * change name of vst3 template folders to something that doesn't look like a vst3 folder itself
+* how can we only compute bit depth reduction when the input changes in bw_fx_bitcrush?
 
 build system:
 * make makefiles handle paths with spaces etc

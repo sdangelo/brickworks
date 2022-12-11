@@ -40,8 +40,8 @@
  *  }}}
  */
 
-#ifndef _BW_REDUCER_H
-#define _BW_REDUCER_H
+#ifndef _BW_SR_REDUCE_H
+#define _BW_SR_REDUCE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,7 +136,7 @@ static inline float bw_sr_reduce_process1(const bw_sr_reduce_coeffs *BW_RESTRICT
 
 static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float* y, int n_samples) {
 	for (int i = 0; i < n_samples; i++)
-		y[i] = bw_sr_reduce_process1_scaling(coeffs, state, x[i]);
+		y[i] = bw_sr_reduce_process1(coeffs, state, x[i]);
 }
 
 static inline void bw_sr_reduce_set_ratio(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, float value) {

@@ -14,6 +14,7 @@ code:
 * should clip slope in triangle?
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
+* change name of vst3 template folders to something that doesn't look like a vst3 folder itself
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -40,8 +40,8 @@
  *  }}}
  */
 
-#ifndef _BW_REDUCER_H
-#define _BW_REDUCER_H
+#ifndef _BW_BD_REDUCE_H
+#define _BW_BD_REDUCE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,7 +133,7 @@ static inline void bw_bd_reduce_reset_coeffs(bw_bd_reduce_coeffs *BW_RESTRICT co
 
 static inline void bw_bd_reduce_update_coeffs_ctrl(bw_bd_reduce_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->bit_depth_prev != coeffs->bit_depth) {
-		coeffs->k = bw_pow2f(coeffs->bit_depth - 1);
+		coeffs->k = bw_pow2f_3(coeffs->bit_depth - 1);
 		coeffs->ki = bw_rcpf_2(coeffs->k);
 		coeffs->max = 1.f - 0.5f * coeffs->ki;
 		coeffs->bit_depth_prev = coeffs->bit_depth;
@@ -148,9 +148,9 @@ static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT
 }
 
 static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float* y, int n_samples) {
-	bw_bd_update_coeffs_ctrl(coeffs);
+	bw_bd_reduce_update_coeffs_ctrl(coeffs);
 	for (int i = 0; i < n_samples; i++)
-		y[i] = bw_bd_reduce_process1_scaling(coeffs, x[i]);
+		y[i] = bw_bd_reduce_process1(coeffs, x[i]);
 }
 
 static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, char value) {

@@ -86,8 +86,8 @@ static inline float bw_sr_reduce_process1(const bw_sr_reduce_coeffs *BW_RESTRICT
 static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
- *    first `n_samples` of the output buffer `y`, while using and updating both
- *    `coeffs` and `state` (control and audio rate).
+ *    first `n_samples` of the output buffer `y`, while using `coeffs` and
+ *    using and updating `state` (control and audio rate).
  *
  *    #### bw_sr_reduce_set_ratio()
  *  ```>>> */

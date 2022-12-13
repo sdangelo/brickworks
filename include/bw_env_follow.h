@@ -144,11 +144,11 @@ static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRIC
 
 /*** Implementation ***/
 
-#include <bw_math.h>
-#include <bw_one_pole.h>
-
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#include <bw_math.h>
+#include <bw_one_pole.h>
 
 struct _bw_env_follow_coeffs {
 	// Sub-components

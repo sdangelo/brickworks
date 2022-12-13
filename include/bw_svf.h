@@ -157,9 +157,9 @@ struct _bw_svf_coeffs {
 	float			t_k;
 
 	float			t;
+	float			kf;
 	float			k;
-	float			hp_hp_z1;
-	float			hp_bp_z1;
+	float			kt;
 	float			hp_x;
 
 	// Parameters
@@ -171,6 +171,7 @@ struct _bw_svf_state {
 	float	hp_z1;
 	float	lp_z1;
 	float	bp_z1;
+	float	cutoff_z1;
 };
 
 static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs) {
@@ -196,15 +197,14 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 		if (cutoff_changed) {
 			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 			coeffs->t = bw_tanf_3(coeffs->t_k * cutoff_cur);
+			coeffs->kf = coeffs->t * bw_rcpf_2(cutoff_cur);
 		}
 		if (Q_changed) {
 			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
 			coeffs->k = bw_rcpf_2(Q_cur);
 		}
-		const float kpt = coeffs->k + coeffs->t;
-		coeffs->hp_hp_z1 = coeffs->t * kpt;
-		coeffs->hp_bp_z1 = coeffs->t + kpt;
-		coeffs->hp_x = bw_rcpf_2(1.f + coeffs->hp_hp_z1);
+		coeffs->kt = coeffs->k + coeffs->t;
+		coeffs->hp_x = bw_rcpf_2(1.f + coeffs->t * coeffs->kt);
 	}
 }
 
@@ -218,6 +218,7 @@ static inline void bw_svf_reset_state(const bw_svf_coeffs *BW_RESTRICT coeffs, b
 	state->hp_z1 = 0.f;
 	state->lp_z1 = 0.f;
 	state->bp_z1 = 0.f;
+	state->cutoff_z1 = coeffs->cutoff;
 }
 
 static inline void bw_svf_update_coeffs_ctrl(bw_svf_coeffs *BW_RESTRICT coeffs) {
@@ -228,13 +229,16 @@ static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs)
 }
 
 static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp) {
-	*y_hp = coeffs->hp_x * (x - state->lp_z1 + coeffs->hp_bp_z1 * state->bp_z1 - coeffs->hp_hp_z1 * state->hp_z1);
-	*y_bp = state->bp_z1 - coeffs->t * (*y_hp + state->hp_z1);
-	*y_lp = state->lp_z1 - coeffs->t * (*y_bp + state->bp_z1);
-
+	const float kk = coeffs->kf * state->cutoff_z1;
+	const float lp_xz1 = state->lp_z1 - kk * state->bp_z1;
+	const float bp_xz1 = state->bp_z1 - kk * state->hp_z1;
+	*y_hp = coeffs->hp_x * (x + coeffs->kt * bp_xz1 - lp_xz1);
+	*y_bp = bp_xz1 - coeffs->t * *y_hp;
+	*y_lp = lp_xz1 - coeffs->t * *y_bp;
 	state->hp_z1 = *y_hp;
 	state->lp_z1 = *y_lp;
 	state->bp_z1 = *y_bp;
+	state->cutoff_z1 = bw_one_pole_get_y_z1(&coeffs->smooth_cutoff_state);
 }
 
 static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, const float *x, float *y_lp, float *y_bp, float *y_hp, int n_samples) {

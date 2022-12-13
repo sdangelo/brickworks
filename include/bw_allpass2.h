@@ -23,7 +23,7 @@
  *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
- *    First-order allpass filter.
+ *    Second-order allpass filter.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -36,8 +36,8 @@
  *  }}}
  */
 
-#ifndef _BW_ALLPASS1_H
-#define _BW_ALLPASS1_H
+#ifndef _BW_ALLPASS2_H
+#define _BW_ALLPASS2_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,72 +46,72 @@ extern "C" {
 #include <bw_common.h>
 
 /*! api {{{
- *    #### bw_allpass1_coeffs
+ *    #### bw_allpass2_coeffs
  *  ```>>> */
-typedef struct _bw_allpass1_coeffs bw_allpass1_coeffs;
+typedef struct _bw_allpass2_coeffs bw_allpass2_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    #### bw_allpass1_state
+ *    #### bw_allpass2_state
  *  ```>>> */
-typedef struct _bw_allpass1_state bw_allpass1_state;
+typedef struct _bw_allpass2_state bw_allpass2_state;
 /*! <<<```
  *    Internal state and related.
  *
- *    #### bw_allpass1_init()
+ *    #### bw_allpass2_init()
  *  ```>>> */
-static inline void bw_allpass1_init(bw_allpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_allpass2_init(bw_allpass2_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
- *    #### bw_allpass1_set_sample_rate()
+ *    #### bw_allpass2_set_sample_rate()
  *  ```>>> */
-static inline void bw_allpass1_set_sample_rate(bw_allpass1_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_allpass2_set_sample_rate(bw_allpass2_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    #### bw_allpass1_reset_coeffs()
+ *    #### bw_allpass2_reset_coeffs()
  *  ```>>> */
-static inline void bw_allpass1_reset_coeffs(bw_allpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_allpass2_reset_coeffs(bw_allpass2_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
- *    #### bw_allpass1_reset_state()
+ *    #### bw_allpass2_reset_state()
  *  ```>>> */
-static inline void bw_allpass1_reset_state(const bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state);
+static inline void bw_allpass2_reset_state(const bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`.
  *
- *    #### bw_allpass1_update_coeffs_ctrl()
+ *    #### bw_allpass2_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_allpass1_update_coeffs_ctrl(bw_allpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_allpass2_update_coeffs_ctrl(bw_allpass2_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
- *    #### bw_allpass1_update_coeffs_audio()
+ *    #### bw_allpass2_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_allpass1_update_coeffs_audio(bw_allpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_allpass2_update_coeffs_audio(bw_allpass2_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
- *    #### bw_allpass1_process1()
+ *    #### bw_allpass2_process1()
  *  ```>>> */
-static inline float bw_allpass1_process1(const bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state, float x);
+static inline float bw_allpass2_process1(const bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state, float x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. Returns the corresponding output sample.
  *
- *    #### bw_allpass1_process()
+ *    #### bw_allpass2_process()
  *  ```>>> */
-static inline void bw_allpass1_process(bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_allpass2_process(bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
- *    #### bw_allpass1_set_cutoff()
+ *    #### bw_allpass2_set_cutoff()
  *  ```>>> */
-static inline void bw_allpass1_set_cutoff(bw_allpass1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_allpass2_set_cutoff(bw_allpass2_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the cutoff frequency `value` (Hz) in `coeffs`.
  *
@@ -125,7 +125,7 @@ static inline void bw_allpass1_set_cutoff(bw_allpass1_coeffs *BW_RESTRICT coeffs
 
 #include <bw_math.h>
 
-struct _bw_allpass1_coeffs {
+struct _bw_allpass2_coeffs {
 	// Coefficients
 	float	t_k;
 
@@ -137,30 +137,30 @@ struct _bw_allpass1_coeffs {
 	float	cutoff_prev;
 };
 
-struct _bw_allpass1_state {
+struct _bw_allpass2_state {
 	float	lp_z1;
 	float	X_z1;
 };
 
-static inline void bw_allpass1_init(bw_allpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_allpass2_init(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
 	coeffs->cutoff = 1e3f;
 }
 
-static inline void bw_allpass1_set_sample_rate(bw_allpass1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_allpass2_set_sample_rate(bw_allpass2_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	coeffs->t_k = 3.141592653589793f / sample_rate;
 }
 
-static inline void bw_allpass1_reset_coeffs(bw_allpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_allpass2_reset_coeffs(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
 	coeffs->cutoff_prev = -1.f;
-	bw_allpass1_update_coeffs_ctrl(coeffs);
+	bw_allpass2_update_coeffs_ctrl(coeffs);
 }
 
-static inline void bw_allpass1_reset_state(const bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state) {
+static inline void bw_allpass2_reset_state(const bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state) {
 	state->lp_z1 = 0.f;
 	state->X_z1 = 0.f;
 }
 
-static inline void bw_allpass1_update_coeffs_ctrl(bw_allpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_allpass2_update_coeffs_ctrl(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->cutoff != coeffs->cutoff_prev) {
 		coeffs->t = bw_tanf_3(coeffs->t_k * coeffs->cutoff);
 		coeffs->X_k = bw_rcpf_2(1,f + coeffs->t);
@@ -168,10 +168,10 @@ static inline void bw_allpass1_update_coeffs_ctrl(bw_allpass1_coeffs *BW_RESTRIC
 	}
 }
 
-static inline void bw_allpass1_update_coeffs_audio(bw_allpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_allpass2_update_coeffs_audio(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
 }
 
-static inline float bw_allpass1_process1(const bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state, float x) {
+static inline float bw_allpass2_process1(const bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state, float x) {
 	const float X = coeffs->X_k * (x - state->lp_z1 - coeffs->t * state->X_z1);
 	const float lp = x - X;
 	state->X_z1 = X;
@@ -179,13 +179,13 @@ static inline float bw_allpass1_process1(const bw_allpass1_coeffs *BW_RESTRICT c
 	return lp + lp - x;
 }
 
-static inline void bw_allpass1_process(bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
-	bw_allpass1_update_coeffs_ctrl(coeffs);
+static inline void bw_allpass2_process(bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+	bw_allpass2_update_coeffs_ctrl(coeffs);
 	for (int i = 0; i < n_samples; i++)
-		y[i] = bw_allpass1_process1(coeffs, state, x[i]);
+		y[i] = bw_allpass2_process1(coeffs, state, x[i]);
 }
 
-static inline void bw_allpass1_set_cutoff(bw_allpass1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_allpass2_set_cutoff(bw_allpass2_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->cutoff = value;
 }
 

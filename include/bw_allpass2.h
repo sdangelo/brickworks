@@ -116,6 +116,14 @@ static inline void bw_allpass2_set_cutoff(bw_allpass2_coeffs *BW_RESTRICT coeffs
  *    Sets the cutoff frequency `value` (Hz) in `coeffs`.
  *
  *    Default value: `1e3f`.
+ *
+ *    #### bw_allpass2_set_Q()
+ *  ```>>> */
+static inline void bw_allpass2_set_Q(bw_allpass2_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the quality factor `value` in `coeffs`.
+ *
+ *    Default value: `0.5f`.
  *  }}} */
 
 /*** Implementation ***/
@@ -130,20 +138,34 @@ struct _bw_allpass2_coeffs {
 	float	t_k;
 
 	float	t;
-	float	X_k;
+	float	kf;
+	float	k;
+	float	ks;
+	float	X1_x;
+	float	X2_X2_xz1_x1;
+	float	X2_X1;
+	float	X1_X2_xz1_x1;
+	float	X1_VC1_xz1;
 
 	// Parameters
 	float	cutoff;
-	float	cutoff_prev;
+	float	Q;
+	int	param_changed;
 };
 
 struct _bw_allpass2_state {
-	float	lp_z1;
-	float	X_z1;
+	float	VC1_z1;
+	float	VC2_z1;
+	float	X1_z1;
+	float	X2_z1;
 };
+
+#define _BW_ALLPASS2_PARAM_CUTOFF	1
+#define _BW_ALLPASS2_PARAM_Q		(1<<1)
 
 static inline void bw_allpass2_init(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
 	coeffs->cutoff = 1e3f;
+	coeffs->Q = 0.5f;
 }
 
 static inline void bw_allpass2_set_sample_rate(bw_allpass2_coeffs *BW_RESTRICT coeffs, float sample_rate) {
@@ -151,20 +173,38 @@ static inline void bw_allpass2_set_sample_rate(bw_allpass2_coeffs *BW_RESTRICT c
 }
 
 static inline void bw_allpass2_reset_coeffs(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
-	coeffs->cutoff_prev = -1.f;
+	coeffs->param_changed = ~0;
 	bw_allpass2_update_coeffs_ctrl(coeffs);
 }
 
 static inline void bw_allpass2_reset_state(const bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state) {
-	state->lp_z1 = 0.f;
-	state->X_z1 = 0.f;
+	state->VC1_z1 = 0.f;
+	state->VC2_z1 = 0.f;
+	state->X1_z1 = 0.f;
+	state->X2_z1 = 0.f;
 }
 
 static inline void bw_allpass2_update_coeffs_ctrl(bw_allpass2_coeffs *BW_RESTRICT coeffs) {
-	if (coeffs->cutoff != coeffs->cutoff_prev) {
-		coeffs->t = bw_tanf_3(coeffs->t_k * coeffs->cutoff);
-		coeffs->X_k = bw_rcpf_2(1,f + coeffs->t);
-		coeffs->cutoff_prev = coeffs->cutoff;
+	if (coeffs->param_changed) {
+		if (coeffs->param_changed & _BW_ALLPASS2_PARAM_CUTOFF) {
+			coeffs->t = bw_tanf_3(coeffs->t_k * coeffs->cutoff);
+			coeffs->kf = coeffs->t * bw_rcpf_2(coeffs->cutoff);
+		}
+		if (coeffs->param_changed & _BW_ALLPASS2_PARAM_Q) {
+			const float Q2 = coeffs->Q + coeffs->Q;
+			const float Q2s = Q2 + Q2;
+			coeffs->k = Q2 * bw_rcpf_2(1.f + bw_sqrtf_2(1.f + Q2s + Q2s));
+			coeffs->ks = coeffs->k * coeffs->k;
+			coeffs->X1_x = 1.f - coeffs->ks - coeffs->ks;
+		}
+		const float kt = coeffs->k * coeffs->t;
+		const float kt1 = 1.f + kt;
+		const float X1_k = coeffs->cutoff * bw_rcpf_2(coeffs->t * kt1 + coeffs->k * (1.f - kt - kt));
+		coeffs->X2_X2_xz1_x1 = -coeffs->cutoff * coeffs->k * bw_rcpf_2(kt1);
+		coeffs->X2_X1 = coeffs->kf * coeffs->X2_X2_xz1_x1;
+		coeffs->X1_X2_xz1_x1 = 3.f * X1_k * coeffs->ks;
+		coeffs->X1_VC1_xz1 = X1_k * kt1;
+		coeffs->param_changed = 0;
 	}
 }
 
@@ -172,11 +212,20 @@ static inline void bw_allpass2_update_coeffs_audio(bw_allpass2_coeffs *BW_RESTRI
 }
 
 static inline float bw_allpass2_process1(const bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state, float x) {
-	const float X = coeffs->X_k * (x - state->lp_z1 - coeffs->t * state->X_z1);
-	const float lp = x - X;
-	state->X_z1 = X;
-	state->lp_z1 = lp;
-	return lp + lp - x;
+	const float VC2_xz1 = coeffs->kf * state->X2_z1 + state->VC2_z1;
+	const float VC1_xz1 = coeffs->kf * state->X1_z1 + state->VC1_z1;
+	const float X2_xz1_x1 = state->VC2_xz1 + state->VC1_xz1;
+	const float X2_xz1 = coeffs->X2_X2_xz1_x1 * X2_xz1_x1;
+	const float X1 = coeffs->X1_VC1_xz1 * (coeffs->X1_x * x - state->VC1_xz1) + coeffs->X1_X2_xz1_x1 * X2_xz1_x1;
+	const float X2 = X2_xz1 + coeffs->X2_X1 * X1;
+	const float VC1 = coeffs->kf * X1 + VC1_xz1;
+	const float VC2 = coeffs->kf * X2 + VC2_xz1;
+	const float y_x1 = VC1 + VC2;
+	state->VC1_z1 = VC1;
+	state->VC2_z1 = VC2;
+	state->X1_z1 = X1;
+	state->X2_z1 = X2;
+	return x - (y_x1 + y_x1);
 }
 
 static inline void bw_allpass2_process(bw_allpass2_coeffs *BW_RESTRICT coeffs, bw_allpass2_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
@@ -186,8 +235,21 @@ static inline void bw_allpass2_process(bw_allpass2_coeffs *BW_RESTRICT coeffs, b
 }
 
 static inline void bw_allpass2_set_cutoff(bw_allpass2_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->cutoff = value;
+	if (value != coeffs->cutoff) {
+		coeffs->cutoff = value;
+		coeffs->param_changed |= _BW_ALLPASS2_PARAM_CUTOFF;
+	}
 }
+
+static inline void bw_allpass2_set_Q(bw_allpass2_coeffs *BW_RESTRICT coeffs, float value) {
+	if (value != coeffs->Q) {
+		coeffs->Q = value;
+		coeffs->param_changed |= _BW_ALLPASS2_PARAM_Q;
+	}
+}
+
+#undef _BW_ALLPASS2_PARAM_CUTOFF
+#undef _BW_ALLPASS2_PARAM_Q
 
 #ifdef __cplusplus
 }

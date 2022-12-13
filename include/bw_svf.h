@@ -132,7 +132,7 @@ static inline void bw_svf_set_cutoff(bw_svf_coeffs *BW_RESTRICT coeffs, float va
  *  ```>>> */
 static inline void bw_svf_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the quality factor to the given `value` (Hz) in `coeffs`.
+ *    Sets the quality factor to the given `value` in `coeffs`.
  *
  *    `value` must be equal or bigger than `0.5f`.
  *

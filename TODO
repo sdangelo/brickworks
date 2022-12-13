@@ -16,6 +16,8 @@ code:
 * polish examples (ranges, etc.)
 * change name of vst3 template folders to something that doesn't look like a vst3 folder itself
 * compute bit depth reduction only when input changes? (state)
+* common smoothing policy (as control rate as possible?)
+* avoid "force" in coeffs update by using inline functions?
 
 build system:
 * make makefiles handle paths with spaces etc

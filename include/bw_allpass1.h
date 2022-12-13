@@ -130,7 +130,9 @@ struct _bw_allpass1_coeffs {
 	float	t_k;
 
 	float	t;
-	float	X_k;
+	float	X_x;
+	float	X_X_z1;
+	float	lp_X;
 
 	// Parameters
 	float	cutoff;
@@ -163,7 +165,10 @@ static inline void bw_allpass1_reset_state(const bw_allpass1_coeffs *BW_RESTRICT
 static inline void bw_allpass1_update_coeffs_ctrl(bw_allpass1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->cutoff != coeffs->cutoff_prev) {
 		coeffs->t = bw_tanf_3(coeffs->t_k * coeffs->cutoff);
-		coeffs->X_k = bw_rcpf_2(1,f + coeffs->t);
+		const float k = bw_rcpf_2(1.f + coeffs->T);
+		coeffs->X_x = k * coeffs->cutoff;
+		coeffs->X_X_z1 = k * coeffs->t;
+		coeffs->lp_X = bw_rcpf_2(coeffs->cutoff);
 		coeffs->cutoff_prev = coeffs->cutoff;
 	}
 }
@@ -172,8 +177,8 @@ static inline void bw_allpass1_update_coeffs_audio(bw_allpass1_coeffs *BW_RESTRI
 }
 
 static inline float bw_allpass1_process1(const bw_allpass1_coeffs *BW_RESTRICT coeffs, bw_allpass1_state *BW_RESTRICT state, float x) {
-	const float X = coeffs->X_k * (x - state->lp_z1 - coeffs->t * state->X_z1);
-	const float lp = x - X;
+	const float X = coeffs->X_x * (x - state->lp_z1) - coeffs->X_X_z1 * state->X_z1;
+	const float lp = x - coeffs->lp_X * X;
 	state->X_z1 = X;
 	state->lp_z1 = lp;
 	return lp + lp - x;

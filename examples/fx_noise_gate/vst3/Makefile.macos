@@ -10,6 +10,7 @@ CXXFLAGS= \
 	-I${ROOT_DIR}/../../../include \
 	-I${VST3_SDK_DIR} \
 	-fPIC \
+	-fvisibility=hidden \
 	-O3
 LDFLAGS= \
 	-framework Cocoa \

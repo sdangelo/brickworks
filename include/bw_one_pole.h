@@ -25,6 +25,9 @@
  *  description {{{
  *    One-pole (6 dB/oct) lowpass filter with unitary DC gain, separate attack
  *    and decay time constants, and sticky target-reach threshold.
+ *
+ *    This is better suited to implement smoothing than
+ *    [bw_lowpass1](bw_lowpass1).
  *  }}}
  *  changelog {{{
  *    <ul>

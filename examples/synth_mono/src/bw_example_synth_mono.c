@@ -37,7 +37,7 @@
 #include <bw_pink_filt.h>
 #include <bw_svf.h>
 #include <bw_env_gen.h>
-#include <bw_vol.h>
+#include <bw_gain.h>
 #include <bw_env_follow.h>
 
 enum {
@@ -50,21 +50,21 @@ enum {
 	p_vco1_fine,
 	p_vco1_waveform,
 	p_vco1_pw_slope,
-	p_vco1_volume,
+	p_vco1_level,
 	p_vco2_mod,
 	p_vco2_coarse,
 	p_vco2_fine,
 	p_vco2_waveform,
 	p_vco2_pw_slope,
-	p_vco2_volume,
+	p_vco2_level,
 	p_vco3_kbd,
 	p_vco3_coarse,
 	p_vco3_fine,
 	p_vco3_waveform,
 	p_vco3_pw_slope,
-	p_vco3_volume,
+	p_vco3_level,
 	p_noise_color,
-	p_noise_volume,
+	p_noise_level,
 	p_vcf_mod,
 	p_vcf_kbd_ctrl,
 	p_vcf_cutoff,
@@ -91,22 +91,22 @@ struct _bw_example_synth_mono {
 	bw_phase_gen_state	vco1_phase_gen_state;
 	bw_osc_pulse_coeffs	vco1_pulse_coeffs;
 	bw_osc_tri_coeffs	vco1_tri_coeffs;
-	bw_vol_coeffs		vco1_vol_coeffs;
+	bw_gain_coeffs		vco1_gain_coeffs;
 	bw_phase_gen_coeffs	vco2_phase_gen_coeffs;
 	bw_phase_gen_state	vco2_phase_gen_state;
 	bw_osc_pulse_coeffs	vco2_pulse_coeffs;
 	bw_osc_tri_coeffs	vco2_tri_coeffs;
-	bw_vol_coeffs		vco2_vol_coeffs;
+	bw_gain_coeffs		vco2_gain_coeffs;
 	bw_phase_gen_coeffs	vco3_phase_gen_coeffs;
 	bw_phase_gen_state	vco3_phase_gen_state;
 	bw_osc_pulse_coeffs	vco3_pulse_coeffs;
 	bw_osc_tri_coeffs	vco3_tri_coeffs;
-	bw_vol_coeffs		vco3_vol_coeffs;
+	bw_gain_coeffs		vco3_gain_coeffs;
 	bw_osc_filt_state	osc_filt_state;
 	bw_noise_gen_coeffs	noise_gen_coeffs;
 	bw_pink_filt_coeffs	pink_filt_coeffs;
 	bw_pink_filt_state	pink_filt_state;
-	bw_vol_coeffs		noise_vol_coeffs;
+	bw_gain_coeffs		noise_gain_coeffs;
 	bw_env_gen_coeffs	vcf_env_gen_coeffs;
 	bw_env_gen_state	vcf_env_gen_state;
 	bw_svf_coeffs		vcf_coeffs;
@@ -115,7 +115,7 @@ struct _bw_example_synth_mono {
 	bw_env_gen_state	vca_env_gen_state;
 	bw_phase_gen_coeffs	a440_phase_gen_coeffs;
 	bw_phase_gen_state	a440_phase_gen_state;
-	bw_vol_coeffs		vol_coeffs;
+	bw_gain_coeffs		gain_coeffs;
 	bw_env_follow_coeffs	env_follow_coeffs;
 	bw_env_follow_state	env_follow_state;
 
@@ -143,23 +143,23 @@ bw_example_synth_mono bw_example_synth_mono_new() {
 	bw_phase_gen_init(&instance->vco1_phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->vco1_pulse_coeffs);
 	bw_osc_tri_init(&instance->vco1_tri_coeffs);
-	bw_vol_init(&instance->vco1_vol_coeffs);
+	bw_gain_init(&instance->vco1_gain_coeffs);
 	bw_phase_gen_init(&instance->vco2_phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->vco2_pulse_coeffs);
 	bw_osc_tri_init(&instance->vco2_tri_coeffs);
-	bw_vol_init(&instance->vco2_vol_coeffs);
+	bw_gain_init(&instance->vco2_gain_coeffs);
 	bw_phase_gen_init(&instance->vco3_phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->vco3_pulse_coeffs);
 	bw_osc_tri_init(&instance->vco3_tri_coeffs);
-	bw_vol_init(&instance->vco3_vol_coeffs);
+	bw_gain_init(&instance->vco3_gain_coeffs);
 	bw_noise_gen_init(&instance->noise_gen_coeffs, &instance->rand_state);
 	bw_pink_filt_init(&instance->pink_filt_coeffs);
-	bw_vol_init(&instance->noise_vol_coeffs);
+	bw_gain_init(&instance->noise_gain_coeffs);
 	bw_env_gen_init(&instance->vcf_env_gen_coeffs);
 	bw_svf_init(&instance->vcf_coeffs);
 	bw_env_gen_init(&instance->vca_env_gen_coeffs);
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
-	bw_vol_init(&instance->vol_coeffs);
+	bw_gain_init(&instance->gain_coeffs);
 	bw_env_follow_init(&instance->env_follow_coeffs);
 	
 	bw_osc_saw_set_antialiasing(&instance->vco_saw_coeffs, 1);
@@ -167,11 +167,11 @@ bw_example_synth_mono bw_example_synth_mono_new() {
 	bw_osc_tri_set_antialiasing(&instance->vco1_tri_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco2_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco2_tri_coeffs, 1);
-	bw_vol_set_volume_lin(&instance->vco2_vol_coeffs, 0.f);
+	bw_gain_set_gain_lin(&instance->vco2_gain_coeffs, 0.f);
 	bw_osc_pulse_set_antialiasing(&instance->vco3_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco3_tri_coeffs, 1);
-	bw_vol_set_volume_lin(&instance->vco3_vol_coeffs, 0.f);
-	bw_vol_set_volume_lin(&instance->noise_vol_coeffs, 0.f);
+	bw_gain_set_gain_lin(&instance->vco3_gain_coeffs, 0.f);
+	bw_gain_set_gain_lin(&instance->noise_gain_coeffs, 0.f);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	bw_env_follow_set_release_tau(&instance->env_follow_coeffs, 1.f);
 	
@@ -188,23 +188,23 @@ void bw_example_synth_mono_set_sample_rate(bw_example_synth_mono instance, float
 	bw_phase_gen_set_sample_rate(&instance->vco1_phase_gen_coeffs, sample_rate);
 	bw_osc_pulse_set_sample_rate(&instance->vco1_pulse_coeffs, sample_rate);
 	bw_osc_tri_set_sample_rate(&instance->vco1_tri_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&instance->vco1_vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&instance->vco1_gain_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->vco2_phase_gen_coeffs, sample_rate);
 	bw_osc_pulse_set_sample_rate(&instance->vco2_pulse_coeffs, sample_rate);
 	bw_osc_tri_set_sample_rate(&instance->vco2_tri_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&instance->vco2_vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&instance->vco2_gain_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->vco3_phase_gen_coeffs, sample_rate);
 	bw_osc_pulse_set_sample_rate(&instance->vco3_pulse_coeffs, sample_rate);
 	bw_osc_tri_set_sample_rate(&instance->vco3_tri_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&instance->vco3_vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&instance->vco3_gain_coeffs, sample_rate);
 	bw_noise_gen_set_sample_rate(&instance->noise_gen_coeffs, sample_rate);
 	bw_pink_filt_set_sample_rate(&instance->pink_filt_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&instance->noise_vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&instance->noise_gain_coeffs, sample_rate);
 	bw_env_gen_set_sample_rate(&instance->vcf_env_gen_coeffs, sample_rate);
 	bw_svf_set_sample_rate(&instance->vcf_coeffs, sample_rate);
 	bw_env_gen_set_sample_rate(&instance->vca_env_gen_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&instance->vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&instance->gain_coeffs, sample_rate);
 	bw_env_follow_set_sample_rate(&instance->env_follow_coeffs, sample_rate);
 }
 
@@ -217,20 +217,20 @@ void bw_example_synth_mono_reset(bw_example_synth_mono instance) {
 	bw_phase_gen_reset_state(&instance->vco1_phase_gen_coeffs, &instance->vco1_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
-	bw_vol_reset_coeffs(&instance->vco1_vol_coeffs);
+	bw_gain_reset_coeffs(&instance->vco1_gain_coeffs);
 	bw_phase_gen_reset_coeffs(&instance->vco2_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->vco2_phase_gen_coeffs, &instance->vco2_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco2_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
-	bw_vol_reset_coeffs(&instance->vco2_vol_coeffs);
+	bw_gain_reset_coeffs(&instance->vco2_gain_coeffs);
 	bw_phase_gen_reset_coeffs(&instance->vco3_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->vco3_phase_gen_coeffs, &instance->vco3_phase_gen_state, 0.f);
 	bw_osc_pulse_reset_coeffs(&instance->vco3_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco3_tri_coeffs);
-	bw_vol_reset_coeffs(&instance->vco3_vol_coeffs);
+	bw_gain_reset_coeffs(&instance->vco3_gain_coeffs);
 	bw_osc_filt_reset_state(&instance->osc_filt_state);
 	bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state);
-	bw_vol_reset_coeffs(&instance->noise_vol_coeffs);
+	bw_gain_reset_coeffs(&instance->noise_gain_coeffs);
 	bw_env_gen_reset_coeffs(&instance->vcf_env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state);
 	bw_svf_reset_coeffs(&instance->vcf_coeffs);
@@ -239,7 +239,7 @@ void bw_example_synth_mono_reset(bw_example_synth_mono instance) {
 	bw_env_gen_reset_state(&instance->vca_env_gen_coeffs, &instance->vca_env_gen_state);
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, 0.f);
-	bw_vol_reset_coeffs(&instance->vol_coeffs);
+	bw_gain_reset_coeffs(&instance->gain_coeffs);
 	bw_env_follow_reset_coeffs(&instance->env_follow_coeffs);
 	bw_env_follow_reset_state(&instance->env_follow_coeffs, &instance->env_follow_state);
 	instance->note = 60;
@@ -329,10 +329,10 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 			bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
 		}
 		
-		bw_vol_process(&instance->vco1_vol_coeffs, instance->buf[2], instance->buf[2], n);
-		bw_vol_process(&instance->vco2_vol_coeffs, instance->buf[1], instance->buf[1], n);
-		bw_vol_process(&instance->vco3_vol_coeffs, out, out, n);
-		bw_vol_process(&instance->noise_vol_coeffs, instance->buf[0], instance->buf[0], n);
+		bw_gain_process(&instance->vco1_gain_coeffs, instance->buf[2], instance->buf[2], n);
+		bw_gain_process(&instance->vco2_gain_coeffs, instance->buf[1], instance->buf[1], n);
+		bw_gain_process(&instance->vco3_gain_coeffs, out, out, n);
+		bw_gain_process(&instance->noise_gain_coeffs, instance->buf[0], instance->buf[0], n);
 		for (int j = 0; j < n; j++)
 			out[j] = out[j] + instance->buf[1][j] + instance->buf[2][j];
 		
@@ -367,7 +367,7 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 			for (int j = 0; j < n; j++)
 				out[j] += instance->buf[0][j];
 		
-		bw_vol_process(&instance->vol_coeffs, out, out, n);
+		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);
 	}
 }
@@ -378,7 +378,7 @@ void bw_example_synth_mono_set_parameter(bw_example_synth_mono instance, int ind
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:
-		bw_vol_set_volume_lin(&instance->vol_coeffs, value * value * value);
+		bw_gain_set_gain_lin(&instance->gain_coeffs, value * value * value);
 		break;
 	case p_portamento:
 		bw_phase_gen_set_portamento_tau(&instance->vco1_phase_gen_coeffs, value);
@@ -389,25 +389,25 @@ void bw_example_synth_mono_set_parameter(bw_example_synth_mono instance, int ind
 		bw_osc_pulse_set_pulse_width(&instance->vco1_pulse_coeffs, value);
 		bw_osc_tri_set_slope(&instance->vco1_tri_coeffs, bw_clipf(value, 0.001f, 0.999f));
 		break;
-	case p_vco1_volume:
-		bw_vol_set_volume_lin(&instance->vco1_vol_coeffs, value * value * value);
+	case p_vco1_level:
+		bw_gain_set_gain_lin(&instance->vco1_gain_coeffs, value * value * value);
 		break;
 	case p_vco2_pw_slope:
 		bw_osc_pulse_set_pulse_width(&instance->vco2_pulse_coeffs, value);
 		bw_osc_tri_set_slope(&instance->vco2_tri_coeffs, bw_clipf(value, 0.001f, 0.999f));
 		break;
-	case p_vco2_volume:
-		bw_vol_set_volume_lin(&instance->vco2_vol_coeffs, value * value * value);
+	case p_vco2_level:
+		bw_gain_set_gain_lin(&instance->vco2_gain_coeffs, value * value * value);
 		break;
 	case p_vco3_pw_slope:
 		bw_osc_pulse_set_pulse_width(&instance->vco3_pulse_coeffs, value);
 		bw_osc_tri_set_slope(&instance->vco3_tri_coeffs, bw_clipf(value, 0.001f, 0.999f));
 		break;
-	case p_vco3_volume:
-		bw_vol_set_volume_lin(&instance->vco3_vol_coeffs, value * value * value);
+	case p_vco3_level:
+		bw_gain_set_gain_lin(&instance->vco3_gain_coeffs, value * value * value);
 		break;
-	case p_noise_volume:
-		bw_vol_set_volume_lin(&instance->noise_vol_coeffs, value * value * value);
+	case p_noise_level:
+		bw_gain_set_gain_lin(&instance->noise_gain_coeffs, value * value * value);
 		break;
 	case p_vcf_Q:
 		bw_svf_set_Q(&instance->vcf_coeffs, 0.5f + 9.5f * value);

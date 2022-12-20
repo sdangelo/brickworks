@@ -74,7 +74,7 @@ var parameters = [
 		defaultValue:	0.5
 	},
 	{
-		name:		"VCO1 volume",
+		name:		"VCO1 level",
 		output:		false,
 		defaultValue:	1.0
 	},
@@ -106,7 +106,7 @@ var parameters = [
 		defaultValue:	0.5
 	},
 	{
-		name:		"VCO2 volume",
+		name:		"VCO2 level",
 		output:		false,
 		defaultValue:	0.0
 	},
@@ -139,7 +139,7 @@ var parameters = [
 		defaultValue:	0.5
 	},
 	{
-		name:		"VCO3 volume",
+		name:		"VCO3 level",
 		output:		false,
 		defaultValue:	0.0
 	},
@@ -150,7 +150,7 @@ var parameters = [
 		step:		1
 	},
 	{
-		name:		"Noise volume",
+		name:		"Noise level",
 		output:		false,
 		defaultValue:	0.0
 	},

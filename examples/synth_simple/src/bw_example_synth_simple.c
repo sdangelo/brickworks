@@ -32,7 +32,7 @@
 #include <bw_osc_filt.h>
 #include <bw_svf.h>
 #include <bw_env_gen.h>
-#include <bw_vol.h>
+#include <bw_gain.h>
 #include <bw_env_follow.h>
 
 enum {
@@ -61,7 +61,7 @@ struct _bw_example_synth_simple {
 	bw_svf_state		svf_state;
 	bw_env_gen_coeffs	env_gen_coeffs;
 	bw_env_gen_state	env_gen_state;
-	bw_vol_coeffs		vol_coeffs;
+	bw_gain_coeffs		gain_coeffs;
 	bw_env_follow_coeffs	env_follow_coeffs;
 	bw_env_follow_state	env_follow_state;
 
@@ -85,7 +85,7 @@ bw_example_synth_simple bw_example_synth_simple_new() {
 	bw_osc_pulse_init(&instance->osc_pulse_coeffs);
 	bw_svf_init(&instance->svf_coeffs);
 	bw_env_gen_init(&instance->env_gen_coeffs);
-	bw_vol_init(&instance->vol_coeffs);
+	bw_gain_init(&instance->gain_coeffs);
 	bw_env_follow_init(&instance->env_follow_coeffs);
 	
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse_coeffs, 1);
@@ -105,7 +105,7 @@ void bw_example_synth_simple_set_sample_rate(bw_example_synth_simple instance, f
 	bw_osc_pulse_set_sample_rate(&instance->osc_pulse_coeffs, sample_rate);
 	bw_svf_set_sample_rate(&instance->svf_coeffs, sample_rate);
 	bw_env_gen_set_sample_rate(&instance->env_gen_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&instance->vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&instance->gain_coeffs, sample_rate);
 	bw_env_follow_set_sample_rate(&instance->env_follow_coeffs, sample_rate);
 }
 
@@ -118,7 +118,7 @@ void bw_example_synth_simple_reset(bw_example_synth_simple instance) {
 	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state);
 	bw_env_gen_reset_coeffs(&instance->env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->env_gen_coeffs, &instance->env_gen_state);
-	bw_vol_reset_coeffs(&instance->vol_coeffs);
+	bw_gain_reset_coeffs(&instance->gain_coeffs);
 	bw_env_follow_reset_coeffs(&instance->env_follow_coeffs);
 	bw_env_follow_reset_state(&instance->env_follow_coeffs, &instance->env_follow_state);
 	instance->note = -1;
@@ -142,7 +142,7 @@ void bw_example_synth_simple_process(bw_example_synth_simple instance, const flo
 		bw_env_gen_process(&instance->env_gen_coeffs, &instance->env_gen_state, instance->buf, n);
 		for (int j = 0; j < n; j++)
 			out[j] *= instance->buf[j];
-		bw_vol_process(&instance->vol_coeffs, out, out, n);
+		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);
 	}
 }
@@ -153,7 +153,7 @@ void bw_example_synth_simple_set_parameter(bw_example_synth_simple instance, int
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:
-		bw_vol_set_volume_lin(&instance->vol_coeffs, value * value * value);
+		bw_gain_set_gain_lin(&instance->gain_coeffs, value * value * value);
 		break;
 	case p_portamento:
 		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, value);

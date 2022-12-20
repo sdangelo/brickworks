@@ -21,7 +21,9 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.3.0 }}}
- *  requires {{{ bw_config bw_common bw_env_follow bw_one_pole bw_math bw_vol }}}
+ *  requires {{{
+ *    bw_config bw_common bw_env_follow bw_one_pole bw_math bw_gain
+ *  }}}
  *  description {{{
  *    Feedforward compressor/limiter with independent sidechain input.
  *  }}}
@@ -180,13 +182,13 @@ static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float
 
 #include <bw_math.h>
 #include <bw_env_follow.h>
-#include <bw_vol.h>
+#include <bw_gain.h>
 #include <bw_one_pole.h>
 
 struct _bw_comp_coeffs {
 	// Sub-components
 	bw_env_follow_coeffs	env_follow_coeffs;
-	bw_vol_coeffs		vol_coeffs;
+	bw_gain_coeffs		gain_coeffs;
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_thresh_state;
 	bw_one_pole_state	smooth_ratio_state;
@@ -205,7 +207,7 @@ struct _bw_comp_state {
 
 static inline void bw_comp_init(bw_comp_coeffs *BW_RESTRICT coeffs) {
 	bw_env_follow_init(&coeffs->env_follow_coeffs);
-	bw_vol_init(&coeffs->vol_coeffs);
+	bw_gain_init(&coeffs->gain_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	coeffs->thresh = 1.f;
 	coeffs->ratio = 1.f;
@@ -213,14 +215,14 @@ static inline void bw_comp_init(bw_comp_coeffs *BW_RESTRICT coeffs) {
 
 static inline void bw_comp_set_sample_rate(bw_comp_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_env_follow_set_sample_rate(&coeffs->env_follow_coeffs, sample_rate);
-	bw_vol_set_sample_rate(&coeffs->vol_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&coeffs->gain_coeffs, sample_rate);
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 }
 
 static inline void bw_comp_reset_coeffs(bw_comp_coeffs *BW_RESTRICT coeffs) {
 	bw_env_follow_reset_coeffs(&coeffs->env_follow_coeffs);
-	bw_vol_reset_coeffs(&coeffs->vol_coeffs);
+	bw_gain_reset_coeffs(&coeffs->gain_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
 }
@@ -231,12 +233,12 @@ static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs,
 
 static inline void bw_comp_update_coeffs_ctrl(bw_comp_coeffs *BW_RESTRICT coeffs) {
 	bw_env_follow_update_coeffs_ctrl(&coeffs->env_follow_coeffs);
-	bw_vol_update_coeffs_ctrl(&coeffs->vol_coeffs);
+	bw_gain_update_coeffs_ctrl(&coeffs->gain_coeffs);
 }
 
 static inline void bw_comp_update_coeffs_audio(bw_comp_coeffs *BW_RESTRICT coeffs) {
 	bw_env_follow_update_coeffs_audio(&coeffs->env_follow_coeffs);
-	bw_vol_update_coeffs_audio(&coeffs->vol_coeffs);
+	bw_gain_update_coeffs_audio(&coeffs->gain_coeffs);
 	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
 	coeffs->kc = 1.f - bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
 }
@@ -245,7 +247,7 @@ static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, b
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
 	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
 	const float y = env > thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(thresh * bw_rcpf_2(env))) * x : x;
-	return bw_vol_process1(&coeffs->vol_coeffs, y);
+	return bw_gain_process1(&coeffs->gain_coeffs, y);
 }
 
 static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, int n_samples) {
@@ -277,11 +279,11 @@ static inline void bw_comp_set_release_tau(bw_comp_coeffs *BW_RESTRICT coeffs, f
 }
 
 static inline void bw_comp_set_gain_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_vol_set_volume_lin(&coeffs->vol_coeffs, value);
+	bw_gain_set_gain_lin(&coeffs->gain_coeffs, value);
 }
 
 static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_vol_set_volume_dB(&coeffs->vol_coeffs, value);
+	bw_gain_set_gain_dB(&coeffs->gain_coeffs, value);
 }
 
 #ifdef __cplusplus

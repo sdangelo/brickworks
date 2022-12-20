@@ -15,8 +15,8 @@ code:
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
 * change name of vst3 template folders to something that doesn't look like a vst3 folder itself
-* compute bit depth reduction only when input changes? (state)
-* common smoothing policy (as control rate as possible?)
+* compute bit depth reduction only when input changes? (state, option?)
+* common smoothing policy (as control rate as possible?) - smoothing control?
 * avoid "force" in coeffs update by using inline functions?
 
 build system:

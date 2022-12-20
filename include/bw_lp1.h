@@ -39,8 +39,8 @@
  *  }}}
  */
 
-#ifndef _BW_LOWPASS1_H
-#define _BW_LOWPASS1_H
+#ifndef _BW_LP1_H
+#define _BW_LP1_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,72 +49,72 @@ extern "C" {
 #include <bw_common.h>
 
 /*! api {{{
- *    #### bw_lowpass1_coeffs
+ *    #### bw_lp1_coeffs
  *  ```>>> */
-typedef struct _bw_lowpass1_coeffs bw_lowpass1_coeffs;
+typedef struct _bw_lp1_coeffs bw_lp1_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    #### bw_lowpass1_state
+ *    #### bw_lp1_state
  *  ```>>> */
-typedef struct _bw_lowpass1_state bw_lowpass1_state;
+typedef struct _bw_lp1_state bw_lp1_state;
 /*! <<<```
  *    Internal state and related.
  *
- *    #### bw_lowpass1_init()
+ *    #### bw_lp1_init()
  *  ```>>> */
-static inline void bw_lowpass1_init(bw_lowpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_lp1_init(bw_lp1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
- *    #### bw_lowpass1_set_sample_rate()
+ *    #### bw_lp1_set_sample_rate()
  *  ```>>> */
-static inline void bw_lowpass1_set_sample_rate(bw_lowpass1_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_lp1_set_sample_rate(bw_lp1_coeffs *BW_RESTRICT coeffs, float sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    #### bw_lowpass1_reset_coeffs()
+ *    #### bw_lp1_reset_coeffs()
  *  ```>>> */
-static inline void bw_lowpass1_reset_coeffs(bw_lowpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_lp1_reset_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
- *    #### bw_lowpass1_reset_state()
+ *    #### bw_lp1_reset_state()
  *  ```>>> */
-static inline void bw_lowpass1_reset_state(const bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state);
+static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`.
  *
- *    #### bw_lowpass1_update_coeffs_ctrl()
+ *    #### bw_lp1_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_lowpass1_update_coeffs_ctrl(bw_lowpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_lp1_update_coeffs_ctrl(bw_lp1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
- *    #### bw_lowpass1_update_coeffs_audio()
+ *    #### bw_lp1_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_lowpass1_update_coeffs_audio(bw_lowpass1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_lp1_update_coeffs_audio(bw_lp1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
- *    #### bw_lowpass1_process1()
+ *    #### bw_lp1_process1()
  *  ```>>> */
-static inline float bw_lowpass1_process1(const bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state, float x);
+static inline float bw_lp1_process1(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state, float x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. Returns the corresponding output sample.
  *
- *    #### bw_lowpass1_process()
+ *    #### bw_lp1_process()
  *  ```>>> */
-static inline void bw_lowpass1_process(bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_lp1_process(bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
- *    #### bw_lowpass1_set_cutoff()
+ *    #### bw_lp1_set_cutoff()
  *  ```>>> */
-static inline void bw_lowpass1_set_cutoff(bw_lowpass1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_lp1_set_cutoff(bw_lp1_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the cutoff frequency `value` (Hz) in `coeffs`.
  *
@@ -129,7 +129,7 @@ static inline void bw_lowpass1_set_cutoff(bw_lowpass1_coeffs *BW_RESTRICT coeffs
 #include <bw_math.h>
 #include <bw_one_pole.h>
 
-struct _bw_lowpass1_coeffs {
+struct _bw_lp1_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_state;
@@ -146,25 +146,25 @@ struct _bw_lowpass1_coeffs {
 	float			cutoff;
 };
 
-struct _bw_lowpass1_state {
+struct _bw_lp1_state {
 	float	y_z1;
 	float	X_z1;
 };
 
-static inline void bw_lowpass1_init(bw_lowpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_lp1_init(bw_lp1_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
 	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
 	coeffs->cutoff = 1e3f;
 }
 
-static inline void bw_lowpass1_set_sample_rate(bw_lowpass1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_lp1_set_sample_rate(bw_lp1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	coeffs->t_k = 3.141592653589793f / sample_rate;
 }
 
-static inline void _bw_lowpass1_do_update_coeffs(bw_lowpass1_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void _bw_lp1_do_update_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs, char force) {
 	float cutoff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_state);
 	const char cutoff_changed = force || coeffs->cutoff != cutoff_cur;
 	if (cutoff_changed) {
@@ -177,24 +177,24 @@ static inline void _bw_lowpass1_do_update_coeffs(bw_lowpass1_coeffs *BW_RESTRICT
 	}
 }
 
-static inline void bw_lowpass1_reset_coeffs(bw_lowpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_lp1_reset_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->cutoff);
-	_bw_lowpass1_do_update_coeffs(coeffs, 1);
+	_bw_lp1_do_update_coeffs(coeffs, 1);
 }
 
-static inline void bw_lowpass1_reset_state(const bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state) {
+static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state) {
 	state->y_z1 = 0.f;
 	state->X_z1 = 0.f;
 }
 
-static inline void bw_lowpass1_update_coeffs_ctrl(bw_lowpass1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_lp1_update_coeffs_ctrl(bw_lp1_coeffs *BW_RESTRICT coeffs) {
 }
 
-static inline void bw_lowpass1_update_coeffs_audio(bw_lowpass1_coeffs *BW_RESTRICT coeffs) {
-	_bw_lowpass1_do_update_coeffs(coeffs, 0);
+static inline void bw_lp1_update_coeffs_audio(bw_lp1_coeffs *BW_RESTRICT coeffs) {
+	_bw_lp1_do_update_coeffs(coeffs, 0);
 }
 
-static inline float bw_lowpass1_process1(const bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state, float x) {
+static inline float bw_lp1_process1(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state, float x) {
 	const float X = coeffs->X_x * (x - state->y_z1) - coeffs->X_X_z1 * state->X_z1;
 	const float y = x - coeffs->y_X * X;
 	state->y_z1 = y;
@@ -202,14 +202,14 @@ static inline float bw_lowpass1_process1(const bw_lowpass1_coeffs *BW_RESTRICT c
 	return y;
 }
 
-static inline void bw_lowpass1_process(bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_lp1_process(bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	for (int i = 0; i < n_samples; i++) {
-		bw_lowpass1_update_coeffs_audio(coeffs);
-		y[i] = bw_lowpass1_process1(coeffs, state, x[i]);
+		bw_lp1_update_coeffs_audio(coeffs);
+		y[i] = bw_lp1_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_lowpass1_set_cutoff(bw_lowpass1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_lp1_set_cutoff(bw_lp1_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->cutoff = value;
 }
 

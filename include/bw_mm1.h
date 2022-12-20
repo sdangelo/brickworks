@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.3.0 }}}
- *  requires {{{ bw_config bw_common bw_gain bw_lowpass1 bw_math bw_one_pole }}}
+ *  requires {{{ bw_config bw_common bw_gain bw_lp1 bw_math bw_one_pole }}}
  *  description {{{
  *    First-order multimode filter.
  *  }}}
@@ -139,22 +139,22 @@ static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-#include <bw_lowpass1.h>
+#include <bw_lp1.h>
 #include <bw_gain.h>
 
 struct _bw_mm1_coeffs {
 	// Sub-components
-	bw_lowpass1_coeffs	lowpass1_coeffs;
-	bw_gain_coeffs		gain_x_coeffs;
-	bw_gain_coeffs		gain_lp_coeffs;
+	bw_lp1_coeffs	lp1_coeffs;
+	bw_gain_coeffs	gain_x_coeffs;
+	bw_gain_coeffs	gain_lp_coeffs;
 };
 
 struct _bw_mm1_state {
-	bw_lowpass1_state	lowpass1_state;
+	bw_lp1_state	lp1_state;
 };
 
 static inline void bw_mm1_init(bw_mm1_coeffs *BW_RESTRICT coeffs) {
-	bw_lowpass1_init(&coeffs->lowpass1_coeffs);
+	bw_lp1_init(&coeffs->lp1_coeffs);
 	bw_gain_init(&coeffs->gain_x_coeffs);
 	bw_gain_init(&coeffs->gain_lp_coeffs);
 	bw_gain_set_smooth_tau(&coeffs->gain_x_coeffs, 0.005f);
@@ -164,35 +164,35 @@ static inline void bw_mm1_init(bw_mm1_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_mm1_set_sample_rate(bw_mm1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	bw_lowpass1_set_sample_rate(&coeffs->lowpass1_coeffs, sample_rate);
+	bw_lp1_set_sample_rate(&coeffs->lp1_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_x_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_lp_coeffs, sample_rate);
 }
 
 static inline void bw_mm1_reset_coeffs(bw_mm1_coeffs *BW_RESTRICT coeffs) {
-	bw_lowpass1_reset_coeffs(&coeffs->lowpass1_coeffs);
+	bw_lp1_reset_coeffs(&coeffs->lp1_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_x_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_lp_coeffs);
 }
 
 static inline void bw_mm1_reset_state(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state) {
-	bw_lowpass1_reset_state(&coeffs->lowpass1_coeffs, &state->lowpass1_state);
+	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state);
 }
 
 static inline void bw_mm1_update_coeffs_ctrl(bw_mm1_coeffs *BW_RESTRICT coeffs) {
-	bw_lowpass1_update_coeffs_ctrl(&coeffs->lowpass1_coeffs);
+	bw_lp1_update_coeffs_ctrl(&coeffs->lp1_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_x_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_lp_coeffs);
 }
 
 static inline void bw_mm1_update_coeffs_audio(bw_mm1_coeffs *BW_RESTRICT coeffs) {
-	bw_lowpass1_update_coeffs_audio(&coeffs->lowpass1_coeffs);
+	bw_lp1_update_coeffs_audio(&coeffs->lp1_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_x_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_lp_coeffs);
 }
 
 static inline float bw_mm1_process1(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, float x) {
-	const float lp = bw_lowpass1_process1(&coeffs->lowpass1_coeffs, &state->lowpass1_state, x);
+	const float lp = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, x);
 	const float vx = bw_gain_process1(&coeffs->gain_x_coeffs, x);
 	const float vlp = bw_gain_process1(&coeffs->gain_lp_coeffs, lp);
 	return vx + vlp;
@@ -207,7 +207,7 @@ static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_stat
 }
 
 static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_lowpass1_set_cutoff(&coeffs->lowpass1_coeffs, value);
+	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, value);
 }
 
 static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {

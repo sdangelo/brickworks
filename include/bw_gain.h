@@ -124,6 +124,14 @@ static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float
  *    Sets the gain parameter to the given `value` (dB) in `coeffs`.
  *
  *    Default value: `0.f`.
+ *
+ *    #### bw_gain_set_smooth_tau()
+ *  ```>>> */
+static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the smoothing time constant `value` (s) in `coeffs`.
+ *
+ *    Default value: `0.05f`.
  *  }}} */
 
 /*** Implementation ***/
@@ -141,12 +149,15 @@ struct _bw_gain_coeffs {
 
 	// Parameters
 	float			gain;
+	float			smooth_tau;
+	float			smooth_tau_prev;
 };
 
 static inline void bw_gain_init(bw_gain_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	coeffs->gain = 1.f;
+	coeffs->smooth_tau = 0.05f;
 }
 
 static inline void bw_gain_set_sample_rate(bw_gain_coeffs *BW_RESTRICT coeffs, float sample_rate) {
@@ -154,11 +165,21 @@ static inline void bw_gain_set_sample_rate(bw_gain_coeffs *BW_RESTRICT coeffs, f
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 }
 
+static inline void _bw_gain_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs, char force) {
+	if (force || coeffs->smooth_tau != coeffs->smooth_tau_prev) {
+		bw_one_pole_set_tau(&coeffs->smooth_coeffs, coeffs->smooth_tau);
+		bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
+		coeffs->smooth_tau_prev = coeffs->smooth_tau;
+	}
+}
+
 static inline void bw_gain_reset_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs) {
+	_bw_gain_do_update_coeffs(coeffs, 1);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->gain);
 }
 
 static inline void bw_gain_update_coeffs_ctrl(bw_gain_coeffs *BW_RESTRICT coeffs) {
+	_bw_gain_do_update_coeffs(coeffs, 0);
 }
 
 static inline void bw_gain_update_coeffs_audio(bw_gain_coeffs *BW_RESTRICT coeffs) {
@@ -170,6 +191,7 @@ static inline float bw_gain_process1(const bw_gain_coeffs *BW_RESTRICT coeffs, f
 }
 
 static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples) {
+	bw_gain_update_coeffs_ctrl(coeffs);
 	for (int i = 0; i < n_samples; i++) {
 		bw_gain_update_coeffs_audio(coeffs);
 		y[i] = bw_gain_process1(coeffs, x[i]);
@@ -182,6 +204,10 @@ static inline void bw_gain_set_gain_lin(bw_gain_coeffs *BW_RESTRICT coeffs, floa
 
 static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->gain = bw_dB2linf_3(value);
+}
+
+static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
+	coeffs->smooth_tau = value;
 }
 
 #ifdef __cplusplus

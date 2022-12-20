@@ -18,6 +18,7 @@ code:
 * compute bit depth reduction only when input changes? (state, option?)
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * avoid "force" in coeffs update by using inline functions?
+* should rather use backward Euler in bw_onepole?
 
 build system:
 * make makefiles handle paths with spaces etc

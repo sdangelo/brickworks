@@ -137,6 +137,11 @@ struct _bw_lowpass1_coeffs {
 	// Coefficients
 	float			t_k;
 
+	float			t;
+	float			X_x;
+	float			X_X_z1;
+	float			y_X;
+
 	// Parameters
 	float			cutoff;
 };
@@ -159,11 +164,11 @@ static inline void bw_lowpass1_set_sample_rate(bw_lowpass1_coeffs *BW_RESTRICT c
 	coeffs->t_k = 3.141592653589793f / sample_rate;
 }
 
-static inline void _bw_lowpass1_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void _bw_lowpass1_do_update_coeffs(bw_lowpass1_coeffs *BW_RESTRICT coeffs, char force) {
 	float cutoff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_state);
 	const char cutoff_changed = force || coeffs->cutoff != cutoff_cur;
 	if (cutoff_changed) {
-		cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
+		cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->cutoff);
 		coeffs->t = bw_tanf_3(coeffs->t_k * cutoff_cur);
 		const float k = bw_rcpf_2(1.f + coeffs->t);
 		coeffs->X_x = k * cutoff_cur;
@@ -191,7 +196,7 @@ static inline void bw_lowpass1_update_coeffs_audio(bw_lowpass1_coeffs *BW_RESTRI
 
 static inline float bw_lowpass1_process1(const bw_lowpass1_coeffs *BW_RESTRICT coeffs, bw_lowpass1_state *BW_RESTRICT state, float x) {
 	const float X = coeffs->X_x * (x - state->y_z1) - coeffs->X_X_z1 * state->X_z1;
-	const float y = x - coeffs->y_f * X;
+	const float y = x - coeffs->y_X * X;
 	state->y_z1 = y;
 	state->X_z1 = X;
 	return y;

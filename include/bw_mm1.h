@@ -119,7 +119,7 @@ static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float va
  *
  *    #### bw_mm1_set_coeff_x()
  *  ```>>> */
-static inline void bw_mm1_set_mode_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the input mode coefficient `value` in `coeffs`.
  *
@@ -127,7 +127,7 @@ static inline void bw_mm1_set_mode_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, fl
  *
  *    #### bw_mm1_set_coeff_lp()
  *  ```>>> */
-static inline void bw_mm1_set_mode_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the lowpass mode coefficient `value` in `coeffs`.
  *
@@ -195,7 +195,7 @@ static inline float bw_mm1_process1(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_
 	const float lp = bw_lowpass1_process1(&coeffs->lowpass1_coeffs, &state->lowpass1_state, x);
 	const float vx = bw_gain_process1(&coeffs->gain_x_coeffs, x);
 	const float vlp = bw_gain_process1(&coeffs->gain_lp_coeffs, lp);
-	return vx * x + vlp * lp;
+	return vx + vlp;
 }
 
 static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
@@ -210,11 +210,11 @@ static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float va
 	bw_lowpass1_set_cutoff(&coeffs->lowpass1_coeffs, value);
 }
 
-static inline void bw_mm1_set_mode_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_gain_set_gain_lin(&coeffs->gain_x_coeffs, value);
 }
 
-static inline void bw_mm1_set_mode_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_gain_set_gain_lin(&coeffs->gain_lp_coeffs, value);
 }
 

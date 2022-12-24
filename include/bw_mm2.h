@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.3.0 }}}
- *  requires {{{ bw_config bw_common bw_gain bw_svf bw_math bw_one_pole }}}
+ *  requires {{{ bw_config bw_common bw_gain bw_math bw_one_pole bw_svf }}}
  *  description {{{
  *    Second-order multimode filter.
  *  }}}

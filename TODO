@@ -19,6 +19,7 @@ code:
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * avoid "force" in coeffs update by using inline functions?
 * should rather use backward Euler in bw_onepole?
+* Q to slope and viceversa functions in 2nd order shelf filters?
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -135,7 +135,6 @@ static inline void bw_ls1_set_dc_gain_dB(bw_ls1_coeffs *BW_RESTRICT coeffs, floa
  *    Sets the dc gain parameter to the given `value` (dB) in `coeffs`.
  *
  *    Default value: `-INFINITY`.
- *
  *  }}} */
 
 /*** Implementation ***/

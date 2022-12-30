@@ -214,17 +214,7 @@ static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 	bw_mm2_set_sample_rate(&coeffs->mm2_coeffs, sample_rate);
 }
 
-static inline void bw_ls2_reset_coeffs(bw_ls2_coeffs *BW_RESTRICT coeffs) {
-	bw_mm2_reset_coeffs(&coeffs->mm2_coeffs);
-	coeffs->param_changed = ~0;
-	bw_ls2_update_coeffs_ctrl(coeffs);
-}
-
-static inline void bw_ls2_reset_state(const bw_ls2_coeffs *BW_RESTRICT coeffs, bw_ls2_state *BW_RESTRICT state) {
-	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state);
-}
-
-static inline void bw_ls2_update_coeffs_ctrl(bw_ls2_coeffs *BW_RESTRICT coeffs) {
+static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_LS2_PARAM_GAIN) {
 			coeffs->sg = bw_math_sqrtf_2(coeffs->gain);
@@ -245,6 +235,20 @@ static inline void bw_ls2_update_coeffs_ctrl(bw_ls2_coeffs *BW_RESTRICT coeffs) 
 		}
 		coeffs->param_changed = 0;
 	}
+}
+
+static inline void bw_ls2_reset_coeffs(bw_ls2_coeffs *BW_RESTRICT coeffs) {
+	coeffs->param_changed = ~0;
+	_bw_ls2_update_mm2_params(coeffs);
+	bw_mm2_reset_coeffs(&coeffs->mm2_coeffs);
+}
+
+static inline void bw_ls2_reset_state(const bw_ls2_coeffs *BW_RESTRICT coeffs, bw_ls2_state *BW_RESTRICT state) {
+	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state);
+}
+
+static inline void bw_ls2_update_coeffs_ctrl(bw_ls2_coeffs *BW_RESTRICT coeffs) {
+	_bw_ls2_update_mm2_params(coeffs);
 	bw_mm2_update_coeffs_ctrl(&coeffs->mm2_coeffs);
 }
 

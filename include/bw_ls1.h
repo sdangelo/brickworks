@@ -148,6 +148,11 @@ static inline void bw_ls1_set_dc_gain_dB(bw_ls1_coeffs *BW_RESTRICT coeffs, floa
 struct _bw_ls1_coeffs {
 	// Sub-components
 	bw_mm1_coeffs	mm1_coeffs;
+
+	// Parameters
+	float		cutoff;
+	float		dc_gain;
+	char		update;
 };
 
 struct _bw_ls1_state {
@@ -156,15 +161,29 @@ struct _bw_ls1_state {
 
 static inline void bw_ls1_init(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	bw_mm1_init(&coeffs->mm1_coeffs);
+	bw_mm1_set_prewarp_at_cutoff(&coeffs->mm1_coeffs, 0);
 	bw_mm1_set_coeffs_x(&coeffs->mm1_coeffs, 1.f);
 	bw_mm1_set_coeffs_lp(&coeffs->mm1_coeffs, 0.f);
+	coeffs->cutoff = 1e3f;
+	coeffs->dc_gain = 1.f;
 }
 
 static inline void bw_ls1_set_sample_rate(bw_ls1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_mm1_set_sample_rate(&coeffs->mm1_coeffs, sample_rate);
 }
 
+static inline void _bw_ls1_update_mm1_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+	if (coeffs->update) {
+		bw_mm1_set_cutoff(&coeffs->mm1_coeffs, coeffs->cutoff * bw_rcpf_2(bw_sqrtf_2(coeffs->dc_gain)));
+		bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, coeffs->dc_gain - 1.f);
+		bw_mm1_set_prewarp_freq(&coeffs->mm1_coeffs, coeffs->cutoff);
+		coeffs->update = 0;
+	}
+}
+
 static inline void bw_ls1_reset_coeffs(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+	coeffs->update = 1;
+	_bw_ls1_update_mm1_params(coeffs);
 	bw_mm1_reset_coeffs(&coeffs->mm1_coeffs);
 }
 
@@ -173,6 +192,7 @@ static inline void bw_ls1_reset_state(const bw_ls1_coeffs *BW_RESTRICT coeffs, b
 }
 
 static inline void bw_ls1_update_coeffs_ctrl(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+	_bw_ls1_update_mm1_params(coeffs);
 	bw_mm1_update_coeffs_ctrl(&coeffs->mm1_coeffs);
 }
 
@@ -193,11 +213,17 @@ static inline void bw_ls1_process(bw_ls1_coeffs *BW_RESTRICT coeffs, bw_ls1_stat
 }
 
 static inline void bw_ls1_set_cutoff(bw_ls1_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_mm1_set_cutoff(&coeffs->mm1_coeffs, value);
+	if (value != coeffs->cutoff) {
+		coeffs->cutoff = value;
+		coeffs->update = 1;
+	}
 }
 
 static inline void bw_ls1_set_dc_gain_lin(bw_ls1_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, value - 1.f);
+	if (value != coeffs->dc_gain) {
+		coeffs->dc_gain = value;
+		coeffs->update = 1;
+	}
 }
 
 static inline void bw_ls1_set_dc_gain_dB(bw_ls1_coeffs *BW_RESTRICT coeffs, float value) {

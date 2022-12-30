@@ -150,6 +150,11 @@ static inline void bw_hs1_set_high_gain_dB(bw_hs1_coeffs *BW_RESTRICT coeffs, fl
 struct _bw_hs1_coeffs {
 	// Sub-components
 	bw_mm1_coeffs	mm1_coeffs;
+
+	// Parameters
+	float		cutoff;
+	float		high_gain;
+	char		update;
 };
 
 struct _bw_hs1_state {
@@ -158,15 +163,30 @@ struct _bw_hs1_state {
 
 static inline void bw_hs1_init(bw_hs1_coeffs *BW_RESTRICT coeffs) {
 	bw_mm1_init(&coeffs->mm1_coeffs);
+	bw_mm1_set_prewarp_at_cutoff(&coeffs->mm1_coeffs, 0);
 	bw_mm1_set_coeffs_x(&coeffs->mm1_coeffs, 0.f);
 	bw_mm1_set_coeffs_lp(&coeffs->mm1_coeffs, 1.f);
+	coeffs->cutoff = 1e3f;
+	coeffs->dc_gain = 1.f;
 }
 
 static inline void bw_hs1_set_sample_rate(bw_hs1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_mm1_set_sample_rate(&coeffs->mm1_coeffs, sample_rate);
 }
 
+static inline void _bw_hs1_update_mm1_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+	if (coeffs->update) {
+		bw_mm1_set_cutoff(&coeffs->mm1_coeffs, coeffs->cutoff * bw_sqrtf_2(coeffs->dc_gain));
+		bw_mm1_set_coeff_x(&coeffs->mm1_coeffs, coeffs->dc_gain);
+		bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, 1.f - coeffs->dc_gain);
+		bw_mm1_set_prewarp_freq(&coeffs->mm1_coeffs, coeffs->cutoff);
+		coeffs->update = 0;
+	}
+}
+
 static inline void bw_hs1_reset_coeffs(bw_hs1_coeffs *BW_RESTRICT coeffs) {
+	coeffs->update = 1;
+	_bw_hs1_update_mm1_params(coeffs);
 	bw_mm1_reset_coeffs(&coeffs->mm1_coeffs);
 }
 
@@ -175,6 +195,7 @@ static inline void bw_hs1_reset_state(const bw_hs1_coeffs *BW_RESTRICT coeffs, b
 }
 
 static inline void bw_hs1_update_coeffs_ctrl(bw_hs1_coeffs *BW_RESTRICT coeffs) {
+	_bw_hs1_update_mm1_params(coeffs);
 	bw_mm1_update_coeffs_ctrl(&coeffs->mm1_coeffs);
 }
 
@@ -195,12 +216,17 @@ static inline void bw_hs1_process(bw_hs1_coeffs *BW_RESTRICT coeffs, bw_hs1_stat
 }
 
 static inline void bw_hs1_set_cutoff(bw_hs1_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_mm1_set_cutoff(&coeffs->mm1_coeffs, value);
+	if (value != coeffs->cutoff) {
+		coeffs->cutoff = value;
+		coeffs->update = 1;
+	}
 }
 
 static inline void bw_hs1_set_high_gain_lin(bw_hs1_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_mm1_set_coeff_x(&coeffs->mm1_coeffs, value);
-	bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, 1.f - value);
+	if (value != coeffs->high_gain) {
+		coeffs->high_gain = value;
+		coeffs->update = 1;
+	}
 }
 
 static inline void bw_hs1_set_high_gain_dB(bw_hs1_coeffs *BW_RESTRICT coeffs, float value) {

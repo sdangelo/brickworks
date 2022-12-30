@@ -117,6 +117,23 @@ static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float va
  *
  *    Default value: `1e3f`.
  *
+ *    #### bw_mm1_set_prewarp_at_cutoff()
+ *  ```>>> */
+static inline void bw_mm1_set_prewarp_at_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, char value);
+/*! <<<```
+ *    Sets whether bilinear transform prewarping frequency should match the
+ *    cutoff frequency (non-`0`) or not (`0`).
+ *
+ *    Default value: non-`0` (on).
+ *
+ *    #### bw_mm1_set_prewarp_freq()
+ *  ```>>> */
+static inline void bw_mm1_set_prewarp_freq(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the prewarping frequency `value` (Hz) in `coeffs`.
+ *
+ *    Only used when the prewarp\_at\_cutoff parameter is off.
+ *
  *    #### bw_mm1_set_coeff_x()
  *  ```>>> */
 static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
@@ -208,6 +225,14 @@ static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_stat
 
 static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, value);
+}
+
+static inline void bw_mm1_set_prewarp_at_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, char value) {
+	bw_lp1_set_prewarp_at_cutoff(&coeffs->lp1_coeffs, value);
+}
+
+static inline void bw_mm1_set_prewarp_freq(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_lp1_set_prewarp_freq(&coeffs->lp1_coeffs, value);
 }
 
 static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {

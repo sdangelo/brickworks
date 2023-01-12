@@ -21,6 +21,7 @@ code:
 * should rather use backward Euler in bw_onepole?
 * Q to slope and viceversa functions in 2nd order shelf filters? keep updated values (seamless switch, syncrhonicity)?
 * treat unused variable/function warnings
+* csch for bw_peak bandwidth -> Q
 
 build system:
 * make makefiles handle paths with spaces etc

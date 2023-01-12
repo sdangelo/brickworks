@@ -137,6 +137,25 @@ static inline void bw_svf_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
  *    `value` must be equal or bigger than `0.5f`.
  *
  *    Default value: `0.5f`.
+ * 
+ *    #### bw_svf_set_prewarp_at_cutoff()
+ *  ```>>> */
+static inline void bw_svf_set_prewarp_at_cutoff(bw_svf_coeffs *BW_RESTRICT coeffs, char value);
+/*! <<<```
+ *    Sets whether bilinear transform prewarping frequency should match the
+ *    cutoff frequency (non-`0`) or not (`0`).
+ *
+ *    Default value: non-`0` (on).
+ *
+ *    #### bw_svf_set_prewarp_freq()
+ *  ```>>> */
+static inline void bw_svf_set_prewarp_freq(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the prewarping frequency `value` (Hz) in `coeffs`.
+ *
+ *    Only used when the prewarp\_at\_cutoff parameter is off.
+ *
+ *    Default value: `1e3f`.
  *  }}} */
 
 /*** Implementation ***/
@@ -152,10 +171,12 @@ struct _bw_svf_coeffs {
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_cutoff_state;
 	bw_one_pole_state	smooth_Q_state;
+	bw_one_pole_state	smooth_prewarp_freq_state;
 	
 	// Coefficients
 	float			t_k;
 
+	float			prewarp_k;
 	float			t;
 	float			kf;
 	float			k;
@@ -165,6 +186,7 @@ struct _bw_svf_coeffs {
 	// Parameters
 	float			cutoff;
 	float			Q;
+	float			prewarp_freq;
 };
 
 struct _bw_svf_state {
@@ -180,6 +202,8 @@ static inline void bw_svf_init(bw_svf_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
 	coeffs->cutoff = 1e3f;
 	coeffs->Q = 0.5f;
+	coeffs->prewarp_freq = 1e3f;
+	coeffs->prewarp_k = 1.f;
 }
 
 static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, float sample_rate) {
@@ -189,15 +213,16 @@ static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, flo
 }
 
 static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, char force) {
-	float cutoff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_cutoff_state);
+	const float prewarp_freq = coeffs->prewarp_freq + coeffs->prewarp_k * (coeffs->cutoff - coeffs->prewarp_freq);
+	float prewarp_freq_cur = bw_one_pole_get_y_z1(&coeffs->smooth_prewarp_freq_state);
 	float Q_cur = bw_one_pole_get_y_z1(&coeffs->smooth_Q_state);
-	const char cutoff_changed = force || coeffs->cutoff != cutoff_cur;
+	const char prewarp_freq_changed = force || prewarp_freq != prewarp_freq_cur;
 	const char Q_changed = force || coeffs->Q != Q_cur;
-	if (cutoff_changed || Q_changed) {
-		if (cutoff_changed) {
-			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
-			coeffs->t = bw_tanf_3(coeffs->t_k * cutoff_cur);
-			coeffs->kf = coeffs->t * bw_rcpf_2(cutoff_cur);
+	if (prewarp_freq_changed || Q_changed) {
+		if (prewarp_freq_changed) {
+			prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
+			coeffs->t = bw_tanf_3(coeffs->t_k * prewarp_freq_cur);
+			coeffs->kf = coeffs->t * bw_rcpf_2(prewarp_freq_cur);
 		}
 		if (Q_changed) {
 			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
@@ -206,11 +231,13 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 		coeffs->kt = coeffs->k + coeffs->t;
 		coeffs->hp_x = bw_rcpf_2(1.f + coeffs->t * coeffs->kt);
 	}
+	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 }
 
 static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, coeffs->prewarp_freq + coeffs->prewarp_k * (coeffs->cutoff - coeffs->prewarp_freq));
 	_bw_svf_do_update_coeffs(coeffs, 1);
 }
 
@@ -310,6 +337,14 @@ static inline void bw_svf_set_cutoff(bw_svf_coeffs *BW_RESTRICT coeffs, float va
 
 static inline void bw_svf_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->Q = value;
+}
+
+static inline void bw_svf_set_prewarp_at_cutoff(bw_svf_coeffs *BW_RESTRICT coeffs, char value) {
+	coeffs->prewarp_k = value ? 1.f : 0.f;
+}
+
+static inline void bw_svf_set_prewarp_freq(bw_svf_coeffs *BW_RESTRICT coeffs, float value) {
+	coeffs->prewarp_freq = value;
 }
 
 #ifdef __cplusplus

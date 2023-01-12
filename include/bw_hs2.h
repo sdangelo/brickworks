@@ -215,7 +215,7 @@ static inline void bw_hs2_set_sample_rate(bw_hs2_coeffs *BW_RESTRICT coeffs, flo
 	bw_mm2_set_sample_rate(&coeffs->mm2_coeffs, sample_rate);
 }
 
-static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+static inline void _bw_hs2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_HS2_PARAM_HIGH_GAIN) {
 			coeffs->sg = bw_math_sqrtf_2(coeffs->high_gain);

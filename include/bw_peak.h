@@ -185,8 +185,7 @@ struct _bw_peak_coeffs {
 	bw_mm2_coeffs	mm2_coeffs;
 
 	// Coefficients
-	float		sg;
-	float		isg;
+	float		bw_Q;
 
 	// Parameters
 	float		peak_gain;
@@ -208,7 +207,7 @@ static inline void bw_peak_init(bw_peak_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_init(&coeffs->mm2_coeffs);
 	coeffs->peak_gain = 1.f;
 	coeffs->Q = 0.5f;
-	coeffs->bandwidth = ?; //Q=sqrt(gain)*k/(k^2-1), k=ratio f_half/f_peak
+	coeffs->bandwidth = 2.543106606327224f;
 	coeffs->use_bandwidth = 1;
 }
 
@@ -218,22 +217,20 @@ static inline void bw_peak_set_sample_rate(bw_peak_coeffs *BW_RESTRICT coeffs, f
 
 static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
-		if (coeffs->param_changed & _BW_HS2_PARAM_GAIN) {
-			coeffs->sg = bw_math_sqrtf_2(coeffs->gain);
-			coeffs->isg = bw_rcpf_2(coeffs->sg);
-			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
-			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
-			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, coeffs->gain - coeffs->sg);
-		}
-		if (coeffs->use_slope) {
-			if (coeffs->param_changed & _BW_HS2_PARAM_SLOPE) {
-				const float k = coeffs->sg + coeffs->isg;
-				bw_mm2_set_Q(&coeffs->mm2_coeffs, bw_sqrtf_2(coeffs->slope * bw_rcpf_2(coeffs->slope + coeffs->slope + k - k * coeffs->slope)));
+		if (coeffs->use_bandwidth) {
+			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_BANDWIDTH)) {
+				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH) {
+					coeffs->bw_Q = (bw_pow2f_3(0.5f * coeffs->bandiwdth) * bw_sqrtf_2(coeffs->peak_gain)) * bw_rcpf_2(bw_pow2f_3(coeffs->bandiwdth) - 1.f);
+					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->bw_Q);
+				}
+				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, coeffs->peak_gain * bw_rcpf_2(coeffs->bw_Q) - 1.f);
 			}
-		}
-		else {
-			if (coeffs->param_changed & _BW_HS2_PARAM_Q)
-				bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->Q);
+		} else {
+			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_Q) {
+				if (coeffs->param_changed & _BW_PEAK_PARAM_Q)
+					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->Q);
+				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, coeffs->peak_gain * bw_rcpf_2(coeffs->Q) - 1.f);
+			}
 		}
 		coeffs->param_changed = 0;
 	}
@@ -277,36 +274,36 @@ static inline void bw_peak_set_cutoff(bw_peak_coeffs *BW_RESTRICT coeffs, float 
 static inline void bw_peak_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->Q != value) {
 		coeffs->Q = value;
-		coeffs->param_changed |= _BW_HS2_PARAM_Q;
+		coeffs->param_changed |= _BW_PEAK_PARAM_Q;
 	}
 }
 
-static inline void bw_peak_set_dc_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
-	if (coeffs->gain != value) {
-		coeffs->gain = value;
-		coeffs->param_changed |= _BW_HS2_PARAM_GAIN;
+static inline void bw_peak_set_peak_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
+	if (coeffs->peak_gain != value) {
+		coeffs->peak_gain = value;
+		coeffs->param_changed |= _BW_PEAK_PARAM_PEAK_GAIN;
 	}
 }
 
-static inline void bw_peak_set_dc_gain_dB(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_peak_set_dc_gain_lin(coeffs, bw_dB2linf_3(value));
+static inline void bw_peak_set_peak_gain_dB(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_peak_set_peak_gain_lin(coeffs, bw_dB2linf_3(value));
 }
 
-static inline void bw_peak_set_slope(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
-	if (coeffs->slope != value) {
-		coeffs->slope = value;
-		coeffs->param_changed |= _BW_HS2_PARAM_SLOPE;
+static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
+	if (coeffs->bandwidth != value) {
+		coeffs->bandwidth = value;
+		coeffs->param_changed |= _BW_PEAK_PARAM_BANDWIDTH;
 	}
 }
 
-static inline void bw_peak_set_use_slope(bw_mm2_coeffs *BW_RESTRICT coeffs, char value) {
-	if ((coeffs->use_slope && !value) || (!coeffs->use_slope && value)) {
-		coeffs->use_slope = value;
-		coeffs->param_changed |= _BW_HS2_PARAM_Q | _BW_HS2_PARAM_SLOPE;
+static inline void bw_peak_set_use_bandwidth(bw_mm2_coeffs *BW_RESTRICT coeffs, char value) {
+	if ((coeffs->use_bandwidth && !value) || (!coeffs->use_bandwidth && value)) {
+		coeffs->use_bandwidth = value;
+		coeffs->param_changed |= _BW_PEAK_PARAM_Q | _BW_PEAK_PARAM_BANDWIDTH;
 	}
 }
 
-#undef _BW_PEAK_PARAM_GAIN
+#undef _BW_PEAK_PARAM_PEAK_GAIN
 #undef _BW_PEAK_PARAM_Q
 #undef _BW_PEAK_PARAM_BANDWIDTH
 

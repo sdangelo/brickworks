@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ struct _bw_ls2_coeffs {
 	float		isg;
 
 	// Parameters
-	float		gain;
+	float		dc_gain;
 	float		Q;
 	float		slope;
 	char		use_slope;
@@ -198,13 +198,13 @@ struct _bw_ls2_state {
 	bw_mm2_state	mm2_state;
 };
 
-#define _BW_LS2_PARAM_GAIN	1
+#define _BW_LS2_PARAM_DC_GAIN	1
 #define _BW_LS2_PARAM_Q		(1<<1)
-#define _BW_LS2_PARAM_SLOPE	(1<<1)
+#define _BW_LS2_PARAM_SLOPE	(1<<2)
 
 static inline void bw_ls2_init(bw_ls2_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_init(&coeffs->mm2_coeffs);
-	coeffs->gain = 1.f;
+	coeffs->dc_gain = 1.f;
 	coeffs->Q = 0.5f;
 	coeffs->slope = 0.5f;
 	coeffs->use_slope = 1;
@@ -216,8 +216,8 @@ static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 
 static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
-		if (coeffs->param_changed & _BW_LS2_PARAM_GAIN) {
-			coeffs->sg = bw_math_sqrtf_2(coeffs->gain);
+		if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
+			coeffs->sg = bw_math_sqrtf_2(coeffs->dc_gain);
 			coeffs->isg = bw_rcpf_2(coeffs->sg);
 			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
 			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, 1.f - coeffs->isg);
@@ -280,9 +280,9 @@ static inline void bw_ls2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) 
 }
 
 static inline void bw_ls2_set_dc_gain_lin(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
-	if (coeffs->gain != value) {
-		coeffs->gain = value;
-		coeffs->param_changed |= _BW_LS2_PARAM_GAIN;
+	if (coeffs->dc_gain != value) {
+		coeffs->dc_gain = value;
+		coeffs->param_changed |= _BW_LS2_PARAM_DC_GAIN;
 	}
 }
 
@@ -304,9 +304,9 @@ static inline void bw_ls2_set_use_slope(bw_mm2_coeffs *BW_RESTRICT coeffs, char 
 	}
 }
 
-#undef _BW_LS2_PARAM_GAIN
+#undef _BW_LS2_PARAM_DC_GAIN
 #undef _BW_LS2_PARAM_Q
-#undef _BW_LS2_PARAM_S
+#undef _BW_LS2_PARAM_SLOPE
 
 #ifdef __cplusplus
 }

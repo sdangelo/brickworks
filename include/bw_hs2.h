@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,19 +135,21 @@ static inline void bw_hs2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value);
  *
  *    Default value: `0.5f`.
  *
- *    #### bw_hs2_set_dc_gain_lin()
+ *    #### bw_hs2_set_high_gain_lin()
  *  ```>>> */
-static inline void bw_hs2_set_dc_gain_lin(bw_hs2_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_hs2_set_high_gain_lin(bw_hs2_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the dc gain parameter to the given `value` (linear gain) in `coeffs`.
+ *    Sets the high-frequency gain parameter to the given `value` (linear gain)
+ *    in `coeffs`.
  *
  *    Default value: `0.f`.
  *
- *    #### bw_hs2_set_dc_gain_dB()
+ *    #### bw_hs2_set_high_gain_dB()
  *  ```>>> */
-static inline void bw_hs2_set_dc_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_hs2_set_high_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the dc gain parameter to the given `value` (dB) in `coeffs`.
+ *    Sets the high-frequency gain parameter to the given `value` (dB) in
+ *    `coeffs`.
  *
  *    Default value: `-INFINITY`.
  *
@@ -186,7 +188,7 @@ struct _bw_hs2_coeffs {
 	float		isg;
 
 	// Parameters
-	float		gain;
+	float		high_gain;
 	float		Q;
 	float		slope;
 	char		use_slope;
@@ -197,13 +199,13 @@ struct _bw_hs2_state {
 	bw_mm2_state	mm2_state;
 };
 
-#define _BW_HS2_PARAM_GAIN	1
+#define _BW_HS2_PARAM_HIGH_GAIN	1
 #define _BW_HS2_PARAM_Q		(1<<1)
-#define _BW_HS2_PARAM_SLOPE	(1<<1)
+#define _BW_HS2_PARAM_SLOPE	(1<<2)
 
 static inline void bw_hs2_init(bw_hs2_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_init(&coeffs->mm2_coeffs);
-	coeffs->gain = 1.f;
+	coeffs->high_gain = 1.f;
 	coeffs->Q = 0.5f;
 	coeffs->slope = 0.5f;
 	coeffs->use_slope = 1;
@@ -215,12 +217,12 @@ static inline void bw_hs2_set_sample_rate(bw_hs2_coeffs *BW_RESTRICT coeffs, flo
 
 static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
-		if (coeffs->param_changed & _BW_HS2_PARAM_GAIN) {
-			coeffs->sg = bw_math_sqrtf_2(coeffs->gain);
+		if (coeffs->param_changed & _BW_HS2_PARAM_HIGH_GAIN) {
+			coeffs->sg = bw_math_sqrtf_2(coeffs->high_gain);
 			coeffs->isg = bw_rcpf_2(coeffs->sg);
 			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
 			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
-			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, coeffs->gain - coeffs->sg);
+			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, coeffs->high_gain - coeffs->sg);
 		}
 		if (coeffs->use_slope) {
 			if (coeffs->param_changed & _BW_HS2_PARAM_SLOPE) {
@@ -278,15 +280,15 @@ static inline void bw_hs2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) 
 	}
 }
 
-static inline void bw_hs2_set_dc_gain_lin(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
-	if (coeffs->gain != value) {
-		coeffs->gain = value;
-		coeffs->param_changed |= _BW_HS2_PARAM_GAIN;
+static inline void bw_hs2_set_high_gain_lin(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
+	if (coeffs->high_gain != value) {
+		coeffs->high_gain = value;
+		coeffs->param_changed |= _BW_HS2_PARAM_HIGH_GAIN;
 	}
 }
 
-static inline void bw_hs2_set_dc_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_hs2_set_dc_gain_lin(coeffs, bw_dB2linf_3(value));
+static inline void bw_hs2_set_high_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_hs2_set_high_gain_lin(coeffs, bw_dB2linf_3(value));
 }
 
 static inline void bw_hs2_set_slope(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
@@ -303,9 +305,9 @@ static inline void bw_hs2_set_use_slope(bw_mm2_coeffs *BW_RESTRICT coeffs, char 
 	}
 }
 
-#undef _BW_HS2_PARAM_GAIN
+#undef _BW_HS2_PARAM_HIGH_GAIN
 #undef _BW_HS2_PARAM_Q
-#undef _BW_HS2_PARAM_S
+#undef _BW_HS2_PARAM_SLOPE
 
 #ifdef __cplusplus
 }

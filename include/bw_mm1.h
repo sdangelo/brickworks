@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -133,6 +133,8 @@ static inline void bw_mm1_set_prewarp_freq(bw_mm1_coeffs *BW_RESTRICT coeffs, fl
  *    Sets the prewarping frequency `value` (Hz) in `coeffs`.
  *
  *    Only used when the prewarp\_at\_cutoff parameter is off.
+ *
+ *    Default value: `1e3f`.
  *
  *    #### bw_mm1_set_coeff_x()
  *  ```>>> */

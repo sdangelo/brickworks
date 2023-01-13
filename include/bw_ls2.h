@@ -185,9 +185,11 @@ struct _bw_ls2_coeffs {
 	// Coefficients
 	float		sg;
 	float		isg;
+	float		issg;
 
 	// Parameters
 	float		dc_gain;
+	float		cutoff;
 	float		Q;
 	float		slope;
 	char		use_slope;
@@ -199,12 +201,15 @@ struct _bw_ls2_state {
 };
 
 #define _BW_LS2_PARAM_DC_GAIN	1
-#define _BW_LS2_PARAM_Q		(1<<1)
-#define _BW_LS2_PARAM_SLOPE	(1<<2)
+#define _BW_LS2_PARAM_CUTOFF	(1<<1)
+#define _BW_LS2_PARAM_Q		(1<<2)
+#define _BW_LS2_PARAM_SLOPE	(1<<3)
 
 static inline void bw_ls2_init(bw_ls2_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_init(&coeffs->mm2_coeffs);
+	bw_mm2_set_prewarp_at_cutoff(&coeffs->mm2_coeffs, 0);
 	coeffs->dc_gain = 1.f;
+	coeffs->cutoff = 1e3f;
 	coeffs->Q = 0.5f;
 	coeffs->slope = 0.5f;
 	coeffs->use_slope = 1;
@@ -216,15 +221,21 @@ static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 
 static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
-		if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
-			coeffs->sg = bw_math_sqrtf_2(coeffs->dc_gain);
-			coeffs->isg = bw_rcpf_2(coeffs->sg);
-			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
-			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, 1.f - coeffs->isg);
-			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, 1.f - sg);
+		if (coeffs->param_changed & (_BW_LS2_PARAM_DC_GAIN | _BW_LS2_PARAM_CUTOFF)) {
+			if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
+				coeffs->sg = bw_sqrtf_2(coeffs->dc_gain);
+				coeffs->isg = bw_rcpf_2(coeffs->sg);
+				coeffs->issg = bw_sqrtf_2(coeffs->isg);
+				bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
+				bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, coeffs->dc_gain - coeffs->sg);
+				bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
+			}
+			if (coeffs->param_changed & _BW_LS2_PARAM_CUTOFF)
+				bw_mm2_set_prewarp_freq(&coeffs->mm2_coeffs, coeffs->cutoff);
+			bw_mm2_set_cutoff(&coeffs->mm2_coeffs, coeffs->cutoff * coeffs->issg);
 		}
 		if (coeffs->use_slope) {
-			if (coeffs->param_changed & _BW_LS2_PARAM_SLOPE) {
+			if (coeffs->param_changed & (_BW_LS2_PARAM_DC_GAIN | _BW_LS2_PARAM_SLOPE)) {
 				const float k = coeffs->sg + coeffs->isg;
 				bw_mm2_set_Q(&coeffs->mm2_coeffs, bw_sqrtf_2(coeffs->slope * bw_rcpf_2(coeffs->slope + coeffs->slope + k - k * coeffs->slope)));
 			}
@@ -269,7 +280,10 @@ static inline void bw_ls2_process(bw_ls2_coeffs *BW_RESTRICT coeffs, bw_ls2_stat
 }
 
 static inline void bw_ls2_set_cutoff(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_mm2_set_cutoff(&coeffs->mm2_coeffs, value);
+	if (coeffs->cutoff != value) {
+		coeffs->cutoff = value;
+		coeffs->param_changed |= _BW_LS2_PARAM_CUTOFF;
+	}
 }
 
 static inline void bw_ls2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
@@ -305,6 +319,7 @@ static inline void bw_ls2_set_use_slope(bw_mm2_coeffs *BW_RESTRICT coeffs, char 
 }
 
 #undef _BW_LS2_PARAM_DC_GAIN
+#undef _BW_LS2_PARAM_CUTOFF
 #undef _BW_LS2_PARAM_Q
 #undef _BW_LS2_PARAM_SLOPE
 

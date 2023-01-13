@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,6 +126,25 @@ static inline void bw_mm2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value);
  *    `value` must be equal or bigger than `0.5f`.
  *
  *    Default value: `0.5f`.
+ *
+ *    #### bw_mm2_set_prewarp_at_cutoff()
+ *  ```>>> */
+static inline void bw_mm2_set_prewarp_at_cutoff(bw_mm2_coeffs *BW_RESTRICT coeffs, char value);
+/*! <<<```
+ *    Sets whether bilinear transform prewarping frequency should match the
+ *    cutoff frequency (non-`0`) or not (`0`).
+ *
+ *    Default value: non-`0` (on).
+ *
+ *    #### bw_mm2_set_prewarp_freq()
+ *  ```>>> */
+static inline void bw_mm2_set_prewarp_freq(bw_mm2_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the prewarping frequency `value` (Hz) in `coeffs`.
+ *
+ *    Only used when the prewarp\_at\_cutoff parameter is off.
+ *
+ *    Default value: `1e3f`.
  *
  *    #### bw_mm2_set_coeff_x()
  *  ```>>> */
@@ -257,6 +276,14 @@ static inline void bw_mm2_set_cutoff(bw_mm2_coeffs *BW_RESTRICT coeffs, float va
 
 static inline void bw_mm2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_svf_set_Q(&coeffs->svf_coeffs, value);
+}
+
+static inline void bw_mm2_set_prewarp_at_cutoff(bw_mm2_coeffs *BW_RESTRICT coeffs, char value) {
+	bw_svf_set_prewarp_at_cutoff(&coeffs->svf_coeffs, value);
+}
+
+static inline void bw_mm2_set_prewarp_freq(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_svf_set_prewarp_freq(&coeffs->svf_coeffs, value);
 }
 
 static inline void bw_mm2_set_coeff_x(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {

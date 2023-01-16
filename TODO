@@ -22,6 +22,8 @@ code:
 * Q to slope and viceversa functions in 2nd order shelf filters? keep updated values (seamless switch, syncrhonicity)?
 * treat unused variable/function warnings
 * csch for bw_peak bandwidth -> Q
+* sample rate-constant coeffs? (pan case)
+* pan process with no out: should just reset coeffs?
 
 build system:
 * make makefiles handle paths with spaces etc

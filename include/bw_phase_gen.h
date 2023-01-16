@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -29,6 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.3.0</strong>:
+ *        <ul>
+ *          <li>Added `BW_RESTRICT` to `bw_phase_gen_process1\*()`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -103,8 +108,8 @@ static inline void bw_phase_gen_update_coeffs_audio(bw_phase_gen_coeffs *BW_REST
  *
  *    #### bw_phase_gen_process1\*()
  *  ```>>> */
-static inline void bw_phase_gen_process1(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float *y, float *y_phase_inc);
-static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float x_mod, float *y, float *y_phase_inc);
+static inline void bw_phase_gen_process1(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float *BW_RESTRICT y, float *BW_RESTRICT y_phase_inc);
+static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float x_mod, float *BW_RESTRICT y, float *BW_RESTRICT y_phase_inc);
 /*! <<<```
  *    These functions generate and return one sample using `coeffs`, while using
  *    and updating `state`, and put the corresponding phase increment value in
@@ -214,12 +219,12 @@ static inline float _bw_phase_gen_update_phase(bw_phase_gen_state *BW_RESTRICT s
 	return state->phase;
 }
 
-static inline void bw_phase_gen_process1(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float *y, float *y_phase_inc) {
+static inline void bw_phase_gen_process1(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float *BW_RESTRICT y, float *BW_RESTRICT y_phase_inc) {
 	*y_phase_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state);
 	*y = _bw_phase_gen_update_phase(state, *y_phase_inc);
 }
 
-static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float x_mod, float *y, float *y_phase_inc) {
+static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float x_mod, float *BW_RESTRICT y, float *BW_RESTRICT y_phase_inc) {
 	*y_phase_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state) * bw_pow2f_3(x_mod);
 	*y = _bw_phase_gen_update_phase(state, *y_phase_inc);
 }

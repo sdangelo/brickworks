@@ -31,6 +31,7 @@
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Added prewarping control.</li>
+ *          <li>Added `BW_RESTRICT` to `bw_svf_process1()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
@@ -107,7 +108,7 @@ static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs)
  *
  *    #### bw_svf_process1()
  *  ```>>> */
-static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp);
+static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *BW_RESTRICT y_lp, float *BW_RESTRICT y_bp, float *BW_RESTRICT y_hp);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. The lowpass, bandpass, and highpass output samples are put into
@@ -260,7 +261,7 @@ static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs)
 	_bw_svf_do_update_coeffs(coeffs, 0);
 }
 
-static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *y_lp, float *y_bp, float *y_hp) {
+static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state *BW_RESTRICT state, float x, float *BW_RESTRICT y_lp, float *BW_RESTRICT y_bp, float *BW_RESTRICT y_hp) {
 	const float kk = coeffs->kf * state->cutoff_z1;
 	const float lp_xz1 = state->lp_z1 - kk * state->bp_z1;
 	const float bp_xz1 = state->bp_z1 - kk * state->hp_z1;

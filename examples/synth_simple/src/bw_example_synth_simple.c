@@ -34,6 +34,7 @@
 #include <bw_env_gen.h>
 #include <bw_gain.h>
 #include <bw_env_follow.h>
+#include <bw_buf.h>
 
 enum {
 	p_volume,
@@ -140,8 +141,7 @@ void bw_example_synth_simple_process(bw_example_synth_simple instance, const flo
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		bw_svf_process(&instance->svf_coeffs, &instance->svf_state, out, out, NULL, NULL, n);
 		bw_env_gen_process(&instance->env_gen_coeffs, &instance->env_gen_state, instance->buf, n);
-		for (int j = 0; j < n; j++)
-			out[j] *= instance->buf[j];
+		bw_buf_mul(out, out, instance->buf, n);
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);
 	}

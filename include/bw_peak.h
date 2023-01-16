@@ -220,7 +220,8 @@ static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) 
 		if (coeffs->use_bandwidth) {
 			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_BANDWIDTH)) {
 				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH) {
-					coeffs->bw_Q = (bw_pow2f_3(0.5f * coeffs->bandiwdth) * bw_sqrtf_2(coeffs->peak_gain)) * bw_rcpf_2(bw_pow2f_3(coeffs->bandiwdth) - 1.f);
+					const float k = bw_pow2f_3(coeffs->bandiwdth);
+					coeffs->bw_Q = bw_sqrtf_2(k * coeffs->peak_gain) * bw_rcpf_2(k - 1.f);
 					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->bw_Q);
 				}
 				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf_2(coeffs->bw_Q));

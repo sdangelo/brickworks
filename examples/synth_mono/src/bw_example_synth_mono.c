@@ -39,6 +39,7 @@
 #include <bw_env_gen.h>
 #include <bw_gain.h>
 #include <bw_env_follow.h>
+#include <bw_buf.h>
 
 enum {
 	p_volume,
@@ -299,8 +300,7 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 			instance->buf[1][j] = instance->mod_wheel * (out[j] + instance->params[p_mod_mix] * (instance->buf[0][j] - out[j]));
 		const float vcf_mod = 0.3f * instance->params[p_vcf_mod] * instance->buf[1][0];
 		
-		for (int j = 0; j < n; j++)
-			instance->buf[2][j] = instance->params[p_vco1_mod] * instance->buf[1][j];
+		bw_buf_scale(instance->buf[2], instance->buf[1], instance->params[p_vco1_mod], n);
 		bw_phase_gen_process(&instance->vco1_phase_gen_coeffs, &instance->vco1_phase_gen_state, instance->buf[2], instance->buf[2], instance->buf[3], n);
 		if (instance->params[p_vco1_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
 			bw_osc_tri_process(&instance->vco1_tri_coeffs, instance->buf[2], instance->buf[3], instance->buf[2], n);
@@ -314,8 +314,7 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 			bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
 		}
 		
-		for (int j = 0; j < n; j++)
-			instance->buf[1][j] = instance->params[p_vco2_mod] * instance->buf[1][j];
+		bw_buf_scale(instance->buf[1], instance->buf[1], instance->params[p_vco2_mod], n);
 		bw_phase_gen_process(&instance->vco2_phase_gen_coeffs, &instance->vco2_phase_gen_state, instance->buf[1], instance->buf[1], instance->buf[3], n);
 		if (instance->params[p_vco2_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
 			bw_osc_tri_process(&instance->vco2_tri_coeffs, instance->buf[1], instance->buf[3], instance->buf[1], n);
@@ -333,16 +332,16 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		bw_gain_process(&instance->vco2_gain_coeffs, instance->buf[1], instance->buf[1], n);
 		bw_gain_process(&instance->vco3_gain_coeffs, out, out, n);
 		bw_gain_process(&instance->noise_gain_coeffs, instance->buf[0], instance->buf[0], n);
-		for (int j = 0; j < n; j++)
-			out[j] = out[j] + instance->buf[1][j] + instance->buf[2][j];
+		bw_buf_mix(out, out, instance->buf[1], n);
+		bw_buf_mix(out, out, instance->buf[2], n);
 		
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		
 		const float k = instance->params[p_noise_color] >= 0.5f
 			? 3.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
 			: 0.01f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
-		for (int j = 0; j < n; j++)
-			out[j] = out[j] + 3.f * instance->buf[0][j];
+		bw_buf_scale(instance->buf[0], instance->buf[0], k, n);
+		bw_buf_mix(out, out, instance->buf[0], n);
 		
 		bw_env_gen_process(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, NULL, n);
 		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * bw_env_gen_get_y_z1(&instance->vcf_env_gen_state) + vcf_mod;
@@ -358,14 +357,12 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		bw_svf_process(&instance->vcf_coeffs, &instance->vcf_state, out, out, NULL, NULL, n);
 		
 		bw_env_gen_process(&instance->vca_env_gen_coeffs, &instance->vca_env_gen_state, instance->buf[0], n);
-		for (int j = 0; j < n; j++)
-			out[j] *= instance->buf[0][j];
+		bw_buf_mul(out, out, instance->buf[0], n);
 		
 		bw_phase_gen_process(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, NULL, instance->buf[0], NULL, n);
 		bw_osc_sin_process(instance->buf[0], instance->buf[0], n);
 		if (instance->params[p_a440] >= 0.5f)
-			for (int j = 0; j < n; j++)
-				out[j] += instance->buf[0][j];
+			bw_buf_mix(out, out, instance->buf[0], n);
 		
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);

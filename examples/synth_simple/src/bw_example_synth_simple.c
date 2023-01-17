@@ -33,7 +33,7 @@
 #include <bw_svf.h>
 #include <bw_env_gen.h>
 #include <bw_gain.h>
-#include <bw_env_follow.h>
+#include <bw_ppm.h>
 #include <bw_buf.h>
 
 enum {
@@ -63,8 +63,8 @@ struct _bw_example_synth_simple {
 	bw_env_gen_coeffs	env_gen_coeffs;
 	bw_env_gen_state	env_gen_state;
 	bw_gain_coeffs		gain_coeffs;
-	bw_env_follow_coeffs	env_follow_coeffs;
-	bw_env_follow_state	env_follow_state;
+	bw_ppm_coeffs		ppm_coeffs;
+	bw_ppm_state		ppm_state;
 
 	// Parameters
 	float			params[p_n];
@@ -87,10 +87,9 @@ bw_example_synth_simple bw_example_synth_simple_new() {
 	bw_svf_init(&instance->svf_coeffs);
 	bw_env_gen_init(&instance->env_gen_coeffs);
 	bw_gain_init(&instance->gain_coeffs);
-	bw_env_follow_init(&instance->env_follow_coeffs);
+	bw_ppm_init(&instance->ppm_coeffs);
 	
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse_coeffs, 1);
-	bw_env_follow_set_release_tau(&instance->env_follow_coeffs, 1.f);
 	
 	instance->rand_state = 0xbaddecaf600dfeed;
 
@@ -107,7 +106,7 @@ void bw_example_synth_simple_set_sample_rate(bw_example_synth_simple instance, f
 	bw_svf_set_sample_rate(&instance->svf_coeffs, sample_rate);
 	bw_env_gen_set_sample_rate(&instance->env_gen_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&instance->gain_coeffs, sample_rate);
-	bw_env_follow_set_sample_rate(&instance->env_follow_coeffs, sample_rate);
+	bw_ppm_set_sample_rate(&instance->ppm_coeffs, sample_rate);
 }
 
 void bw_example_synth_simple_reset(bw_example_synth_simple instance) {
@@ -120,8 +119,8 @@ void bw_example_synth_simple_reset(bw_example_synth_simple instance) {
 	bw_env_gen_reset_coeffs(&instance->env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->env_gen_coeffs, &instance->env_gen_state);
 	bw_gain_reset_coeffs(&instance->gain_coeffs);
-	bw_env_follow_reset_coeffs(&instance->env_follow_coeffs);
-	bw_env_follow_reset_state(&instance->env_follow_coeffs, &instance->env_follow_state);
+	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
+	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state);
 	instance->note = -1;
 }
 
@@ -143,7 +142,7 @@ void bw_example_synth_simple_process(bw_example_synth_simple instance, const flo
 		bw_env_gen_process(&instance->env_gen_coeffs, &instance->env_gen_state, instance->buf, n);
 		bw_buf_mul(out, out, instance->buf, n);
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
-		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);
+		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);
 	}
 }
 
@@ -183,7 +182,10 @@ void bw_example_synth_simple_set_parameter(bw_example_synth_simple instance, int
 }
 
 float bw_example_synth_simple_get_parameter(bw_example_synth_simple instance, int index) {
-	return index < p_n ? instance->params[index] : bw_clipf(bw_env_follow_get_y_z1(&instance->env_follow_state), 0.f, 1.f);
+	if (index < p_n)
+		return instance->params[index];
+	const float v = bw_ppm_get_y_z1(&instance->ppm_state);
+	return v < -200.f ? 0.f : bw_clipf(0.01666666666666666f * v + 1.f, 0.f, 1.f);
 }
 
 void bw_example_synth_simple_note_on(bw_example_synth_simple instance, char note, char velocity) {

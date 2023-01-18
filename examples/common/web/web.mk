@@ -69,3 +69,5 @@ build/web:
 
 clean:
 	rm -fr build/web
+
+.PHONY: all clean

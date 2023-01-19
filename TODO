@@ -24,12 +24,11 @@ code:
 * csch for bw_peak bandwidth -> Q
 * sample rate-constant coeffs? (pan case)
 * pan process with no out: should just reset coeffs?
+* trace calls (debug)
 
 build system:
 * make makefiles handle paths with spaces etc
 * can run su on windows? (system-wide install)
 * make autodependencies (.d?)
 * make from... directories
-* order-only prerequisites to avoid multiple make updates? (https://interrupt.memfault.com/blog/gnu-make-guidelines#order-only-prerequisites)
-* put common parts of Makefiles together somewhere/somehow (DRY)
 * recursive make?

@@ -128,7 +128,7 @@ static inline void bw_ls2_set_cutoff(bw_ls2_coeffs *BW_RESTRICT coeffs, float va
  *
  *    #### bw_ls2_set_Q()
  *  ```>>> */
-static inline void bw_ls2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_ls2_set_Q(bw_ls2_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the quality factor to the given `value` in `coeffs`.
  *
@@ -162,7 +162,7 @@ static inline void bw_ls2_set_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, float val
  *
  *    #### bw_ls2_set_use_slope()
  *  ```>>> */
-static inline void bw_ls2_set_use_slope(bw_mm2_coeffs *BW_RESTRICT coeffs, char value);
+static inline void bw_ls2_set_use_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
  *    Sets whether the quality factor should be controlled via the slope
  *    parameter (`value` non-`0`) or via the Q parameter (`0`).
@@ -219,7 +219,7 @@ static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 	bw_mm2_set_sample_rate(&coeffs->mm2_coeffs, sample_rate);
 }
 
-static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+static inline void _bw_ls2_update_mm2_params(bw_ls2_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & (_BW_LS2_PARAM_DC_GAIN | _BW_LS2_PARAM_CUTOFF)) {
 			if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
@@ -286,7 +286,7 @@ static inline void bw_ls2_set_cutoff(bw_ls2_coeffs *BW_RESTRICT coeffs, float va
 	}
 }
 
-static inline void bw_ls2_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_ls2_set_Q(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->Q != value) {
 		coeffs->Q = value;
 		coeffs->param_changed |= _BW_LS2_PARAM_Q;
@@ -311,7 +311,7 @@ static inline void bw_ls2_set_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, float val
 	}
 }
 
-static inline void bw_ls2_set_use_slope(bw_mm2_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_ls2_set_use_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, char value) {
 	if ((coeffs->use_slope && !value) || (!coeffs->use_slope && value)) {
 		coeffs->use_slope = value;
 		coeffs->param_changed |= _BW_LS2_PARAM_Q | _BW_LS2_PARAM_SLOPE;

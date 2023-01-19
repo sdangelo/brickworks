@@ -129,7 +129,7 @@ static inline void bw_peak_set_cutoff(bw_peak_coeffs *BW_RESTRICT coeffs, float 
  *
  *    #### bw_peak_set_Q()
  *  ```>>> */
-static inline void bw_peak_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_peak_set_Q(bw_peak_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the quality factor to the given `value` in `coeffs`.
  *
@@ -164,7 +164,7 @@ static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, flo
  *
  *    #### bw_peak_set_use_slope()
  *  ```>>> */
-static inline void bw_peak_set_use_bandwidth(bw_mm2_coeffs *BW_RESTRICT coeffs, char value);
+static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```
  *    Sets whether the quality factor should be controlled via the bandwidth
  *    parameter (`value` non-`0`) or via the Q parameter (`0`).
@@ -185,7 +185,7 @@ struct _bw_peak_coeffs {
 	bw_mm2_coeffs	mm2_coeffs;
 
 	// Coefficients
-	float		bw_Q;
+	float		bw_k;
 
 	// Parameters
 	float		peak_gain;
@@ -215,19 +215,18 @@ static inline void bw_peak_set_sample_rate(bw_peak_coeffs *BW_RESTRICT coeffs, f
 	bw_mm2_set_sample_rate(&coeffs->mm2_coeffs, sample_rate);
 }
 
-static inline void _bw_ls2_update_mm2_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+static inline void _bw_peak_update_mm2_params(bw_peak_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->use_bandwidth) {
 			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_BANDWIDTH)) {
-				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH) {
-					const float k = bw_pow2f_3(coeffs->bandiwdth);
-					coeffs->bw_Q = bw_sqrtf_2(k * coeffs->peak_gain) * bw_rcpf_2(k - 1.f);
-					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->bw_Q);
-				}
-				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf_2(coeffs->bw_Q));
+				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH)
+					coeffs->bw_k = bw_pow2f_3(coeffs->bandwidth);
+				const float Q = bw_sqrtf_2(coeffs->bw_k * coeffs->peak_gain) * bw_rcpf_2(coeffs->bw_k - 1.f);
+				bw_mm2_set_Q(&coeffs->mm2_coeffs, Q);
+				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf_2(Q));
 			}
 		} else {
-			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_Q) {
+			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_Q)) {
 				if (coeffs->param_changed & _BW_PEAK_PARAM_Q)
 					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->Q);
 				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf_2(coeffs->Q));
@@ -272,7 +271,7 @@ static inline void bw_peak_set_cutoff(bw_peak_coeffs *BW_RESTRICT coeffs, float 
 	bw_mm2_set_cutoff(&coeffs->mm2_coeffs, value);
 }
 
-static inline void bw_peak_set_Q(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_peak_set_Q(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->Q != value) {
 		coeffs->Q = value;
 		coeffs->param_changed |= _BW_PEAK_PARAM_Q;
@@ -297,7 +296,7 @@ static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, flo
 	}
 }
 
-static inline void bw_peak_set_use_bandwidth(bw_mm2_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, char value) {
 	if ((coeffs->use_bandwidth && !value) || (!coeffs->use_bandwidth && value)) {
 		coeffs->use_bandwidth = value;
 		coeffs->param_changed |= _BW_PEAK_PARAM_Q | _BW_PEAK_PARAM_BANDWIDTH;

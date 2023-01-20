@@ -90,7 +90,6 @@ void bw_example_fx_eq_3band_process(bw_example_fx_eq_3band instance, const float
 	bw_ls2_process(&instance->ls2_coeffs, &instance->ls2_state, x[0], y[0], n_samples);
 	bw_peak_process(&instance->peak_coeffs, &instance->peak_state, y[0], y[0], n_samples);
 	bw_hs2_process(&instance->hs2_coeffs, &instance->hs2_state, y[0], y[0], n_samples);
-	//bw_peak_process(&instance->peak_coeffs, &instance->peak_state, x[0], y[0], n_samples);
 }
 
 void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int index, float value) {
@@ -111,7 +110,7 @@ void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int i
 		bw_peak_set_peak_gain_dB(&instance->peak_coeffs, -20.f + 40.f * value);
 		break;
 	case p_peak_bw:
-		bw_peak_set_bandwidth(&instance->peak_coeffs, 0.5f + 3.9f * value);
+		bw_peak_set_bandwidth(&instance->peak_coeffs, 0.01f + 1.99f * value);
 		break;
 	case p_hs_cutoff:
 		bw_hs2_set_cutoff(&instance->hs2_coeffs, 20.f + (20e3f - 20.f) * value * value * value);

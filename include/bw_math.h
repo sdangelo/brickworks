@@ -395,6 +395,8 @@ static inline float bw_omega_3lognr(float x);
 static inline float bw_sqrtf_2(float x);
 /*! <<<```
  *    Returns an approximation of the square root of `x`.
+ *
+ *    Do not feed `0.f`.
  * 
  *    Relative error < 0.0007%.
  *
@@ -623,10 +625,10 @@ static inline float bw_omega_3lognr(float x) {
 
 static inline float bw_sqrtf_2(float x) {
 	_bw_floatint v = {.f = x};
-	v.u = ((v.u - 0x3f82a127) >> 1) + 0x3f7d8fc7;
+	v.u = (((v.u - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
 	float r = bw_rcpf_2(x);
-	v.f = v.f + v.f * (0.5f + 0.5f * r * v.f * v.f);
-	v.f = v.f + v.f * (0.5f + 0.5f * r * v.f * v.f);
+	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
+	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	return v.f;
 }
 

@@ -75,7 +75,7 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 	{ "Peak cutoff", "Peak cutoff", "Hz", 0, 0, 0, 0.5f },
 	{ "Peak gain", "Peak gain", "dB", 0, 0, 0, 0.5f },
 	{ "Peak bandiwdth", "Peak BW", "", 0, 0, 0, 1.f },
-	{ "High shelf cutoff", "HS cutoff", "Hz", 0, 0, 0, 0.2f },
+	{ "High shelf cutoff", "HS cutoff", "Hz", 0, 0, 0, 0.8f },
 	{ "High shelf gain", "HS gain", "dB", 0, 0, 0, 0.5f },
 	{ "High shelf slope", "HS slope", "", 0, 0, 0, 0.f }
 };

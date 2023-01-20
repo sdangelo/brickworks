@@ -26,7 +26,9 @@ LDFLAGS := \
 ifdef SYNTH
 LDFLAGS += \
 	-Wl,--export=wrapper_note_on \
-	-Wl,--export=wrapper_note_off
+	-Wl,--export=wrapper_note_off \
+	-Wl,--export=wrapper_pitch_bend \
+	-Wl,--export=wrapper_mod_wheel
 
 INDEX := ${ROOT_DIR}/../../common/web/index-synth.html
 else

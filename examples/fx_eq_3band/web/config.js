@@ -41,7 +41,7 @@ var parameters = [
 		defaultValue:	0.5
 	},
 	{
-		name:		"Low shelf slope",
+		name:		"Low shelf Q",
 		output:		false,
 		defaultValue:	0.0
 	},
@@ -71,7 +71,7 @@ var parameters = [
 		defaultValue:	0.5
 	},
 	{
-		name:		"High shelf slope",
+		name:		"High shelf Q",
 		output:		false,
 		defaultValue:	0.0
 	}

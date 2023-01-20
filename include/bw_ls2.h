@@ -27,12 +27,6 @@
  *  description {{{
  *    Second-order low shelf filter (12 dB/oct) with gain asymptotically
  *    approaching unity as frequency increases.
- *
- *    The quality factor can be either directly controlled via the Q parameter
- *    or indirectly through the slope parameter, which indicates the "shelf
- *    slope" as defined in the "Cookbook formulae for audio EQ biquad filter
- *    coefficients" by Robert Bristow-Johnson. The use_slope parameter allows
- *    you to choose which parameterization to use.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -151,23 +145,6 @@ static inline void bw_ls2_set_dc_gain_dB(bw_ls2_coeffs *BW_RESTRICT coeffs, floa
  *    Sets the dc gain parameter to the given `value` (dB) in `coeffs`.
  *
  *    Default value: `-INFINITY`.
- *
- *    #### bw_ls2_set_slope()
- *  ```>>> */
-static inline void bw_ls2_set_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, float value);
-/*! <<<```
- *    Sets the shelf slope `value` in `coeffs`.
- *
- *    Default value: `0.5f`.
- *
- *    #### bw_ls2_set_use_slope()
- *  ```>>> */
-static inline void bw_ls2_set_use_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, char value);
-/*! <<<```
- *    Sets whether the quality factor should be controlled via the slope
- *    parameter (`value` non-`0`) or via the Q parameter (`0`).
- *
- *    Default value: non-`0` (use slope parameter).
  *  }}} */
 
 /*** Implementation ***/
@@ -190,9 +167,6 @@ struct _bw_ls2_coeffs {
 	// Parameters
 	float		dc_gain;
 	float		cutoff;
-	float		Q;
-	float		slope;
-	char		use_slope;
 	int		param_changed;
 };
 
@@ -202,17 +176,12 @@ struct _bw_ls2_state {
 
 #define _BW_LS2_PARAM_DC_GAIN	1
 #define _BW_LS2_PARAM_CUTOFF	(1<<1)
-#define _BW_LS2_PARAM_Q		(1<<2)
-#define _BW_LS2_PARAM_SLOPE	(1<<3)
 
 static inline void bw_ls2_init(bw_ls2_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_init(&coeffs->mm2_coeffs);
 	bw_mm2_set_prewarp_at_cutoff(&coeffs->mm2_coeffs, 0);
 	coeffs->dc_gain = 1.f;
 	coeffs->cutoff = 1e3f;
-	coeffs->Q = 0.5f;
-	coeffs->slope = 0.5f;
-	coeffs->use_slope = 1;
 }
 
 static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, float sample_rate) {
@@ -221,29 +190,17 @@ static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 
 static inline void _bw_ls2_update_mm2_params(bw_ls2_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
-		if (coeffs->param_changed & (_BW_LS2_PARAM_DC_GAIN | _BW_LS2_PARAM_CUTOFF)) {
-			if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
-				coeffs->sg = bw_sqrtf_2(coeffs->dc_gain);
-				coeffs->isg = bw_rcpf_2(coeffs->sg);
-				coeffs->issg = bw_sqrtf_2(coeffs->isg);
-				bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
-				bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, coeffs->dc_gain - coeffs->sg);
-				bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
-			}
-			if (coeffs->param_changed & _BW_LS2_PARAM_CUTOFF)
-				bw_mm2_set_prewarp_freq(&coeffs->mm2_coeffs, coeffs->cutoff);
-			bw_mm2_set_cutoff(&coeffs->mm2_coeffs, coeffs->cutoff * coeffs->issg);
+		if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
+			coeffs->sg = bw_sqrtf_2(coeffs->dc_gain);
+			coeffs->isg = bw_rcpf_2(coeffs->sg);
+			coeffs->issg = bw_sqrtf_2(coeffs->isg);
+			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
+			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, coeffs->dc_gain - coeffs->sg);
+			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
 		}
-		if (coeffs->use_slope) {
-			if (coeffs->param_changed & (_BW_LS2_PARAM_DC_GAIN | _BW_LS2_PARAM_SLOPE)) {
-				const float k = coeffs->sg + coeffs->isg;
-				bw_mm2_set_Q(&coeffs->mm2_coeffs, bw_sqrtf_2(coeffs->slope * bw_rcpf_2(coeffs->slope + coeffs->slope + k - k * coeffs->slope)));
-			}
-		}
-		else {
-			if (coeffs->param_changed & _BW_LS2_PARAM_Q)
-				bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->Q);
-		}
+		if (coeffs->param_changed & _BW_LS2_PARAM_CUTOFF)
+			bw_mm2_set_prewarp_freq(&coeffs->mm2_coeffs, coeffs->cutoff);
+		bw_mm2_set_cutoff(&coeffs->mm2_coeffs, coeffs->cutoff * coeffs->issg);
 		coeffs->param_changed = 0;
 	}
 }
@@ -287,10 +244,7 @@ static inline void bw_ls2_set_cutoff(bw_ls2_coeffs *BW_RESTRICT coeffs, float va
 }
 
 static inline void bw_ls2_set_Q(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
-	if (coeffs->Q != value) {
-		coeffs->Q = value;
-		coeffs->param_changed |= _BW_LS2_PARAM_Q;
-	}
+	bw_mm2_set_Q(&coeffs->mm2_coeffs, value);
 }
 
 static inline void bw_ls2_set_dc_gain_lin(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
@@ -304,24 +258,8 @@ static inline void bw_ls2_set_dc_gain_dB(bw_ls2_coeffs *BW_RESTRICT coeffs, floa
 	bw_ls2_set_dc_gain_lin(coeffs, bw_dB2linf_3(value));
 }
 
-static inline void bw_ls2_set_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
-	if (coeffs->slope != value) {
-		coeffs->slope = value;
-		coeffs->param_changed |= _BW_LS2_PARAM_SLOPE;
-	}
-}
-
-static inline void bw_ls2_set_use_slope(bw_ls2_coeffs *BW_RESTRICT coeffs, char value) {
-	if ((coeffs->use_slope && !value) || (!coeffs->use_slope && value)) {
-		coeffs->use_slope = value;
-		coeffs->param_changed |= _BW_LS2_PARAM_Q | _BW_LS2_PARAM_SLOPE;
-	}
-}
-
 #undef _BW_LS2_PARAM_DC_GAIN
 #undef _BW_LS2_PARAM_CUTOFF
-#undef _BW_LS2_PARAM_Q
-#undef _BW_LS2_PARAM_SLOPE
 
 #ifdef __cplusplus
 }

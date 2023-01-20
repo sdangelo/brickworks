@@ -294,7 +294,8 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		if (instance->params[p_noise_color] >= 0.5f)
 			bw_pink_filt_process(&instance->pink_filt_coeffs, &instance->pink_filt_state, instance->buf[0], instance->buf[0], n);
 		else
-			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state);
+			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state); // FIXME: calling this here is sloppy coding
+		bw_buf_scale(instance->buf[0], instance->buf[0], 5.f, n);
 		
 		for (int j = 0; j < n; j++)
 			instance->buf[1][j] = instance->mod_wheel * (out[j] + instance->params[p_mod_mix] * (instance->buf[0][j] - out[j]));
@@ -338,8 +339,8 @@ void bw_example_synth_mono_process(bw_example_synth_mono instance, const float**
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		
 		const float k = instance->params[p_noise_color] >= 0.5f
-			? 3.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
-			: 0.01f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
+			? 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
+			: 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
 		bw_buf_scale(instance->buf[0], instance->buf[0], k, n);
 		bw_buf_mix(out, out, instance->buf[0], n);
 		

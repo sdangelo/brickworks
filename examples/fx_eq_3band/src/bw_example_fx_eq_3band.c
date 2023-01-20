@@ -32,13 +32,13 @@
 enum {
 	p_ls_cutoff,
 	p_ls_gain,
-	p_ls_slope,
+	p_ls_Q,
 	p_peak_cutoff,
 	p_peak_gain,
 	p_peak_bw,
 	p_hs_cutoff,
 	p_hs_gain,
-	p_hs_slope,
+	p_hs_Q,
 	p_n
 };
 
@@ -62,8 +62,6 @@ bw_example_fx_eq_3band bw_example_fx_eq_3band_new() {
 	bw_ls2_init(&instance->ls2_coeffs);
 	bw_peak_init(&instance->peak_coeffs);
 	bw_hs2_init(&instance->hs2_coeffs);
-	bw_ls2_set_use_slope(&instance->ls2_coeffs, 0);
-	bw_hs2_set_use_slope(&instance->hs2_coeffs, 0);
 	return instance;
 }
 
@@ -101,7 +99,8 @@ void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int i
 	case p_ls_gain:
 		bw_ls2_set_dc_gain_dB(&instance->ls2_coeffs, -20.f + 40.f * value);
 		break;
-	case p_ls_slope:
+	case p_ls_Q:
+		bw_ls2_set_Q(&instance->ls2_coeffs, 0.5f + 4.5f * value);
 		break;
 	case p_peak_cutoff:
 		bw_peak_set_cutoff(&instance->peak_coeffs, 20.f + (20e3f - 20.f) * value * value * value);
@@ -118,7 +117,8 @@ void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int i
 	case p_hs_gain:
 		bw_hs2_set_high_gain_dB(&instance->hs2_coeffs, -20.f + 40.f * value);
 		break;
-	case p_hs_slope:
+	case p_hs_Q:
+		bw_hs2_set_Q(&instance->hs2_coeffs, 0.5f + 4.5f * value);
 		break;
 	}
 }

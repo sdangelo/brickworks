@@ -162,7 +162,7 @@ static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, flo
  *
  *    Default value: `0.5f`.
  *
- *    #### bw_peak_set_use_slope()
+ *    #### bw_peak_set_use_bandwidth()
  *  ```>>> */
 static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, char value);
 /*! <<<```

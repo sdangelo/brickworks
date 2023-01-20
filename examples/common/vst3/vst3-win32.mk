@@ -27,14 +27,4 @@ ALL_DIRS += ${DLL_DIR} ${BUILD_PLUGIN_DIR}
 ${DLL_FILE}: ${SOURCES} | ${DLL_DIR}
 	${CXX} $^ ${CXXFLAGS} ${LDFLAGS} -o $@
 
-#USER_PREFIX=$(shell echo '${LOCALAPPDATA}' | sed 's:\\:/:g')
-
-#install-user: all
-#	mkdir -p ${USER_PREFIX}/Programs/Common/VST3
-#	@echo mkdir -p -m 0755 `find build/${NAME}.vst3 -type d | sed s?^build/?${USER_PREFIX}/Programs/Common/VST3/?g`
-#	@mkdir -p -m 0755 `find build/${NAME}.vst3 -type d | sed s?^build/?${USER_PREFIX}/Programs/Common/VST3/?g`
-#	@for f in `find build/${NAME}.vst3 -type f | sed s?^build/??g`; do \
-#		d=`dirname $$f`; \
-#		echo install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${USER_PREFIX}/Programs/Common/VST3/$$d; \
-#		install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${USER_PREFIX}/Programs/Common/VST3/$$d; \
-#	done
+INSTALL_USER_PREFIX := $(shell echo '${LOCALAPPDATA}' | sed 's:\\:/:g')/Programs/Common/VST3

@@ -1,8 +1,8 @@
 default: all
 
-COMMON_DIR := $(shell realpath --relative-to . ${ROOT_DIR}/../../common/vst3)
-VST3_SDK_DIR := $(shell realpath --relative-to . ${ROOT_DIR}/../../../../VST_SDK/vst3sdk)
-TEMPLATE_DIR := $(shell realpath --relative-to . ${ROOT_DIR}/../../common/vst3/template.vst3)
+COMMON_DIR := ${ROOT_DIR}/../../common/vst3
+VST3_SDK_DIR := ${ROOT_DIR}/../../../../VST_SDK/vst3sdk
+TEMPLATE_DIR := ${ROOT_DIR}/../../common/vst3/template.vst3
 BUILD_PLUGIN_DIR := build/${NAME}.vst3
 
 CXXFLAGS := \
@@ -81,9 +81,9 @@ ${ALL_DIRS}:
 
 install-user:
 	mkdir -p ${INSTALL_USER_PREFIX}
-	@echo mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s:^build/:${INSTALL_USER_PREFIX}/:g`
-	@mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s:^build/:${INSTALL_USER_PREFIX}/:g`
-	@for f in `find ${BUILD_PLUGIN_DIR} -type f | sed s:^build/::g`; do \
+	@echo mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s?^build/?${INSTALL_USER_PREFIX}/?g`
+	@mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s?^build/?${INSTALL_USER_PREFIX}/?g`
+	@for f in `find ${BUILD_PLUGIN_DIR} -type f | sed s?^build/??g`; do \
 		d=`dirname $$f`; \
 		echo install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${INSTALL_USER_PREFIX}/$$d; \
 		install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${INSTALL_USER_PREFIX}/$$d; \
@@ -91,9 +91,9 @@ install-user:
 
 install:
 	mkdir -p ${INSTALL_PREFIX}
-	@echo mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s:^build/:${INSTALL_PREFIX}/:g`
-	@mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s:^build/:${INSTALL_PREFIX}/:g`
-	@for f in `find ${BUILD_PLUGIN_DIR} -type f | sed s:^build/::g`; do \
+	@echo mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s?^build/?${INSTALL_PREFIX}/?g`
+	@mkdir -p -m 0755 `find ${BUILD_PLUGIN_DIR} -type d | sed s?^build/?${INSTALL_PREFIX}/?g`
+	@for f in `find ${BUILD_PLUGIN_DIR} -type f | sed s?^build/??g`; do \
 		d=`dirname $$f`; \
 		echo install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${INSTALL_PREFIX}/$$d; \
 		install -m `[ -x build/$$f ] && echo 0755 || echo 0644` build/$$f ${INSTALL_PREFIX}/$$d; \

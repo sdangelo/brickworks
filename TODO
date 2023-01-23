@@ -25,6 +25,7 @@ code:
 * sample rate-constant coeffs? (pan case)
 * pan process with no out: should just reset coeffs?
 * trace calls (debug)
+* svf bandpass out polarity too confusing?
 
 build system:
 * make makefiles handle paths with spaces etc

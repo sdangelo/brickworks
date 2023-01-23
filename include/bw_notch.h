@@ -120,7 +120,7 @@ static inline void bw_notch_set_cutoff(bw_notch_coeffs *BW_RESTRICT coeffs, floa
  *
  *    #### bw_notch_set_Q()
  *  ```>>> */
-static inline void bw_notch_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_notch_set_Q(bw_notch_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the quality factor to the given `value` in `coeffs`.
  *
@@ -187,7 +187,7 @@ static inline void bw_notch_set_cutoff(bw_notch_coeffs *BW_RESTRICT coeffs, floa
 	bw_svf_set_cutoff(&coeffs->svf_coeffs, value);
 }
 
-static inline void bw_notch_set_Q(bw_svf_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_notch_set_Q(bw_notch_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_svf_set_Q(&coeffs->svf_coeffs, value);
 }
 

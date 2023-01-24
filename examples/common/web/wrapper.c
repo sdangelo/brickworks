@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,23 +54,29 @@ wrapper wrapper_new(float sample_rate) {
 
 #if NUM_BUSES_IN != 0
 	int dx = 0;
+	int jx = 0;
 	for (int i = 0; i < NUM_BUSES_IN; i++) {
-		ret->x[i] = ret->ins + dx;
+		ret->x[jx] = ret->ins + dx;
 		dx += 128;
+		jx++;
 		if (config_buses_in[i].configs & IO_STEREO) {
-			ret->x[i] = ret->ins + dx;
+			ret->x[jx] = ret->ins + dx;
 			dx += 128;
+			jx++;
 		}
 	}
 #endif
 #if NUM_BUSES_OUT != 0
 	int dy = 0;
+	int jy = 0;
 	for (int i = 0; i < NUM_BUSES_OUT; i++) {
-		ret->y[i] = ret->outs + dy;
+		ret->y[jy] = ret->outs + dy;
 		dy += 128;
+		jy++;
 		if (config_buses_out[i].configs & IO_STEREO) {
-			ret->y[i] = ret->outs + dy;
+			ret->y[jy] = ret->outs + dy;
 			dy += 128;
+			jy++;
 		}
 	}
 #endif

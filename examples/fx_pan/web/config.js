@@ -18,11 +18,31 @@
  * File author: Stefano D'Angelo
  */
 
-#include <stddef.h>
+var buses = [
+	{
+		stereo:		false,
+		output:		false
+	},
+	{
+		stereo:		true,
+		output:		true
+	}
+];
 
-void *memset(void *ptr, int value, size_t num) {
-	unsigned char *p = (unsigned char *)ptr;
-	for (size_t i = 0; i < num; i++)
-		p[i] = (unsigned char)value;
-	return ptr;
-}
+var parameters = [
+	{
+		name:		"Pan",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"Left level",
+		output:		true,
+		defaultValue:	0.0
+	},
+	{
+		name:		"Right level",
+		output:		true,
+		defaultValue:	0.0
+	}
+];

@@ -15,14 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
- * File author: Stefano D'Angelo
+ * File authors: Stefano D'Angelo, Paolo Marrone
  */
 
-#include <stddef.h>
+#ifndef _VST3_CONFIG_H
+#define _VST3_CONFIG_H
 
-void *memset(void *ptr, int value, size_t num) {
-	unsigned char *p = (unsigned char *)ptr;
-	for (size_t i = 0; i < num; i++)
-		p[i] = (unsigned char)value;
-	return ptr;
-}
+#define PLUGIN_SUBCATEGORY	"Fx|Spatial"
+
+#define PLUGIN_GUID_1		0x7ad61d9e
+#define PLUGIN_GUID_2		0x26b44033
+#define PLUGIN_GUID_3		0xbfae229a
+#define PLUGIN_GUID_4		0x3e99719e
+
+#define CTRL_GUID_1		0x59d57809
+#define CTRL_GUID_2		0x6b3d4822
+#define CTRL_GUID_3		0x89272538
+#define CTRL_GUID_4		0x8e8a352c
+
+#endif

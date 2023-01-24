@@ -84,7 +84,7 @@ static inline void bw_pan_update_coeffs_audio(bw_pan_coeffs *BW_RESTRICT coeffs)
  *
  *    #### bw_pan_process1()
  *  ```>>> */
-static inline float bw_pan_process1(const bw_pan_coeffs *BW_RESTRICT coeffs, float x, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r);
+static inline void bw_pan_process1(const bw_pan_coeffs *BW_RESTRICT coeffs, float x, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. The left and right output samples are put into `y_l` (left) and
@@ -138,7 +138,7 @@ static inline void bw_pan_set_sample_rate(bw_pan_coeffs *BW_RESTRICT coeffs, flo
 	bw_gain_set_sample_rate(&coeffs->r_coeffs, sample_rate);
 }
 
-static inline void _bw_pan_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void _bw_pan_do_update_coeffs(bw_pan_coeffs *BW_RESTRICT coeffs, char force) {
 	if (force || coeffs->pan != coeffs->pan_prev) {
 		const float k = 0.125f * coeffs->pan + 0.125f;
 		bw_gain_set_gain_lin(&coeffs->l_coeffs, bw_cos2pif_3(k));
@@ -164,7 +164,7 @@ static inline void bw_pan_update_coeffs_audio(bw_pan_coeffs *BW_RESTRICT coeffs)
 	bw_gain_update_coeffs_audio(&coeffs->r_coeffs);
 }
 
-static inline float bw_pan_process1(const bw_pan_coeffs *BW_RESTRICT coeffs, float x, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r) {
+static inline void bw_pan_process1(const bw_pan_coeffs *BW_RESTRICT coeffs, float x, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r) {
 	*y_l = bw_gain_process1(&coeffs->l_coeffs, x);
 	*y_r = bw_gain_process1(&coeffs->r_coeffs, x);
 }
@@ -175,13 +175,13 @@ static inline void bw_pan_process(bw_pan_coeffs *BW_RESTRICT coeffs, const float
 		if (y_r != NULL) {
 			for (int i = 0; i < n_samples; i++) {
 				bw_pan_update_coeffs_audio(coeffs);
-				bw_pan_process1(coeffs, state, x[i], y_l + i, y_r + i);
+				bw_pan_process1(coeffs, x[i], y_l + i, y_r + i);
 			}
 		} else {
 			for (int i = 0; i < n_samples; i++) {
 				bw_pan_update_coeffs_audio(coeffs);
 				float r;
-				bw_pan_process1(coeffs, state, x[i], y_l + i, &r);
+				bw_pan_process1(coeffs, x[i], y_l + i, &r);
 			}
 		}
 	} else {
@@ -189,13 +189,13 @@ static inline void bw_pan_process(bw_pan_coeffs *BW_RESTRICT coeffs, const float
 			for (int i = 0; i < n_samples; i++) {
 				bw_pan_update_coeffs_audio(coeffs);
 				float l;
-				bw_pan_process1(coeffs, state, x[i], &l, y_r + i);
+				bw_pan_process1(coeffs, x[i], &l, y_r + i);
 			}
 		} else {
 			for (int i = 0; i < n_samples; i++) {
 				bw_pan_update_coeffs_audio(coeffs);
 				float l, r;
-				bw_pan_process1(coeffs, state, x[i], &l, &r);
+				bw_pan_process1(coeffs, x[i], &l, &r);
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 
   Brickworks
 
-  Copyright (C) 2022 Orastron Srl unipersonale
+  Copyright (C) 2022, 2023 Orastron Srl unipersonale
 
   Brickworks is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -50,9 +50,9 @@ var Effect = {
 		if (!this.node)
 			this.node = new AudioWorkletNode(audioCtx, "BWExample",
 				{
-					numberOfInputs: 1,
-					numberOfOutputs: 1,
-					outputChannelCount: [ 1 ],
+					numberOfInputs: buses.filter(function (b) { return !b.output; }).length,
+					numberOfOutputs: buses.filter(function (b) { return b.output; }).length,
+					outputChannelCount: buses.filter(function (b) { return b.output}).map(function (b) { return b.stereo ? 2 : 1 }),
 					processorOptions: {
 						wasmBytes: this.wasmBytes
 					}

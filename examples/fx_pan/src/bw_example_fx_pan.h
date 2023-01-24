@@ -18,11 +18,25 @@
  * File author: Stefano D'Angelo
  */
 
-#include <stddef.h>
+#ifndef _BW_EXAMPLE_FX_PAN_H
+#define _BW_EXAMPLE_FX_PAN_H
 
-void *memset(void *ptr, int value, size_t num) {
-	unsigned char *p = (unsigned char *)ptr;
-	for (size_t i = 0; i < num; i++)
-		p[i] = (unsigned char)value;
-	return ptr;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _bw_example_fx_pan* bw_example_fx_pan;
+
+bw_example_fx_pan bw_example_fx_pan_new();
+void bw_example_fx_pan_free(bw_example_fx_pan instance);
+void bw_example_fx_pan_set_sample_rate(bw_example_fx_pan instance, float sample_rate);
+void bw_example_fx_pan_reset(bw_example_fx_pan instance);
+void bw_example_fx_pan_process(bw_example_fx_pan instance, const float** x, float** y, int n_samples);
+void bw_example_fx_pan_set_parameter(bw_example_fx_pan instance, int index, float value);
+float bw_example_fx_pan_get_parameter(bw_example_fx_pan instance, int index);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif

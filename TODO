@@ -26,6 +26,7 @@ code:
 * pan process with no out: should just reset coeffs?
 * trace calls (debug)
 * svf bandpass out polarity too confusing?
+* better common config.h (less stuff maybe)
 
 build system:
 * make makefiles handle paths with spaces etc

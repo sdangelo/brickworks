@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,29 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_wah* bw_example_fx_wah;
+#include <bw_wah.h>
 
-bw_example_fx_wah bw_example_fx_wah_new();
-void bw_example_fx_wah_free(bw_example_fx_wah instance);
-void bw_example_fx_wah_set_sample_rate(bw_example_fx_wah instance, float sample_rate);
-void bw_example_fx_wah_reset(bw_example_fx_wah instance);
-void bw_example_fx_wah_process(bw_example_fx_wah instance, const float** x, float** y, int n_samples);
-void bw_example_fx_wah_set_parameter(bw_example_fx_wah instance, int index, float value);
-float bw_example_fx_wah_get_parameter(bw_example_fx_wah instance, int index);
+enum {
+	p_wah,
+	p_n
+};
+
+struct _bw_example_fx_wah {
+	// Sub-components
+	bw_wah_coeffs	wah_coeffs;
+	bw_wah_state	wah_state;
+
+	// Parameters
+	float		params[p_n];
+};
+typedef struct _bw_example_fx_wah bw_example_fx_wah;
+
+void bw_example_fx_wah_init(bw_example_fx_wah *instance);
+void bw_example_fx_wah_set_sample_rate(bw_example_fx_wah *instance, float sample_rate);
+void bw_example_fx_wah_reset(bw_example_fx_wah *instance);
+void bw_example_fx_wah_process(bw_example_fx_wah *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_wah_set_parameter(bw_example_fx_wah *instance, int index, float value);
+float bw_example_fx_wah_get_parameter(bw_example_fx_wah *instance, int index);
 
 #ifdef __cplusplus
 }

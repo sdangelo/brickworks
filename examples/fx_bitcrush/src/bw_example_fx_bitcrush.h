@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,32 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_bitcrush* bw_example_fx_bitcrush;
+#include <bw_sr_reduce.h>
+#include <bw_bd_reduce.h>
 
-bw_example_fx_bitcrush bw_example_fx_bitcrush_new();
-void bw_example_fx_bitcrush_free(bw_example_fx_bitcrush instance);
-void bw_example_fx_bitcrush_set_sample_rate(bw_example_fx_bitcrush instance, float sample_rate);
-void bw_example_fx_bitcrush_reset(bw_example_fx_bitcrush instance);
-void bw_example_fx_bitcrush_process(bw_example_fx_bitcrush instance, const float** x, float** y, int n_samples);
-void bw_example_fx_bitcrush_set_parameter(bw_example_fx_bitcrush instance, int index, float value);
-float bw_example_fx_bitcrush_get_parameter(bw_example_fx_bitcrush instance, int index);
+enum {
+	p_sr_ratio,
+	p_bit_depth,
+	p_n
+};
+
+struct _bw_example_fx_bitcrush {
+	// Sub-components
+	bw_sr_reduce_coeffs	sr_reduce_coeffs;
+	bw_sr_reduce_state	sr_reduce_state;
+	bw_bd_reduce_coeffs	bd_reduce_coeffs;
+
+	// Parameters
+	float			params[p_n];
+};
+typedef struct _bw_example_fx_bitcrush bw_example_fx_bitcrush;
+
+void bw_example_fx_bitcrush_init(bw_example_fx_bitcrush *instance);
+void bw_example_fx_bitcrush_set_sample_rate(bw_example_fx_bitcrush *instance, float sample_rate);
+void bw_example_fx_bitcrush_reset(bw_example_fx_bitcrush *instance);
+void bw_example_fx_bitcrush_process(bw_example_fx_bitcrush *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_bitcrush_set_parameter(bw_example_fx_bitcrush *instance, int index, float value);
+float bw_example_fx_bitcrush_get_parameter(bw_example_fx_bitcrush *instance, int index);
 
 #ifdef __cplusplus
 }

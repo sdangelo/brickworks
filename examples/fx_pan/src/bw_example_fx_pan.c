@@ -20,57 +20,24 @@
 
 #include "bw_example_fx_pan.h"
 
-#include <bw_pan.h>
-#include <bw_ppm.h>
-#include <bw_math.h>
-#ifdef __WASM__
-# include "walloc.h"
-#else
-# include <stdlib.h>
-#endif
-
-enum {
-	p_pan,
-	p_n
-};
-
-struct _bw_example_fx_pan {
-	// Sub-components
-	bw_pan_coeffs	pan_coeffs;
-	bw_ppm_coeffs	ppm_coeffs;
-	bw_ppm_state	ppm_l_state;
-	bw_ppm_state	ppm_r_state;
-
-	// Parameters
-	float		params[p_n];
-};
-
-bw_example_fx_pan bw_example_fx_pan_new() {
-	bw_example_fx_pan instance = (bw_example_fx_pan)malloc(sizeof(struct _bw_example_fx_pan));
-	if (instance == NULL)
-		return NULL;
+void bw_example_fx_pan_init(bw_example_fx_pan *instance) {
 	bw_pan_init(&instance->pan_coeffs);
 	bw_ppm_init(&instance->ppm_coeffs);
-	return instance;
 }
 
-void bw_example_fx_pan_free(bw_example_fx_pan instance) {
-	free(instance);
-}
-
-void bw_example_fx_pan_set_sample_rate(bw_example_fx_pan instance, float sample_rate) {
+void bw_example_fx_pan_set_sample_rate(bw_example_fx_pan *instance, float sample_rate) {
 	bw_pan_set_sample_rate(&instance->pan_coeffs, sample_rate);
 	bw_ppm_set_sample_rate(&instance->ppm_coeffs, sample_rate);
 }
 
-void bw_example_fx_pan_reset(bw_example_fx_pan instance) {
+void bw_example_fx_pan_reset(bw_example_fx_pan *instance) {
 	bw_pan_reset_coeffs(&instance->pan_coeffs);
 	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
 	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_l_state);
 	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_r_state);
 }
 
-void bw_example_fx_pan_process(bw_example_fx_pan instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_pan_process(bw_example_fx_pan *instance, const float** x, float** y, int n_samples) {
 	bw_pan_process(&instance->pan_coeffs, x[0], y[0], y[1], n_samples);
 	bw_ppm_update_coeffs_ctrl(&instance->ppm_coeffs);
 	for (int i = 0; i < n_samples; i++) {
@@ -80,7 +47,7 @@ void bw_example_fx_pan_process(bw_example_fx_pan instance, const float** x, floa
 	}
 }
 
-void bw_example_fx_pan_set_parameter(bw_example_fx_pan instance, int index, float value) {
+void bw_example_fx_pan_set_parameter(bw_example_fx_pan *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_pan:
@@ -89,7 +56,7 @@ void bw_example_fx_pan_set_parameter(bw_example_fx_pan instance, int index, floa
 	}
 }
 
-float bw_example_fx_pan_get_parameter(bw_example_fx_pan instance, int index) {
+float bw_example_fx_pan_get_parameter(bw_example_fx_pan *instance, int index) {
 	float r;
 	switch (index) {
 	case p_pan:

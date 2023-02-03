@@ -46,11 +46,7 @@ wrapper wrapper_new(float sample_rate) {
 	if (ret == NULL)
 		return NULL;
 
-	ret->instance = P_NEW();
-	if (ret->instance == NULL) {
-		free(ret);
-		return NULL;
-	}
+	P_INIT(&ret->instance);
 
 #if NUM_BUSES_IN != 0
 	int dx = 0;
@@ -86,14 +82,13 @@ wrapper wrapper_new(float sample_rate) {
 		wrapper_set_parameter(ret, i, config_parameters[i].defaultValueUnmapped);
 #endif
 
-	P_SET_SAMPLE_RATE(ret->instance, sample_rate);
-	P_RESET(ret->instance);
+	P_SET_SAMPLE_RATE(&ret->instance, sample_rate);
+	P_RESET(&ret->instance);
 
 	return ret;
 }
 
 void wrapper_free(wrapper w) {
-	P_FREE(w->instance);
 	free(w);
 }
 
@@ -132,41 +127,41 @@ void wrapper_process(wrapper w, int n_samples) {
 #else
 	float **y = NULL;
 #endif
-	P_PROCESS(w->instance, x, y, n_samples);
+	P_PROCESS(&w->instance, x, y, n_samples);
 
 #if NUM_PARAMETERS != 0
 	for (int i = 0; i < NUM_PARAMETERS; i++)
-		w->param_values[i] = P_GET_PARAMETER(w->instance, i);
+		w->param_values[i] = P_GET_PARAMETER(&w->instance, i);
 #endif
 }
 
 void wrapper_set_parameter(wrapper w, int index, float value) {
 #if NUM_PARAMETERS != 0
-	P_SET_PARAMETER(w->instance, index, value);
+	P_SET_PARAMETER(&w->instance, index, value);
 	w->param_values[index] = value;
 #endif
 }
 
 void wrapper_note_on(wrapper w, int note, int velocity) {
 #ifdef P_NOTE_ON
-	P_NOTE_ON(w->instance, note, velocity);
+	P_NOTE_ON(&w->instance, note, velocity);
 #endif
 }
 
 void wrapper_note_off(wrapper w, int note) {
 #ifdef P_NOTE_OFF
-	P_NOTE_OFF(w->instance, note);
+	P_NOTE_OFF(&w->instance, note);
 #endif
 }
 
 void wrapper_pitch_bend(wrapper w, int bend) {
 #ifdef P_PITCH_BEND
-	P_PITCH_BEND(w->instance, bend);
+	P_PITCH_BEND(&w->instance, bend);
 #endif
 }
 
 void wrapper_mod_wheel(wrapper w, int wheel) {
 #ifdef P_MOD_WHEEL
-	P_MOD_WHEEL(w->instance, wheel);
+	P_MOD_WHEEL(&w->instance, wheel);
 #endif
 }

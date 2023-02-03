@@ -25,15 +25,43 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_eq_3band* bw_example_fx_eq_3band;
+#include <bw_ls2.h>
+#include <bw_hs2.h>
+#include <bw_peak.h>
 
-bw_example_fx_eq_3band bw_example_fx_eq_3band_new();
-void bw_example_fx_eq_3band_free(bw_example_fx_eq_3band instance);
-void bw_example_fx_eq_3band_set_sample_rate(bw_example_fx_eq_3band instance, float sample_rate);
-void bw_example_fx_eq_3band_reset(bw_example_fx_eq_3band instance);
-void bw_example_fx_eq_3band_process(bw_example_fx_eq_3band instance, const float** x, float** y, int n_samples);
-void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int index, float value);
-float bw_example_fx_eq_3band_get_parameter(bw_example_fx_eq_3band instance, int index);
+enum {
+	p_ls_cutoff,
+	p_ls_gain,
+	p_ls_Q,
+	p_peak_cutoff,
+	p_peak_gain,
+	p_peak_bw,
+	p_hs_cutoff,
+	p_hs_gain,
+	p_hs_Q,
+	p_n
+};
+
+struct _bw_example_fx_eq_3band {
+	// Sub-components
+	bw_ls2_coeffs	ls2_coeffs;
+	bw_ls2_state	ls2_state;
+	bw_peak_coeffs	peak_coeffs;
+	bw_peak_state	peak_state;
+	bw_hs2_coeffs	hs2_coeffs;
+	bw_hs2_state	hs2_state;
+
+	// Parameters
+	float		params[p_n];
+};
+typedef struct _bw_example_fx_eq_3band bw_example_fx_eq_3band;
+
+void bw_example_fx_eq_3band_init(bw_example_fx_eq_3band *instance);
+void bw_example_fx_eq_3band_set_sample_rate(bw_example_fx_eq_3band *instance, float sample_rate);
+void bw_example_fx_eq_3band_reset(bw_example_fx_eq_3band *instance);
+void bw_example_fx_eq_3band_process(bw_example_fx_eq_3band *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band *instance, int index, float value);
+float bw_example_fx_eq_3band_get_parameter(bw_example_fx_eq_3band *instance, int index);
 
 #ifdef __cplusplus
 }

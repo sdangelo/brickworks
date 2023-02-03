@@ -25,15 +25,30 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_notch* bw_example_fx_notch;
+#include <bw_notch.h>
 
-bw_example_fx_notch bw_example_fx_notch_new();
-void bw_example_fx_notch_free(bw_example_fx_notch instance);
-void bw_example_fx_notch_set_sample_rate(bw_example_fx_notch instance, float sample_rate);
-void bw_example_fx_notch_reset(bw_example_fx_notch instance);
-void bw_example_fx_notch_process(bw_example_fx_notch instance, const float** x, float** y, int n_samples);
-void bw_example_fx_notch_set_parameter(bw_example_fx_notch instance, int index, float value);
-float bw_example_fx_notch_get_parameter(bw_example_fx_notch instance, int index);
+enum {
+	p_cutoff,
+	p_Q,
+	p_n
+};
+
+struct _bw_example_fx_notch {
+	// Sub-components
+	bw_notch_coeffs	notch_coeffs;
+	bw_notch_state	notch_state;
+
+	// Parameters
+	float		params[p_n];
+};
+typedef struct _bw_example_fx_notch bw_example_fx_notch;
+
+void bw_example_fx_notch_init(bw_example_fx_notch *instance);
+void bw_example_fx_notch_set_sample_rate(bw_example_fx_notch *instance, float sample_rate);
+void bw_example_fx_notch_reset(bw_example_fx_notch *instance);
+void bw_example_fx_notch_process(bw_example_fx_notch *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_notch_set_parameter(bw_example_fx_notch *instance, int index, float value);
+float bw_example_fx_notch_get_parameter(bw_example_fx_notch *instance, int index);
 
 #ifdef __cplusplus
 }

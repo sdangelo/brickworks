@@ -25,15 +25,33 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_pan* bw_example_fx_pan;
+#include <bw_pan.h>
+#include <bw_ppm.h>
+#include <bw_math.h>
 
-bw_example_fx_pan bw_example_fx_pan_new();
-void bw_example_fx_pan_free(bw_example_fx_pan instance);
-void bw_example_fx_pan_set_sample_rate(bw_example_fx_pan instance, float sample_rate);
-void bw_example_fx_pan_reset(bw_example_fx_pan instance);
-void bw_example_fx_pan_process(bw_example_fx_pan instance, const float** x, float** y, int n_samples);
-void bw_example_fx_pan_set_parameter(bw_example_fx_pan instance, int index, float value);
-float bw_example_fx_pan_get_parameter(bw_example_fx_pan instance, int index);
+enum {
+	p_pan,
+	p_n
+};
+
+struct _bw_example_fx_pan {
+	// Sub-components
+	bw_pan_coeffs	pan_coeffs;
+	bw_ppm_coeffs	ppm_coeffs;
+	bw_ppm_state	ppm_l_state;
+	bw_ppm_state	ppm_r_state;
+
+	// Parameters
+	float		params[p_n];
+};
+typedef struct _bw_example_fx_pan bw_example_fx_pan;
+
+void bw_example_fx_pan_init(bw_example_fx_pan *instance);
+void bw_example_fx_pan_set_sample_rate(bw_example_fx_pan *instance, float sample_rate);
+void bw_example_fx_pan_reset(bw_example_fx_pan *instance);
+void bw_example_fx_pan_process(bw_example_fx_pan *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_pan_set_parameter(bw_example_fx_pan *instance, int index, float value);
+float bw_example_fx_pan_get_parameter(bw_example_fx_pan *instance, int index);
 
 #ifdef __cplusplus
 }

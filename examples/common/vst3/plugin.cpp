@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -152,15 +152,11 @@ Plugin::Plugin() {
 }
 
 tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
-	instance = P_NEW();
-	if (instance == nullptr)
-		return kResultFalse;
-
 	tresult r = AudioEffect::initialize(context);
-	if (r != kResultTrue) {
-		P_FREE(instance);
+	if (r != kResultTrue)
 		return r;
-	}
+
+	P_INIT(&instance);
 
 #ifdef P_NOTE_ON
 	addEventInput(ConstStringTable::instance()->getString("MIDI Input"));
@@ -192,7 +188,7 @@ tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
 #if NUM_PARAMETERS != 0
 	for (int i = 0; i < NUM_PARAMETERS; i++) {
 		parameters[i] = config_parameters[i].defaultValueUnmapped;
-		P_SET_PARAMETER(instance, i, parameters[i]);
+		P_SET_PARAMETER(&instance, i, parameters[i]);
 	}
 #endif
 
@@ -200,15 +196,13 @@ tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
 }
 
 tresult PLUGIN_API Plugin::terminate() {
-	P_FREE(instance);
-
 	return AudioEffect::terminate();
 }
 
 tresult PLUGIN_API Plugin::setActive(TBool state) {
 	if (state) {
-		P_SET_SAMPLE_RATE(instance, sampleRate);
-		P_RESET(instance);
+		P_SET_SAMPLE_RATE(&instance, sampleRate);
+		P_RESET(&instance);
 	}
 	return AudioEffect::setActive(state);
 }
@@ -236,17 +230,17 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 				switch (pi) {
 #ifdef P_PITCH_BEND
 				case TAG_PITCH_BEND:
-					P_PITCH_BEND(instance, static_cast<int>(16383.f * std::min(std::max(static_cast<float>(v), 0.f), 1.f)));
+					P_PITCH_BEND(&instance, static_cast<int>(16383.f * std::min(std::max(static_cast<float>(v), 0.f), 1.f)));
 					break;
 #endif
 #ifdef P_MOD_WHEEL
 				case TAG_MOD_WHEEL:
-					P_MOD_WHEEL(instance, static_cast<char>(127.f * std::min(std::max(static_cast<float>(v), 0.f), 1.f)));
+					P_MOD_WHEEL(&instance, static_cast<char>(127.f * std::min(std::max(static_cast<float>(v), 0.f), 1.f)));
 					break;
 #endif
 				default:
 					parameters[pi] = v;
-					P_SET_PARAMETER(instance, pi, std::min(std::max(static_cast<float>(v), 0.f), 1.f));
+					P_SET_PARAMETER(&instance, pi, std::min(std::max(static_cast<float>(v), 0.f), 1.f));
 					break;
 				}
 			}
@@ -263,10 +257,10 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 				continue;
 			switch (e.type) {
 				case Event::kNoteOnEvent:
-					P_NOTE_ON(instance, e.noteOn.pitch, 127.f * e.noteOn.velocity);
+					P_NOTE_ON(&instance, e.noteOn.pitch, 127.f * e.noteOn.velocity);
 					break;
 				case Event::kNoteOffEvent:
-					P_NOTE_OFF(instance, e.noteOff.pitch);
+					P_NOTE_OFF(&instance, e.noteOff.pitch);
 					break;
 			}
 		}
@@ -301,7 +295,7 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 #if NUM_BUSES_OUT == 0
 	float **outputs = nullptr;
 #endif
-	P_PROCESS(instance, inputs, outputs, data.numSamples);
+	P_PROCESS(&instance, inputs, outputs, data.numSamples);
 
 #ifndef NO_DAZ_FTZ
 	_MM_SET_FLUSH_ZERO_MODE(flush_zero_mode);
@@ -312,7 +306,7 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 	for (int i = 0; i < NUM_PARAMETERS; i++) {
 		if (!config_parameters[i].out)
 			continue;
-		float v = P_GET_PARAMETER(instance, i);
+		float v = P_GET_PARAMETER(&instance, i);
 		if (parameters[i] == v)
 			continue;
 		parameters[i] = v;
@@ -363,7 +357,7 @@ tresult PLUGIN_API Plugin::setState(IBStream *state) {
 		if (streamer.readFloat(f) == false)
 			return kResultFalse;
 		parameters[i] = f;
-		P_SET_PARAMETER(instance, i, f);
+		P_SET_PARAMETER(&instance, i, f);
 	}
 #endif
 

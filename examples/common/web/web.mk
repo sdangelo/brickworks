@@ -1,6 +1,5 @@
 CC := clang
 CFLAGS := \
-	-D__WASM__ \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../common/web \
 	-I${ROOT_DIR}/../../../include \
@@ -49,21 +48,21 @@ endif
 
 all: build/web/module.wasm build/web/index.html build/web/config.js build/web/processor.js build/web/cert.pem build/web/key.pem
 
-build/web/module.wasm: build/web ${SOURCES}
+build/web/module.wasm: ${SOURCES} | build/web
 	${CC} ${SOURCES} ${CFLAGS} ${LDFLAGS} -o $@
 
-build/web/index.html: build/web ${INDEX}
+build/web/index.html: ${INDEX} | build/web
 	cp ${INDEX} $@
 
-build/web/processor.js: build/web ${ROOT_DIR}/config.js ${ROOT_DIR}/../../common/web/processor.js
+build/web/processor.js: ${ROOT_DIR}/config.js ${ROOT_DIR}/../../common/web/processor.js | build/web
 	cat ${ROOT_DIR}/config.js ${ROOT_DIR}/../../common/web//processor.js > $@
 
-build/web/config.js: build/web ${ROOT_DIR}/config.js
+build/web/config.js: ${ROOT_DIR}/config.js | build/web
 	cp ${ROOT_DIR}/config.js $@
 
 build/web/key.pem: build/web/cert.pem
 
-build/web/cert.pem: build/web
+build/web/cert.pem: | build/web
 	yes "" | openssl req -x509 -newkey rsa:2048 -keyout build/web/key.pem -out build/web/cert.pem -days 365 -nodes 2>/dev/null
 
 build/web:

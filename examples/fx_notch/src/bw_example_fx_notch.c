@@ -20,53 +20,24 @@
 
 #include "bw_example_fx_notch.h"
 
-#include <bw_notch.h>
-#ifdef __WASM__
-# include "walloc.h"
-#else
-# include <stdlib.h>
-#endif
-
-enum {
-	p_cutoff,
-	p_Q,
-	p_n
-};
-
-struct _bw_example_fx_notch {
-	// Sub-components
-	bw_notch_coeffs	notch_coeffs;
-	bw_notch_state	notch_state;
-
-	// Parameters
-	float		params[p_n];
-};
-
-bw_example_fx_notch bw_example_fx_notch_new() {
-	bw_example_fx_notch instance = (bw_example_fx_notch)malloc(sizeof(struct _bw_example_fx_notch));
-	if (instance != NULL)
-		bw_notch_init(&instance->notch_coeffs);
-	return instance;
+void bw_example_fx_notch_init(bw_example_fx_notch *instance) {
+	bw_notch_init(&instance->notch_coeffs);
 }
 
-void bw_example_fx_notch_free(bw_example_fx_notch instance) {
-	free(instance);
-}
-
-void bw_example_fx_notch_set_sample_rate(bw_example_fx_notch instance, float sample_rate) {
+void bw_example_fx_notch_set_sample_rate(bw_example_fx_notch *instance, float sample_rate) {
 	bw_notch_set_sample_rate(&instance->notch_coeffs, sample_rate);
 }
 
-void bw_example_fx_notch_reset(bw_example_fx_notch instance) {
+void bw_example_fx_notch_reset(bw_example_fx_notch *instance) {
 	bw_notch_reset_coeffs(&instance->notch_coeffs);
 	bw_notch_reset_state(&instance->notch_coeffs, &instance->notch_state);
 }
 
-void bw_example_fx_notch_process(bw_example_fx_notch instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_notch_process(bw_example_fx_notch *instance, const float** x, float** y, int n_samples) {
 	bw_notch_process(&instance->notch_coeffs, &instance->notch_state, x[0], y[0], n_samples);
 }
 
-void bw_example_fx_notch_set_parameter(bw_example_fx_notch instance, int index, float value) {
+void bw_example_fx_notch_set_parameter(bw_example_fx_notch *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_cutoff:
@@ -78,6 +49,6 @@ void bw_example_fx_notch_set_parameter(bw_example_fx_notch instance, int index, 
 	}
 }
 
-float bw_example_fx_notch_get_parameter(bw_example_fx_notch instance, int index) {
+float bw_example_fx_notch_get_parameter(bw_example_fx_notch *instance, int index) {
 	return instance->params[index];
 }

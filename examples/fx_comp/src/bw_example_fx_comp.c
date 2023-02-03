@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,56 +20,24 @@
 
 #include "bw_example_fx_comp.h"
 
-#include <bw_comp.h>
-#ifdef __WASM__
-# include "walloc.h"
-#else
-# include <stdlib.h>
-#endif
-
-enum {
-	p_thresh,
-	p_ratio,
-	p_attack,
-	p_release,
-	p_gain,
-	p_n
-};
-
-struct _bw_example_fx_comp {
-	// Sub-components
-	bw_comp_coeffs	comp_coeffs;
-	bw_comp_state	comp_state;
-
-	// Parameters
-	float		params[p_n];
-};
-
-bw_example_fx_comp bw_example_fx_comp_new() {
-	bw_example_fx_comp instance = (bw_example_fx_comp)malloc(sizeof(struct _bw_example_fx_comp));
-	if (instance != NULL)
-		bw_comp_init(&instance->comp_coeffs);
-	return instance;
+void bw_example_fx_comp_init(bw_example_fx_comp *instance) {
+	bw_comp_init(&instance->comp_coeffs);
 }
 
-void bw_example_fx_comp_free(bw_example_fx_comp instance) {
-	free(instance);
-}
-
-void bw_example_fx_comp_set_sample_rate(bw_example_fx_comp instance, float sample_rate) {
+void bw_example_fx_comp_set_sample_rate(bw_example_fx_comp *instance, float sample_rate) {
 	bw_comp_set_sample_rate(&instance->comp_coeffs, sample_rate);
 }
 
-void bw_example_fx_comp_reset(bw_example_fx_comp instance) {
+void bw_example_fx_comp_reset(bw_example_fx_comp *instance) {
 	bw_comp_reset_coeffs(&instance->comp_coeffs);
 	bw_comp_reset_state(&instance->comp_coeffs, &instance->comp_state);
 }
 
-void bw_example_fx_comp_process(bw_example_fx_comp instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_comp_process(bw_example_fx_comp *instance, const float** x, float** y, int n_samples) {
 	bw_comp_process(&instance->comp_coeffs, &instance->comp_state, x[0], x[0], y[0], n_samples);
 }
 
-void bw_example_fx_comp_set_parameter(bw_example_fx_comp instance, int index, float value) {
+void bw_example_fx_comp_set_parameter(bw_example_fx_comp *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_thresh:
@@ -90,6 +58,6 @@ void bw_example_fx_comp_set_parameter(bw_example_fx_comp instance, int index, fl
 	}
 }
 
-float bw_example_fx_comp_get_parameter(bw_example_fx_comp instance, int index) {
+float bw_example_fx_comp_get_parameter(bw_example_fx_comp *instance, int index) {
 	return instance->params[index];
 }

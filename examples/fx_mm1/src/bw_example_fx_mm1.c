@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,54 +20,24 @@
 
 #include "bw_example_fx_mm1.h"
 
-#include <bw_mm1.h>
-#ifdef __WASM__
-# include "walloc.h"
-#else
-# include <stdlib.h>
-#endif
-
-enum {
-	p_cutoff,
-	p_input_coeff,
-	p_lp_coeff,
-	p_n
-};
-
-struct _bw_example_fx_mm1 {
-	// Sub-components
-	bw_mm1_coeffs	mm1_coeffs;
-	bw_mm1_state	mm1_state;
-
-	// Parameters
-	float		params[p_n];
-};
-
-bw_example_fx_mm1 bw_example_fx_mm1_new() {
-	bw_example_fx_mm1 instance = (bw_example_fx_mm1)malloc(sizeof(struct _bw_example_fx_mm1));
-	if (instance != NULL)
-		bw_mm1_init(&instance->mm1_coeffs);
-	return instance;
+void bw_example_fx_mm1_init(bw_example_fx_mm1 *instance) {
+	bw_mm1_init(&instance->mm1_coeffs);
 }
 
-void bw_example_fx_mm1_free(bw_example_fx_mm1 instance) {
-	free(instance);
-}
-
-void bw_example_fx_mm1_set_sample_rate(bw_example_fx_mm1 instance, float sample_rate) {
+void bw_example_fx_mm1_set_sample_rate(bw_example_fx_mm1 *instance, float sample_rate) {
 	bw_mm1_set_sample_rate(&instance->mm1_coeffs, sample_rate);
 }
 
-void bw_example_fx_mm1_reset(bw_example_fx_mm1 instance) {
+void bw_example_fx_mm1_reset(bw_example_fx_mm1 *instance) {
 	bw_mm1_reset_coeffs(&instance->mm1_coeffs);
 	bw_mm1_reset_state(&instance->mm1_coeffs, &instance->mm1_state);
 }
 
-void bw_example_fx_mm1_process(bw_example_fx_mm1 instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_mm1_process(bw_example_fx_mm1 *instance, const float** x, float** y, int n_samples) {
 	bw_mm1_process(&instance->mm1_coeffs, &instance->mm1_state, x[0], y[0], n_samples);
 }
 
-void bw_example_fx_mm1_set_parameter(bw_example_fx_mm1 instance, int index, float value) {
+void bw_example_fx_mm1_set_parameter(bw_example_fx_mm1 *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_cutoff:
@@ -82,6 +52,6 @@ void bw_example_fx_mm1_set_parameter(bw_example_fx_mm1 instance, int index, floa
 	}
 }
 
-float bw_example_fx_mm1_get_parameter(bw_example_fx_mm1 instance, int index) {
+float bw_example_fx_mm1_get_parameter(bw_example_fx_mm1 *instance, int index) {
 	return instance->params[index];
 }

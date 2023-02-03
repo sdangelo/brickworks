@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,30 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_satur* bw_example_fx_satur;
+#include <bw_satur.h>
 
-bw_example_fx_satur bw_example_fx_satur_new();
-void bw_example_fx_satur_free(bw_example_fx_satur instance);
-void bw_example_fx_satur_set_sample_rate(bw_example_fx_satur instance, float sample_rate);
-void bw_example_fx_satur_reset(bw_example_fx_satur instance);
-void bw_example_fx_satur_process(bw_example_fx_satur instance, const float** x, float** y, int n_samples);
-void bw_example_fx_satur_set_parameter(bw_example_fx_satur instance, int index, float value);
-float bw_example_fx_satur_get_parameter(bw_example_fx_satur instance, int index);
+enum {
+	p_bias,
+	p_gain,
+	p_n
+};
+
+struct _bw_example_fx_satur {
+	// Sub-components
+	bw_satur_coeffs	satur_coeffs;
+	bw_satur_state	satur_state;
+
+	// Parameters
+	float		params[p_n];
+};
+typedef struct _bw_example_fx_satur bw_example_fx_satur;
+
+void bw_example_fx_satur_init(bw_example_fx_satur *instance);
+void bw_example_fx_satur_set_sample_rate(bw_example_fx_satur *instance, float sample_rate);
+void bw_example_fx_satur_reset(bw_example_fx_satur *instance);
+void bw_example_fx_satur_process(bw_example_fx_satur *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_satur_set_parameter(bw_example_fx_satur *instance, int index, float value);
+float bw_example_fx_satur_get_parameter(bw_example_fx_satur *instance, int index);
 
 #ifdef __cplusplus
 }

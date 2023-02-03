@@ -20,62 +20,19 @@
 
 #include "bw_example_fx_eq_3band.h"
 
-#include <bw_ls2.h>
-#include <bw_hs2.h>
-#include <bw_peak.h>
-#ifdef __WASM__
-# include "walloc.h"
-#else
-# include <stdlib.h>
-#endif
-
-enum {
-	p_ls_cutoff,
-	p_ls_gain,
-	p_ls_Q,
-	p_peak_cutoff,
-	p_peak_gain,
-	p_peak_bw,
-	p_hs_cutoff,
-	p_hs_gain,
-	p_hs_Q,
-	p_n
-};
-
-struct _bw_example_fx_eq_3band {
-	// Sub-components
-	bw_ls2_coeffs	ls2_coeffs;
-	bw_ls2_state	ls2_state;
-	bw_peak_coeffs	peak_coeffs;
-	bw_peak_state	peak_state;
-	bw_hs2_coeffs	hs2_coeffs;
-	bw_hs2_state	hs2_state;
-
-	// Parameters
-	float		params[p_n];
-};
-
-bw_example_fx_eq_3band bw_example_fx_eq_3band_new() {
-	bw_example_fx_eq_3band instance = (bw_example_fx_eq_3band)malloc(sizeof(struct _bw_example_fx_eq_3band));
-	if (instance == NULL)
-		return NULL;
+void bw_example_fx_eq_3band_init(bw_example_fx_eq_3band *instance) {
 	bw_ls2_init(&instance->ls2_coeffs);
 	bw_peak_init(&instance->peak_coeffs);
 	bw_hs2_init(&instance->hs2_coeffs);
-	return instance;
 }
 
-void bw_example_fx_eq_3band_free(bw_example_fx_eq_3band instance) {
-	free(instance);
-}
-
-void bw_example_fx_eq_3band_set_sample_rate(bw_example_fx_eq_3band instance, float sample_rate) {
+void bw_example_fx_eq_3band_set_sample_rate(bw_example_fx_eq_3band *instance, float sample_rate) {
 	bw_ls2_set_sample_rate(&instance->ls2_coeffs, sample_rate);
 	bw_peak_set_sample_rate(&instance->peak_coeffs, sample_rate);
 	bw_hs2_set_sample_rate(&instance->hs2_coeffs, sample_rate);
 }
 
-void bw_example_fx_eq_3band_reset(bw_example_fx_eq_3band instance) {
+void bw_example_fx_eq_3band_reset(bw_example_fx_eq_3band *instance) {
 	bw_ls2_reset_coeffs(&instance->ls2_coeffs);
 	bw_ls2_reset_state(&instance->ls2_coeffs, &instance->ls2_state);
 	bw_peak_reset_coeffs(&instance->peak_coeffs);
@@ -84,13 +41,13 @@ void bw_example_fx_eq_3band_reset(bw_example_fx_eq_3band instance) {
 	bw_hs2_reset_state(&instance->hs2_coeffs, &instance->hs2_state);
 }
 
-void bw_example_fx_eq_3band_process(bw_example_fx_eq_3band instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_eq_3band_process(bw_example_fx_eq_3band *instance, const float** x, float** y, int n_samples) {
 	bw_ls2_process(&instance->ls2_coeffs, &instance->ls2_state, x[0], y[0], n_samples);
 	bw_peak_process(&instance->peak_coeffs, &instance->peak_state, y[0], y[0], n_samples);
 	bw_hs2_process(&instance->hs2_coeffs, &instance->hs2_state, y[0], y[0], n_samples);
 }
 
-void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int index, float value) {
+void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_ls_cutoff:
@@ -123,6 +80,6 @@ void bw_example_fx_eq_3band_set_parameter(bw_example_fx_eq_3band instance, int i
 	}
 }
 
-float bw_example_fx_eq_3band_get_parameter(bw_example_fx_eq_3band instance, int index) {
+float bw_example_fx_eq_3band_get_parameter(bw_example_fx_eq_3band *instance, int index) {
 	return instance->params[index];
 }

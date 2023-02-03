@@ -78,8 +78,7 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 #include "bw_example_fx_notch.h"
 
 #define P_TYPE				bw_example_fx_notch
-#define P_NEW				bw_example_fx_notch_new
-#define P_FREE				bw_example_fx_notch_free
+#define P_INIT				bw_example_fx_notch_init
 #define P_SET_SAMPLE_RATE		bw_example_fx_notch_set_sample_rate
 #define P_RESET				bw_example_fx_notch_reset
 #define P_PROCESS			bw_example_fx_notch_process

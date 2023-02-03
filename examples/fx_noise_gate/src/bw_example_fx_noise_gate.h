@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,32 @@
 extern "C" {
 #endif
 
-typedef struct _bw_example_fx_noise_gate* bw_example_fx_noise_gate;
+#include <bw_noise_gate.h>
 
-bw_example_fx_noise_gate bw_example_fx_noise_gate_new();
-void bw_example_fx_noise_gate_free(bw_example_fx_noise_gate instance);
-void bw_example_fx_noise_gate_set_sample_rate(bw_example_fx_noise_gate instance, float sample_rate);
-void bw_example_fx_noise_gate_reset(bw_example_fx_noise_gate instance);
-void bw_example_fx_noise_gate_process(bw_example_fx_noise_gate instance, const float** x, float** y, int n_samples);
-void bw_example_fx_noise_gate_set_parameter(bw_example_fx_noise_gate instance, int index, float value);
-float bw_example_fx_noise_gate_get_parameter(bw_example_fx_noise_gate instance, int index);
+enum {
+	p_thresh,
+	p_attenuation,
+	p_attack,
+	p_release,
+	p_n
+};
+
+struct _bw_example_fx_noise_gate {
+	// Sub-noise_gateonents
+	bw_noise_gate_coeffs	noise_gate_coeffs;
+	bw_noise_gate_state	noise_gate_state;
+
+	// Parameters
+	float			params[p_n];
+};
+typedef struct _bw_example_fx_noise_gate bw_example_fx_noise_gate;
+
+void bw_example_fx_noise_gate_init(bw_example_fx_noise_gate *instance);
+void bw_example_fx_noise_gate_set_sample_rate(bw_example_fx_noise_gate *instance, float sample_rate);
+void bw_example_fx_noise_gate_reset(bw_example_fx_noise_gate *instance);
+void bw_example_fx_noise_gate_process(bw_example_fx_noise_gate *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_noise_gate_set_parameter(bw_example_fx_noise_gate *instance, int index, float value);
+float bw_example_fx_noise_gate_get_parameter(bw_example_fx_noise_gate *instance, int index);
 
 #ifdef __cplusplus
 }

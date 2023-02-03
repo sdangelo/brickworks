@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,8 +80,7 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 #include "bw_example_fx_noise_gate.h"
 
 #define P_TYPE				bw_example_fx_noise_gate
-#define P_NEW				bw_example_fx_noise_gate_new
-#define P_FREE				bw_example_fx_noise_gate_free
+#define P_INIT				bw_example_fx_noise_gate_init
 #define P_SET_SAMPLE_RATE		bw_example_fx_noise_gate_set_sample_rate
 #define P_RESET				bw_example_fx_noise_gate_reset
 #define P_PROCESS			bw_example_fx_noise_gate_process

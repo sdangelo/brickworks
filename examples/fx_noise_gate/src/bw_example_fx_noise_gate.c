@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,55 +20,24 @@
 
 #include "bw_example_fx_noise_gate.h"
 
-#include <bw_noise_gate.h>
-#ifdef __WASM__
-# include "walloc.h"
-#else
-# include <stdlib.h>
-#endif
-
-enum {
-	p_thresh,
-	p_attenuation,
-	p_attack,
-	p_release,
-	p_n
-};
-
-struct _bw_example_fx_noise_gate {
-	// Sub-noise_gateonents
-	bw_noise_gate_coeffs	noise_gate_coeffs;
-	bw_noise_gate_state	noise_gate_state;
-
-	// Parameters
-	float			params[p_n];
-};
-
-bw_example_fx_noise_gate bw_example_fx_noise_gate_new() {
-	bw_example_fx_noise_gate instance = (bw_example_fx_noise_gate)malloc(sizeof(struct _bw_example_fx_noise_gate));
-	if (instance != NULL)
-		bw_noise_gate_init(&instance->noise_gate_coeffs);
-	return instance;
+void bw_example_fx_noise_gate_free(bw_example_fx_noise_gate *instance) {
+	bw_noise_gate_init(&instance->noise_gate_coeffs);
 }
 
-void bw_example_fx_noise_gate_free(bw_example_fx_noise_gate instance) {
-	free(instance);
-}
-
-void bw_example_fx_noise_gate_set_sample_rate(bw_example_fx_noise_gate instance, float sample_rate) {
+void bw_example_fx_noise_gate_set_sample_rate(bw_example_fx_noise_gate *instance, float sample_rate) {
 	bw_noise_gate_set_sample_rate(&instance->noise_gate_coeffs, sample_rate);
 }
 
-void bw_example_fx_noise_gate_reset(bw_example_fx_noise_gate instance) {
+void bw_example_fx_noise_gate_reset(bw_example_fx_noise_gate *instance) {
 	bw_noise_gate_reset_coeffs(&instance->noise_gate_coeffs);
 	bw_noise_gate_reset_state(&instance->noise_gate_coeffs, &instance->noise_gate_state);
 }
 
-void bw_example_fx_noise_gate_process(bw_example_fx_noise_gate instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_noise_gate_process(bw_example_fx_noise_gate *instance, const float** x, float** y, int n_samples) {
 	bw_noise_gate_process(&instance->noise_gate_coeffs, &instance->noise_gate_state, x[0], x[0], y[0], n_samples);
 }
 
-void bw_example_fx_noise_gate_set_parameter(bw_example_fx_noise_gate instance, int index, float value) {
+void bw_example_fx_noise_gate_set_parameter(bw_example_fx_noise_gate *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_thresh:
@@ -86,6 +55,6 @@ void bw_example_fx_noise_gate_set_parameter(bw_example_fx_noise_gate instance, i
 	}
 }
 
-float bw_example_fx_noise_gate_get_parameter(bw_example_fx_noise_gate instance, int index) {
+float bw_example_fx_noise_gate_get_parameter(bw_example_fx_noise_gate *instance, int index) {
 	return instance->params[index];
 }

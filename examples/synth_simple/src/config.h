@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ struct config_parameter {
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
 #define PLUGIN_NAME		"bw_example_synth_simple"
-#define PLUGIN_VERSION		"0.2.0"
+#define PLUGIN_VERSION		"0.3.0"
 
 #define NUM_BUSES_IN		0
 #define NUM_BUSES_OUT		1
@@ -83,8 +83,7 @@ static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 #include "bw_example_synth_simple.h"
 
 #define P_TYPE				bw_example_synth_simple
-#define P_NEW				bw_example_synth_simple_new
-#define P_FREE				bw_example_synth_simple_free
+#define P_INIT				bw_example_synth_simple_init
 #define P_SET_SAMPLE_RATE		bw_example_synth_simple_set_sample_rate
 #define P_RESET				bw_example_synth_simple_reset
 #define P_PROCESS			bw_example_synth_simple_process

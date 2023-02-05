@@ -162,7 +162,6 @@ struct _bw_hs2_coeffs {
 
 	// Coefficients
 	float		sg;
-	float		isg;
 	float		ssg;
 
 	// Parameters
@@ -193,7 +192,6 @@ static inline void _bw_hs2_update_mm2_params(bw_hs2_coeffs *BW_RESTRICT coeffs) 
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_HS2_PARAM_HIGH_GAIN) {
 			coeffs->sg = bw_sqrtf_2(coeffs->high_gain);
-			coeffs->isg = bw_rcpf_2(coeffs->sg);
 			coeffs->ssg = bw_sqrtf_2(coeffs->sg);
 			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
 			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);

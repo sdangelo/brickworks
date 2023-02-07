@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
  *  description {{{
  *    Linear ADSR envelope generator.
@@ -40,6 +40,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.3.0</strong>:
+ *        <ul>
+ *          <li>Avoid a warning related to a potentially uninitialized
+ *          variable.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -301,7 +307,7 @@ static inline void bw_env_gen_update_state_ctrl(const bw_env_gen_coeffs *BW_REST
 }
 
 static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state) {
-	float v;
+	float v = 0.f;
 	switch (state->phase) {
 	case bw_env_gen_phase_attack:
 		v = state->y_z1 + coeffs->attack_inc;

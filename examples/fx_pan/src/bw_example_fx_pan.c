@@ -57,7 +57,7 @@ void bw_example_fx_pan_set_parameter(bw_example_fx_pan *instance, int index, flo
 }
 
 float bw_example_fx_pan_get_parameter(bw_example_fx_pan *instance, int index) {
-	float r;
+	float r = 0.f;
 	switch (index) {
 	case p_pan:
 		r = instance->params[p_pan];

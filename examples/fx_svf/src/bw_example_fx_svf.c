@@ -20,7 +20,7 @@
 
 #include "bw_example_fx_svf.h"
 
-void bw_example_fx_svf_free(bw_example_fx_svf *instance) {
+void bw_example_fx_svf_init(bw_example_fx_svf *instance) {
 	bw_svf_init(&instance->svf_coeffs);
 }
 

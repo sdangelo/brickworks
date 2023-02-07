@@ -20,7 +20,7 @@
 
 #include "bw_example_fx_noise_gate.h"
 
-void bw_example_fx_noise_gate_free(bw_example_fx_noise_gate *instance) {
+void bw_example_fx_noise_gate_init(bw_example_fx_noise_gate *instance) {
 	bw_noise_gate_init(&instance->noise_gate_coeffs);
 }
 

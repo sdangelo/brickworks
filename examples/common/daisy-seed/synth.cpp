@@ -48,6 +48,11 @@ int main() {
 
 	loadMeter.Init(sample_rate, BLOCK_SIZE);
 
+#if NUM_PARAMETERS != 0
+	for (int i = 0; i < NUM_PARAMETERS; i++)
+		P_SET_PARAMETER(&instance, i, config_parameters[i].defaultValueUnmapped);
+#endif
+
 	P_RESET(&instance);
 
 	MidiUsbHandler::Config midi_cfg;

@@ -21,24 +21,15 @@
 #ifndef _CONFIG_DAISY_SEED_H
 #define _CONFIG_DAISY_SEED_H
 
-struct config_cc {
-	int		param_index;
-	unsigned char	cc;
+struct config_pin {
+	int	param_index;
+	int	pin;
 };
 
-#define NUM_CCS 	10
+#define NUM_PINS 	1
 
-static struct config_cc config_ccs[NUM_CCS] = {
-	{ 0, 20 },
-	{ 1, 21 },
-	{ 2, 22 },
-	{ 3, 23 },
-	{ 4, 24 },
-	{ 5, 25 },
-	{ 6, 26 },
-	{ 7, 27 },
-	{ 8, 52 },
-	{ 9, 53 }
+static struct config_pin config_pins[NUM_PINS] = {
+	{ 0, 15 }
 };
 
 #endif

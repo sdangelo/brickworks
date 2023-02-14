@@ -84,7 +84,7 @@ static inline void bw_balance_update_coeffs_audio(bw_balance_coeffs *BW_RESTRICT
  *
  *    #### bw_balance_process1()
  *  ```>>> */
-static inline float bw_balance_process1(const bw_balance_coeffs *BW_RESTRICT coeffs, float x_l, float x_r, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r);
+static inline void bw_balance_process1(const bw_balance_coeffs *BW_RESTRICT coeffs, float x_l, float x_r, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r);
 /*! <<<```
  *    Processes one set of input samples `x_l` (left) and `x_r` (right) using
  *    `coeffs`, while using and updating `state`. The left and right output
@@ -138,7 +138,7 @@ static inline void bw_balance_set_sample_rate(bw_balance_coeffs *BW_RESTRICT coe
 	bw_gain_set_sample_rate(&coeffs->r_coeffs, sample_rate);
 }
 
-static inline void _bw_balance_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void _bw_balance_do_update_coeffs(bw_balance_coeffs *BW_RESTRICT coeffs, char force) {
 	if (force || coeffs->balance != coeffs->balance_prev) {
 		bw_gain_set_gain_lin(&coeffs->l_coeffs, bw_minf(1.f - coeffs->balance, 1.f));
 		bw_gain_set_gain_lin(&coeffs->r_coeffs, bw_minf(1.f + coeffs->balance, 1.f));
@@ -163,7 +163,7 @@ static inline void bw_balance_update_coeffs_audio(bw_balance_coeffs *BW_RESTRICT
 	bw_gain_update_coeffs_audio(&coeffs->r_coeffs);
 }
 
-static inline float bw_balance_process1(const bw_balance_coeffs *BW_RESTRICT coeffs, float x_l, float x_r, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r) {
+static inline void bw_balance_process1(const bw_balance_coeffs *BW_RESTRICT coeffs, float x_l, float x_r, float *BW_RESTRICT y_l, float *BW_RESTRICT y_r) {
 	*y_l = bw_gain_process1(&coeffs->l_coeffs, x_l);
 	*y_r = bw_gain_process1(&coeffs->r_coeffs, x_r);
 }
@@ -174,13 +174,13 @@ static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, con
 		if (y_r != NULL) {
 			for (int i = 0; i < n_samples; i++) {
 				bw_balance_update_coeffs_audio(coeffs);
-				bw_balance_process1(coeffs, state, x_l[i], x_r[i], y_l + i, y_r + i);
+				bw_balance_process1(coeffs, x_l[i], x_r[i], y_l + i, y_r + i);
 			}
 		} else {
 			for (int i = 0; i < n_samples; i++) {
 				bw_balance_update_coeffs_audio(coeffs);
 				float r;
-				bw_balance_process1(coeffs, state, x_l[i], x_r[i], y_l + i, &r);
+				bw_balance_process1(coeffs, x_l[i], x_r[i], y_l + i, &r);
 			}
 		}
 	} else {
@@ -188,13 +188,13 @@ static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, con
 			for (int i = 0; i < n_samples; i++) {
 				bw_balance_update_coeffs_audio(coeffs);
 				float l;
-				bw_balance_process1(coeffs, state, x_l[i], x_r[i], &l, y_r + i);
+				bw_balance_process1(coeffs, x_l[i], x_r[i], &l, y_r + i);
 			}
 		} else {
 			for (int i = 0; i < n_samples; i++) {
 				bw_balance_update_coeffs_audio(coeffs);
 				float l, r;
-				bw_balance_process1(coeffs, state, x_l[i], x_r[i], &l, &r);
+				bw_balance_process1(coeffs, x_l[i], x_r[i], &l, &r);
 			}
 		}
 	}

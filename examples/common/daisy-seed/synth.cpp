@@ -92,7 +92,7 @@ int main() {
 #endif
 					for (int i = 0; i < NUM_CCS; i++)
 						if (v.control_number == config_ccs[i].cc)
-							P_SET_PARAMETER(&instance, config_ccs[i].param_index, v.value);
+							P_SET_PARAMETER(&instance, config_ccs[i].param_index, (1.f / 127.f) * v.value);
 #ifdef P_MOD_WHEEL
 				}
 #endif

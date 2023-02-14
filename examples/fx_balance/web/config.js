@@ -15,30 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
- * File authors: Stefano D'Angelo
+ * File author: Stefano D'Angelo
  */
 
-#ifndef _CONFIG_DAISY_SEED_H
-#define _CONFIG_DAISY_SEED_H
+var buses = [
+	{
+		stereo:		false,
+		output:		false
+	},
+	{
+		stereo:		true,
+		output:		true
+	}
+];
 
-struct config_cc {
-	int		param_index;
-	unsigned char	cc;
-};
-
-#define NUM_CCS 	10
-
-static struct config_cc config_ccs[NUM_CCS] = {
-	{ 0, 20 },
-	{ 1, 21 },
-	{ 2, 22 },
-	{ 3, 23 },
-	{ 4, 24 },
-	{ 5, 25 },
-	{ 6, 26 },
-	{ 7, 27 },
-	{ 8, 52 },
-	{ 9, 53 }
-};
-
-#endif
+var parameters = [
+	{
+		name:		"Balance",
+		output:		false,
+		defaultValue:	0.5
+	},
+	{
+		name:		"Left level",
+		output:		true,
+		defaultValue:	0.0
+	},
+	{
+		name:		"Right level",
+		output:		true,
+		defaultValue:	0.0
+	}
+];

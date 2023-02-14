@@ -15,30 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
- * File authors: Stefano D'Angelo
+ * File authors: Stefano D'Angelo, Paolo Marrone
  */
 
-#ifndef _CONFIG_DAISY_SEED_H
-#define _CONFIG_DAISY_SEED_H
+#ifndef _VST3_CONFIG_H
+#define _VST3_CONFIG_H
 
-struct config_cc {
-	int		param_index;
-	unsigned char	cc;
-};
+#define PLUGIN_SUBCATEGORY	"Fx|Spatial"
 
-#define NUM_CCS 	10
+#define PLUGIN_GUID_1		0xffe1e17f
+#define PLUGIN_GUID_2		0x3c4b492c
+#define PLUGIN_GUID_3		0x8d882912
+#define PLUGIN_GUID_4		0xf93c1e95
 
-static struct config_cc config_ccs[NUM_CCS] = {
-	{ 0, 20 },
-	{ 1, 21 },
-	{ 2, 22 },
-	{ 3, 23 },
-	{ 4, 24 },
-	{ 5, 25 },
-	{ 6, 26 },
-	{ 7, 27 },
-	{ 8, 52 },
-	{ 9, 53 }
-};
+#define CTRL_GUID_1		0x68133a09
+#define CTRL_GUID_2		0xd70b4a46
+#define CTRL_GUID_3		0x81f2808f
+#define CTRL_GUID_4		0x9790b266
 
 #endif

@@ -20,7 +20,7 @@
 
 var buses = [
 	{
-		stereo:		false,
+		stereo:		true,
 		output:		false
 	},
 	{

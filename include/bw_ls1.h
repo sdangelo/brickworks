@@ -162,8 +162,8 @@ struct _bw_ls1_state {
 static inline void bw_ls1_init(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	bw_mm1_init(&coeffs->mm1_coeffs);
 	bw_mm1_set_prewarp_at_cutoff(&coeffs->mm1_coeffs, 0);
-	bw_mm1_set_coeffs_x(&coeffs->mm1_coeffs, 1.f);
-	bw_mm1_set_coeffs_lp(&coeffs->mm1_coeffs, 0.f);
+	bw_mm1_set_coeff_x(&coeffs->mm1_coeffs, 1.f);
+	bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, 0.f);
 	coeffs->cutoff = 1e3f;
 	coeffs->dc_gain = 1.f;
 }

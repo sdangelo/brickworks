@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ struct config_parameter {
 #define COMPANY_WEBSITE		"https://www.orastron.com/"
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
-#define PLUGIN_NAME		"bw_example_fx_mm1"
+#define PLUGIN_NAME		"bw_example_fx_hp1"
 #define PLUGIN_VERSION		"0.3.0"
 
 #define NUM_BUSES_IN		1
@@ -66,24 +66,22 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 	{ "Audio out", 1, 0, 0, IO_MONO }
 };
 
-#define NUM_PARAMETERS		3
+#define NUM_PARAMETERS		1
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
 	{ "Cutoff", "Cutoff", "Hz", 0, 0, 0, 0.5f },
-	{ "Input coefficient", "In coeff", "", 0, 0, 0, 1.f },
-	{ "Lowpass coefficient", "LP coeff", "", 0, 0, 0, 0.5f }
 };
 
 // Internal API
 
-#include "bw_example_fx_mm1.h"
+#include "bw_example_fx_hp1.h"
 
-#define P_TYPE				bw_example_fx_mm1
-#define P_INIT				bw_example_fx_mm1_init
-#define P_SET_SAMPLE_RATE		bw_example_fx_mm1_set_sample_rate
-#define P_RESET				bw_example_fx_mm1_reset
-#define P_PROCESS			bw_example_fx_mm1_process
-#define P_SET_PARAMETER			bw_example_fx_mm1_set_parameter
-#define P_GET_PARAMETER			bw_example_fx_mm1_get_parameter
+#define P_TYPE				bw_example_fx_hp1
+#define P_INIT				bw_example_fx_hp1_init
+#define P_SET_SAMPLE_RATE		bw_example_fx_hp1_set_sample_rate
+#define P_RESET				bw_example_fx_hp1_reset
+#define P_PROCESS			bw_example_fx_hp1_process
+#define P_SET_PARAMETER			bw_example_fx_hp1_set_parameter
+#define P_GET_PARAMETER			bw_example_fx_hp1_get_parameter
 
 #endif

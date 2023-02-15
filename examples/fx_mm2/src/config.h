@@ -69,7 +69,7 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 #define NUM_PARAMETERS		6
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
-	{ "Cutoff", "Cutoff", "", 0, 0, 0, 0.5f },
+	{ "Cutoff", "Cutoff", "Hz", 0, 0, 0, 0.5f },
 	{ "Q", "Q", "", 0, 0, 0, 0.f },
 	{ "Input coefficient", "In coeff", "", 0, 0, 0, 1.f },
 	{ "Lowpass coefficient", "LP coeff", "", 0, 0, 0, 0.5f },

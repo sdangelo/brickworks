@@ -164,21 +164,21 @@ struct _bw_hs1_state {
 static inline void bw_hs1_init(bw_hs1_coeffs *BW_RESTRICT coeffs) {
 	bw_mm1_init(&coeffs->mm1_coeffs);
 	bw_mm1_set_prewarp_at_cutoff(&coeffs->mm1_coeffs, 0);
-	bw_mm1_set_coeffs_x(&coeffs->mm1_coeffs, 0.f);
-	bw_mm1_set_coeffs_lp(&coeffs->mm1_coeffs, 1.f);
+	bw_mm1_set_coeff_x(&coeffs->mm1_coeffs, 0.f);
+	bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, 1.f);
 	coeffs->cutoff = 1e3f;
-	coeffs->dc_gain = 1.f;
+	coeffs->high_gain = 1.f;
 }
 
 static inline void bw_hs1_set_sample_rate(bw_hs1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_mm1_set_sample_rate(&coeffs->mm1_coeffs, sample_rate);
 }
 
-static inline void _bw_hs1_update_mm1_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
+static inline void _bw_hs1_update_mm1_params(bw_hs1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->update) {
-		bw_mm1_set_cutoff(&coeffs->mm1_coeffs, coeffs->cutoff * bw_sqrtf_2(coeffs->dc_gain));
-		bw_mm1_set_coeff_x(&coeffs->mm1_coeffs, coeffs->dc_gain);
-		bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, 1.f - coeffs->dc_gain);
+		bw_mm1_set_cutoff(&coeffs->mm1_coeffs, coeffs->cutoff * bw_sqrtf_2(coeffs->high_gain));
+		bw_mm1_set_coeff_x(&coeffs->mm1_coeffs, coeffs->high_gain);
+		bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, 1.f - coeffs->high_gain);
 		bw_mm1_set_prewarp_freq(&coeffs->mm1_coeffs, coeffs->cutoff);
 		coeffs->update = 0;
 	}

@@ -29,16 +29,16 @@ struct config_cc {
 #define NUM_CCS 	10
 
 static struct config_cc config_ccs[NUM_CCS] = {
-	{ 0, 20 },
-	{ 1, 21 },
-	{ 2, 22 },
-	{ 3, 23 },
-	{ 4, 24 },
-	{ 5, 25 },
-	{ 6, 26 },
-	{ 7, 27 },
-	{ 8, 52 },
-	{ 9, 53 }
+	{ 0, 7 },	// Volume
+	{ 1, 3 },	// Master tune
+	{ 2, 5 },	// Portamento
+	{ 3, 28 },	// Pulse width
+	{ 4, 74 },	// Cutoff
+	{ 5, 71 },	// Q
+	{ 6, 73 },	// Attack
+	{ 7, 109 },	// Decay
+	{ 8, 110 },	// Sustain
+	{ 9, 72 }	// Release
 };
 
 #endif

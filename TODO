@@ -4,9 +4,8 @@ code:
 * audio rate optional pulse width/slope inputs?
 * one pole process const input? (return also if const out)
 * optimize triangle generation for constant pulse width
-* API for buffer fill, scale, offset, zero, copy...?
 * web examples construction/destruction
-* web effect multichannel in?
+* web effect mono->stereo and stereo->mono inputs? or display "input needs to be n channels"?
 * check const restrict etc.
 * define BW_RESTRICT to __restrict or similar when the compiler supports it
 * empty functions etc. to keep consistency and forward compatibility?
@@ -14,23 +13,24 @@ code:
 * should clip slope in triangle?
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
-* change name of vst3 template folders to something that doesn't look like a vst3 folder itself
 * compute bit depth reduction only when input changes? (state, option?)
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * avoid "force" in coeffs update by using inline functions?
 * should rather use backward Euler in bw_onepole?
-* Q to slope and viceversa functions in 2nd order shelf filters? keep updated values (seamless switch, syncrhonicity)?
 * treat unused variable/function warnings
 * csch for bw_peak bandwidth -> Q
 * sample rate-constant coeffs? (pan case)
 * pan process with no out: should just reset coeffs?
 * trace calls (debug)
-* svf bandpass out polarity too confusing?
-* better common config.h (less stuff maybe)
+* svf bandpass out polarity too confusing (inverted in mm2)?
+* better common config.h (less stuff maybe, or more stuff - decide)
+* separate tests an examples?
+* define common midi CCs for examples
 
 build system:
 * make makefiles handle paths with spaces etc
 * can run su on windows? (system-wide install)
-* make autodependencies (.d?)
+* make autodependencies (.d?) - https://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 * make from... directories
 * recursive make?
+* make hashdeps (https://github.com/olipratt/hashdeps)?

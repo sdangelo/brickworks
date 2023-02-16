@@ -28,7 +28,8 @@ extern "C" {
 #include <bw_hs1.h>
 
 enum {
-	p_hs1,
+	p_cutoff,
+	p_gain,
 	p_n
 };
 

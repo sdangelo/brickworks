@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ foundation }}}
- *  version {{{ 0.1.0 }}}
+ *  version {{{ 0.2.0 }}}
  *  requires {{{ bw_config }}}
  *  description {{{
  *    A common header to make sure that a bunch of basic definitions are

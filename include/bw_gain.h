@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Renamed as bw_gain.</li>
+ *          <li>Added new smooth_tau parameter.</li>
  *          <li>Changed gain parameter API to express values in linear gain
  *              and dB.</li>
  *        </ul>

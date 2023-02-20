@@ -1,3 +1,34 @@
+0.3.0
+-----
+  * Added new bw_ap1, bw_ap2, bw_balance, bw_bd_reduce, bw_buf, bw_comp, bw_hp1,
+    bw_hs1, bw_hs2, bw_lp1, bw_ls1, bw_ls2, bw_mm1, bw_mm2, bw_notch,
+    bw_noise_gate, bw_pan, bw_peak, bw_ppm, and bw_sr_reduce modules.
+  * Added new fx_ap1, fx_ap2, fx_balance, fx_bitcrush, fx_comp, fx_eq_3band,
+    fx_hp1, fx_hs1, fx_ls1, fx_mm1, fx_mm2, fx_noise_gate, fx_notch, fx_pan 
+    examples.
+  * Added support and examples for the Daisy Seed platform.
+  * Strengthened bw_svf algorithm for modulation and added prewarp_at_cutoff
+    and prewarp_freq parameters.
+  * Changed bw_wah to be a bandpass and not a lowpass filter.
+  * Renamed bw_vol as bw_gain, added new smooth_tau parameter, and changed gain
+    parameter API to express values in linear gain an dB.
+  * Added new bw_log10f_3(), bw_pow10f_3(), bw_dB2linf_3(), and bw_lin2dBf_3()
+    math routines.
+  * Fixed computation bug in bw_sqrtf_2().
+  * Avoid a warning related to a potentially uninitialized variable in
+    bw_env_gen.
+  * Reworked example source code structure and Makefiles.
+  * Stopped using dynamic memory allocation for individual modules in example
+    code.
+  * Adjusted noise levels in synth_mono example.
+  * Added BW_RESTRICT to bw_svf_process1() arguments.
+  * Fixed bad defintion of bw_pink_filt_set_sample_rate_scaling().
+  * Moved header inclusions where most appropriate in bw_env_follow.
+  * Added missing API documentation in bw_pink_filt.
+  * Fixed typo in the documentation of bw_svf_set_Q().
+  * Now using bw_ppm in synth_simple example.
+  * Fixed license headers in all source files.
+
 0.2.0
 -----
   * Refactored API of DSP modules for better flexibility and performance.

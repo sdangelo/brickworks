@@ -30,8 +30,11 @@
  *    <ul>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
- *          <li>Added prewarping control.</li>
+ *          <li>Strenghtened algorithm for modulation.</li>
+ *          <li>Added prewarping control parameters (prewarp_at_cutoff and
+ *              prewarp_freq).</li>
  *          <li>Added `BW_RESTRICT` to `bw_svf_process1()`.</li>
+ *          <li>Fixed typo in `bw_svf_set_Q()` documentation.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.3.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Envelope follower made of a full-wave rectifier followed by
@@ -28,6 +28,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.3.0</strong>:
+ *        <ul>
+ *          <li>Moved header inclusions where most appropriate.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>

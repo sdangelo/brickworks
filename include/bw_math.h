@@ -75,6 +75,7 @@
  *          <li>Added <code>bw_log10f_3()</code>, <code>bw_pow10f_3()</code>,
  *              <code>bw_dB2linf_3()</code>, and
  *              <code>bw_lin2dBf_3()</code>.</li>
+ *          <li>Fixed computation bug in <code>bw_sqrtf_2()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:

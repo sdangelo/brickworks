@@ -6,7 +6,7 @@ You can find information and documentation [on the official web page](https://ww
 
 ## Subfolders
 
-* examples: synth and an effect examples in VST3 and Web Audio formats;
+* examples: synth and an effect examples in VST3, Web Audio, and Daisy Seed formats;
 * include: header files.
 
 ## Legal

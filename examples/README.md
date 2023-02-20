@@ -36,7 +36,7 @@ In order to build just type `make`. You'll find the resulting output directory i
 
 ### Running
 
-The output files need to be served over HTTPS. A self-signed certificate is generated in the output directory (hence the OpenSSL requirement) to make it possible to run an HTTPS-enabled web server, e.g. `https-server -S`,  directly on/from the output folder.
+The output files need to be served over HTTPS. A self-signed certificate is generated in the output directory (hence the OpenSSL requirement) to make it possible to run an HTTPS-enabled web server, e.g. `http-server -S`,  directly on/from the output folder.
 
 ## Daisy Seed
 

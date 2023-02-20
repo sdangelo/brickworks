@@ -37,8 +37,7 @@ extern "C" {
 #include <bw_svf.h>
 #include <bw_env_gen.h>
 #include <bw_gain.h>
-#include <bw_env_follow.h>
-#include <bw_buf.h>
+#include <bw_ppm.h>
 
 enum {
 	p_volume,
@@ -116,8 +115,8 @@ struct _bw_example_synth_mono {
 	bw_phase_gen_coeffs	a440_phase_gen_coeffs;
 	bw_phase_gen_state	a440_phase_gen_state;
 	bw_gain_coeffs		gain_coeffs;
-	bw_env_follow_coeffs	env_follow_coeffs;
-	bw_env_follow_state	env_follow_state;
+	bw_ppm_coeffs		ppm_coeffs;
+	bw_ppm_state		ppm_state;
 
 	// Parameters
 	float			params[p_n];

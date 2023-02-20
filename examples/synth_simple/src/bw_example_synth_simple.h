@@ -33,7 +33,6 @@ extern "C" {
 #include <bw_env_gen.h>
 #include <bw_gain.h>
 #include <bw_ppm.h>
-#include <bw_buf.h>
 
 enum {
 	p_volume,

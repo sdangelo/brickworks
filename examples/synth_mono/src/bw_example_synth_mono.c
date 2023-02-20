@@ -20,6 +20,8 @@
 
 #include "bw_example_synth_mono.h"
 
+#include <bw_buf.h>
+
 void bw_example_synth_mono_init(bw_example_synth_mono *instance) {
 	bw_osc_saw_init(&instance->vco_saw_coeffs);
 	bw_phase_gen_init(&instance->vco1_phase_gen_coeffs);
@@ -42,7 +44,7 @@ void bw_example_synth_mono_init(bw_example_synth_mono *instance) {
 	bw_env_gen_init(&instance->vca_env_gen_coeffs);
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
 	bw_gain_init(&instance->gain_coeffs);
-	bw_env_follow_init(&instance->env_follow_coeffs);
+	bw_ppm_init(&instance->ppm_coeffs);
 	
 	bw_osc_saw_set_antialiasing(&instance->vco_saw_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco1_pulse_coeffs, 1);
@@ -55,7 +57,6 @@ void bw_example_synth_mono_init(bw_example_synth_mono *instance) {
 	bw_gain_set_gain_lin(&instance->vco3_gain_coeffs, 0.f);
 	bw_gain_set_gain_lin(&instance->noise_gain_coeffs, 0.f);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
-	bw_env_follow_set_release_tau(&instance->env_follow_coeffs, 1.f);
 	
 	instance->rand_state = 0xbaddecaf600dfeed;
 }
@@ -81,7 +82,7 @@ void bw_example_synth_mono_set_sample_rate(bw_example_synth_mono *instance, floa
 	bw_env_gen_set_sample_rate(&instance->vca_env_gen_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&instance->gain_coeffs, sample_rate);
-	bw_env_follow_set_sample_rate(&instance->env_follow_coeffs, sample_rate);
+	bw_ppm_set_sample_rate(&instance->ppm_coeffs, sample_rate);
 }
 
 void bw_example_synth_mono_reset(bw_example_synth_mono *instance) {
@@ -116,8 +117,8 @@ void bw_example_synth_mono_reset(bw_example_synth_mono *instance) {
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
 	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, 0.f);
 	bw_gain_reset_coeffs(&instance->gain_coeffs);
-	bw_env_follow_reset_coeffs(&instance->env_follow_coeffs);
-	bw_env_follow_reset_state(&instance->env_follow_coeffs, &instance->env_follow_state);
+	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
+	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state);
 	instance->note = 60;
 	instance->gate = 0;
 	instance->pitch_bend = 0.f;
@@ -241,7 +242,7 @@ void bw_example_synth_mono_process(bw_example_synth_mono *instance, const float*
 			bw_buf_mix(out, out, instance->buf[0], n);
 		
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
-		bw_env_follow_process(&instance->env_follow_coeffs, &instance->env_follow_state, out, NULL, n);
+		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);
 	}
 }
 
@@ -313,7 +314,10 @@ void bw_example_synth_mono_set_parameter(bw_example_synth_mono *instance, int in
 }
 
 float bw_example_synth_mono_get_parameter(bw_example_synth_mono *instance, int index) {
-	return index < p_n ? instance->params[index] : bw_clipf(bw_env_follow_get_y_z1(&instance->env_follow_state), 0.f, 1.f);
+	if (index < p_n)
+		return instance->params[index];
+	const float v = bw_ppm_get_y_z1(&instance->ppm_state);
+	return v < -200.f ? 0.f : bw_clipf(0.01666666666666666f * v + 1.f, 0.f, 1.f);
 }
 
 static void update_note_gate(bw_example_synth_mono *instance) {

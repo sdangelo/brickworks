@@ -23,10 +23,10 @@
   * Adjusted noise levels in synth_mono example.
   * Added BW_RESTRICT to bw_svf_process1() arguments.
   * Fixed bad defintion of bw_pink_filt_set_sample_rate_scaling().
+  * Now using bw_ppm in synth_mono and synth_simple examples.
   * Moved header inclusions where most appropriate in bw_env_follow.
   * Added missing API documentation in bw_pink_filt.
   * Fixed typo in the documentation of bw_svf_set_Q().
-  * Now using bw_ppm in synth_simple example.
   * Fixed license headers in all source files.
 
 0.2.0

@@ -20,6 +20,8 @@
 
 #include "bw_example_synth_simple.h"
 
+#include <bw_buf.h>
+
 void bw_example_synth_simple_init(bw_example_synth_simple *instance) {
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->osc_pulse_coeffs);

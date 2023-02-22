@@ -26,7 +26,7 @@ struct config_cc {
 	unsigned char	cc;
 };
 
-#define NUM_CCS 	37
+#define NUM_CCS 	38
 
 static struct config_cc config_ccs[NUM_CCS] = {
 	{ 0, 7 },	// Volume
@@ -49,23 +49,24 @@ static struct config_cc config_ccs[NUM_CCS] = {
 	{ 17, 31 },	// VCO3 coarse
 	{ 18, 85 },	// VCO3 fine
 	{ 19, 86 },	// VCO3 waveform
-	{ 20, 87 },	// VCO3 level
-	{ 21, 89 },	// Noise color
-	{ 22, 90 },	// Noise level
-	{ 23, 102 },	// VCF modulation
-	{ 24, 103 },	// VCF keyboard control
-	{ 25, 74 },	// VCF cutoff
-	{ 26, 71 },	// VCF Q
-	{ 27, 104 },	// VCF contour
-	{ 28, 105 },	// VCF attack
-	{ 29, 106 },	// VCF decay
-	{ 30, 107 },	// VCF sustain
-	{ 31, 108 },	// VCF release
-	{ 32, 73 },	// VCA attack
-	{ 33, 109 },	// VCA decay
-	{ 34, 110 },	// VCA sustain
-	{ 35, 72 },	// VCA release
-	{ 36, 111 }	// A440
+	{ 20, 87 },	// VCO3 puslse width/slope
+	{ 21, 89 },	// VCO3 level
+	{ 22, 90 },	// Noise color
+	{ 23, 102 },	// Noise level
+	{ 24, 103 },	// VCF modulation
+	{ 25, 104 },	// VCF keyboard control
+	{ 26, 74 },	// VCF cutoff
+	{ 27, 71 },	// VCF Q
+	{ 28, 105 },	// VCF contour
+	{ 29, 106 },	// VCF attack
+	{ 30, 107 },	// VCF decay
+	{ 31, 108 },	// VCF sustain
+	{ 32, 109 },	// VCF release
+	{ 33, 73 },	// VCA attack
+	{ 34, 110 },	// VCA decay
+	{ 35, 111 },	// VCA sustain
+	{ 36, 72 },	// VCA release
+	{ 37, 112 }	// A440
 };
 
 #endif

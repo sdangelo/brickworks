@@ -98,9 +98,9 @@ static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, con
  *    output buffer `y`, while using and updating `coeffs` (control and audio
  *    rate).
  *
- *    #### bw_ringmod_set_mod_amount()
+ *    #### bw_ringmod_set_amount()
  *  ```>>> */
-static inline void bw_ringmod_set_mod_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_ringmod_set_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the modulation amount parameter to the given `value` (`0.f` = no
  *    modulation, `1.f` = full modulation, `-1.f` = full modulation with
@@ -159,7 +159,7 @@ static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, con
 	}
 }
 
-static inline void bw_ringmod_set_mod_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_ringmod_set_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->mod_amount = value;
 }
 

@@ -111,15 +111,15 @@ static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_s
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
- *    #### bw_trem_set_speed()
+ *    #### bw_trem_set_rate()
  *  ```>>> */
-static inline void bw_trem_set_frequency(bw_trem_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_trem_set_rate(bw_trem_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the modulation frequency (speed) `value` (Hz) in `coeffs`.
+ *    Sets the modulation rate `value` (Hz) in `coeffs`.
  *
  *    Default value: `1.f`.
  *
- *    #### bw_trem_set_thresh_dBFS()
+ *    #### bw_trem_set_amount()
  *  ```>>> */
 static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
@@ -142,10 +142,6 @@ struct _bw_trem_coeffs {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_ringmod_coeffs	ringmod_coeffs;
-	
-	// Coefficients
-
-	// Parameters
 };
 
 struct _bw_trem_state {
@@ -196,7 +192,7 @@ static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_s
 	}
 }
 
-static inline void bw_trem_set_frequency(bw_trem_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_trem_set_rate(bw_trem_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_phase_gen_set_frequency(&coeffs->phase_gen_coeffs, value);
 }
 

@@ -18,37 +18,38 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_FX_TREM_H
-#define _BW_EXAMPLE_FX_TREM_H
+#ifndef _BW_EXAMPLE_FX_PHASER_H
+#define _BW_EXAMPLE_FX_PHASER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <bw_trem.h>
+#include <bw_phaser.h>
 
 enum {
 	p_rate,
+	p_center,
 	p_amount,
 	p_n
 };
 
-struct _bw_example_fx_trem {
+struct _bw_example_fx_phaser {
 	// Sub-components
-	bw_trem_coeffs	trem_coeffs;
-	bw_trem_state	trem_state;
+	bw_phaser_coeffs	phaser_coeffs;
+	bw_phaser_state		phaser_state;
 
 	// Parameters
-	float		params[p_n];
+	float			params[p_n];
 };
-typedef struct _bw_example_fx_trem bw_example_fx_trem;
+typedef struct _bw_example_fx_phaser bw_example_fx_phaser;
 
-void bw_example_fx_trem_init(bw_example_fx_trem *instance);
-void bw_example_fx_trem_set_sample_rate(bw_example_fx_trem *instance, float sample_rate);
-void bw_example_fx_trem_reset(bw_example_fx_trem *instance);
-void bw_example_fx_trem_process(bw_example_fx_trem *instance, const float** x, float** y, int n_samples);
-void bw_example_fx_trem_set_parameter(bw_example_fx_trem *instance, int index, float value);
-float bw_example_fx_trem_get_parameter(bw_example_fx_trem *instance, int index);
+void bw_example_fx_phaser_init(bw_example_fx_phaser *instance);
+void bw_example_fx_phaser_set_sample_rate(bw_example_fx_phaser *instance, float sample_rate);
+void bw_example_fx_phaser_reset(bw_example_fx_phaser *instance);
+void bw_example_fx_phaser_process(bw_example_fx_phaser *instance, const float** x, float** y, int n_samples);
+void bw_example_fx_phaser_set_parameter(bw_example_fx_phaser *instance, int index, float value);
+float bw_example_fx_phaser_get_parameter(bw_example_fx_phaser *instance, int index);
 
 #ifdef __cplusplus
 }

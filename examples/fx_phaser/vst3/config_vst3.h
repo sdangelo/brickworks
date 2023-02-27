@@ -15,29 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
- * File author: Stefano D'Angelo
+ * File authors: Stefano D'Angelo, Paolo Marrone
  */
 
-var buses = [
-	{
-		stereo:		false,
-		output:		false
-	},
-	{
-		stereo:		false,
-		output:		true
-	}
-];
+#ifndef _VST3_CONFIG_H
+#define _VST3_CONFIG_H
 
-var parameters = [
-	{
-		name:		"Rate",
-		output:		false,
-		defaultValue:	0.5
-	},
-	{
-		name:		"Amount",
-		output:		false,
-		defaultValue:	0.5
-	}
-];
+#define PLUGIN_SUBCATEGORY	"Fx|Modulation"
+
+#define PLUGIN_GUID_1		0x7be03bdd
+#define PLUGIN_GUID_2		0x49d746b8
+#define PLUGIN_GUID_3		0xa6cd129d
+#define PLUGIN_GUID_4		0xdaa551d1
+
+#define CTRL_GUID_1		0xb0f47f98
+#define CTRL_GUID_2		0x51b64cbe
+#define CTRL_GUID_3		0x9079e44a
+#define CTRL_GUID_4		0xdad925e3
+
+#endif

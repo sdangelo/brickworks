@@ -50,7 +50,7 @@ struct config_parameter {
 #define COMPANY_WEBSITE		"https://www.orastron.com/"
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
-#define PLUGIN_NAME		"bw_example_fx_trem"
+#define PLUGIN_NAME		"bw_example_fx_phaser"
 #define PLUGIN_VERSION		"0.4.0"
 
 #define NUM_BUSES_IN		1
@@ -66,23 +66,24 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 	{ "Audio out", 1, 0, 0, IO_MONO }
 };
 
-#define NUM_PARAMETERS		2
+#define NUM_PARAMETERS		3
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
-	{ "Rate", "Rate", "", 0, 0, 0, 0.5f },
-	{ "Amount", "Amount", "", 0, 0, 0, 0.5f }
+	{ "Modulation rate", "Rate", "", 0, 0, 0, 0.5f },
+	{ "Center frequency", "Center", "", 0, 0, 0, 0.5f },
+	{ "Modulation amount", "Amount", "", 0, 0, 0, 0.5f }
 };
 
 // Internal API
 
-#include "bw_example_fx_trem.h"
+#include "bw_example_fx_phaser.h"
 
-#define P_TYPE				bw_example_fx_trem
-#define P_INIT				bw_example_fx_trem_init
-#define P_SET_SAMPLE_RATE		bw_example_fx_trem_set_sample_rate
-#define P_RESET				bw_example_fx_trem_reset
-#define P_PROCESS			bw_example_fx_trem_process
-#define P_SET_PARAMETER			bw_example_fx_trem_set_parameter
-#define P_GET_PARAMETER			bw_example_fx_trem_get_parameter
+#define P_TYPE				bw_example_fx_phaser
+#define P_INIT				bw_example_fx_phaser_init
+#define P_SET_SAMPLE_RATE		bw_example_fx_phaser_set_sample_rate
+#define P_RESET				bw_example_fx_phaser_reset
+#define P_PROCESS			bw_example_fx_phaser_process
+#define P_SET_PARAMETER			bw_example_fx_phaser_set_parameter
+#define P_GET_PARAMETER			bw_example_fx_phaser_get_parameter
 
 #endif

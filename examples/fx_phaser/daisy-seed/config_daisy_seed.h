@@ -15,29 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
- * File author: Stefano D'Angelo
+ * File authors: Stefano D'Angelo
  */
 
-var buses = [
-	{
-		stereo:		false,
-		output:		false
-	},
-	{
-		stereo:		false,
-		output:		true
-	}
-];
+#ifndef _CONFIG_DAISY_SEED_H
+#define _CONFIG_DAISY_SEED_H
 
-var parameters = [
-	{
-		name:		"Rate",
-		output:		false,
-		defaultValue:	0.5
-	},
-	{
-		name:		"Amount",
-		output:		false,
-		defaultValue:	0.5
-	}
-];
+struct config_pin {
+	int	param_index;
+	int	pin;
+};
+
+#define NUM_PINS 	3
+
+static struct config_pin config_pins[NUM_PINS] = {
+	{ 0, 15 },
+	{ 1, 16 },
+	{ 2, 17 }
+};
+
+#endif

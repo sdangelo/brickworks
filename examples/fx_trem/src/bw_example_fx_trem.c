@@ -40,8 +40,8 @@ void bw_example_fx_trem_process(bw_example_fx_trem *instance, const float** x, f
 void bw_example_fx_trem_set_parameter(bw_example_fx_trem *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
-	case p_speed:
-		bw_trem_set_frequency(&instance->trem_coeffs, (20.f - 1.f) * value * value * value + 1.f);
+	case p_rate:
+		bw_trem_set_rate(&instance->trem_coeffs, (20.f - 1.f) * value * value * value + 1.f);
 		break;
 	case p_amount:
 		bw_trem_set_amount(&instance->trem_coeffs, value);

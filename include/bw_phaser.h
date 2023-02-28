@@ -100,8 +100,7 @@ static inline void bw_phaser_update_coeffs_audio(bw_phaser_coeffs *BW_RESTRICT c
  *
  *    #### bw_phaser_process1()
  *  ```>>> */
-//XXXXXXXXXXXXXXX const
-static inline float bw_phaser_process1(bw_phaser_coeffs *BW_RESTRICT coeffs, bw_phaser_state *BW_RESTRICT state, float x);
+static inline float bw_phaser_process1(const bw_phaser_coeffs *BW_RESTRICT coeffs, bw_phaser_state *BW_RESTRICT state, float x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. Returns the corresponding output sample.
@@ -152,6 +151,7 @@ static inline void bw_phaser_set_amount(bw_phaser_coeffs *BW_RESTRICT coeffs, fl
 struct _bw_phaser_coeffs {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
+	bw_phase_gen_state	phase_gen_state;
 	bw_ap1_coeffs		ap1_coeffs;
 
 	// Coefficients
@@ -163,7 +163,6 @@ struct _bw_phaser_coeffs {
 };
 
 struct _bw_phaser_state {
-	bw_phase_gen_state	phase_gen_state;
 	bw_ap1_state		ap1_state[4];
 };
 
@@ -182,11 +181,11 @@ static inline void bw_phaser_set_sample_rate(bw_phaser_coeffs *BW_RESTRICT coeff
 
 static inline void bw_phaser_reset_coeffs(bw_phaser_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_reset_coeffs(&coeffs->phase_gen_coeffs);
+	bw_phase_gen_reset_state(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, 0.f);
 	bw_ap1_reset_coeffs(&coeffs->ap1_coeffs);
 }
 
 static inline void bw_phaser_reset_state(const bw_phaser_coeffs *BW_RESTRICT coeffs, bw_phaser_state *BW_RESTRICT state) {
-	bw_phase_gen_reset_state(&coeffs->phase_gen_coeffs, &state->phase_gen_state, 0.f);
 	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[0]);
 	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[1]);
 	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[2]);
@@ -199,15 +198,15 @@ static inline void bw_phaser_update_coeffs_ctrl(bw_phaser_coeffs *BW_RESTRICT co
 
 static inline void bw_phaser_update_coeffs_audio(bw_phaser_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_update_coeffs_audio(&coeffs->phase_gen_coeffs);
-}
-
-static inline float bw_phaser_process1(bw_phaser_coeffs *BW_RESTRICT coeffs, bw_phaser_state *BW_RESTRICT state, float x) {
 	float p, pi;
-	bw_phase_gen_process1(&coeffs->phase_gen_coeffs, &state->phase_gen_state, &p, &pi);
+	bw_phase_gen_process1(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, &p, &pi);
 	const float m = coeffs->amount * bw_osc_sin_process1(p);
 	bw_ap1_set_cutoff(&coeffs->ap1_coeffs, bw_clipf(coeffs->center * bw_pow2f_3(m), 1.f, coeffs->cutoff_max));
 	bw_ap1_update_coeffs_ctrl(&coeffs->ap1_coeffs);
 	bw_ap1_update_coeffs_audio(&coeffs->ap1_coeffs);
+}
+
+static inline float bw_phaser_process1(const bw_phaser_coeffs *BW_RESTRICT coeffs, bw_phaser_state *BW_RESTRICT state, float x) {
 	float y = bw_ap1_process1(&coeffs->ap1_coeffs, &state->ap1_state[0], x);
 	y = bw_ap1_process1(&coeffs->ap1_coeffs, &state->ap1_state[1], y);
 	y = bw_ap1_process1(&coeffs->ap1_coeffs, &state->ap1_state[2], y);

@@ -72,7 +72,7 @@ static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs,
  *
  *    ### bw_delay_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float max_delay);
+static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay);
 /*! <<<```
  *   XXX
  *
@@ -160,7 +160,7 @@ static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs,
 	coeffs->fs = sample_rate;
 }
 
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float max_delay) {
+static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay) {
 	return (BW_SIZE_T)bw_ceilf(coeffs->fs * max_delay) + 1;
 }
 

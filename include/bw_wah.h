@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_one_pole bw_math bw_svf }}}
  *  description {{{
  *    Wah effect.
@@ -29,6 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed documentation for `bw_wah_state` and `bw_wah_reset_state()`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Use bandpass SVF output rather than lowpass.</li>
@@ -59,7 +64,7 @@ typedef struct _bw_wah_coeffs bw_wah_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_svf_state
+ *    ### bw_wah_state
  *  ```>>> */
 typedef struct _bw_wah_state bw_wah_state;
 /*! <<<```
@@ -77,7 +82,7 @@ static inline void bw_wah_set_sample_rate(bw_wah_coeffs *BW_RESTRICT coeffs, flo
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    #### bw_wah_reset_state()
+ *    #### bw_wah_reset_coeffs()
  *  ```>>> */
 static inline void bw_wah_reset_coeffs(bw_wah_coeffs *BW_RESTRICT coeffs);
 /*! <<<```

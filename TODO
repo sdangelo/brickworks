@@ -26,6 +26,10 @@ code:
 * better common config.h (less stuff maybe, or more stuff - decide)
 * separate tests an examples?
 * define common midi CCs for examples
+* get_y_z1, common strategy?
+* sqrt(0) and corner cases, common strategy?
+* MEM_REQ_ROUGH() macro?
+* use BW_SIZE_T, check constant types
 
 build system:
 * make makefiles handle paths with spaces etc

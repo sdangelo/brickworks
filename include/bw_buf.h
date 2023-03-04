@@ -29,7 +29,7 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added `bw_buf_add()`.</li>
+ *          <li>Added `bw_buf_fill()` and `bw_buf_add()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
@@ -51,6 +51,12 @@ extern "C" {
 #endif
 
 /*! api {{{
+ *    #### bw_buf_fill()
+ *  ```>>> */
+static inline voide bw_buf_fill(float *dest, float k, int n_elems);
+/*! <<<```
+ *    Sets the first `n_elems` in `dest` to `k`.
+ *
  *    #### bw_buf_add()
  *  ```>>> */
 static inline void bw_buf_add(float *dest, const float *src, float k, int n_elems);
@@ -84,6 +90,11 @@ static inline void bw_buf_mul(float *dest, const float *src1, const float *src2,
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+static inline voide bw_buf_fill(float *dest, float k, int n_elems) {
+	for (int i = 0; i < n_elems; i++)
+		dest[i] = k;
+}
 
 static inline void bw_buf_add(float *dest, const float *src, float k, int n_elems) {
 	for (int i = 0; i < n_elems; i++)

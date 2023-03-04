@@ -70,19 +70,22 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Added `bw_ceilf()`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
- *          <li>Added <code>bw_log10f_3()</code>, <code>bw_pow10f_3()</code>,
- *              <code>bw_dB2linf_3()</code>, and
- *              <code>bw_lin2dBf_3()</code>.</li>
- *          <li>Fixed computation bug in <code>bw_sqrtf_2()</code>.</li>
+ *          <li>Added `bw_log10f_3()`, `bw_pow10f_3()`, `bw_dB2linf_3()`, and
+ *              `bw_lin2dBf_3()`.</li>
+ *          <li>Fixed computation bug in `bw_sqrtf_2()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Added <code>bw_sin2pif_3()</code>, <code>bw_cos2pif_3()</code>,
- *              <code>bw_tan2pif_3()</code>, <code>bw_omega_3lognr()</code>, and
- *              <code>bw_tanhf_3()</code>.</li>
+ *          <li>Added `bw_sin2pif_3()`, `bw_cos2pif_3()`, `bw_tan2pif_3()`,
+ *              `bw_omega_3lognr()`, and `bw_tanhf_3()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -227,8 +230,15 @@ static inline float bw_roundf(float x);
  *  ```>>> */
 static inline float bw_floorf(float x);
 /*! <<<```
- *    Returns the biggest integer lower or equal than `x` (i.e., `x` is rounded
+ *    Returns the biggest integer less or equal than `x` (i.e., `x` is rounded
  *    down).
+ *
+ *    #### bw_ceilf()
+ *  ```>>> */
+static inline float bw_ceilf(float x);
+/*! <<<```
+ *    Returns the smallest integer greater or equal than `x` (i.e., `x` is
+ *    rounded up).
  *
  *    #### bw_rcpf_2()
  *  ```>>> */
@@ -523,6 +533,14 @@ static inline float bw_floorf(float x) {
 	_bw_floatint s = {.f = 1.f};
 	s.i &= bw_signfilli32(t.i & y.i);
 	return t.f - s.f;
+}
+
+static inline float bw_ceilf(float x) {
+	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
+	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
+	_bw_floatint s = {.f = 1.f};
+	s.i &= bw_signfilli32(~t.i & y.i);
+	return t.f + s.f;
 }
 
 static inline float bw_rcpf_2(float x) {

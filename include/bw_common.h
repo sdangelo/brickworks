@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ foundation }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config }}}
  *  description {{{
  *    A common header to make sure that a bunch of basic definitions are
@@ -28,10 +28,15 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Added `BW_SIZE_T`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Removed <code>BW_MALLOC</code>, <code>BW_REALLOC</code>, and <code>BW_FREE</code>.</li>
- *          <li>Added <code>BW_RESTRICT</code>.</li>
+ *          <li>Removed `BW_MALLOC`, `BW_REALLOC`, and `BW_FREE`.</li>
+ *          <li>Added `BW_RESTRICT`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:
@@ -58,11 +63,16 @@
 #include <bw_config.h>
 /*! ...
  *
- *    #### NULL
- *    If `NULL` is not defined, then `stddef.h` is `#include`d.
+ *    #### NULL and BW_SIZE_T
+ *    If `NULL` or `BW_SIZE_T` are not defined, then `stddef.h` is `#include`d.
+ *
+ *    If `BW_SIZE_T` is not defined, the it is defined as `size_t`.
  *  >>> */
-#ifndef NULL
+#if !defined(NULL) || !defined(BW_SIZE_T)
 # include <stddef.h>
+# if !defined(BW_SIZE_T)
+#  define BW_SIZE_T size_t
+# endif
 #endif
 /*! ...
  *
@@ -86,7 +96,8 @@
 /*! ...
  *
  *    #### BW_RESTRICT
- *    If `BW_RESTRICT` is not defined, then it is defined as `restrict` if C99 is supported.
+ *    If `BW_RESTRICT` is not defined, then it is defined as `restrict` if C99
+ *    is supported.
  *  >>> */
 #ifndef BW_RESTRICT
 # if defined(__STDC__) && (__STDC_VERSION__ >= 199901L)

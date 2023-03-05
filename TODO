@@ -30,6 +30,7 @@ code:
 * sqrt(0) and corner cases, common strategy?
 * MEM_REQ_ROUGH() macro?
 * use BW_SIZE_T, check constant types
+* web examples: need to export memset?
 
 build system:
 * make makefiles handle paths with spaces etc

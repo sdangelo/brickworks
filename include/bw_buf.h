@@ -53,7 +53,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_buf_fill()
  *  ```>>> */
-static inline voide bw_buf_fill(float *dest, float k, int n_elems);
+static inline void bw_buf_fill(float *dest, float k, int n_elems);
 /*! <<<```
  *    Sets the first `n_elems` in `dest` to `k`.
  *
@@ -91,7 +91,7 @@ static inline void bw_buf_mul(float *dest, const float *src1, const float *src2,
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-static inline voide bw_buf_fill(float *dest, float k, int n_elems) {
+static inline void bw_buf_fill(float *dest, float k, int n_elems) {
 	for (int i = 0; i < n_elems; i++)
 		dest[i] = k;
 }

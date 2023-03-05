@@ -35,6 +35,9 @@ struct _wrapper {
 #if NUM_PARAMETERS != 0
 	float		 param_values[NUM_PARAMETERS];
 #endif
+#ifdef P_MEM_REQ
+	void		*mem;
+#endif
 };
 
 typedef struct _wrapper *wrapper;
@@ -83,12 +86,28 @@ wrapper wrapper_new(float sample_rate) {
 #endif
 
 	P_SET_SAMPLE_RATE(&ret->instance, sample_rate);
+#ifdef P_MEM_REQ
+	size_t req = P_MEM_REQ(&ret->instance);
+	if (req) {
+		ret->mem = malloc(req);
+		if (ret->mem == NULL) {
+			free(ret);
+			return NULL;
+		}
+		P_MEM_SET(&ret->instance, ret->mem);
+	} else
+		ret->mem = NULL;
+#endif
 	P_RESET(&ret->instance);
 
 	return ret;
 }
 
 void wrapper_free(wrapper w) {
+#ifdef P_MEM_REQ
+	if (w->mem)
+		free(w->mem);
+#endif
 	free(w);
 }
 

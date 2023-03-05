@@ -50,6 +50,7 @@
 #include "base/source/fstreamer.h"
 #include "common.h"
 
+#include <stdlib.h>
 #include <algorithm>
 
 #if defined(__aarch64__)
@@ -192,6 +193,10 @@ tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
 	}
 #endif
 
+#ifdef P_MEM_REQ
+	this->mem = NULL;
+#endif
+
 	return kResultTrue;
 }
 
@@ -202,8 +207,26 @@ tresult PLUGIN_API Plugin::terminate() {
 tresult PLUGIN_API Plugin::setActive(TBool state) {
 	if (state) {
 		P_SET_SAMPLE_RATE(&instance, sampleRate);
+#ifdef P_MEM_REQ
+		size_t req = P_MEM_REQ(&instance);
+		if (req) {
+			void *mem = malloc(req);
+			if (mem == NULL)
+				return kResultFalse;
+			P_MEM_SET(&instance, mem);
+			this->mem = mem;
+		}
+#endif
 		P_RESET(&instance);
 	}
+#ifdef P_MEM_REQ
+	else {
+		if (this->mem) {
+			free(this->mem);
+			this->mem = NULL;
+		}
+	}
+#endif
 	return AudioEffect::setActive(state);
 }
 

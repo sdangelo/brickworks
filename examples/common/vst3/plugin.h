@@ -60,6 +60,10 @@ private:
 #if NUM_BUSES_OUT != 0
 	float *outputs[NUM_CHANNELS_OUT];
 #endif
+
+#ifdef P_MEM_REQ
+	void *mem;
+#endif
 };
 
 #endif

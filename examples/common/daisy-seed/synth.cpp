@@ -43,6 +43,9 @@ int main() {
 
 	P_INIT(&instance);
 	P_SET_SAMPLE_RATE(&instance, sample_rate);
+#ifdef P_MEM_REQ
+	P_MEM_SET(&instance, (void *)0xC0000000);
+#endif
 	
 //	hardware.StartLog();
 

@@ -60,9 +60,10 @@ typedef struct _bw_delay_state bw_delay_state;
  *
  *    #### bw_delay_init()
  *  ```>>> */
-static inline void bw_delay_init(bw_delay_coeffs *BW_RESTRICT coeffs);
+static inline void bw_delay_init(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
+ *    XXX
  *
  *    #### bw_delay_set_sample_rate()
  *  ```>>> */
@@ -72,7 +73,7 @@ static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs,
  *
  *    ### bw_delay_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay);
+static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *   XXX
  *
@@ -140,28 +141,31 @@ static inline void bw_delay_set_delay(bw_delay_coeffs *BW_RESTRICT coeffs, float
 
 struct _bw_delay_coeffs {
 	// Coefficients
-	float	fs;
+	float		fs;
+	BW_SIZE_T	len;
 
 	// Parameters
-	float	delay;
+	float		max_delay;
+	float		delay;
 };
 
 struct _bw_delay_state {
 	float		*buf;
-	BW_SIZE_T	 len;
 	BW_SIZE_T	 idx;
 };
 
-static inline void bw_delay_init(bw_delay_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_delay_init(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay) {
+	coeffs->max_delay = max_delay;
 	coeffs->delay = 0.f;
 }
 
 static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	coeffs->fs = sample_rate;
+	coeffs->len = (BW_SIZE_T)bw_ceilf(coeffs->fs * coeffs->max_delay) + 1;
 }
 
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay) {
-	return ((BW_SIZE_T)bw_ceilf(coeffs->fs * max_delay) + 1) * sizeof(float);
+static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs) {
+	return coeffs->len * sizeof(float);
 }
 
 static inline void bw_delay_mem_set(bw_delay_state *BW_RESTRICT state, void *mem) {
@@ -172,7 +176,7 @@ static inline void bw_delay_reset_coeffs(bw_delay_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state) {
-	bw_buf_fill(state->buf, 0.f, state->len);
+	bw_buf_fill(state->buf, 0.f, coeffs->len);
 	state->idx = 0;
 }
 
@@ -186,14 +190,14 @@ static inline float bw_delay_process1(const bw_delay_coeffs *BW_RESTRICT coeffs,
 	// XXX optim, coeffs
 	const float s = coeffs->delay * coeffs->fs;
 	const float f = bw_floorf(s);
-	const float d = coeffs->delay - f;
-	const BW_SIZE_T j = (BW_SIZE_T)d;
-	const BW_SIZE_T l = (state->idx >= j ? state->idx : state->idx + state->len) - j;
-	const BW_SIZE_T h = l == state->len - 1 ? 0 : l + 1;
-	const BW_SIZE_T n = state->idx == state->len - 1 ? 0 : state->idx + 1;
+	const float d = s - f;
+	const BW_SIZE_T j = (BW_SIZE_T)f;
+	const BW_SIZE_T n = (state->idx + (state->idx >= j ? 0 : coeffs->len)) - j;
+	const BW_SIZE_T p = (n ? n : coeffs->len) - 1;
 	state->buf[state->idx] = x;
-	const float y = state->buf[l] + d * (state->buf[h] - state->buf[l]);
-	state->idx = n;
+	const float y = state->buf[n] + d * (state->buf[p] - state->buf[n]);
+	state->idx++;
+	state->idx = state->idx == coeffs->len ? 0 : state->idx;
 	return y;
 }
 

@@ -180,6 +180,18 @@ static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeff
 	state->idx = 0;
 }
 
+static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, BW_SIZE_T d_int, float d_frac) {
+	const BW_SIZE_T n = (state->idx + (state->idx >= d_int ? 0 : coeffs->len)) - d_int;
+	const BW_SIZE_T p = (n ? n : coeffs->len) - 1;
+	return state->buf[n] + d_frac * (state->buf[p] - state->buf[n]);
+}
+
+static void bw_delay_write(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float x) {
+	state->buf[state->idx] = x;
+	state->idx++;
+	state->idx = state->idx == coeffs->len ? 0 : state->idx;
+}
+
 static inline void bw_delay_update_coeffs_ctrl(bw_delay_coeffs *BW_RESTRICT coeffs) {
 }
 
@@ -192,13 +204,8 @@ static inline float bw_delay_process1(const bw_delay_coeffs *BW_RESTRICT coeffs,
 	const float f = bw_floorf(s);
 	const float d = s - f;
 	const BW_SIZE_T j = (BW_SIZE_T)f;
-	const BW_SIZE_T n = (state->idx + (state->idx >= j ? 0 : coeffs->len)) - j;
-	const BW_SIZE_T p = (n ? n : coeffs->len) - 1;
-	state->buf[state->idx] = x;
-	const float y = state->buf[n] + d * (state->buf[p] - state->buf[n]);
-	state->idx++;
-	state->idx = state->idx == coeffs->len ? 0 : state->idx;
-	return y;
+	bw_delay_write(coeffs, state, x);
+	return bw_delay_read(coeffs, state, j, d);
 }
 
 static inline void bw_delay_process(bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {

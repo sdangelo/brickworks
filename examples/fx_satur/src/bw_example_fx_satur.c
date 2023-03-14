@@ -22,19 +22,30 @@
 
 void bw_example_fx_satur_init(bw_example_fx_satur *instance) {
 	bw_satur_init(&instance->satur_coeffs);
+	bw_src_int_init(&instance->src_up_coeffs, 2);
+	bw_src_int_init(&instance->src_down_coeffs, -2);
 }
 
 void bw_example_fx_satur_set_sample_rate(bw_example_fx_satur *instance, float sample_rate) {
-	bw_satur_set_sample_rate(&instance->satur_coeffs, sample_rate);
+	bw_satur_set_sample_rate(&instance->satur_coeffs, 2.f * sample_rate);
 }
 
 void bw_example_fx_satur_reset(bw_example_fx_satur *instance) {
 	bw_satur_reset_coeffs(&instance->satur_coeffs);
 	bw_satur_reset_state(&instance->satur_coeffs, &instance->satur_state);
+	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
+	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }
 
 void bw_example_fx_satur_process(bw_example_fx_satur *instance, const float** x, float** y, int n_samples) {
-	bw_satur_process(&instance->satur_coeffs, &instance->satur_state, x[0], y[0], n_samples);
+	int i = 0;
+	while (i < n_samples) {
+		int n = bw_mini32(n_samples - i, BUF_SIZE >> 1);
+		bw_src_int_process(&instance->src_up_coeffs, &instance->src_up_state, x[0] + i, instance->buf, n);
+		bw_satur_process(&instance->satur_coeffs, &instance->satur_state, instance->buf, instance->buf, n << 1);
+		bw_src_int_process(&instance->src_down_coeffs, &instance->src_down_state, instance->buf, y[0] + i, n << 1);
+		i += n;
+	}
 }
 
 void bw_example_fx_satur_set_parameter(bw_example_fx_satur *instance, int index, float value) {

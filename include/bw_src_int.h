@@ -138,7 +138,7 @@ static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT c
 		state->z2 = state->z1;
 		state->z3 = state->z2;
 		state->z4 = state->z3;
-		state->i = -coeffs->ratio;
+		state->i = 1;
 	} else {
 		// DF-I
 		state->z1 = x0;
@@ -153,7 +153,7 @@ static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT c
 }
 
 static inline int bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT state, const float *x, float *y, int n_in_samples) {
-	n = 0;
+	int n = 0;
 	if (coeffs->ratio < 0) {
 		for (int i = 0; i < n_in_samples; i++) {
 			// DF-II

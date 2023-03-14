@@ -31,6 +31,7 @@ code:
 * MEM_REQ_ROUGH() macro?
 * use BW_SIZE_T, check constant types
 * web examples: need to export memset?
+* cite papers, thank authors
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -110,10 +110,6 @@ struct _bw_src_int_state {
 	float	z2;
 	float	z3;
 	float	z4;
-	float	xz1;
-	float	xz2;
-	float	xz3;
-	float	xz4;
 };
 
 static inline void bw_src_int_init(bw_src_int_coeffs *BW_RESTRICT coeffs, int ratio) {
@@ -140,15 +136,11 @@ static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT c
 		state->z4 = state->z3;
 		state->i = 1;
 	} else {
-		// DF-I
-		state->z1 = x0;
-		state->z2 = x0;
-		state->z3 = x0;
-		state->z4 = x0;
-		state->xz1 = x0;
-		state->xz2 = x0;
-		state->xz3 = x0;
-		state->xz4 = x0;
+		// TDF-II
+		state->z4 = (coeffs->b4 - coeffs->a4) * x0;
+		state->z3 = (coeffs->b3 - coeffs->a3) * x0 + state->z4;
+		state->z2 = (coeffs->b2 - coeffs->a2) * x0 + state->z3;
+		state->z1 = (coeffs->b1 - coeffs->a1) * x0 + state->z2;
 	}
 }
 
@@ -171,18 +163,18 @@ static inline int bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs
 		}
 	} else {
 		for (int i = 0; i < n_in_samples; i++) {
-			// DF-I
-			const float v = coeffs->b0 * x[i] + coeffs->b1 * state->xz1 + coeffs->b2 * state->xz2 + coeffs->b3 * state->xz3 + coeffs->b4 * state->xz4;
-			state->xz4 = state->xz3;
-			state->xz3 = state->xz2;
-			state->xz2 = state->xz1;
-			state->xz1 = x[i];
+			// TDF-II
+			const float v0 = coeffs->b0 * x[i];
+			const float v1 = coeffs->b1 * x[i];
+			const float v2 = coeffs->b2 * x[i];
+			const float v3 = coeffs->b3 * x[i];
+			const float v4 = coeffs->b4 * x[i];
 			for (int j = 0; j < coeffs->ratio; j++) {
-				y[n] = v - coeffs->a1 * state->z1 - coeffs->a2 * state->z2 - coeffs->a3 * state->z3 - coeffs->a4 * state->z4;
-				state->z4 = state->z3;
-				state->z3 = state->z2;
-				state->z2 = state->z1;
-				state->z1 = y[n];
+				y[n] = v0 + state->z1;
+				state->z1 = v1 - coeffs->a1 * y[n] + state->z2;
+				state->z2 = v2 - coeffs->a2 * y[n] + state->z3;
+				state->z3 = v3 - coeffs->a3 * y[n] + state->z4;
+				state->z4 = v4 - coeffs->a4 * y[n];
 				n++;
 			}
 		}

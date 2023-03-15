@@ -33,6 +33,7 @@ code:
 * web examples: need to export memset?
 * bw_satur gain compensation to divide by actual gain (derivative) rather than gain parameter?
 * cite papers, thank authors
+* process1 and multi-channel
 
 build system:
 * make makefiles handle paths with spaces etc

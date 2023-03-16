@@ -86,7 +86,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 #include <bw_math.h>
 
 struct _bw_src_coeffs {
-	float	r;
+	float	k;
 	float	a1;
 	float	a2;
 	float	a3;
@@ -125,7 +125,7 @@ static inline void bw_src_init(bw_src_coeffs *BW_RESTRICT coeffs, float ratio) {
 }
 
 static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, float x0) {
-	if (coeffs->ratio < 0) {
+	if (coeffs->k < 0) {
 		// DF-II
 		state->z1 = x0 / (1.f + coeffs->a1 + coeffs->a2 + coeffs->a3 + coeffs->a4);
 		state->z2 = state->z1;
@@ -159,7 +159,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				const float k1 = state->xz2 - state->xz1;
 				const float k2 = 0.333333333333333f * (o - state->xz3);
 				const float k3 = o + k1;
-				const float k4 = k1 + o -> state->xz1;
+				const float k4 = k3 - state->xz1;
 				const float a = k4 + 0.5f * k4 + k2;
 				const float b = k3 + k1 - 0.5f * (state->xz1 + state->xz3);
 				const float c = 0.5f * (k1 + k2);
@@ -178,7 +178,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 		}
 	} else {
 		while (i < *n_in_samples && j < *n_out_samples) {
-			for (int j = 0; j < coeffs->ratio; j++) {
+			while (state->i < 1.f && j < *n_out_samples) {
 				// 3rd degree Lagrange interpolation + Horner's rule
 				const float k1 = state->xz2 - state->xz1;
 				const float k2 = 0.333333333333333f * (x[i] - state->xz3);
@@ -197,15 +197,17 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				state->i += coeffs->k;
 				j++;
 			}
-			state->xz3 = state->xz2;
-			state->xz2 = state->xz1;
-			state->xz1 = x[i];
-			state->i -= 1.f;
-			i++;
+			if (state->i >= 1.f) {
+				state->xz3 = state->xz2;
+				state->xz2 = state->xz1;
+				state->xz1 = x[i];
+				state->i -= 1.f;
+				i++;
+			}
 		}
 	}
 	*n_in_samples = i;
-	*n_out_sample = j;
+	*n_out_samples = j;
 }
 
 #ifdef __cplusplus

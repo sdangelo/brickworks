@@ -100,6 +100,7 @@ build system:
 * VC, XCode, etc project files?
 * single header(s)
 * cross compile (rpi etc.)
+* consider tuist (https://tuist.io/), bazel (https://bazel.build/), pants (https://www.pantsbuild.org/), buck (https://buck2.build/), please (https://please.build/index.html) for mobile apps
 
 --
 

@@ -129,15 +129,14 @@ static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, b
 		state->z2 = state->z1;
 		state->z3 = state->z2;
 		state->z4 = state->z3;
-		state->i = 1.f;
 	} else {
 		// TDF-II
 		state->z4 = (coeffs->b4 - coeffs->a4) * x0;
 		state->z3 = (coeffs->b3 - coeffs->a3) * x0 + state->z4;
 		state->z2 = (coeffs->b2 - coeffs->a2) * x0 + state->z3;
 		state->z1 = (coeffs->b1 - coeffs->a1) * x0 + state->z2;
-		state->i = 0.f;
 	}
+	state->i = 0.f;
 	state->xz1 = x0;
 	state->xz2 = x0;
 	state->xz3 = x0;
@@ -151,7 +150,6 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 			// DF-II
 			const float z0 = x[i] - coeffs->a1 * state->z1 - coeffs->a2 * state->z2 - coeffs->a3 * state->z3 - coeffs->a4 * state->z4;
 			const float o = coeffs->b0 * z0 + coeffs->b1 * state->z1 + coeffs->b2 * state->z2 + coeffs->b3 * state->z3 + coeffs->b4 * state->z4;
-			state->i -= 1.f;
 			if (state->i <= 0.f) {
 				// 3rd degree Lagrange interpolation + Horner's rule
 				const float k1 = state->xz2 - state->xz1;
@@ -165,6 +163,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				state->i -= coeffs->k;
 				j++;
 			}
+			state->i -= 1.f;
 			state->z4 = state->z3;
 			state->z3 = state->z2;
 			state->z2 = state->z1;

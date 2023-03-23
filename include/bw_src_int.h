@@ -132,7 +132,7 @@ static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT c
 		state->z2 = state->z1;
 		state->z3 = state->z2;
 		state->z4 = state->z3;
-		state->i = 1;
+		state->i = 0;
 	} else {
 		// TDF-II
 		state->z4 = (coeffs->b4 - coeffs->a4) * x0;
@@ -148,12 +148,12 @@ static inline int bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs
 		for (int i = 0; i < n_in_samples; i++) {
 			// DF-II
 			const float z0 = x[i] - coeffs->a1 * state->z1 - coeffs->a2 * state->z2 - coeffs->a3 * state->z3 - coeffs->a4 * state->z4;
-			state->i--;
 			if (!state->i) {
 				state->i = -coeffs->ratio;
 				y[n] = coeffs->b0 * z0 + coeffs->b1 * state->z1 + coeffs->b2 * state->z2 + coeffs->b3 * state->z3 + coeffs->b4 * state->z4;
 				n++;
 			}
+			state->i--;
 			state->z4 = state->z3;
 			state->z3 = state->z2;
 			state->z2 = state->z1;

@@ -49,7 +49,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    A collection of mathematical routines that strive to be better suited to
@@ -72,7 +72,8 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added `bw_ceilf()`.</li>
+ *          <li>Added `bw_ceilf()`, `bw_sinhf_3()`, `bw_coshf_3()`,
+ *              `bw_asinhf_3()`, and `bw_acoshf_3()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
@@ -418,6 +419,38 @@ static inline float bw_tanhf_3(float x);
  *    Returns an approximation of the hyperbolic tangent of `x`.
  *
  *    Absolute error < 0.035, relative error < 6.5%.
+ *
+ *    #### bw_sinhf_3()
+ *  ```>>> */
+static inline float bw_sinhf_3(float x);
+/*! <<<```
+ *    Returns an approximation of the hyperbolic sine of `x`.
+ *
+ *    Relative error < 0.07%.
+ *
+ *    #### bw_coshf_3()
+ *  ```>>> */
+static inline float bw_coshf_3(float x);
+/*! <<<```
+ *    Returns an approximation of the hyperbolic cosine of `x`.
+ *
+ *    Relative error < 0.07%.
+ *
+ *    #### bw_asinhf_3()
+ *  ```>>> */
+static inline float bw_asinhf_3(float x);
+/*! <<<```
+ *    Returns an approximation of the hyperbolic arcsine of `x`.
+ *
+ *    Absolute error < 0.004, relative error < 1.2%.
+ *
+ *    #### bw_acoshf_3()
+ *  ```>>> */
+static inline float bw_acoshf_3(float x);
+/*! <<<```
+ *    Returns an approximation of the hyperbolic arccosine of `x`.
+ *
+ *    Absolute error < 0.004, relative error < 0.8%.
  *  }}} */
 
 /*** Implementation ***/
@@ -655,6 +688,23 @@ static inline float bw_tanhf_3(float x) {
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
 	return xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
+}
+
+static inline float bw_sinhf_3(float x) {
+	return 0.5f * (bw_expf_3(x) - bw_expf_3(-x));
+}
+
+static inline float bw_coshf_3(float x) {
+	return 0.5f * (bw_expf_3(x) + bw_expf_3(-x));
+}
+
+static inline float bw_asinhf_3(float x) {
+	float a = bw_absf(x);
+	return bw_copysignf(bw_logf_3(bw_sqrtf_2(a * a + 1.f) + a), x);
+}
+
+static inline float bw_acoshf_3(float x) {
+	return x == 0.f ? 0.f : bw_logf_3(bw_sqrtf_2(x * x + 1.f) + x);
 }
 
 #ifdef __cplusplus

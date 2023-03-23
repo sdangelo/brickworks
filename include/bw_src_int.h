@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math }}}
+ *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Integer-ratio IIR sample rate converter.
  *
@@ -88,8 +88,6 @@ static inline int bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
-
-#include <bw_math.h>
 
 struct _bw_src_int_coeffs {
 	int	ratio;

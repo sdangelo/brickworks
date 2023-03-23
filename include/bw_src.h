@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math }}}
+ *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Aribtrary-ratio IIR sample rate converter.
  *  }}}
@@ -83,8 +83,6 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-#include <bw_math.h>
-
 struct _bw_src_coeffs {
 	float	k;
 	float	a1;
@@ -110,9 +108,9 @@ struct _bw_src_state {
 };
 
 static inline void bw_src_init(bw_src_coeffs *BW_RESTRICT coeffs, float ratio) {
-	coeffs->k = ratio >= 0.f ? 1.f / ratio : ratio;
+	coeffs->k = ratio >= 1.f ? 1.f / ratio : -1.f / ratio;
 	// TODO: better filter, perhaps optimzied coefficients
-	ratio = bw_absf(ratio);
+	ratio = ratio >= 1.f ? ratio : -coeffs->k;
 	coeffs->a1 = (12.56637061435917f - 8.f * ratio) / (2.f * ratio + 3.141592653589793f);
 	coeffs->a2 = (ratio * (24.f * ratio - 75.39822368615503f) + 59.21762640653615f) / (ratio * (4.f * ratio + 12.56637061435917f) + 9.869604401089358f);
 	coeffs->a3 = (ratio * ((150.7964473723101f - 32.f * ratio) * ratio - 236.8705056261446f) + 124.0251067211993f) / (ratio * (ratio * (8.f * ratio + 37.69911184307752f) + 59.21762640653615f) + 31.00627668029982f);

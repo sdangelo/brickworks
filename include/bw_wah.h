@@ -31,6 +31,8 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
+ *          <li>Now specifying `0.f` as initial input value for
+ *              `bw_svf_reset_state()`.</li>
  *          <li>Fixed documentation for `bw_wah_state` and `bw_wah_reset_state()`.</li>
  *        </ul>
  *      </li>
@@ -163,7 +165,7 @@ static inline void bw_wah_reset_coeffs(bw_wah_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_wah_reset_state(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state) {
-	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state);
+	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, 0.f);
 }
 
 static inline void bw_wah_update_coeffs_ctrl(bw_wah_coeffs *BW_RESTRICT coeffs) {

@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{
  *    bw_config bw_common bw_gain bw_math bw_mm2 bw_one_pole bw_svf
  *  }}}
@@ -29,6 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Added initial input value to `bw_hs2_reset_state()`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -80,9 +85,10 @@ static inline void bw_hs2_reset_coeffs(bw_hs2_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_hs2_reset_state()
  *  ```>>> */
-static inline void bw_hs2_reset_state(const bw_hs2_coeffs *BW_RESTRICT coeffs, bw_hs2_state *BW_RESTRICT state);
+static inline void bw_hs2_reset_state(const bw_hs2_coeffs *BW_RESTRICT coeffs, bw_hs2_state *BW_RESTRICT state, float x0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x0`.
  *
  *    #### bw_hs2_update_coeffs_ctrl()
  *  ```>>> */
@@ -210,8 +216,8 @@ static inline void bw_hs2_reset_coeffs(bw_hs2_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_reset_coeffs(&coeffs->mm2_coeffs);
 }
 
-static inline void bw_hs2_reset_state(const bw_hs2_coeffs *BW_RESTRICT coeffs, bw_hs2_state *BW_RESTRICT state) {
-	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state);
+static inline void bw_hs2_reset_state(const bw_hs2_coeffs *BW_RESTRICT coeffs, bw_hs2_state *BW_RESTRICT state, float x0) {
+	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state, x0);
 }
 
 static inline void bw_hs2_update_coeffs_ctrl(bw_hs2_coeffs *BW_RESTRICT coeffs) {

@@ -30,7 +30,7 @@ void bw_example_fx_notch_set_sample_rate(bw_example_fx_notch *instance, float sa
 
 void bw_example_fx_notch_reset(bw_example_fx_notch *instance) {
 	bw_notch_reset_coeffs(&instance->notch_coeffs);
-	bw_notch_reset_state(&instance->notch_coeffs, &instance->notch_state);
+	bw_notch_reset_state(&instance->notch_coeffs, &instance->notch_state, 0.f);
 }
 
 void bw_example_fx_notch_process(bw_example_fx_notch *instance, const float** x, float** y, int n_samples) {

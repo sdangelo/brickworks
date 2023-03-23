@@ -34,11 +34,11 @@ void bw_example_fx_eq_3band_set_sample_rate(bw_example_fx_eq_3band *instance, fl
 
 void bw_example_fx_eq_3band_reset(bw_example_fx_eq_3band *instance) {
 	bw_ls2_reset_coeffs(&instance->ls2_coeffs);
-	bw_ls2_reset_state(&instance->ls2_coeffs, &instance->ls2_state);
+	bw_ls2_reset_state(&instance->ls2_coeffs, &instance->ls2_state, 0.f);
 	bw_peak_reset_coeffs(&instance->peak_coeffs);
-	bw_peak_reset_state(&instance->peak_coeffs, &instance->peak_state);
+	bw_peak_reset_state(&instance->peak_coeffs, &instance->peak_state, 0.f);
 	bw_hs2_reset_coeffs(&instance->hs2_coeffs);
-	bw_hs2_reset_state(&instance->hs2_coeffs, &instance->hs2_state);
+	bw_hs2_reset_state(&instance->hs2_coeffs, &instance->hs2_state, 0.f);
 }
 
 void bw_example_fx_eq_3band_process(bw_example_fx_eq_3band *instance, const float** x, float** y, int n_samples) {

@@ -111,7 +111,7 @@ void bw_example_synth_mono_reset(bw_example_synth_mono *instance) {
 	bw_env_gen_reset_coeffs(&instance->vcf_env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state);
 	bw_svf_reset_coeffs(&instance->vcf_coeffs);
-	bw_svf_reset_state(&instance->vcf_coeffs, &instance->vcf_state);
+	bw_svf_reset_state(&instance->vcf_coeffs, &instance->vcf_state, 0.f);
 	bw_env_gen_reset_coeffs(&instance->vca_env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->vca_env_gen_coeffs, &instance->vca_env_gen_state);
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);

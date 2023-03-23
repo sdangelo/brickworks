@@ -30,7 +30,7 @@ void bw_example_fx_mm2_set_sample_rate(bw_example_fx_mm2 *instance, float sample
 
 void bw_example_fx_mm2_reset(bw_example_fx_mm2 *instance) {
 	bw_mm2_reset_coeffs(&instance->mm2_coeffs);
-	bw_mm2_reset_state(&instance->mm2_coeffs, &instance->mm2_state);
+	bw_mm2_reset_state(&instance->mm2_coeffs, &instance->mm2_state, 0.f);
 }
 
 void bw_example_fx_mm2_process(bw_example_fx_mm2 *instance, const float** x, float** y, int n_samples) {

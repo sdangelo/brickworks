@@ -163,7 +163,6 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				state->i += coeffs->k;
 				j++;
 			}
-			state->i += 1.f;
 			state->z4 = state->z3;
 			state->z3 = state->z2;
 			state->z2 = state->z1;
@@ -171,6 +170,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 			state->xz3 = state->xz2;
 			state->xz2 = state->xz1;
 			state->xz1 = o;
+			state->i += 1.f;
 			i++;
 		}
 	} else {
@@ -181,7 +181,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				const float k2 = 0.333333333333333f * (x[i] - state->xz3);
 				const float k3 = state->xz3 - k1;
 				const float k4 = state->xz2 - k3;
-				const float a = k2 + k4 + 0.5f;
+				const float a = k2 + k4 + 0.5f * k4;
 				const float b = k3 - k1 - 0.5f * (x[i] + state->xz2);
 				const float c = 0.5f * (k1 + k2);
 				const float o = state->xz3 + state->i * (a + state->i * (b + state->i * c));

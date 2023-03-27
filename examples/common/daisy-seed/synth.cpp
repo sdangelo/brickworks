@@ -8,7 +8,8 @@ using namespace daisy;
 
 DaisySeed hardware;
 CpuLoadMeter loadMeter;
-MidiUsbHandler midi;
+MidiUartHandler midi_uart;
+//MidiUsbHandler midi_usb;
 
 P_TYPE instance;
 
@@ -47,7 +48,7 @@ int main() {
 	P_MEM_SET(&instance, (void *)0xC0000000);
 #endif
 	
-//	hardware.StartLog();
+	//hardware.StartLog();
 
 	loadMeter.Init(sample_rate, BLOCK_SIZE);
 
@@ -58,17 +59,29 @@ int main() {
 
 	P_RESET(&instance);
 
-	MidiUsbHandler::Config midi_cfg;
-	midi_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
-	midi.Init(midi_cfg);
-	
+	/*
+	MidiUsbHandler::Config midi_usb_cfg;
+	midi_usb_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
+	midi_usb.Init(midi_usb_cfg);
+	*/
+
+	MidiUartHandler::Config midi_uart_cfg;
+	midi_uart.Init(midi_uart_cfg);
+		
 	hardware.StartAudio(AudioCallback);
+
+	midi_uart.StartReceive();
 	
-//	int i = 0;
+	//int i = 0;
 	while (1) {
-		midi.Listen();
-		while (midi.HasEvents()) {
-			MidiEvent ev = midi.PopEvent();
+		//midi_usb.Listen();
+		midi_uart.Listen();
+		//while (midi_usb.HasEvents() || midi_uart.HasEvents()) {
+		while (midi_uart.HasEvents()) {
+		//while (midi_usb.HasEvents()) {
+			//MidiEvent ev = midi_usb.HasEvents() ? midi_usb.PopEvent() : midi_uart.PopEvent();
+			MidiEvent ev = midi_uart.PopEvent();
+			//MidiEvent ev = midi_usb.PopEvent();
 			switch (ev.type) {
 			case NoteOn:
 			{
@@ -127,7 +140,7 @@ int main() {
 			hardware.PrintLine("Min: " FLT_FMT3, FLT_VAR3(minLoad * 100.0f));
 			i = 0;
 		}
-		*/
 		System::Delay(1);
+		*/
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
  *  description {{{
  *    Antialiased tanh-based saturation with parametric bias and gain
@@ -38,6 +38,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed unused parameter warnings.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -221,11 +226,13 @@ static inline void bw_satur_reset_coeffs(bw_satur_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_satur_reset_state(const bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state *BW_RESTRICT state) {
+	(void)coeffs;
 	state->F_z1 = 0.f;
 	state->x_z1 = 0.f;
 }
 
 static inline void bw_satur_update_coeffs_ctrl(bw_satur_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_satur_update_coeffs_audio(bw_satur_coeffs *BW_RESTRICT coeffs) {

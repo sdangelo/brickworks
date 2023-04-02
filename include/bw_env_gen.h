@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
  *  description {{{
  *    Linear ADSR envelope generator.
@@ -40,6 +40,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed unused parameter warnings.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Avoid a warning related to a potentially uninitialized
@@ -277,6 +282,7 @@ static inline void bw_env_gen_reset_coeffs(bw_env_gen_coeffs *BW_RESTRICT coeffs
 }
 
 static inline void bw_env_gen_reset_state(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state) {
+	(void)coeffs;
 	state->phase = bw_env_gen_phase_off;
 	state->y_z1 = 0.f;
 }
@@ -294,6 +300,7 @@ static inline void bw_env_gen_update_coeffs_ctrl(bw_env_gen_coeffs *BW_RESTRICT 
 }
 
 static inline void bw_env_gen_update_coeffs_audio(bw_env_gen_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_env_gen_update_state_ctrl(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state) {

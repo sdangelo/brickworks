@@ -132,6 +132,8 @@ void bw_example_synth_mono_process(bw_example_synth_mono *instance, const float*
 	// it's all good as long as hosts gives us buffers whose length is a multiple of 32,
 	// otherwise it's probably still ok but a bit "swingy"
 	
+	(void)x;
+	
 	bw_env_gen_set_gate(&instance->vcf_env_gen_coeffs, instance->gate);
 	bw_env_gen_set_gate(&instance->vca_env_gen_coeffs, instance->gate);
 	
@@ -334,14 +336,14 @@ void bw_example_synth_mono_note_on(bw_example_synth_mono *instance, char note, c
 	if (velocity == 0)
 		bw_example_synth_mono_note_off(instance, note);
 	else {
-		instance->notes_pressed[note] = 1;
+		instance->notes_pressed[(int)note] = 1;
 		update_note_gate(instance);
 	}
 }
 
 void bw_example_synth_mono_note_off(bw_example_synth_mono *instance, char note) {
-	if (instance->notes_pressed[note]) {
-		instance->notes_pressed[note] = 0;
+	if (instance->notes_pressed[(int)note]) {
+		instance->notes_pressed[(int)note] = 0;
 		update_note_gate(instance);
 	}
 }

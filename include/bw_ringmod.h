@@ -142,6 +142,7 @@ static inline void bw_ringmod_reset_coeffs(bw_ringmod_coeffs *BW_RESTRICT coeffs
 }
 
 static inline void bw_ringmod_update_coeffs_ctrl(bw_ringmod_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_ringmod_update_coeffs_audio(bw_ringmod_coeffs *BW_RESTRICT coeffs) {

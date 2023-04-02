@@ -6,7 +6,9 @@ CFLAGS := \
 	--target=wasm32 \
 	-flto \
 	-fvisibility=hidden \
-	-Ofast
+	-Ofast \
+	-Wall \
+	-Wunused-parameter
 LDFLAGS := \
 	-Wl,--allow-undefined \
 	-Wl,--no-entry \

@@ -17,7 +17,6 @@ code:
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * avoid "force" in coeffs update by using inline functions?
 * should rather use backward Euler in bw_onepole?
-* treat unused variable/function warnings
 * csch for bw_peak bandwidth -> Q, inv sqrt ls2 hs2
 * sample rate-constant coeffs? (pan case)
 * pan process with no out: should just reset coeffs?

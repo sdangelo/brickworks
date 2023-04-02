@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Pinking filter.
@@ -34,6 +34,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed unused parameter warnings.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Fixed <code>bw_pink_filt_set_sample_rate_scaling()</code>
@@ -168,6 +173,7 @@ static inline void bw_pink_filt_set_sample_rate(bw_pink_filt_coeffs *BW_RESTRICT
 }
 
 static inline void bw_pink_filt_reset_state(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state) {
+	(void)coeffs;
 	state->s1_z1 = 0.f;
 	state->s2_z1 = 0.f;
 	state->s3_z1 = 0.f;
@@ -175,6 +181,7 @@ static inline void bw_pink_filt_reset_state(const bw_pink_filt_coeffs *BW_RESTRI
 }
 
 static inline float bw_pink_filt_process1(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x) {
+	(void)coeffs;
 	const float s1 = 0.320696754235142f * x + state->s1_z1;
 	state->s1_z1 = 0.999760145116749f * s1 - 0.3204568993518913f * x;
 	const float s2 = 0.2870206617007935f * s1 + state->s2_z1;
@@ -187,6 +194,7 @@ static inline float bw_pink_filt_process1(const bw_pink_filt_coeffs *BW_RESTRICT
 }
 
 static inline float bw_pink_filt_process1_scaling(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, float x) {
+	(void)coeffs;
 	return coeffs->scaling_k * bw_pink_filt_process1(coeffs, state, x);
 }
 

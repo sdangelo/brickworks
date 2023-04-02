@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    First-order lowpass filter (6 dB/oct) with unitary DC gain.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed unused parameter warnings.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -216,11 +221,13 @@ static inline void bw_lp1_reset_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state) {
+	(void)coeffs;
 	state->y_z1 = 0.f;
 	state->X_z1 = 0.f;
 }
 
 static inline void bw_lp1_update_coeffs_ctrl(bw_lp1_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_lp1_update_coeffs_audio(bw_lp1_coeffs *BW_RESTRICT coeffs) {

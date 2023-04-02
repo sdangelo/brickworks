@@ -60,6 +60,8 @@ void bw_example_synth_simple_reset(bw_example_synth_simple *instance) {
 }
 
 void bw_example_synth_simple_process(bw_example_synth_simple *instance, const float** x, float** y, int n_samples) {
+	(void)x;
+
 	char gate = instance->note >= 0 ? 1 : 0;
 	bw_env_gen_set_gate(&instance->env_gen_coeffs, gate);
 	if (instance->note >= 0)

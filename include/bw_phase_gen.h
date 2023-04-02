@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -29,6 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed unused parameter warnings.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Added `BW_RESTRICT` to `bw_phase_gen_process1\*()`.</li>
@@ -202,6 +207,7 @@ static inline void bw_phase_gen_reset_coeffs(bw_phase_gen_coeffs *BW_RESTRICT co
 }
 
 static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float phase_0) {
+	(void)coeffs;
 	state->phase = phase_0;
 }
 

@@ -173,6 +173,7 @@ static inline void bw_delay_mem_set(bw_delay_state *BW_RESTRICT state, void *mem
 }
 
 static inline void bw_delay_reset_coeffs(bw_delay_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state) {
@@ -193,9 +194,11 @@ static void bw_delay_write(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_s
 }
 
 static inline void bw_delay_update_coeffs_ctrl(bw_delay_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_delay_update_coeffs_audio(bw_delay_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline float bw_delay_process1(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float x) {

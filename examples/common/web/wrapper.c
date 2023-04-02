@@ -115,6 +115,7 @@ float *wrapper_get_ins(wrapper w) {
 #if NUM_BUSES_IN != 0
 	return w->ins;
 #else
+	(void)w;
 	return NULL;
 #endif
 }
@@ -123,6 +124,7 @@ float *wrapper_get_outs(wrapper w) {
 #if NUM_BUSES_OUT != 0
 	return w->outs;
 #else
+	(void)w;
 	return NULL;
 #endif
 }
@@ -131,6 +133,7 @@ float *wrapper_get_param_values(wrapper w) {
 #if NUM_PARAMETERS != 0
 	return w->param_values;
 #else
+	(void)w;
 	return NULL;
 #endif
 }
@@ -158,29 +161,46 @@ void wrapper_set_parameter(wrapper w, int index, float value) {
 #if NUM_PARAMETERS != 0
 	P_SET_PARAMETER(&w->instance, index, value);
 	w->param_values[index] = value;
+#else
+	(void)w;
+	(void)index;
+	(void)value;
 #endif
 }
 
 void wrapper_note_on(wrapper w, int note, int velocity) {
 #ifdef P_NOTE_ON
 	P_NOTE_ON(&w->instance, note, velocity);
+#else
+	(void)w;
+	(void)note;
+	(void)velocity;
 #endif
 }
 
 void wrapper_note_off(wrapper w, int note) {
 #ifdef P_NOTE_OFF
 	P_NOTE_OFF(&w->instance, note);
+#else
+	(void)w;
+	(void)note;
 #endif
 }
 
 void wrapper_pitch_bend(wrapper w, int bend) {
 #ifdef P_PITCH_BEND
 	P_PITCH_BEND(&w->instance, bend);
+#else
+	(void)w;
+	(void)bend;
 #endif
 }
 
 void wrapper_mod_wheel(wrapper w, int wheel) {
 #ifdef P_MOD_WHEEL
 	P_MOD_WHEEL(&w->instance, wheel);
+#else
+	(void)w;
+	(void)wheel;
 #endif
 }

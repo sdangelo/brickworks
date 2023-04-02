@@ -31,6 +31,7 @@
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added initial input value to `bw_svf_reset_state()`.</li>
+ *          <li>Fixed unused parameter warnings.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
@@ -264,6 +265,7 @@ static inline void bw_svf_reset_state(const bw_svf_coeffs *BW_RESTRICT coeffs, b
 }
 
 static inline void bw_svf_update_coeffs_ctrl(bw_svf_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline void bw_svf_update_coeffs_audio(bw_svf_coeffs *BW_RESTRICT coeffs) {

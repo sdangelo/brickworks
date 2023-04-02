@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_math }}}
  *  description {{{
  *    Sawtooth oscillator waveshaper with PolyBLEP antialiasing.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Fixed unused parameter warnings.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -118,6 +123,7 @@ static inline void bw_osc_saw_init(bw_osc_saw_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline float bw_osc_saw_process1(const bw_osc_saw_coeffs *BW_RESTRICT coeffs, float x) {
+	(void)coeffs;
 	return x + x - 1.f;
 }
 
@@ -129,6 +135,7 @@ static inline float _bw_osc_saw_blep_diff(float x) {
 }
 
 static inline float bw_osc_saw_process1_antialias(const bw_osc_saw_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc) {
+	(void)coeffs;
 	const float s_1_m_phase = 1.f - x;
 	float v = x - s_1_m_phase;
 	if (x_phase_inc != 0.f) {

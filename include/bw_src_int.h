@@ -73,8 +73,8 @@ static inline void bw_src_int_init(bw_src_int_coeffs *BW_RESTRICT coeffs, int ra
  *    If `ratio` is positive, then the sample rate of the output signal will be
  *    `ratio` times the sample rate of the input signal, otherwise, if it is
  *    negative, then the sample rate of the output signal will be equal to the
- *    sample rate of the input signal divided by `-ratio`. `ratio` must not be
- *    `0`.
+ *    sample rate of the input signal divided by `-ratio`. `ratio` *MUST NOT* be
+ *    in [`-1`, `1`].
  *
  *    #### bw_src_int_reset_state()
  *  ```>>> */
@@ -127,7 +127,7 @@ static inline void bw_src_int_init(bw_src_int_coeffs *BW_RESTRICT coeffs, int ra
 	coeffs->ratio = ratio;
 	// 4th-degree Butterworth with cutoff at ratio * Nyquist, using bilinear transform w/ prewarping
 	const float fc = (float)(ratio >= 0 ? ratio : -ratio);
-	const float T = bw_tanf_3(0.785398163397448f / (float)fc);
+	const float T = bw_tanf_3(1.570796326794896f / (float)fc);
 	const float T2 = T * T;
 	const float k = 1.f / (T * (T * (T * (T + 2.613125929752753f) + 3.414213562373095f) + 2.613125929752753f) + 1.f);
 	coeffs->b0 = T2 * T2;

@@ -121,7 +121,7 @@ static inline void bw_src_init(bw_src_coeffs *BW_RESTRICT coeffs, float ratio) {
 	coeffs->k = ratio >= 1.f ? 1.f / ratio : -1.f / ratio;
 	// 4th-degree Butterworth with cutoff at ratio * Nyquist, using bilinear transform w/ prewarping
 	const float fc = bw_minf((float)(ratio >= 1.f ? 1.f / ratio : ratio), 0.9f);
-	const float T = bw_tanf_3(1.570796326794896f / (float)fc);
+	const float T = bw_tanf_3(1.570796326794896f * (float)fc);
 	const float T2 = T * T;
 	const float k = 1.f / (T * (T * (T * (T + 2.613125929752753f) + 3.414213562373095f) + 2.613125929752753f) + 1.f);
 	coeffs->b0 = k * T2 * T2;
@@ -201,9 +201,9 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				const float v1 = coeffs->b1 * o;
 				const float v2 = coeffs->b2 * o;
 				y[j] = v0 + state->z1;
-				state->z1 = v1 * o - coeffs->a1 * y[j] + state->z2;
+				state->z1 = v1 - coeffs->a1 * y[j] + state->z2;
 				state->z2 = coeffs->b2 * o - coeffs->a2 * y[j] + state->z3;
-				state->z3 = v1 * o - coeffs->a3 * y[j] + state->z4;
+				state->z3 = v1 - coeffs->a3 * y[j] + state->z4;
 				state->z4 = v0 - coeffs->a4 * y[j];
 				state->i += coeffs->k;
 				j++;

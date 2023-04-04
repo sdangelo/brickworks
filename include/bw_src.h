@@ -124,7 +124,7 @@ static inline void bw_src_init(bw_src_coeffs *BW_RESTRICT coeffs, float ratio) {
 	const float T = bw_tanf_3(1.570796326794896f / (float)fc);
 	const float T2 = T * T;
 	const float k = 1.f / (T * (T * (T * (T + 2.613125929752753f) + 3.414213562373095f) + 2.613125929752753f) + 1.f);
-	coeffs->b0 = T2 * T2;
+	coeffs->b0 = k * T2 * T2;
 	coeffs->b1 = 4.f * coeffs->b0;
 	coeffs->b2 = 6.f * coeffs->b0;
 	coeffs->a1 = k * (T * (T2 * (4.f * T + 5.226251859505504f) - 5.226251859505504f) - 4.f);

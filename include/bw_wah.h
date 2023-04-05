@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_one_pole bw_math bw_svf }}}
+ *  requires {{{ bw_config bw_common bw_math bw_one_pole bw_svf }}}
  *  description {{{
  *    Wah effect.
  *
@@ -33,7 +33,8 @@
  *        <ul>
  *          <li>Now specifying `0.f` as initial input value for
  *              `bw_svf_reset_state()`.</li>
- *          <li>Fixed documentation for `bw_wah_state` and `bw_wah_reset_state()`.</li>
+ *          <li>Fixed documentation for `bw_wah_state`, `bw_wah_reset_state()`,
+ *              and `bw_wah_process()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
@@ -115,7 +116,7 @@ static inline float bw_wah_process1(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. Returns the corresponding output sample.
  *
- *    #### bw_env_follow_process()
+ *    #### bw_wah_process()
  *  ```>>> */
 static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```

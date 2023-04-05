@@ -72,8 +72,8 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added `bw_ceilf()`, `bw_sinhf_3()`, `bw_coshf_3()`,
- *              `bw_asinhf_3()`, and `bw_acoshf_3()`.</li>
+ *          <li>Added `bw_ceilf()`, `bw_intfracf()`, `bw_sinhf_3()`,
+ *              `bw_coshf_3()`, `bw_asinhf_3()`, and `bw_acoshf_3()`.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
@@ -240,6 +240,13 @@ static inline float bw_ceilf(float x);
 /*! <<<```
  *    Returns the smallest integer greater or equal than `x` (i.e., `x` is
  *    rounded up).
+ *
+ *    #### bw_intfracf()
+ *  ```>>> */
+static inline void bw_intfracf(float x, float *i, float *f);
+/*! <<<```
+ *    Puts the integer part (floor) of `x` in `i` and the fractional part in
+ *    `f`.
  *
  *    #### bw_rcpf_2()
  *  ```>>> */
@@ -574,6 +581,11 @@ static inline float bw_ceilf(float x) {
 	_bw_floatint s = {.f = 1.f};
 	s.i &= bw_signfilli32(~t.i & y.i);
 	return t.f + s.f;
+}
+
+static inline void bw_intfracf(float x, float *i, float *f) {
+	*i = bw_floorf(x);
+	*f = x - *i;
 }
 
 static inline float bw_rcpf_2(float x) {

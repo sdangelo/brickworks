@@ -36,6 +36,8 @@ code:
 * add initial state (x0) to reset state of lp1, ap1, mm1, hs1, ls1, others? all?
 * multichannel process (multiple buffers, non interleaved)
 * check unused param warning visual studio
+* bw_comb: should also modulate feedback?
+* bw_comb: integer target delay values?
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -39,9 +39,6 @@ struct _bw_example_fx_delay {
 
 	// Parameters
 	float		 params[p_n];
-
-	// Memory
-	void		*mem;
 };
 typedef struct _bw_example_fx_delay bw_example_fx_delay;
 

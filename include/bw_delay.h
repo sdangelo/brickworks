@@ -153,7 +153,7 @@ static inline void bw_delay_set_delay(bw_delay_coeffs *BW_RESTRICT coeffs, float
  *
  *    #### bw_delay_get_length()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_get_length(bw_delay_coeffs *BW_RESTRICT coeffs);
+static inline BW_SIZE_T bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the length of the delay line in samples.
  *  }}} */
@@ -220,9 +220,9 @@ static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, const bw_d
 }
 
 static void bw_delay_write(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float x) {
-	state->buf[state->idx] = x;
 	state->idx++;
 	state->idx = state->idx == coeffs->len ? 0 : state->idx;
+	state->buf[state->idx] = x;
 }
 
 static inline void bw_delay_update_coeffs_ctrl(bw_delay_coeffs *BW_RESTRICT coeffs) {
@@ -256,7 +256,7 @@ static inline void bw_delay_set_delay(bw_delay_coeffs *BW_RESTRICT coeffs, float
 	}
 }
 
-static inline BW_SIZE_T bw_delay_get_length(bw_delay_coeffs *BW_RESTRICT coeffs) {
+static inline BW_SIZE_T bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->len;
 }
 

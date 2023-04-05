@@ -80,16 +80,16 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    ### bw_delay_mem_req()
+ *    ### bw_comb_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs);
+static inline BW_SIZE_T bw_comb_mem_req(bw_comb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_delay_mem_set()` using `coeffs`.
  *
- *    ### bw_delay_mem_set()
+ *    ### bw_comb_mem_set()
  *  ```>>> */
-static inline void bw_delay_mem_set(bw_delay_state *BW_RESTRICT state, void *mem);
+static inline void bw_comb_mem_set(bw_comb_state *BW_RESTRICT state, void *mem);
 /*! <<<```
  *    Associates the contiguous memory block `mem` to the given `state`.
  *
@@ -153,9 +153,9 @@ static inline void bw_comb_set_delay_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
  *
  *    Default value: `0.f`.
  *
- *    #### bw_comb_set_blend()
+ *    #### bw_comb_set_coeff_blend()
  *  ```>>> */
-static inline void bw_mm1_set_coeff_blend(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comb_set_coeff_blend(bw_comb_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the blend coefficient `value` in `coeffs`.
  *
@@ -163,7 +163,7 @@ static inline void bw_mm1_set_coeff_blend(bw_mm1_coeffs *BW_RESTRICT coeffs, flo
  *
  *    #### bw_comb_set_coeff_ff()
  *  ```>>> */
-static inline void bw_mm1_set_coeff_ff(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comb_set_coeff_ff(bw_comb_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the feedforward coefficient `value` in `coeffs`.
  *
@@ -171,7 +171,7 @@ static inline void bw_mm1_set_coeff_ff(bw_mm1_coeffs *BW_RESTRICT coeffs, float 
  *
  *    #### bw_comb_set_coeff_fb()
  *  ```>>> */
-static inline void bw_mm1_set_coeff_fb(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the feedback coefficient `value` in `coeffs`.
  *
@@ -185,17 +185,18 @@ static inline void bw_mm1_set_coeff_fb(bw_mm1_coeffs *BW_RESTRICT coeffs, float 
 
 #include <bw_delay.h>
 #include <bw_gain.h>
+#include <bw_one_pole.h>
 #include <bw_math.h>
 
 struct _bw_comb_coeffs {
 	// Sub-components
-	bw_delay_coeffs	delay_coeffs;
-	bw_gain_coeffs	blend_coeffs;
-	bw_gain_coeffs	ff_coeffs;
-	bw_gain_coeffs	fb_coeffs;
-	bw_one_pole	smooth_coeffs;
-	bw_one_pole	smooth_delay_ff_state;
-	bw_one_pole	smooth_delay_fb_state;
+	bw_delay_coeffs		delay_coeffs;
+	bw_gain_coeffs		blend_coeffs;
+	bw_gain_coeffs		ff_coeffs;
+	bw_gain_coeffs		fb_coeffs;
+	bw_one_pole_coeffs	smooth_coeffs;
+	bw_one_pole_state	smooth_delay_ff_state;
+	bw_one_pole_state	smooth_delay_fb_state;
 
 	// Coefficients
 	float		fs;
@@ -219,7 +220,7 @@ static inline void bw_comb_init(bw_comb_coeffs *BW_RESTRICT coeffs, float max_de
 	bw_gain_init(&coeffs->ff_coeffs);
 	bw_gain_init(&coeffs->fb_coeffs);
 	bw_one_pole_init(&coeffs->smooth_coeffs);
-	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
+	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	bw_gain_set_gain_lin(&coeffs->ff_coeffs, 0.f);
 	bw_gain_set_gain_lin(&coeffs->fb_coeffs, 0.f);
 	coeffs->delay_ff = 0.f;
@@ -236,11 +237,11 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
 	coeffs->fs = sample_rate;
 }
 
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs) {
+static inline BW_SIZE_T bw_comb_mem_req(bw_comb_coeffs *BW_RESTRICT coeffs) {
 	return bw_delay_mem_req(&coeffs->delay_coeffs);
 }
 
-static inline void bw_delay_mem_set(bw_delay_state *BW_RESTRICT state, void *mem) {
+static inline void bw_comb_mem_set(bw_comb_state *BW_RESTRICT state, void *mem) {
 	bw_delay_mem_set(&state->delay_state, mem);
 }
 
@@ -292,8 +293,8 @@ static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, b
 		dffi = len;
 		dfff = 0.f;
 	}
-	const float fb = bw_delay_read(&coeffs->delay_coeffs, &state->delay_state, dfbi, dfbf);
-	const float v = x + fb;
+	const float fb = bw_delay_read(&coeffs->delay_coeffs, &state->delay_state, coeffs->dfbi, coeffs->dfbf);
+	const float v = x + bw_gain_process1(&coeffs->fb_coeffs, fb);
 	bw_delay_write(&coeffs->delay_coeffs, &state->delay_state, v);
 	const float ff = bw_delay_read(&coeffs->delay_coeffs, &state->delay_state, dffi, dfff);
 	return bw_gain_process1(&coeffs->blend_coeffs, v) + bw_gain_process1(&coeffs->ff_coeffs, ff);
@@ -321,15 +322,15 @@ static inline void bw_comb_set_delay_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
 	coeffs->delay_fb = value;
 }
 
-static inline void bw_mm1_set_coeff_blend(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_comb_set_coeff_blend(bw_comb_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_gain_set_gain_lin(&coeffs->blend_coeffs, value);
 }
 
-static inline void bw_mm1_set_coeff_ff(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_comb_set_coeff_ff(bw_comb_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_gain_set_gain_lin(&coeffs->ff_coeffs, value);
 }
 
-static inline void bw_mm1_set_coeff_fb(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_gain_set_gain_lin(&coeffs->fb_coeffs, value);
 }
 

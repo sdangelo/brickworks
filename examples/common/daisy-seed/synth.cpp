@@ -9,7 +9,7 @@ using namespace daisy;
 DaisySeed hardware;
 CpuLoadMeter loadMeter;
 MidiUartHandler midi_uart;
-//MidiUsbHandler midi_usb;
+MidiUsbHandler midi_usb;
 
 P_TYPE instance;
 
@@ -59,11 +59,9 @@ int main() {
 
 	P_RESET(&instance);
 
-	/*
 	MidiUsbHandler::Config midi_usb_cfg;
 	midi_usb_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
 	midi_usb.Init(midi_usb_cfg);
-	*/
 
 	MidiUartHandler::Config midi_uart_cfg;
 	midi_uart.Init(midi_uart_cfg);
@@ -74,14 +72,10 @@ int main() {
 	
 	//int i = 0;
 	while (1) {
-		//midi_usb.Listen();
+		midi_usb.Listen();
 		midi_uart.Listen();
-		//while (midi_usb.HasEvents() || midi_uart.HasEvents()) {
-		while (midi_uart.HasEvents()) {
-		//while (midi_usb.HasEvents()) {
-			//MidiEvent ev = midi_usb.HasEvents() ? midi_usb.PopEvent() : midi_uart.PopEvent();
-			MidiEvent ev = midi_uart.PopEvent();
-			//MidiEvent ev = midi_usb.PopEvent();
+		while (midi_usb.HasEvents() || midi_uart.HasEvents()) {
+			MidiEvent ev = midi_usb.HasEvents() ? midi_usb.PopEvent() : midi_uart.PopEvent();
 			switch (ev.type) {
 			case NoteOn:
 			{

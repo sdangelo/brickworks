@@ -85,7 +85,7 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
 static inline BW_SIZE_T bw_comb_mem_req(bw_comb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
- *    `bw_delay_mem_set()` using `coeffs`.
+ *    `bw_comb_mem_set()` using `coeffs`.
  *
  *    ### bw_comb_mem_set()
  *  ```>>> */
@@ -250,8 +250,8 @@ static inline void bw_comb_reset_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs) {
 	bw_gain_reset_coeffs(&coeffs->blend_coeffs);
 	bw_gain_reset_coeffs(&coeffs->ff_coeffs);
 	bw_gain_reset_coeffs(&coeffs->fb_coeffs);
-	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->fs * coeffs->delay_ff);
-	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->fs * coeffs->delay_fb);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
 }
 
 static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state) {
@@ -268,10 +268,10 @@ static inline void bw_comb_update_coeffs_audio(bw_comb_coeffs *BW_RESTRICT coeff
 	bw_gain_update_coeffs_audio(&coeffs->blend_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->ff_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->fb_coeffs);
-	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->fs * coeffs->delay_ff);
-	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->fs * coeffs->delay_fb);
+	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
+	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
 	const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
-	const float dfb = bw_maxf(bw_one_pole_get_y_z1(&coeffs->smooth_delay_fb_state), 1.f) - 1.f;
+	const float dfb = bw_maxf(coeffs->fs * bw_one_pole_get_y_z1(&coeffs->smooth_delay_fb_state), 1.f) - 1.f;
 	float dfbif, dfbf;
 	bw_intfracf(dfb, &dfbif, &dfbf);
 	BW_SIZE_T dfbi = (BW_SIZE_T)dfbif;
@@ -285,7 +285,7 @@ static inline void bw_comb_update_coeffs_audio(bw_comb_coeffs *BW_RESTRICT coeff
 
 static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x, float x_mod) {
 	const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
-	const float dff = bw_maxf(bw_one_pole_get_y_z1(&coeffs->smooth_delay_ff_state) + x_mod, 0.f);
+	const float dff = bw_maxf(coeffs->fs * (bw_one_pole_get_y_z1(&coeffs->smooth_delay_ff_state) + x_mod), 0.f);
 	float dffif, dfff;
 	bw_intfracf(dff, &dffif, &dfff);
 	BW_SIZE_T dffi = (BW_SIZE_T)dffif;

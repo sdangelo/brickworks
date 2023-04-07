@@ -184,9 +184,6 @@ struct _bw_chorus_coeffs {
 	bw_phase_gen_state	phase_gen_state;
 	bw_comb_coeffs		comb_coeffs;
 
-	// Coefficients
-	float			mod;
-
 	// Parameters
 	float			delay;
 	float			amount;
@@ -238,12 +235,14 @@ static inline void bw_chorus_update_coeffs_audio(bw_chorus_coeffs *BW_RESTRICT c
 	bw_phase_gen_update_coeffs_audio(&coeffs->phase_gen_coeffs);
 	float p, pi;
 	bw_phase_gen_process1(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, &p, &pi);
-	coeffs->mod = coeffs->delay + coeffs->amount * bw_osc_sin_process1(p);
+	const float mod = coeffs->delay + coeffs->amount * bw_osc_sin_process1(p);
+	bw_comb_set_delay_ff(&coeffs->comb_coeffs, mod);
+	bw_comb_update_coeffs_ctrl(&coeffs->comb_coeffs);
 	bw_comb_update_coeffs_audio(&coeffs->comb_coeffs);
 }
 
 static inline float bw_chorus_process1(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, float x) {
-	return bw_comb_process1(&coeffs->comb_coeffs, &state->comb_state, x, coeffs->mod);
+	return bw_comb_process1(&coeffs->comb_coeffs, &state->comb_state, x);
 }
 
 static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {

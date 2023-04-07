@@ -42,7 +42,7 @@ void bw_example_fx_comb_reset(bw_example_fx_comb *instance) {
 }
 
 void bw_example_fx_comb_process(bw_example_fx_comb *instance, const float** x, float** y, int n_samples) {
-	bw_comb_process(&instance->comb_coeffs, &instance->comb_state, x[0], NULL, y[0], n_samples);
+	bw_comb_process(&instance->comb_coeffs, &instance->comb_state, x[0], y[0], n_samples);
 }
 
 void bw_example_fx_comb_set_parameter(bw_example_fx_comb *instance, int index, float value) {

@@ -119,23 +119,18 @@ static inline void bw_comb_update_coeffs_audio(bw_comb_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_comb_process1()
  *  ```>>> */
-static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x, float x_mod);
+static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x);
 /*! <<<```
- *    Processes one input sample `x` using `coeffs` and the feedforward delay
- *    time modulation term `x_mod` (s), while using and updating `state`.
- *    Returns the corresponding output sample.
+ *    Processes one input sample `x` using `coeffs`, while using and updating
+ *    `state`. Returns the corresponding output sample.
  *
  *    #### bw_comb_process()
  *  ```>>> */
-static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, const float *x_mod, float *y, int n_samples);
+static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
- *
- *    `x_mod` can either be `NULL`, in which case the feedforward delay time is
- *    not modulated, or it points to a buffer whose first `n_samples` contain
- *    values (s) used for modulating the feedforward delay time.
  *
  *    #### bw_comb_set_delay_ff()
  *  ```>>> */
@@ -199,19 +194,21 @@ struct _bw_comb_coeffs {
 	bw_one_pole_state	smooth_delay_fb_state;
 
 	// Coefficients
-	float		fs;
+	float			fs;
 
-	BW_SIZE_T	dfbi;
-	float		dfbf;
+	BW_SIZE_T		dffi;
+	float			dfff;
+	BW_SIZE_T		dfbi;
+	float			dfbf;
 
 	// Parameters
-	float		delay_ff;
-	float		delay_fb;
+	float			delay_ff;
+	float			delay_fb;
 };
 
 struct _bw_comb_state {
 	// Sub-components
-	bw_delay_state	delay_state;
+	bw_delay_state		delay_state;
 };
 
 static inline void bw_comb_init(bw_comb_coeffs *BW_RESTRICT coeffs, float max_delay) {
@@ -221,6 +218,7 @@ static inline void bw_comb_init(bw_comb_coeffs *BW_RESTRICT coeffs, float max_de
 	bw_gain_init(&coeffs->fb_coeffs);
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
+	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
 	bw_gain_set_gain_lin(&coeffs->ff_coeffs, 0.f);
 	bw_gain_set_gain_lin(&coeffs->fb_coeffs, 0.f);
 	coeffs->delay_ff = 0.f;
@@ -245,6 +243,35 @@ static inline void bw_comb_mem_set(bw_comb_state *BW_RESTRICT state, void *mem) 
 	bw_delay_mem_set(&state->delay_state, mem);
 }
 
+static inline void _bw_comb_do_update_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs, char force) {
+	float delay_ff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_delay_ff_state);
+	float delay_fb_cur = bw_one_pole_get_y_z1(&coeffs->smooth_delay_fb_state);
+	if (force || delay_ff_cur != coeffs->delay_ff) {
+		delay_ff_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
+		const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
+		const float dff = bw_maxf(coeffs->fs * delay_ff_cur, 0.f);
+		float dffif;
+		bw_intfracf(dff, &dffif, &coeffs->dfff);
+		coeffs->dffi = (BW_SIZE_T)dffif;
+		if (coeffs->dffi >= len) {
+			coeffs->dffi = len;
+			coeffs->dfff = 0.f;
+		}
+	}
+	if (force || delay_fb_cur != coeffs->delay_fb) {
+		delay_fb_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
+		const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
+		const float dfb = bw_maxf(coeffs->fs * delay_fb_cur, 1.f) - 1.f;
+		float dfbif;
+		bw_intfracf(dfb, &dfbif, &coeffs->dfbf);
+		coeffs->dfbi = (BW_SIZE_T)dfbif;
+		if (coeffs->dfbi >= len) {
+			coeffs->dfbi = len;
+			coeffs->dfbf = 0.f;
+		}
+	}
+}
+
 static inline void bw_comb_reset_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs) {
 	bw_delay_reset_coeffs(&coeffs->delay_coeffs);
 	bw_gain_reset_coeffs(&coeffs->blend_coeffs);
@@ -252,6 +279,7 @@ static inline void bw_comb_reset_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs) {
 	bw_gain_reset_coeffs(&coeffs->fb_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
+	_bw_comb_do_update_coeffs(coeffs, 1);
 }
 
 static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state) {
@@ -268,50 +296,23 @@ static inline void bw_comb_update_coeffs_audio(bw_comb_coeffs *BW_RESTRICT coeff
 	bw_gain_update_coeffs_audio(&coeffs->blend_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->ff_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->fb_coeffs);
-	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
-	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
-	const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
-	const float dfb = bw_maxf(coeffs->fs * bw_one_pole_get_y_z1(&coeffs->smooth_delay_fb_state), 1.f) - 1.f;
-	float dfbif, dfbf;
-	bw_intfracf(dfb, &dfbif, &dfbf);
-	BW_SIZE_T dfbi = (BW_SIZE_T)dfbif;
-	if (dfbi >= len) {
-		dfbi = len;
-		dfbf = 0.f;
-	}
-	coeffs->dfbi = dfbi;
-	coeffs->dfbf = dfbf;
+	_bw_comb_do_update_coeffs(coeffs, 0);
 }
 
-static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x, float x_mod) {
-	const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
-	const float dff = bw_maxf(coeffs->fs * (bw_one_pole_get_y_z1(&coeffs->smooth_delay_ff_state) + x_mod), 0.f);
-	float dffif, dfff;
-	bw_intfracf(dff, &dffif, &dfff);
-	BW_SIZE_T dffi = (BW_SIZE_T)dffif;
-	if (dffi >= len) {
-		dffi = len;
-		dfff = 0.f;
-	}
+static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x) {
 	const float fb = bw_delay_read(&coeffs->delay_coeffs, &state->delay_state, coeffs->dfbi, coeffs->dfbf);
 	const float v = x + bw_gain_process1(&coeffs->fb_coeffs, fb);
 	bw_delay_write(&coeffs->delay_coeffs, &state->delay_state, v);
-	const float ff = bw_delay_read(&coeffs->delay_coeffs, &state->delay_state, dffi, dfff);
+	const float ff = bw_delay_read(&coeffs->delay_coeffs, &state->delay_state, coeffs->dffi, coeffs->dfff);
 	return bw_gain_process1(&coeffs->blend_coeffs, v) + bw_gain_process1(&coeffs->ff_coeffs, ff);
 }
 
-static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, const float *x_mod, float *y, int n_samples) {
+static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_comb_update_coeffs_ctrl(coeffs);
-	if (x_mod != NULL)
-		for (int i = 0; i < n_samples; i++) {
-			bw_comb_update_coeffs_audio(coeffs);
-			y[i] = bw_comb_process1(coeffs, state, x[i], x_mod[i]);
-		}
-	else
-		for (int i = 0; i < n_samples; i++) {
-			bw_comb_update_coeffs_audio(coeffs);
-			y[i] = bw_comb_process1(coeffs, state, x[i], 0.f);
-		}
+	for (int i = 0; i < n_samples; i++) {
+		bw_comb_update_coeffs_audio(coeffs);
+		y[i] = bw_comb_process1(coeffs, state, x[i]);
+	}
 }
 
 static inline void bw_comb_set_delay_ff(bw_comb_coeffs *BW_RESTRICT coeffs, float value) {

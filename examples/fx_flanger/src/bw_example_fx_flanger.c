@@ -18,49 +18,49 @@
  * File author: Stefano D'Angelo
  */
 
-#include "bw_example_fx_chorus.h"
+#include "bw_example_fx_flanger.h"
 
-void bw_example_fx_chorus_init(bw_example_fx_chorus *instance) {
-	bw_chorus_init(&instance->chorus_coeffs, 0.01f);
-	bw_chorus_set_delay(&instance->chorus_coeffs, 0.005f);
+void bw_example_fx_flanger_init(bw_example_fx_flanger *instance) {
+	bw_chorus_init(&instance->chorus_coeffs, 0.002f);
+	bw_chorus_set_delay(&instance->chorus_coeffs, 0.001f);
 	bw_chorus_set_coeff_x(&instance->chorus_coeffs, 0.7071f);
-	bw_chorus_set_coeff_mod(&instance->chorus_coeffs, 1.f);
-	bw_chorus_set_coeff_fb(&instance->chorus_coeffs, -0.7071f);
+	bw_chorus_set_coeff_mod(&instance->chorus_coeffs, 0.7071f);
+	bw_chorus_set_coeff_fb(&instance->chorus_coeffs, 0.7071f);
 }
 
-void bw_example_fx_chorus_set_sample_rate(bw_example_fx_chorus *instance, float sample_rate) {
+void bw_example_fx_flanger_set_sample_rate(bw_example_fx_flanger *instance, float sample_rate) {
 	bw_chorus_set_sample_rate(&instance->chorus_coeffs, sample_rate);
 }
 
-BW_SIZE_T bw_example_fx_chorus_mem_req(bw_example_fx_chorus *instance) {
+BW_SIZE_T bw_example_fx_flanger_mem_req(bw_example_fx_flanger *instance) {
 	return bw_chorus_mem_req(&instance->chorus_coeffs);
 }
 
-void bw_example_fx_chorus_mem_set(bw_example_fx_chorus *instance, void *mem) {
+void bw_example_fx_flanger_mem_set(bw_example_fx_flanger *instance, void *mem) {
 	bw_chorus_mem_set(&instance->chorus_state, mem);
 }
 
-void bw_example_fx_chorus_reset(bw_example_fx_chorus *instance) {
+void bw_example_fx_flanger_reset(bw_example_fx_flanger *instance) {
 	bw_chorus_reset_coeffs(&instance->chorus_coeffs);
 	bw_chorus_reset_state(&instance->chorus_coeffs, &instance->chorus_state);
 }
 
-void bw_example_fx_chorus_process(bw_example_fx_chorus *instance, const float** x, float** y, int n_samples) {
+void bw_example_fx_flanger_process(bw_example_fx_flanger *instance, const float** x, float** y, int n_samples) {
 	bw_chorus_process(&instance->chorus_coeffs, &instance->chorus_state, x[0], y[0], n_samples);
 }
 
-void bw_example_fx_chorus_set_parameter(bw_example_fx_chorus *instance, int index, float value) {
+void bw_example_fx_flanger_set_parameter(bw_example_fx_flanger *instance, int index, float value) {
 	instance->params[index] = value;
 	switch (index) {
 	case p_rate:
 		bw_chorus_set_rate(&instance->chorus_coeffs, 0.01f + 1.99f * value * value * value);
 		break;
 	case p_amount:
-		bw_chorus_set_amount(&instance->chorus_coeffs, 0.004f * value);
+		bw_chorus_set_amount(&instance->chorus_coeffs, 0.001f * value);
 		break;
 	}
 }
 
-float bw_example_fx_chorus_get_parameter(bw_example_fx_chorus *instance, int index) {
+float bw_example_fx_flanger_get_parameter(bw_example_fx_flanger *instance, int index) {
 	return instance->params[index];
 }

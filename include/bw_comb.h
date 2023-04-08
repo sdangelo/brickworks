@@ -218,7 +218,7 @@ static inline void bw_comb_init(bw_comb_coeffs *BW_RESTRICT coeffs, float max_de
 	bw_gain_init(&coeffs->fb_coeffs);
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
-	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
+	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-6f);
 	bw_gain_set_gain_lin(&coeffs->ff_coeffs, 0.f);
 	bw_gain_set_gain_lin(&coeffs->fb_coeffs, 0.f);
 	coeffs->delay_ff = 0.f;

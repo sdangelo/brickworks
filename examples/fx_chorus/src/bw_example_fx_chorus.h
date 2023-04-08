@@ -29,10 +29,7 @@ extern "C" {
 
 enum {
 	p_rate,
-	p_delay,
 	p_amount,
-	p_input,
-	p_mod,
 	p_n
 };
 

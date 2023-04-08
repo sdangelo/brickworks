@@ -31,27 +31,12 @@ var buses = [
 
 var parameters = [
 	{
-		name:		"Modulation rate",
+		name:		"Rate",
 		output:		false,
 		defaultValue:	0.5
 	},
 	{
-		name:		"Delay",
-		output:		false,
-		defaultValue:	0.5
-	},
-	{
-		name:		"Modulation amount",
-		output:		false,
-		defaultValue:	0.5
-	},
-	{
-		name:		"Input",
-		output:		false,
-		defaultValue:	0.5
-	},
-	{
-		name:		"Modulated branch",
+		name:		"Amount",
 		output:		false,
 		defaultValue:	0.5
 	}

@@ -22,6 +22,10 @@
 
 void bw_example_fx_chorus_init(bw_example_fx_chorus *instance) {
 	bw_chorus_init(&instance->chorus_coeffs, 0.1f);
+	bw_chorus_set_delay(&instance->chorus_coeffs, 0.005f);
+	bw_chorus_set_coeff_x(&instance->chorus_coeffs, 0.7071f);
+	bw_chorus_set_coeff_mod(&instance->chorus_coeffs, 1.f);
+	bw_chorus_set_coeff_fb(&instance->chorus_coeffs, -0.7071f);
 }
 
 void bw_example_fx_chorus_set_sample_rate(bw_example_fx_chorus *instance, float sample_rate) {
@@ -49,19 +53,10 @@ void bw_example_fx_chorus_set_parameter(bw_example_fx_chorus *instance, int inde
 	instance->params[index] = value;
 	switch (index) {
 	case p_rate:
-		bw_chorus_set_rate(&instance->chorus_coeffs, value);
-		break;
-	case p_delay:
-		bw_chorus_set_delay(&instance->chorus_coeffs, 0.1f * value);
+		bw_chorus_set_rate(&instance->chorus_coeffs, 0.01f + 1.99f * value * value * value);
 		break;
 	case p_amount:
-		bw_chorus_set_amount(&instance->chorus_coeffs, 0.05f * value);
-		break;
-	case p_input:
-		bw_chorus_set_coeff_x(&instance->chorus_coeffs, value);
-		break;
-	case p_mod:
-		bw_chorus_set_coeff_mod(&instance->chorus_coeffs, value);
+		bw_chorus_set_amount(&instance->chorus_coeffs, 0.004f * value);
 		break;
 	}
 }

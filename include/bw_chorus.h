@@ -26,10 +26,13 @@
  *    bw_osc_sin bw_phase_gen
  *  }}}
  *  description {{{
- *    Chorus / vibrato with variable speed and amount.
+ *    Chorus / vibrato / flanger with variable rate and amount.
  *
  *    It outputs a mix of the dry input signal with itself going through a
- *    modulated delay.
+ *    modulated delay and an optional feedback, as explained in
+ *
+ *    J. Dattorro, "Effect Design, Part 2: Delay-Line Modulation and Chorus",
+ *    J. Audio Eng. Soc., vol. 45, no. 10, pp. 764-788, October 1997.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -156,9 +159,9 @@ static inline void bw_chorus_set_amount(bw_chorus_coeffs *BW_RESTRICT coeffs, fl
  *  ```>>> */
 static inline void bw_chorus_set_coeff_x(bw_chorus_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the dry input coefficient `value` in `coeffs`.
+ *    Sets the input coefficient `value` in `coeffs`.
  *
- *    Default value: `0.f`.
+ *    Default value: `1.f`.
  *
  *    #### bw_chorus_set_coeff_mod()
  *  ```>>> */
@@ -166,7 +169,15 @@ static inline void bw_chorus_set_coeff_mod(bw_chorus_coeffs *BW_RESTRICT coeffs,
 /*! <<<```
  *    Sets the modulated branch coefficient `value` in `coeffs`.
  *
- *    Default value: `1.f`.
+ *    Default value: `0.f`.
+ *
+ *    #### bw_chorus_set_coeff_fb()
+ *  ```>>> */
+static inline void bw_chorus_set_coeff_fb(bw_chorus_coeffs *BW_RESTRICT coeffs, float value);
+/*! <<<```
+ *    Sets the feedback branch coefficient `value` in `coeffs`.
+ *
+ *    Default value: `0.f`.
  *  }}} */
 
 /*** Implementation ***/
@@ -197,8 +208,6 @@ struct _bw_chorus_state {
 static inline void bw_chorus_init(bw_chorus_coeffs *BW_RESTRICT coeffs, float max_delay) {
 	bw_phase_gen_init(&coeffs->phase_gen_coeffs);
 	bw_comb_init(&coeffs->comb_coeffs, max_delay);
-	bw_comb_set_coeff_blend(&coeffs->comb_coeffs, 0.f);
-	bw_comb_set_coeff_ff(&coeffs->comb_coeffs, 1.f);
 	coeffs->delay = 0.f;
 	coeffs->amount = 0.f;
 }
@@ -258,6 +267,7 @@ static inline void bw_chorus_set_rate(bw_chorus_coeffs *BW_RESTRICT coeffs, floa
 }
 
 static inline void bw_chorus_set_delay(bw_chorus_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_comb_set_delay_fb(&coeffs->comb_coeffs, value);
 	coeffs->delay = value;
 }
 
@@ -271,6 +281,10 @@ static inline void bw_chorus_set_coeff_x(bw_chorus_coeffs *BW_RESTRICT coeffs, f
 
 static inline void bw_chorus_set_coeff_mod(bw_chorus_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_comb_set_coeff_ff(&coeffs->comb_coeffs, value);
+}
+
+static inline void bw_chorus_set_coeff_fb(bw_chorus_coeffs *BW_RESTRICT coeffs, float value) {
+	bw_comb_set_coeff_fb(&coeffs->comb_coeffs, value);
 }
 
 #ifdef __cplusplus

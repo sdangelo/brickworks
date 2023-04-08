@@ -66,14 +66,11 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 	{ "Audio out", 1, 0, 0, IO_MONO }
 };
 
-#define NUM_PARAMETERS		5
+#define NUM_PARAMETERS		2
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
-	{ "Modulation rate", "Rate", "", 0, 0, 0, 0.5f },
-	{ "Delay", "Delay", "s", 0, 0, 0, 0.5f },
-	{ "Modulation amount", "Mod amount", "", 0, 0, 0, 0.5f },
-	{ "Input", "Input", "", 0, 0, 0, 0.5f },
-	{ "Modulated branch", "Mod branch", "", 0, 0, 0, 0.5f },
+	{ "Rate", "Rate", "", 0, 0, 0, 0.5f },
+	{ "Depth", "Depth", "", 0, 0, 0, 0.5f },
 };
 
 // Internal API

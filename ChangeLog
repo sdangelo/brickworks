@@ -1,3 +1,21 @@
+0.4.0
+-----
+  * Added new bw_ringmod, bw_trem, bw_phaser, bw_delay, bw_src_int, bw_src,
+    bw_comb, and bw_chorus modules.
+  * Added new fx_ringmod, fx_trem, fx_phaser, fx_delay, fx_comb, fx_chorus,
+    fx_vibrato, and fx_flanger examples.
+  * Added MIDI over UART support for example synthesizers running on the Daisy
+    Seed platform.
+  * Added new bw_buf_add() and bw_buf_fill() routines to bw_buf.
+  * Added new bw_ceilf(), bw_intfracf(), bw_sinhf_3(), bw_coshf_3(),
+    bw_asinhf_3(), and bw_acoshf_3() math routines.
+  * Added BW_SIZE_T definition to bw_common.
+  * Added initial value parameters to bw_*_reset_state() in
+    bw_{lp1,ap1,hp1,hs1,ls1,mm1,ap2,hs2,ls2,mm2,notch,peak,svf}.
+  * Fixed typos in the documentation of bw_wah.
+  * Fixed unused parameter warnings.
+  * Now using bw_src_int in fx_satur.
+
 0.3.0
 -----
   * Added new bw_ap1, bw_ap2, bw_balance, bw_bd_reduce, bw_buf, bw_comp, bw_hp1,

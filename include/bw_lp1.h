@@ -32,6 +32,7 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
+ *          <li>Added initial input value to `bw_lp1_reset_state()`.</li>
  *          <li>Fixed unused parameter warnings.</li>
  *        </ul>
  *      </li>
@@ -86,9 +87,10 @@ static inline void bw_lp1_reset_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_lp1_reset_state()
  *  ```>>> */
-static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state);
+static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state, float x0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x0`.
  *
  *    #### bw_lp1_update_coeffs_ctrl()
  *  ```>>> */
@@ -220,9 +222,9 @@ static inline void bw_lp1_reset_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs) {
 	_bw_lp1_do_update_coeffs(coeffs, 1);
 }
 
-static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state) {
+static inline void bw_lp1_reset_state(const bw_lp1_coeffs *BW_RESTRICT coeffs, bw_lp1_state *BW_RESTRICT state, float x0) {
 	(void)coeffs;
-	state->y_z1 = 0.f;
+	state->y_z1 = x0;
 	state->X_z1 = 0.f;
 }
 

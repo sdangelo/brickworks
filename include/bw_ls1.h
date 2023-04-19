@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{
  *    bw_config bw_common bw_gain bw_lp1 bw_math bw_mm1 bw_one_pole
  *  }}}
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Added initial input value to `bw_ls1_reset_state()`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -81,9 +86,10 @@ static inline void bw_ls1_reset_coeffs(bw_ls1_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_ls1_reset_state()
  *  ```>>> */
-static inline void bw_ls1_reset_state(const bw_ls1_coeffs *BW_RESTRICT coeffs, bw_ls1_state *BW_RESTRICT state);
+static inline void bw_ls1_reset_state(const bw_ls1_coeffs *BW_RESTRICT coeffs, bw_ls1_state *BW_RESTRICT state, float x0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x0`.
  *
  *    #### bw_ls1_update_coeffs_ctrl()
  *  ```>>> */
@@ -187,8 +193,8 @@ static inline void bw_ls1_reset_coeffs(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	bw_mm1_reset_coeffs(&coeffs->mm1_coeffs);
 }
 
-static inline void bw_ls1_reset_state(const bw_ls1_coeffs *BW_RESTRICT coeffs, bw_ls1_state *BW_RESTRICT state) {
-	bw_mm1_reset_state(&coeffs->mm1_coeffs, &state->mm1_state);
+static inline void bw_ls1_reset_state(const bw_ls1_coeffs *BW_RESTRICT coeffs, bw_ls1_state *BW_RESTRICT state, float x0) {
+	bw_mm1_reset_state(&coeffs->mm1_coeffs, &state->mm1_state, x0);
 }
 
 static inline void bw_ls1_update_coeffs_ctrl(bw_ls1_coeffs *BW_RESTRICT coeffs) {

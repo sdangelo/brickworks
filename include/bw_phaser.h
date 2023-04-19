@@ -186,10 +186,10 @@ static inline void bw_phaser_reset_coeffs(bw_phaser_coeffs *BW_RESTRICT coeffs) 
 }
 
 static inline void bw_phaser_reset_state(const bw_phaser_coeffs *BW_RESTRICT coeffs, bw_phaser_state *BW_RESTRICT state) {
-	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[0]);
-	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[1]);
-	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[2]);
-	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[3]);
+	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[0], 0.f);
+	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[1], 0.f);
+	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[2], 0.f);
+	bw_ap1_reset_state(&coeffs->ap1_coeffs, &state->ap1_state[3], 0.f);
 }
 
 static inline void bw_phaser_update_coeffs_ctrl(bw_phaser_coeffs *BW_RESTRICT coeffs) {

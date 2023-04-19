@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.4.0 }}}
  *  requires {{{ bw_config bw_common bw_lp1 bw_math bw_one_pole }}}
  *  description {{{
  *    First-order highpass filter (6 dB/oct) with gain asymptotically
@@ -28,6 +28,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
+ *          <li>Added initial input value to `bw_hp1_reset_state()`.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -79,9 +84,10 @@ static inline void bw_hp1_reset_coeffs(bw_hp1_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_hp1_reset_state()
  *  ```>>> */
-static inline void bw_hp1_reset_state(const bw_hp1_coeffs *BW_RESTRICT coeffs, bw_hp1_state *BW_RESTRICT state);
+static inline void bw_hp1_reset_state(const bw_hp1_coeffs *BW_RESTRICT coeffs, bw_hp1_state *BW_RESTRICT state, float x0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x0`.
  *
  *    #### bw_hp1_update_coeffs_ctrl()
  *  ```>>> */
@@ -147,8 +153,8 @@ static inline void bw_hp1_reset_coeffs(bw_hp1_coeffs *BW_RESTRICT coeffs) {
 	bw_lp1_reset_coeffs(&coeffs->lp1_coeffs);
 }
 
-static inline void bw_hp1_reset_state(const bw_hp1_coeffs *BW_RESTRICT coeffs, bw_hp1_state *BW_RESTRICT state) {
-	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state);
+static inline void bw_hp1_reset_state(const bw_hp1_coeffs *BW_RESTRICT coeffs, bw_hp1_state *BW_RESTRICT state, float x0) {
+	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x0);
 }
 
 static inline void bw_hp1_update_coeffs_ctrl(bw_hp1_coeffs *BW_RESTRICT coeffs) {

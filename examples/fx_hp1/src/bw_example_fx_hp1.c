@@ -30,7 +30,7 @@ void bw_example_fx_hp1_set_sample_rate(bw_example_fx_hp1 *instance, float sample
 
 void bw_example_fx_hp1_reset(bw_example_fx_hp1 *instance) {
 	bw_hp1_reset_coeffs(&instance->hp1_coeffs);
-	bw_hp1_reset_state(&instance->hp1_coeffs, &instance->hp1_state);
+	bw_hp1_reset_state(&instance->hp1_coeffs, &instance->hp1_state, 0.f);
 }
 
 void bw_example_fx_hp1_process(bw_example_fx_hp1 *instance, const float** x, float** y, int n_samples) {

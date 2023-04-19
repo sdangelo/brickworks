@@ -36,7 +36,8 @@
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
- *          <li>Added `BW_RESTRICT` to `bw_phase_gen_process1\*()`.</li>
+ *          <li>Added <code>BW_RESTRICT</code> to
+ *              <code>bw_phase_gen_process1*()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:

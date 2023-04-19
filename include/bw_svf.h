@@ -30,7 +30,8 @@
      <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added initial input value to `bw_svf_reset_state()`.</li>
+ *          <li>Added initial input value to
+ *              <code>bw_svf_reset_state()</code>.</li>
  *          <li>Fixed unused parameter warnings.</li>
  *        </ul>
  *      </li>
@@ -39,8 +40,9 @@
  *          <li>Strenghtened algorithm for modulation.</li>
  *          <li>Added prewarping control parameters (prewarp_at_cutoff and
  *              prewarp_freq).</li>
- *          <li>Added `BW_RESTRICT` to `bw_svf_process1()`.</li>
- *          <li>Fixed typo in `bw_svf_set_Q()` documentation.</li>
+ *          <li>Added <code>BW_RESTRICT</code> to
+ *              <code>bw_svf_process1()</code>.</li>
+ *          <li>Fixed typo in <code>bw_svf_set_Q()</code> documentation.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:

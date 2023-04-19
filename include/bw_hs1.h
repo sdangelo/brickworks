@@ -31,7 +31,8 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added initial input value to `bw_hs1_reset_state()`.</li>
+ *          <li>Added initial input value to
+ *              <code>bw_hs1_reset_state()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:

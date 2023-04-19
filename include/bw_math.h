@@ -72,21 +72,24 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added `bw_ceilf()`, `bw_intfracf()`, `bw_sinhf_3()`,
- *              `bw_coshf_3()`, `bw_asinhf_3()`, and `bw_acoshf_3()`.</li>
+ *          <li>Added <code>bw_ceilf()</code>, <code>bw_intfracf()</code>,
+ *              <code>bw_sinhf_3()</code>, <code>bw_coshf_3()</code>,
+ *              <code>bw_asinhf_3()</code>, and <code>bw_acoshf_3()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
- *          <li>Added `bw_log10f_3()`, `bw_pow10f_3()`, `bw_dB2linf_3()`, and
- *              `bw_lin2dBf_3()`.</li>
- *          <li>Fixed computation bug in `bw_sqrtf_2()`.</li>
+ *          <li>Added <code>bw_log10f_3()</code>, <code>bw_pow10f_3()</code>,
+ *              <code>bw_dB2linf_3()</code>, and
+ *              <code>bw_lin2dBf_3()</code>.</li>
+ *          <li>Fixed computation bug in <code>bw_sqrtf_2()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Added `bw_sin2pif_3()`, `bw_cos2pif_3()`, `bw_tan2pif_3()`,
- *              `bw_omega_3lognr()`, and `bw_tanhf_3()`.</li>
+ *          <li>Added <code>bw_sin2pif_3()</code>, <code>bw_cos2pif_3()</code>,
+ *              <code>bw_tan2pif_3()</code>, <code>bw_omega_3lognr()</code>, and
+ *              <code>bw_tanhf_3()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:

@@ -29,7 +29,8 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added `bw_buf_fill()` and `bw_buf_add()`.</li>
+ *          <li>Added <code>bw_buf_fill()</code> and
+ *              <code>bw_buf_add()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:

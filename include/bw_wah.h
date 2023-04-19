@@ -31,10 +31,11 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Now specifying `0.f` as initial input value for
- *              `bw_svf_reset_state()`.</li>
- *          <li>Fixed documentation for `bw_wah_state`, `bw_wah_reset_state()`,
- *              and `bw_wah_process()`.</li>
+ *          <li>Now specifying <code>0.f</code> as initial input value for
+ *              <code>bw_svf_reset_state()</code>.</li>
+ *          <li>Fixed documentation for <code>bw_wah_state</code>,
+ *              <code>bw_wah_reset_state()</code>, and
+ *              <code>bw_wah_process()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:

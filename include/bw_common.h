@@ -30,13 +30,14 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added `BW_SIZE_T`.</li>
+ *          <li>Added <code>BW_SIZE_T</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
- *          <li>Removed `BW_MALLOC`, `BW_REALLOC`, and `BW_FREE`.</li>
- *          <li>Added `BW_RESTRICT`.</li>
+ *          <li>Removed <code>BW_MALLOC</code>, <code>BW_REALLOC</code>,
+ *              and <code>BW_FREE</code>.</li>
+ *          <li>Added <code>BW_RESTRICT</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.1.0</strong>:

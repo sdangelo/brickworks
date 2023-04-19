@@ -32,7 +32,8 @@
  *    <ul>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
- *          <li>Added initial input value to `bw_lp1_reset_state()`.</li>
+ *          <li>Added initial input value to
+ *              <code>bw_lp1_reset_state()</code>.</li>
  *          <li>Fixed unused parameter warnings.</li>
  *        </ul>
  *      </li>

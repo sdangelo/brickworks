@@ -58,7 +58,7 @@ typedef struct _bw_src_int_coeffs bw_src_int_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_src_int_state
+ *    #### bw_src_int_state
  *  ```>>> */
 typedef struct _bw_src_int_state bw_src_int_state;
 /*! <<<```

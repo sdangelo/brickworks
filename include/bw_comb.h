@@ -61,7 +61,7 @@ typedef struct _bw_comb_coeffs bw_comb_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_comb_state
+ *    #### bw_comb_state
  *  ```>>> */
 typedef struct _bw_comb_state bw_comb_state;
 /*! <<<```

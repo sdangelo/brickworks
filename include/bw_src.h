@@ -52,7 +52,7 @@ typedef struct _bw_src_coeffs bw_src_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_src_state
+ *    #### bw_src_state
  *  ```>>> */
 typedef struct _bw_src_state bw_src_state;
 /*! <<<```

@@ -57,7 +57,7 @@ typedef struct _bw_slew_lim_coeffs bw_slew_lim_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_slew_lim_state
+ *    #### bw_slew_lim_state
  *  ```>>> */
 typedef struct _bw_slew_lim_state bw_slew_lim_state;
 /*! <<<```

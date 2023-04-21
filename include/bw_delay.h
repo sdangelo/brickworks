@@ -56,7 +56,7 @@ typedef struct _bw_delay_coeffs bw_delay_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_delay_state
+ *    #### bw_delay_state
  *  ```>>> */
 typedef struct _bw_delay_state bw_delay_state;
 /*! <<<```

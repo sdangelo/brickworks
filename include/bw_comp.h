@@ -54,7 +54,7 @@ typedef struct _bw_comp_coeffs bw_comp_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_comp_state
+ *    #### bw_comp_state
  *  ```>>> */
 typedef struct _bw_comp_state bw_comp_state;
 /*! <<<```

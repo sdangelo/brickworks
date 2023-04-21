@@ -54,7 +54,7 @@ typedef struct _bw_trem_coeffs bw_trem_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_trem_state
+ *    #### bw_trem_state
  *  ```>>> */
 typedef struct _bw_trem_state bw_trem_state;
 /*! <<<```

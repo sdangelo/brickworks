@@ -75,7 +75,7 @@ typedef struct _bw_svf_coeffs bw_svf_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_svf_state
+ *    #### bw_svf_state
  *  ```>>> */
 typedef struct _bw_svf_state bw_svf_state;
 /*! <<<```

@@ -52,7 +52,7 @@ typedef struct _bw_noise_gate_coeffs bw_noise_gate_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_noise_gate_state
+ *    #### bw_noise_gate_state
  *  ```>>> */
 typedef struct _bw_noise_gate_state bw_noise_gate_state;
 /*! <<<```

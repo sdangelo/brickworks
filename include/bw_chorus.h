@@ -60,7 +60,7 @@ typedef struct _bw_chorus_coeffs bw_chorus_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_chorus_state
+ *    #### bw_chorus_state
  *  ```>>> */
 typedef struct _bw_chorus_state bw_chorus_state;
 /*! <<<```

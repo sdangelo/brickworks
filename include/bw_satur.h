@@ -68,7 +68,7 @@ typedef struct _bw_satur_coeffs bw_satur_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_satur_state
+ *    #### bw_satur_state
  *  ```>>> */
 typedef struct _bw_satur_state bw_satur_state;
 /*! <<<```

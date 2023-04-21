@@ -68,7 +68,7 @@ typedef struct _bw_wah_coeffs bw_wah_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_wah_state
+ *    #### bw_wah_state
  *  ```>>> */
 typedef struct _bw_wah_state bw_wah_state;
 /*! <<<```

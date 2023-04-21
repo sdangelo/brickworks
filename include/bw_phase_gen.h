@@ -70,7 +70,7 @@ typedef struct _bw_phase_gen_coeffs bw_phase_gen_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
- *    ### bw_phase_gen_state
+ *    #### bw_phase_gen_state
  *  ```>>> */
 typedef struct _bw_phase_gen_state bw_phase_gen_state;
 /*! <<<```

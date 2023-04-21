@@ -39,6 +39,7 @@ code:
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
+* bw_math: review types
 
 build system:
 * make makefiles handle paths with spaces etc

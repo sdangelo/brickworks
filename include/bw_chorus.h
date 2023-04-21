@@ -79,14 +79,14 @@ static inline void bw_chorus_set_sample_rate(bw_chorus_coeffs *BW_RESTRICT coeff
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    ### bw_chorus_mem_req()
+ *    #### bw_chorus_mem_req()
  *  ```>>> */
 static inline BW_SIZE_T bw_chorus_mem_req(bw_chorus_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_chorus_mem_set()` using `coeffs`.
  *
- *    ### bw_chorus_mem_set()
+ *    #### bw_chorus_mem_set()
  *  ```>>> */
 static inline void bw_chorus_mem_set(bw_chorus_state *BW_RESTRICT state, void *mem);
 /*! <<<```

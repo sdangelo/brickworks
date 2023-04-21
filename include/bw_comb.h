@@ -80,14 +80,14 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
- *    ### bw_comb_mem_req()
+ *    #### bw_comb_mem_req()
  *  ```>>> */
 static inline BW_SIZE_T bw_comb_mem_req(bw_comb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_comb_mem_set()` using `coeffs`.
  *
- *    ### bw_comb_mem_set()
+ *    #### bw_comb_mem_set()
  *  ```>>> */
 static inline void bw_comb_mem_set(bw_comb_state *BW_RESTRICT state, void *mem);
 /*! <<<```

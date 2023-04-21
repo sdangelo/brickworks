@@ -549,7 +549,7 @@ static inline float bw_clipf(float x, float m, float M) {
 static inline float bw_truncf(float x) {
 	_bw_floatint v = {.f = x};
 	int32_t ex = (v.i & 0x7f800000) >> 23;
-	int32_t m = (~0) << bw_clipi32(150 - ex, 0, 23);
+	int32_t m = (~0u) << bw_clipi32(150 - ex, 0, 23);
 	m &= bw_signfilli32(126 - ex) | 0x80000000;
 	v.i &= m;
 	return v.f;
@@ -559,7 +559,7 @@ static inline float bw_roundf(float x) {
 	_bw_floatint v = {.f = x};
 	int32_t ex = (v.i & 0x7f800000) >> 23;
 	int32_t sh = bw_clipi32(150 - ex, 0, 23);
-	int32_t mt = (~0) << sh;
+	int32_t mt = (~0u) << sh;
 	mt &= bw_signfilli32(126 - ex) | 0x80000000;
 	int32_t mr = (1 << sh) >> 1;
 	mr &= bw_signfilli32(125 - ex);

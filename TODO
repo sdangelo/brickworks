@@ -42,6 +42,7 @@ code:
 * prewarp control in all derived filtering modules
 * bw_math: review types
 * src inside distortions? w/ control from outside?
+* bw_fuzz gain compensation?
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -20,8 +20,8 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
+ *  version {{{ 0.5.0 }}}
+ *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Antialiased tanh-based saturation with parametric bias and gain
  *    (compensation) and output bias removal.
@@ -38,6 +38,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed gain coefficient reset bug.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -222,6 +227,7 @@ static inline void _bw_satur_do_update_coeffs(bw_satur_coeffs *BW_RESTRICT coeff
 
 static inline void bw_satur_reset_coeffs(bw_satur_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_bias_state, coeffs->bias);
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_gain_state, coeffs->gain);
 	_bw_satur_do_update_coeffs(coeffs, 1);
 }
 

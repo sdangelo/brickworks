@@ -39,7 +39,9 @@ code:
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
+* prewarp control in all derived filtering modules
 * bw_math: review types
+* src inside distortions? w/ control from outside?
 
 build system:
 * make makefiles handle paths with spaces etc

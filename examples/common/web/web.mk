@@ -8,7 +8,8 @@ CFLAGS := \
 	-fvisibility=hidden \
 	-Ofast \
 	-Wall \
-	-Wunused-parameter
+	-Wextra \
+	-Wpedantic
 LDFLAGS := \
 	-Wl,--allow-undefined \
 	-Wl,--no-entry \

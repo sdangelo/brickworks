@@ -12,7 +12,11 @@ CXXFLAGS := \
 	-I${COMMON_DIR} \
 	-I${ROOT_DIR}/../../../include \
 	-I${VST3_SDK_DIR} \
-	-O3
+	-O3 \
+	-Wall \
+	-Wextra \
+	-Wpedantic \
+	-std=c++20
 LDFLAGS := \
 	-shared
 

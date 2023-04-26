@@ -137,4 +137,7 @@ int main() {
 		System::Delay(1);
 		*/
 	}
+
+	// silence unused variable warnings
+	(void)config_buses_out;
 }

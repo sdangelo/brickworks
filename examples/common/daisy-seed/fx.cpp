@@ -96,4 +96,8 @@ int main() {
 		hardware.PrintLine("Min: " FLT_FMT3, FLT_VAR3(minLoad * 100.0f));
 		System::Delay(500);
 	}
+
+	// silence unused variable warnings
+	(void)config_buses_in;
+	(void)config_buses_out;
 }

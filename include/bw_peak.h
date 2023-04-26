@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{
  *    bw_config bw_common bw_gain bw_math bw_mm2 bw_one_pole bw_svf
  *  }}}
@@ -37,6 +37,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed documentation for <code>bw_peak_set_peak_gain_lin()</code>
+ *              and <code>bw_peak_set_gain_dB()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added initial input value to
@@ -144,7 +150,7 @@ static inline void bw_peak_set_Q(bw_peak_coeffs *BW_RESTRICT coeffs, float value
  *
  *    Default value: `0.5f`.
  *
- *    #### bw_peak_set_gain_lin()
+ *    #### bw_peak_set_peak_gain_lin()
  *  ```>>> */
 static inline void bw_peak_set_peak_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
@@ -153,7 +159,7 @@ static inline void bw_peak_set_peak_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs,
  *
  *    Default value: `0.f`.
  *
- *    #### bw_peak_set_dc_gain_dB()
+ *    #### bw_peak_set_peak_gain_dB()
  *  ```>>> */
 static inline void bw_peak_set_peak_gain_dB(bw_peak_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```

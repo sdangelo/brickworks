@@ -171,6 +171,7 @@ static inline void bw_fuzz_init(bw_fuzz_coeffs *BW_RESTRICT coeffs) {
 	bw_svf_set_Q(&coeffs->svf_coeffs, 0.87f);
 	bw_hs1_set_cutoff(&coeffs->hs1_coeffs, 50.f);
 	bw_satur_set_bias(&coeffs->satur_coeffs, 0.11f);
+	bw_satur_set_gain_compensation(&coeffs->satur_coeffs, 0);
 	bw_hp1_set_cutoff(&coeffs->hp1_coeffs, 30.f);
 }
 

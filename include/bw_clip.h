@@ -216,9 +216,9 @@ static inline void bw_clip_reset_coeffs(bw_clip_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_clip_reset_state(const bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state *BW_RESTRICT state) {
-	(void)coeffs;
-	state->F_z1 = 0.f;
-	state->x_z1 = 0.f;
+	state->x_z1 = bw_one_pole_get_y_z1(&coeffs->smooth_bias_state);
+	const float a = bw_absf(state->x_z1);
+	state->F_z1 = a > 1.f ? a - 0.5f : 0.5f * a * a;
 }
 
 static inline void bw_clip_update_coeffs_ctrl(bw_clip_coeffs *BW_RESTRICT coeffs) {

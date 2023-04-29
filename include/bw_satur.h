@@ -41,6 +41,7 @@
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Fixed gain coefficient reset bug.</li>
+ *          <li>Fixed initial state bug.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:
@@ -232,9 +233,9 @@ static inline void bw_satur_reset_coeffs(bw_satur_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_satur_reset_state(const bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state *BW_RESTRICT state) {
-	(void)coeffs;
-	state->F_z1 = 0.f;
-	state->x_z1 = 0.f;
+	state->x_z1 = bw_one_pole_get_y_z1(&coeffs->smooth_bias_state);
+	const float ax = bw_absf(state->x_z1);
+	state->F_z1 = ax >= 2.115287308554551f ? ax - 0.6847736211329452f : ax * ax * ((0.00304518315009429f * ax - 0.09167437770414569f) * ax + 0.5f);
 }
 
 static inline void bw_satur_update_coeffs_ctrl(bw_satur_coeffs *BW_RESTRICT coeffs) {

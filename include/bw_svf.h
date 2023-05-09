@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    State variable filter (2nd order, 12 dB/oct) model with separated lowpass,
@@ -28,6 +28,11 @@
  *  }}}
  *  changelog {{{
      <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed prewarping-related stability bug.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added initial input value to
@@ -197,8 +202,9 @@ struct _bw_svf_coeffs {
 	float			prewarp_k;
 	float			t;
 	float			kf;
+	float			kbl;
 	float			k;
-	float			kt;
+	float			hp_hb;
 	float			hp_x;
 
 	// Parameters
@@ -232,24 +238,30 @@ static inline void bw_svf_set_sample_rate(bw_svf_coeffs *BW_RESTRICT coeffs, flo
 
 static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, char force) {
 	const float prewarp_freq = coeffs->prewarp_freq + coeffs->prewarp_k * (coeffs->cutoff - coeffs->prewarp_freq);
+	float cutoff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_cutoff_state);
 	float prewarp_freq_cur = bw_one_pole_get_y_z1(&coeffs->smooth_prewarp_freq_state);
 	float Q_cur = bw_one_pole_get_y_z1(&coeffs->smooth_Q_state);
+	const char cutoff_changed = force || coeffs->cutoff != cutoff_cur;
 	const char prewarp_freq_changed = force || prewarp_freq != prewarp_freq_cur;
 	const char Q_changed = force || coeffs->Q != Q_cur;
-	if (prewarp_freq_changed || Q_changed) {
-		if (prewarp_freq_changed) {
-			prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
-			coeffs->t = bw_tanf_3(coeffs->t_k * prewarp_freq_cur);
-			coeffs->kf = coeffs->t * bw_rcpf_2(prewarp_freq_cur);
+	if (cutoff_changed || prewarp_freq_changed || Q_changed) {
+		if (cutoff_changed || prewarp_freq_changed) {
+			if (cutoff_changed)
+				cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
+			if (prewarp_freq_changed) {
+				prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
+				coeffs->t = bw_tanf_3(coeffs->t_k * prewarp_freq_cur);
+				coeffs->kf = coeffs->t * bw_rcpf_2(prewarp_freq_cur);
+			}
+			coeffs->kbl = coeffs->kf * cutoff_cur;
 		}
 		if (Q_changed) {
 			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
 			coeffs->k = bw_rcpf_2(Q_cur);
 		}
-		coeffs->kt = coeffs->k + coeffs->t;
-		coeffs->hp_x = bw_rcpf_2(1.f + coeffs->t * coeffs->kt);
+		coeffs->hp_hb = coeffs->k + coeffs->kbl;
+		coeffs->hp_x = bw_rcpf_2(1.f + coeffs->kbl * coeffs->hp_hb);
 	}
-	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 }
 
 static inline void bw_svf_reset_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs) {
@@ -278,9 +290,9 @@ static inline void bw_svf_process1(const bw_svf_coeffs *BW_RESTRICT coeffs, bw_s
 	const float kk = coeffs->kf * state->cutoff_z1;
 	const float lp_xz1 = state->lp_z1 - kk * state->bp_z1;
 	const float bp_xz1 = state->bp_z1 - kk * state->hp_z1;
-	*y_hp = coeffs->hp_x * (x + coeffs->kt * bp_xz1 - lp_xz1);
-	*y_bp = bp_xz1 - coeffs->t * *y_hp;
-	*y_lp = lp_xz1 - coeffs->t * *y_bp;
+	*y_hp = coeffs->hp_x * (x + coeffs->hp_hb * bp_xz1 - lp_xz1);
+	*y_bp = bp_xz1 - coeffs->kbl * *y_hp;
+	*y_lp = lp_xz1 - coeffs->kbl * *y_bp;
 	state->hp_z1 = *y_hp;
 	state->lp_z1 = *y_lp;
 	state->bp_z1 = *y_bp;

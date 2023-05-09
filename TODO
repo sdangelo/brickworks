@@ -43,7 +43,7 @@ code:
 * bw_math: review types
 * src inside distortions? w/ control from outside?
 * bw_fuzz gain compensation?
-* check initial conditions (especially distorsions)
+* remove union value = {.f = v};? (std c++ latest)
 
 build system:
 * make makefiles handle paths with spaces etc

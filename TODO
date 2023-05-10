@@ -44,6 +44,7 @@ code:
 * src inside distortions? w/ control from outside?
 * bw_fuzz gain compensation?
 * remove union value = {.f = v};? (std c++ latest)
+* make gain of distortions homogeneous?
 
 build system:
 * make makefiles handle paths with spaces etc

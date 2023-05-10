@@ -227,7 +227,7 @@ static inline void bw_dist_update_coeffs_audio(bw_dist_coeffs *BW_RESTRICT coeff
 }
 
 static inline float bw_dist_process1(const bw_dist_coeffs *BW_RESTRICT coeffs, bw_dist_state *BW_RESTRICT state, float x) {
-	float y = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, x);
+	float y = bw_hp1_process1(&coeffs->hp1_coeffs, &state->hp1_state, x);
 	y = bw_peak_process1(&coeffs->peak_coeffs, &state->peak_state, y);
 	y = bw_clip_process1_comp(&coeffs->clip_coeffs, &state->clip_state, y);
 	y = bw_satur_process1_comp(&coeffs->satur_coeffs, &state->satur_state, y);

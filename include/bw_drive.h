@@ -162,7 +162,7 @@ struct _bw_drive_coeffs {
 
 struct _bw_drive_state {
 	// Sub-components
-	bw_svf_state	svf_state;
+	bw_svf_state	hp2_state;
 	bw_peak_state	peak_state;
 	bw_satur_state	satur_state;
 	bw_svf_state	lp2_state;
@@ -178,7 +178,7 @@ static inline void bw_drive_init(bw_drive_coeffs *BW_RESTRICT coeffs) {
 	bw_peak_set_cutoff(&coeffs->peak_coeffs, 2e3f);
 	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 10.f);
 	bw_satur_set_gain(&coeffs->satur_coeffs, 1.5f);
-	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, 600.f + (7.5e3f - 600.f) * 0.125f);
+	bw_svf_set_cutoff(&coeffs->lp2_coeffs, 600.f + (7.5e3f - 600.f) * 0.125f);
 }
 
 static inline void bw_drive_set_sample_rate(bw_drive_coeffs *BW_RESTRICT coeffs, float sample_rate) {
@@ -221,8 +221,8 @@ static inline float bw_drive_process1(const bw_drive_coeffs *BW_RESTRICT coeffs,
 	bw_svf_process1(&coeffs->hp2_coeffs, &state->hp2_state, x, &v_lp, &v_bp, &v_hp);
 	float y = bw_peak_process1(&coeffs->peak_coeffs, &state->peak_state, v_hp);
 	y = v_hp + 0.5f * bw_satur_process1_comp(&coeffs->satur_coeffs, &state->satur_state, y);
-	y = bw_svf_process1(&coeffs->lp2_coeffs, &state->lp2_state, y);
-	return bw_gain_process1(&coeffs->gain_coeffs, y);
+	bw_svf_process1(&coeffs->lp2_coeffs, &state->lp2_state, y, &v_lp, &v_bp, &v_hp);
+	return bw_gain_process1(&coeffs->gain_coeffs, v_lp);
 }
 
 static inline void bw_drive_process(bw_drive_coeffs *BW_RESTRICT coeffs, bw_drive_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
@@ -238,7 +238,7 @@ static inline void bw_drive_set_drive(bw_drive_coeffs *BW_RESTRICT coeffs, float
 }
 
 static inline void bw_drive_set_tone(bw_drive_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, 600.f + (7.5e3f - 600.f) * value * value * value);
+	bw_svf_set_cutoff(&coeffs->lp2_coeffs, 600.f + (7.5e3f - 600.f) * value * value * value);
 }
 
 static inline void bw_drive_set_volume(bw_drive_coeffs *BW_RESTRICT coeffs, float value) {

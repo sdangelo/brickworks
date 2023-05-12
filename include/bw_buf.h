@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_config bw_common }}}
  *  description {{{
  *    Common operations on buffers.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_buf_neg()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_buf_fill()</code> and
@@ -57,6 +62,13 @@ extern "C" {
 static inline void bw_buf_fill(float *dest, float k, int n_elems);
 /*! <<<```
  *    Sets the first `n_elems` in `dest` to `k`.
+ *
+ *    #### bw_buf_neg()
+ *  ```>>> */
+static inline void bw_buf_neg(float *dest, const float *src, int n_elems);
+/*! <<<```
+ *    Inverts the sign of the first `n_elems` in `src` and stores the results in
+ *    the first `n_elems` of `dest`.
  *
  *    #### bw_buf_add()
  *  ```>>> */
@@ -95,6 +107,11 @@ static inline void bw_buf_mul(float *dest, const float *src1, const float *src2,
 static inline void bw_buf_fill(float *dest, float k, int n_elems) {
 	for (int i = 0; i < n_elems; i++)
 		dest[i] = k;
+}
+
+static inline void bw_buf_neg(float *dest, const float *src, int n_elems) {
+	for (int i = 0; i < n_elems; i++)
+		dest[i] = -src[i];
 }
 
 static inline void bw_buf_add(float *dest, const float *src, float k, int n_elems) {

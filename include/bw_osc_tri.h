@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
- *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Triangle oscillator waveshaper with variable slope (increasing time over
  *    period) and PolyBLEP antialiasing.

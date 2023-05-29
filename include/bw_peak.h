@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
  *  requires {{{
- *    bw_config bw_common bw_gain bw_math bw_mm2 bw_one_pole bw_svf
+ *    bw_common bw_config bw_gain bw_math bw_mm2 bw_one_pole bw_svf
  *  }}}
  *  description {{{
  *    Second-order peak filter with unitary gain at DC and asymptotically

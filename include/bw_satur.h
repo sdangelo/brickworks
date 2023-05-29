@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
- *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Antialiased tanh-based saturation with parametric bias and gain
  *    (compensation) and output bias removal.

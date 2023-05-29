@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
  *  requires {{{
- *    bw_config bw_common bw_gain bw_lp1 bw_math bw_mm1 bw_one_pole
+ *    bw_common bw_config bw_gain bw_lp1 bw_math bw_mm1 bw_one_pole
  *  }}}
  *  description {{{
  *    First-order high shelf filter (6 dB/oct) with unitary DC gain.

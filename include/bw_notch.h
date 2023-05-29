@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math bw_one_pole bw_svf }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole bw_svf }}}
  *  description {{{
  *    Second-order notch filter with unitary gain at DC and asymptotically as
  *    frequency increases, and null gain at cutoff frequency.

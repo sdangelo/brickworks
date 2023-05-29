@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.3.0 }}}
- *  requires {{{ bw_config bw_common bw_env_follow bw_one_pole bw_math }}}
+ *  requires {{{ bw_common bw_config bw_env_follow bw_math bw_one_pole }}}
  *  description {{{
  *    Noise gate with independent sidechain input.
  *  }}}

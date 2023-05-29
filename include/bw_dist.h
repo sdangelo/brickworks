@@ -22,8 +22,8 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
  *  requires {{{
- *    bw_clip bw_config bw_common bw_gain bw_hp1 bw_lp1 bw_math bw_mm2 bw_peak
- *    bw_one_pole bw_satur bw_svf
+ *    bw_clip bw_common bw_config bw_gain bw_hp1 bw_lp1 bw_math bw_mm2
+ *    bw_one_pole bw_peak bw_satur bw_svf
  *  }}}
  *  description {{{
  *    Distortion effect.

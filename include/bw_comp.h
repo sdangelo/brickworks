@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
  *  requires {{{
- *    bw_config bw_common bw_env_follow bw_one_pole bw_math bw_gain
+ *    bw_common bw_config bw_env_follow bw_gain bw_math bw_one_pole
  *  }}}
  *  description {{{
  *    Feedforward compressor/limiter with independent sidechain input.

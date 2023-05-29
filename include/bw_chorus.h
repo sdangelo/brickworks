@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
  *  requires {{{
- *    bw_buf bw_config bw_comb bw_common bw_delay bw_gain bw_math bw_one_pole
+ *    bw_buf bw_comb bw_common bw_config bw_delay bw_gain bw_math bw_one_pole
  *    bw_osc_sin bw_phase_gen
  *  }}}
  *  description {{{

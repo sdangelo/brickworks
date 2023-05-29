@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math bw_one_pole bw_svf }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole bw_svf }}}
  *  description {{{
  *    Second-order allpass filter (180° shift at cutoff, approaching 360° shift
  *    at high frequencies) with unitary gain.

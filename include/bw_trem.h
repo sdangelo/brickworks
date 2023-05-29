@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
  *  requires {{{
- *    bw_config bw_common bw_math bw_one_pole bw_osc_sin bw_phase_gen bw_ringmod
+ *    bw_common bw_config bw_math bw_one_pole bw_osc_sin bw_phase_gen bw_ringmod
  *  }}}
  *  description {{{
  *    Tremolo with variable speed and amount.

@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
  *  requires {{{
- *    bw_buf bw_config bw_common bw_delay bw_gain bw_math bw_one_pole
+ *    bw_buf bw_common bw_config bw_delay bw_gain bw_math bw_one_pole
  *  }}}
  *  description {{{
  *    Comb filter / delay effect with feedforward and feedback paths.

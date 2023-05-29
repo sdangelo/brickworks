@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math }}}
+ *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    One-pole (6 dB/oct) lowpass filter with unitary DC gain, separate attack
  *    and decay time constants, and sticky target-reach threshold.

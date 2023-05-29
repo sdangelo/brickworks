@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
  *  requires {{{
- *    bw_config bw_common bw_gain bw_math bw_mm2 bw_peak bw_one_pole bw_satur
+ *    bw_common bw_config bw_gain bw_math bw_mm2 bw_one_pole bw_peak bw_satur
  *    bw_svf
  *  }}}
  *  description {{{

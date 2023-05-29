@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_lp1 bw_math bw_one_pole }}}
+ *  requires {{{ bw_common bw_config bw_lp1 bw_math bw_one_pole }}}
  *  description {{{
  *    First-order allpass filter (90° shift at cutoff, approaching 180° shift
  *    at high frequencies) with unitary gain.

@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ utility }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common }}}
+ *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    Pseudo-random number generators.
  *

@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 0.5.0 }}}
  *  requires {{{
- *    bw_ap1 bw_config bw_common bw_lp1 bw_math bw_one_pole bw_osc_sin
+ *    bw_ap1 bw_common bw_config bw_lp1 bw_math bw_one_pole bw_osc_sin
  *    bw_phase_gen
  *  }}}
  *  description {{{

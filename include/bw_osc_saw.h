@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math }}}
+ *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Sawtooth oscillator waveshaper with PolyBLEP antialiasing.
  *

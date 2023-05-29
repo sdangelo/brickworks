@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.3.0 }}}
- *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Envelope follower made of a full-wave rectifier followed by
  *    [bw_one_pole](bw_one_pole) one-pole filter (6 dB/oct).

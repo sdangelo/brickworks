@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_math bw_one_pole }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    First-order lowpass filter (6 dB/oct) with unitary DC gain.
  *

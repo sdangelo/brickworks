@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
+ *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Pulse oscillator waveshaper with variable pulse width (actually, duty
  *    cycle) and PolyBLEP antialiasing.

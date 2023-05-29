@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common bw_math bw_rand }}}
+ *  requires {{{ bw_common bw_config bw_math bw_rand }}}
  *  description {{{
  *    Generator of white noise with uniform distribution.
  *

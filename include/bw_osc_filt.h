@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_config bw_common }}}
+ *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    Post-filter to decolorate oscillator waveshapers when antialiasing is on.
  *

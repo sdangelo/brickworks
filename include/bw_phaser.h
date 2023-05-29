@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{
  *    bw_ap1 bw_config bw_common bw_lp1 bw_math bw_one_pole bw_osc_sin
  *    bw_phase_gen
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Now properly setting allpass cutoff on reset.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -182,6 +187,7 @@ static inline void bw_phaser_set_sample_rate(bw_phaser_coeffs *BW_RESTRICT coeff
 static inline void bw_phaser_reset_coeffs(bw_phaser_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_reset_coeffs(&coeffs->phase_gen_coeffs);
 	bw_phase_gen_reset_state(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, 0.f);
+	bw_ap1_set_cutoff(&coeffs->ap1_coeffs, bw_clipf(coeffs->center, 1.f, coeffs->cutoff_max));
 	bw_ap1_reset_coeffs(&coeffs->ap1_coeffs);
 }
 

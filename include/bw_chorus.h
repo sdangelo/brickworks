@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{
  *    bw_buf bw_config bw_comb bw_common bw_delay bw_gain bw_math bw_one_pole
  *    bw_osc_sin bw_phase_gen
@@ -36,7 +36,13 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Now properly setting feedforward delay on reset.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
  *          <li>First release.</li>
  *        </ul>
  *      </li>
@@ -228,6 +234,7 @@ static inline void bw_chorus_mem_set(bw_chorus_state *BW_RESTRICT state, void *m
 static inline void bw_chorus_reset_coeffs(bw_chorus_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_reset_coeffs(&coeffs->phase_gen_coeffs);
 	bw_phase_gen_reset_state(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, 0.f);
+	bw_comb_set_delay_ff(&coeffs->comb_coeffs, coeffs->delay);
 	bw_comb_reset_coeffs(&coeffs->comb_coeffs);
 }
 

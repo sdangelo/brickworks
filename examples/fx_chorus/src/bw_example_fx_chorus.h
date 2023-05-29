@@ -29,7 +29,7 @@ extern "C" {
 
 enum {
 	p_rate,
-	p_amount,
+	p_depth,
 	p_n
 };
 

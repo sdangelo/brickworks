@@ -55,7 +55,7 @@ void bw_example_fx_chorus_set_parameter(bw_example_fx_chorus *instance, int inde
 	case p_rate:
 		bw_chorus_set_rate(&instance->chorus_coeffs, 0.01f + 1.99f * value * value * value);
 		break;
-	case p_amount:
+	case p_depth:
 		bw_chorus_set_amount(&instance->chorus_coeffs, 0.004f * value);
 		break;
 	}

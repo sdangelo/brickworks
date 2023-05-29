@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_config bw_common bw_one_pole bw_math }}}
  *  description {{{
  *    Triangle oscillator waveshaper with variable slope (increasing time over
@@ -31,6 +31,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed typo in <code>bw_osc_tri_process1\*()</code>
+ *              documentation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -96,7 +102,7 @@ static inline void bw_osc_tri_update_coeffs_audio(bw_osc_tri_coeffs *BW_RESTRICT
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
- *    #### bw_osc_pulse_process1\*()
+ *    #### bw_osc_tri_process1\*()
  *  ```>>> */
 static inline float bw_osc_tri_process1(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x);
 static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc);

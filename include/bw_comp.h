@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{
  *    bw_config bw_common bw_env_follow bw_one_pole bw_math bw_gain
  *  }}}
@@ -29,6 +29,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed typo in <code>bw_comp_set_ratio()</code>
+ *              documentation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -133,7 +139,7 @@ static inline void bw_comp_set_thresh_dBFS(bw_comp_coeffs *BW_RESTRICT coeffs, f
  *  ```>>> */
 static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
- *    Sets the copmpression ratio `value` in `coeffs`.
+ *    Sets the compression ratio `value` in `coeffs`.
  *
  *    `value` is actually the slope of the gain curve above the threshold,
  *    hence `1.f` means no compression and `0.f` is a hard limit.

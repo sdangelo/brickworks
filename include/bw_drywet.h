@@ -97,21 +97,13 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
  *    wet input buffer `x_wet` and fills the first `n_samples` of the output
  *    buffer `y`, while using and updating `coeffs` (control and audio rate).
  *
- *    #### bw_drywet_set_wet_lin()
+ *    #### bw_drywet_set_wet()
  *  ```>>> */
-static inline void bw_drywet_set_wet_lin(bw_drywet_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_drywet_set_wet(bw_drywet_coeffs *BW_RESTRICT coeffs, float value);
 /*! <<<```
  *    Sets the wet gain parameter to the given `value` (linear gain) in `coeffs`.
  *
  *    Default value: `1.f`.
- *
- *    #### bw_drywet_set_wet_dB()
- *  ```>>> */
-static inline void bw_drywet_set_wet_dB(bw_drywet_coeffs *BW_RESTRICT coeffs, float value);
-/*! <<<```
- *    Sets the wet gain parameter to the given `value` (dB) in `coeffs`.
- *
- *    Default value: `0.f`.
  *
  *    #### bw_drywet_set_smooth_tau()
  *  ```>>> */
@@ -131,7 +123,7 @@ static inline void bw_drywet_set_smooth_tau(bw_drywet_coeffs *BW_RESTRICT coeffs
 
 struct _bw_drywet_coeffs {
 	// Sub-components
-	bw_gain			gain_coeffs;
+	bw_gain_coeffs	gain_coeffs;
 };
 
 static inline void bw_drywet_init(bw_drywet_coeffs *BW_RESTRICT coeffs) {
@@ -139,7 +131,7 @@ static inline void bw_drywet_init(bw_drywet_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_drywet_set_sample_rate(bw_drywet_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	bw_gain_sample_rate(&coeffs->smooth_coeffs, sample_rate);
+	bw_gain_set_sample_rate(&coeffs->gain_coeffs, sample_rate);
 }
 
 static inline void bw_drywet_reset_coeffs(bw_drywet_coeffs *BW_RESTRICT coeffs) {
@@ -155,7 +147,7 @@ static inline void bw_drywet_update_coeffs_audio(bw_drywet_coeffs *BW_RESTRICT c
 }
 
 static inline float bw_drywet_process1(const bw_drywet_coeffs *BW_RESTRICT coeffs, float x_dry, float x_wet) {
-	return bw_gain_get_gain(coeffs->gain_coeffs) * (x_wet - x_dry) + x_dry;
+	return bw_gain_get_gain(&coeffs->gain_coeffs) * (x_wet - x_dry) + x_dry;
 }
 
 static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const float *x_dry, const float *x_wet, float *y, int n_samples) {
@@ -166,12 +158,8 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
 	}
 }
 
-static inline void bw_drywet_set_drywet_lin(bw_drywet_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_drywet_set_wet(bw_drywet_coeffs *BW_RESTRICT coeffs, float value) {
 	bw_gain_set_gain_lin(&coeffs->gain_coeffs, value);
-}
-
-static inline void bw_drywet_set_drywet_dB(bw_drywet_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_gain_set_gain_dB(&coeffs->gain_coeffs, value);
 }
 
 static inline void bw_drywet_set_smooth_tau(bw_drywet_coeffs *BW_RESTRICT coeffs, float value) {

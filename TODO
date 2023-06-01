@@ -45,6 +45,7 @@ code:
 * bw_fuzz gain compensation?
 * remove union value = {.f = v};? (std c++ latest)
 * make gain of distortions homogeneous?
+* max_delay -> set sample rate? see reverb
 
 build system:
 * make makefiles handle paths with spaces etc

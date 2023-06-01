@@ -20,13 +20,19 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Ring modulator with variable modulation amount.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed inverted-polarity modulation.</li>
+ *          <li>"modulator signal" -> "modulation signal" in documentation.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -86,14 +92,14 @@ static inline void bw_ringmod_update_coeffs_audio(bw_ringmod_coeffs *BW_RESTRICT
  *  ```>>> */
 static inline float bw_ringmod_process1(const bw_ringmod_coeffs *BW_RESTRICT coeffs, float x_mod, float x_car);
 /*! <<<```
- *    Processes one modulator input sample `x_mod` and one carrier input sample
+ *    Processes one modulation input sample `x_mod` and one carrier input sample
  *    `x_car` using `coeffs` and returns the corresponding output sample.
  *
  *    #### bw_ringmod_process()
  *  ```>>> */
 static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float *x_mod, const float *x_car, float *y, int n_samples);
 /*! <<<```
- *    Processes the first `n_samples` of the modulator input buffer `x_mod` and
+ *    Processes the first `n_samples` of the modulation input buffer `x_mod` and
  *    of the carrier input buffer `x_car` and fills the first `n_samples` of the
  *    output buffer `y`, while using and updating `coeffs` (control and audio
  *    rate).
@@ -150,7 +156,8 @@ static inline void bw_ringmod_update_coeffs_audio(bw_ringmod_coeffs *BW_RESTRICT
 }
 
 static inline float bw_ringmod_process1(const bw_ringmod_coeffs *BW_RESTRICT coeffs, float x_mod, float x_car) {
-	return bw_one_pole_get_y_z1(&coeffs->smooth_state) * (x_car * x_mod - x_mod) + x_mod;
+	const float k = bw_one_pole_get_y_z1(&coeffs->smooth_state);
+	return k * x_car * x_mod + bw_absf(1.f - k) * x_mod;
 }
 
 static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float *x_mod, const float *x_car, float *y, int n_samples) {

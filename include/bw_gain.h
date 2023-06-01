@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Gain.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_gain_get_gain()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Renamed as bw_gain.</li>
@@ -133,6 +138,12 @@ static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, fl
  *    Sets the smoothing time constant `value` (s) in `coeffs`.
  *
  *    Default value: `0.05f`.
+ *
+ *    #### bw_gain_get_gain()
+ *  ```>>> */
+static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    Returns the actual current gain coefficient (linear gain) in `coeffs`.
  *  }}} */
 
 /*** Implementation ***/
@@ -209,6 +220,10 @@ static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float
 
 static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
 	coeffs->smooth_tau = value;
+}
+
+static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs) {
+	return bw_one_pole_get_y_z1(&coeffs->smooth_state);
 }
 
 #ifdef __cplusplus

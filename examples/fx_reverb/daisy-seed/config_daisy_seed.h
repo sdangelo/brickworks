@@ -26,10 +26,14 @@ struct config_pin {
 	int	pin;
 };
 
-#define NUM_PINS 	1
+#define NUM_PINS 	5
 
 static struct config_pin config_pins[NUM_PINS] = {
-	{ 0, 15 }
+	{ 0, 15 },
+	{ 1, 16 },
+	{ 2, 17 },
+	{ 3, 18 },
+	{ 4, 19 }
 };
 
 #endif

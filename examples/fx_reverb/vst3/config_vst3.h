@@ -21,16 +21,16 @@
 #ifndef _VST3_CONFIG_H
 #define _VST3_CONFIG_H
 
-#define PLUGIN_SUBCATEGORY	"Fx|Delay"
+#define PLUGIN_SUBCATEGORY	"Fx|Reverb"
 
-#define PLUGIN_GUID_1		0x30a47806
-#define PLUGIN_GUID_2		0x850f445c
-#define PLUGIN_GUID_3		0x9f13660d
-#define PLUGIN_GUID_4		0x0e26f2dc
+#define PLUGIN_GUID_1		0x24c2034d
+#define PLUGIN_GUID_2		0xc34a4553
+#define PLUGIN_GUID_3		0xa556f26b
+#define PLUGIN_GUID_4		0x07853b68
 
-#define CTRL_GUID_1		0xfd1e3d99
-#define CTRL_GUID_2		0xd2cb4d57
-#define CTRL_GUID_3		0x82e54aaf
-#define CTRL_GUID_4		0x5e1a5bd5
+#define CTRL_GUID_1		0x1c2c5513
+#define CTRL_GUID_2		0x3b1f40bb
+#define CTRL_GUID_3		0x8c5e4588
+#define CTRL_GUID_4		0xea7166cd
 
 #endif

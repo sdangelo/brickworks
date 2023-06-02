@@ -419,18 +419,18 @@ static inline void bw_reverb_reset_coeffs(bw_reverb_coeffs *BW_RESTRICT coeffs) 
 static inline void bw_reverb_reset_state(const bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state) {
 	bw_delay_reset_state(&coeffs->predelay_coeffs, &state->predelay_state);
 	bw_lp1_reset_state(&coeffs->bandwidth_coeffs, &state->bandwidth_state, 0.f);
-	bw_delay_reset_state(&coeffs->delay_id1_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_id2_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_id3_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_id4_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_dd1_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_dd2_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_dd3_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_dd4_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_d1_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_d2_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_d3_coeffs, &state->predelay_state);
-	bw_delay_reset_state(&coeffs->delay_d4_coeffs, &state->predelay_state);
+	bw_delay_reset_state(&coeffs->delay_id1_coeffs, &state->delay_id1_state);
+	bw_delay_reset_state(&coeffs->delay_id2_coeffs, &state->delay_id2_state);
+	bw_delay_reset_state(&coeffs->delay_id3_coeffs, &state->delay_id3_state);
+	bw_delay_reset_state(&coeffs->delay_id4_coeffs, &state->delay_id4_state);
+	bw_delay_reset_state(&coeffs->delay_dd1_coeffs, &state->delay_dd1_state);
+	bw_delay_reset_state(&coeffs->delay_dd2_coeffs, &state->delay_dd2_state);
+	bw_delay_reset_state(&coeffs->delay_dd3_coeffs, &state->delay_dd3_state);
+	bw_delay_reset_state(&coeffs->delay_dd4_coeffs, &state->delay_dd4_state);
+	bw_delay_reset_state(&coeffs->delay_d1_coeffs, &state->delay_d1_state);
+	bw_delay_reset_state(&coeffs->delay_d2_coeffs, &state->delay_d2_state);
+	bw_delay_reset_state(&coeffs->delay_d3_coeffs, &state->delay_d3_state);
+	bw_delay_reset_state(&coeffs->delay_d4_coeffs, &state->delay_d4_state);
 	bw_lp1_reset_state(&coeffs->damping_coeffs, &state->damping_1_state, 0.f);
 	bw_lp1_reset_state(&coeffs->damping_coeffs, &state->damping_2_state, 0.f);
 }

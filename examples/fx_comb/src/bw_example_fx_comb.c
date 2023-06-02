@@ -33,7 +33,7 @@ BW_SIZE_T bw_example_fx_comb_mem_req(bw_example_fx_comb *instance) {
 }
 
 void bw_example_fx_comb_mem_set(bw_example_fx_comb *instance, void *mem) {
-	bw_comb_mem_set(&instance->comb_state, mem);
+	bw_comb_mem_set(&instance->comb_coeffs, &instance->comb_state, mem);
 }
 
 void bw_example_fx_comb_reset(bw_example_fx_comb *instance) {

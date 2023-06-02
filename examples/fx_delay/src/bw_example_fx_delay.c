@@ -33,7 +33,7 @@ BW_SIZE_T bw_example_fx_delay_mem_req(bw_example_fx_delay *instance) {
 }
 
 void bw_example_fx_delay_mem_set(bw_example_fx_delay *instance, void *mem) {
-	bw_delay_mem_set(&instance->delay_state, mem);
+	bw_delay_mem_set(&instance->delay_coeffs, &instance->delay_state, mem);
 }
 
 void bw_example_fx_delay_reset(bw_example_fx_delay *instance) {

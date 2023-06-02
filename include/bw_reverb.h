@@ -80,14 +80,14 @@ static inline void bw_reverb_set_sample_rate(bw_reverb_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_reverb_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_reverb_mem_req(bw_reverb_coeffs *BW_RESTRICT coeffs);
+static inline BW_SIZE_T bw_reverb_mem_req(const bw_reverb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_reverb_mem_set()` using `coeffs`.
  *
  *    #### bw_reverb_mem_set()
  *  ```>>> */
-static inline void bw_reverb_mem_set(bw_reverb_state *BW_RESTRICT state, void *mem);
+static inline void bw_reverb_mem_set(const bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, void *mem);
 /*! <<<```
  *    Associates the contiguous memory block `mem` to the given `state`.
  *
@@ -227,6 +227,18 @@ struct _bw_reverb_coeffs {
 struct _bw_reverb_state {
 	bw_delay_state		predelay_state;
 	bw_lp1_state		bandwidth_state;
+	bw_delay_state		delay_id1_state;
+	bw_delay_state		delay_id2_state;
+	bw_delay_state		delay_id3_state;
+	bw_delay_state		delay_id4_state;
+	bw_delay_state		delay_dd1_state;
+	bw_delay_state		delay_dd2_state;
+	bw_delay_state		delay_dd3_state;
+	bw_delay_state		delay_dd4_state;
+	bw_delay_state		delay_d1_state;
+	bw_delay_state		delay_d2_state;
+	bw_delay_state		delay_d3_state;
+	bw_delay_state		delay_d4_state;
 };
 
 static inline void bw_reverb_init(bw_reverb_coeffs *BW_RESTRICT coeffs) {
@@ -285,10 +297,9 @@ static inline void bw_reverb_set_sample_rate(bw_reverb_coeffs *BW_RESTRICT coeff
 	coeffs->d2 = (BW_SIZE_T)bw_roundf(coeffs->fs * (3720.f / 29761.f));
 	coeffs->d3 = (BW_SIZE_T)bw_roundf(coeffs->fs * (4217.f / 29761.f));
 	coeffs->d4 = (BW_SIZE_T)bw_roundf(coeffs->fs * (3163.f / 29761.f));
-	//set delay...
 }
 
-static inline BW_SIZE_T bw_reverb_mem_req(bw_reverb_coeffs *BW_RESTRICT coeffs) {
+static inline BW_SIZE_T bw_reverb_mem_req(const bw_reverb_coeffs *BW_RESTRICT coeffs) {
 	return bw_delay_mem_req(&coeffs->predelay_coeffs)
 		+ bw_delay_mem_req(&coeffs->delay_id1_coeffs)
 		+ bw_delay_mem_req(&coeffs->delay_id2_coeffs)
@@ -304,32 +315,33 @@ static inline BW_SIZE_T bw_reverb_mem_req(bw_reverb_coeffs *BW_RESTRICT coeffs) 
 		+ bw_delay_mem_req(&coeffs->delay_d4_coeffs);
 }
 
-static inline void bw_reverb_mem_set(bw_reverb_state *BW_RESTRICT state, void *mem) {
-	bw_delay_mem_set(&state->predelay_state, mem);
-	mem += bw_delay_mem_req(&coeffs->predelay_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_id1_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_id1_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_id2_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_id2_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_id3_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_id3_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_id4_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_id4_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_dd1_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_dd1_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_dd2_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_dd2_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_dd3_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_dd3_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_dd4_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_dd4_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_d1_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_d1_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_d2_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_d2_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_d3_state, mem);
-	mem += bw_delay_mem_req(&coeffs->delay_d3_coeffs) * sizeof(float);
-	bw_delay_mem_set(&state->delay_d4_state, mem);
+static inline void bw_reverb_mem_set(const bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, void *mem) {
+	float *m = (float *)mem;
+	bw_delay_mem_set(&coeffs->predelay_coeffs, &state->predelay_state, m);
+	m += bw_delay_mem_req(&coeffs->predelay_coeffs);
+	bw_delay_mem_set(&coeffs->delay_id1_coeffs, &state->delay_id1_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_id1_coeffs);
+	bw_delay_mem_set(&coeffs->delay_id2_coeffs, &state->delay_id2_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_id2_coeffs);
+	bw_delay_mem_set(&coeffs->delay_id3_coeffs, &state->delay_id3_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_id3_coeffs);
+	bw_delay_mem_set(&coeffs->delay_id4_coeffs, &state->delay_id4_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_id4_coeffs);
+	bw_delay_mem_set(&coeffs->delay_dd1_coeffs, &state->delay_dd1_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_dd1_coeffs);
+	bw_delay_mem_set(&coeffs->delay_dd2_coeffs, &state->delay_dd2_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_dd2_coeffs);
+	bw_delay_mem_set(&coeffs->delay_dd3_coeffs, &state->delay_dd3_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_dd3_coeffs);
+	bw_delay_mem_set(&coeffs->delay_dd4_coeffs, &state->delay_dd4_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_dd4_coeffs);
+	bw_delay_mem_set(&coeffs->delay_d1_coeffs, &state->delay_d1_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_d1_coeffs);
+	bw_delay_mem_set(&coeffs->delay_d2_coeffs, &state->delay_d2_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_d2_coeffs);
+	bw_delay_mem_set(&coeffs->delay_d3_coeffs, &state->delay_d3_state, m);
+	m += bw_delay_mem_req(&coeffs->delay_d3_coeffs);
+	bw_delay_mem_set(&coeffs->delay_d4_coeffs, &state->delay_d4_state, m);
 }
 
 static inline void bw_reverb_reset_coeffs(bw_reverb_coeffs *BW_RESTRICT coeffs) {
@@ -382,16 +394,19 @@ static inline void bw_reverb_update_coeffs_audio(bw_reverb_coeffs *BW_RESTRICT c
 	bw_delay_set_delay(&coeffs->predelay_coeffs, pd);
 	bw_delay_update_coeffs_ctrl(&coeffs->predelay_coeffs);
 	bw_delay_update_coeffs_audio(&coeffs->predelay_coeffs);
-	//...
 }
 
 static inline void bw_reverb_process1(const bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, float xl, float xr, float *yl, float *yr) {
 	const float i = 0.5f * (xl + xr);
 	const float pd = bw_delay_process1(&coeffs->predelay_coeffs, &state->predelay_state, i);
 	const float bw = bw_lp1_process1(&coeffs->bandwidth_coeffs, &state->bandwidth_state, pd);
+	const float n14 = bw_delay_read(&coeffs->delay_id1_coeffs, &state->delay_id1_state, coeffs->id1, 0.f);
+	const float n13 = bw - 0.75f * n14;
+	const float id1 = 0.75f * n13 + n14;
+	bw_delay_write(&coeffs->delay_id1_coeffs, &state->delay_id1_state, n13);
 	//...
-	*yl = bw_drywet_process1(&coeffs->drywet_coeffs, xl, bw);
-	*yr = bw_drywet_process1(&coeffs->drywet_coeffs, xr, bw);
+	*yl = bw_drywet_process1(&coeffs->drywet_coeffs, xl, id1);
+	*yr = bw_drywet_process1(&coeffs->drywet_coeffs, xr, id1);
 }
 
 static inline void bw_reverb_process(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, const float *xl, const float *xr, float *yl, float *yr, int n_samples) {

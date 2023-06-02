@@ -37,7 +37,7 @@ BW_SIZE_T bw_example_fx_flanger_mem_req(bw_example_fx_flanger *instance) {
 }
 
 void bw_example_fx_flanger_mem_set(bw_example_fx_flanger *instance, void *mem) {
-	bw_chorus_mem_set(&instance->chorus_state, mem);
+	bw_chorus_mem_set(&instance->chorus_coeffs, &instance->chorus_state, mem);
 }
 
 void bw_example_fx_flanger_reset(bw_example_fx_flanger *instance) {

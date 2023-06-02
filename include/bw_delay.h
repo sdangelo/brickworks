@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_buf bw_common bw_config bw_math }}}
  *  description {{{
  *    Interpolated delay line, not smoothed.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Updated mem_req/set API.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -77,14 +82,14 @@ static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_delay_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs);
+static inline BW_SIZE_T bw_delay_mem_req(const bw_delay_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_delay_mem_set()` using `coeffs`.
  *
  *    #### bw_delay_mem_set()
  *  ```>>> */
-static inline void bw_delay_mem_set(bw_delay_state *BW_RESTRICT state, void *mem);
+static inline void bw_delay_mem_set(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, void *mem);
 /*! <<<```
  *    Associates the contiguous memory block `mem` to the given `state`.
  *
@@ -195,11 +200,12 @@ static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs,
 	coeffs->len = (BW_SIZE_T)bw_ceilf(coeffs->fs * coeffs->max_delay) + 1;
 }
 
-static inline BW_SIZE_T bw_delay_mem_req(bw_delay_coeffs *BW_RESTRICT coeffs) {
+static inline BW_SIZE_T bw_delay_mem_req(const bw_delay_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->len * sizeof(float);
 }
 
-static inline void bw_delay_mem_set(bw_delay_state *BW_RESTRICT state, void *mem) {
+static inline void bw_delay_mem_set(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, void *mem) {
+	(void)coeffs;
 	state->buf = (float *)mem;
 }
 

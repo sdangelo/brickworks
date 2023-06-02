@@ -33,7 +33,7 @@ BW_SIZE_T bw_example_fx_reverb_mem_req(bw_example_fx_reverb *instance) {
 }
 
 void bw_example_fx_reverb_mem_set(bw_example_fx_reverb *instance, void *mem) {
-	bw_reverb_mem_set(&instance->reverb_state, mem);
+	bw_reverb_mem_set(&instance->reverb_coeffs, &instance->reverb_state, mem);
 }
 
 void bw_example_fx_reverb_reset(bw_example_fx_reverb *instance) {

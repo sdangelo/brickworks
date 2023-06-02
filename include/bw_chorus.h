@@ -38,6 +38,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Updated mem_req/set API.</li>
  *          <li>Now properly setting feedforward delay on reset.</li>
  *        </ul>
  *      </li>
@@ -87,14 +88,14 @@ static inline void bw_chorus_set_sample_rate(bw_chorus_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_chorus_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_chorus_mem_req(bw_chorus_coeffs *BW_RESTRICT coeffs);
+static inline BW_SIZE_T bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_chorus_mem_set()` using `coeffs`.
  *
  *    #### bw_chorus_mem_set()
  *  ```>>> */
-static inline void bw_chorus_mem_set(bw_chorus_state *BW_RESTRICT state, void *mem);
+static inline void bw_chorus_mem_set(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, void *mem);
 /*! <<<```
  *    Associates the contiguous memory block `mem` to the given `state`.
  *
@@ -223,12 +224,13 @@ static inline void bw_chorus_set_sample_rate(bw_chorus_coeffs *BW_RESTRICT coeff
 	bw_comb_set_sample_rate(&coeffs->comb_coeffs, sample_rate);
 }
 
-static inline BW_SIZE_T bw_chorus_mem_req(bw_chorus_coeffs *BW_RESTRICT coeffs) {
+static inline BW_SIZE_T bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeffs) {
 	return bw_comb_mem_req(&coeffs->comb_coeffs);
 }
 
-static inline void bw_chorus_mem_set(bw_chorus_state *BW_RESTRICT state, void *mem) {
-	bw_comb_mem_set(&state->comb_state, mem);
+static inline void bw_chorus_mem_set(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, void *mem) {
+	(void)coeffs;
+	bw_comb_mem_set(&coeffs->comb_coeffs, &state->comb_state, mem);
 }
 
 static inline void bw_chorus_reset_coeffs(bw_chorus_coeffs *BW_RESTRICT coeffs) {

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{
  *    bw_buf bw_common bw_config bw_delay bw_gain bw_math bw_one_pole
  *  }}}
@@ -37,7 +37,14 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Updated mem_req/set API.</li>
+ *        </ul>
+ *      </li>
+ *    </ul>
  *      <li>Version <strong>0.4.0</strong>:
+ *        <ul>
  *          <li>First release.</li>
  *        </ul>
  *      </li>
@@ -82,14 +89,14 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
  *
  *    #### bw_comb_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_comb_mem_req(bw_comb_coeffs *BW_RESTRICT coeffs);
+static inline BW_SIZE_T bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_comb_mem_set()` using `coeffs`.
  *
  *    #### bw_comb_mem_set()
  *  ```>>> */
-static inline void bw_comb_mem_set(bw_comb_state *BW_RESTRICT state, void *mem);
+static inline void bw_comb_mem_set(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, void *mem);
 /*! <<<```
  *    Associates the contiguous memory block `mem` to the given `state`.
  *
@@ -235,12 +242,13 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
 	coeffs->fs = sample_rate;
 }
 
-static inline BW_SIZE_T bw_comb_mem_req(bw_comb_coeffs *BW_RESTRICT coeffs) {
+static inline BW_SIZE_T bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs) {
 	return bw_delay_mem_req(&coeffs->delay_coeffs);
 }
 
-static inline void bw_comb_mem_set(bw_comb_state *BW_RESTRICT state, void *mem) {
-	bw_delay_mem_set(&state->delay_state, mem);
+static inline void bw_comb_mem_set(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, void *mem) {
+	(void)coeffs;
+	bw_delay_mem_set(&coeffs->delay_coeffs, &state->delay_state, mem);
 }
 
 static inline void _bw_comb_do_update_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs, char force) {

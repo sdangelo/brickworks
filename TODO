@@ -46,6 +46,7 @@ code:
 * remove union value = {.f = v};? (std c++ latest)
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
+* revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
 
 build system:
 * make makefiles handle paths with spaces etc

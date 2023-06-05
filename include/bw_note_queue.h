@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ utility }}}
  *  version {{{ 0.5.0 }}}
- *  requires {{{ }}}
+ *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    Note queue.
  *
@@ -45,62 +45,61 @@
 extern "C" {
 #endif
 
+#include <bw_common.h>
+
 /*! api {{{
  *    #### bw_note_queue_status
  *  ```>>> */
-struct _bw_note_queue_status {
+typedef struct {
 	char		pressed;
-	float		velocity;
-};
-typedef struct _bw_note_queue_status bw_note_queue_status;
+	float		velocity;	// negative = unknown / not available
+} bw_note_queue_status;
 /*! <<<```
  *    #### bw_note_queue_event
  *  ```>>> */
-struct _bw_note_queue_event {
+typedef struct {
 	unsigned char		note;
 	bw_note_queue_status	status;
 	char			went_off;
-};
-typedef struct _bw_note_queue_event bw_note_queue_event;
+} bw_note_queue_event;
 /*! <<<```
  *    #### bw_note_queue
  *  ```>>> */
-struct _bw_note_queue {
+typedef struct {
 	bw_note_queue_event	events[128];
 	unsigned char		n_events;
 	bw_note_queue_status	status[128];
 	unsigned char		n_pressed;
-};
-typedef struct _bw_note_queue bw_note_queue;
+} bw_note_queue;
 /*! <<<```
  *    #### bw_note_queue_reset()
  *  ```>>> */
-static inline void bw_note_queue_reset(bw_note_queue *queue);
+static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue);
 /*! <<<```
  *    #### bw_note_queue_clear()
  *  ```>>> */
-static inline void bw_note_queue_clear(bw_note_queue *queue);
+static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue);
 /*! <<<```
  *    #### bw_note_queue_add()
  *  ```>>> */
-static inline void bw_note_queue_add(bw_note_queue *queue, unsigned char note, char pressed, float velocity, char force_went_off);
+static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off);
 
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-static inline void bw_note_queue_reset(bw_note_queue *queue) {
+static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue) {
 	for (char i = 0; i < 128; i++)
 		queue->status[i] = { 0, 0.f };
 	queue->n_pressed = 0;
 }
 
-static inline void bw_note_queue_clear(bw_note_queue *queue) {
+static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue) {
 	queue->n_events = 0;
 }
 
-static inline void bw_note_queue_add(bw_note_queue *queue, unsigned char note, char pressed, float velocity, char force_went_off) {
+static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off) {
 	if (!pressed && !queue->status[note].pressed)
 		return;
 

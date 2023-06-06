@@ -60,7 +60,6 @@ typedef enum
  *  ```>>> */
 typedef struct {
 	bw_voice_alloc_mode	mode;
-	char			unison;
 
 	void (*note_on)(void *BW_RESTRICT voice, unsigned char note, float velocity);
 	void (*note_off)(void *BW_RESTRICT voice, float velocity);

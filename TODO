@@ -47,6 +47,7 @@ code:
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
 * revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
+* sr-dependent vs cr-dependent coeffs? see synth poly example
 
 build system:
 * make makefiles handle paths with spaces etc

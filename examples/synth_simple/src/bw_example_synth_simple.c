@@ -62,8 +62,6 @@ void bw_example_synth_simple_reset(bw_example_synth_simple *instance) {
 void bw_example_synth_simple_process(bw_example_synth_simple *instance, const float** x, float** y, int n_samples) {
 	(void)x;
 
-	char gate = instance->note >= 0 ? 1 : 0;
-	bw_env_gen_set_gate(&instance->env_gen_coeffs, gate);
 	if (instance->note >= 0)
 		bw_phase_gen_set_frequency(&instance->phase_gen_coeffs,
 			440.f * bw_pow2f_3(8.333333333333333e-2f * ((instance->note - 69) + 2.f * instance->params[p_master_tune] - 1.f)));
@@ -76,7 +74,7 @@ void bw_example_synth_simple_process(bw_example_synth_simple *instance, const fl
 		bw_osc_pulse_process(&instance->osc_pulse_coeffs, out, instance->buf, out, n);
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		bw_svf_process(&instance->svf_coeffs, &instance->svf_state, out, out, NULL, NULL, n);
-		bw_env_gen_process(&instance->env_gen_coeffs, &instance->env_gen_state, instance->buf, n);
+		bw_env_gen_process(&instance->env_gen_coeffs, &instance->env_gen_state, instance->note >= 0, instance->buf, n);
 		bw_buf_mul(out, out, instance->buf, n);
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);

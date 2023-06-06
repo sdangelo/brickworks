@@ -83,6 +83,8 @@ static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue);
  *    #### bw_note_queue_add()
  *  ```>>> */
 static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off);
+/*! <<<```
+ *  }}} */
 
 /*** Implementation ***/
 

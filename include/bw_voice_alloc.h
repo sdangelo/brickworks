@@ -18,6 +18,26 @@
  * File author: Stefano D'Angelo
  */
 
+/*!
+ *  module_type {{{ utility }}}
+ *  version {{{ 0.5.0 }}}
+ *  requires {{{ bw_common bw_config bw_note_queue }}}
+ *  description {{{
+ *    Basic voice allocator.
+ *
+ *    ...
+ *  }}}
+ *  changelog {{{
+ *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>First release.</li>
+ *        </ul>
+ *      </li>
+ *    </ul>
+ *  }}}
+ */
+
 #ifndef _BW_VOICE_ALLOC_H
 #define _BW_VOICE_ALLOC_H
 
@@ -28,24 +48,38 @@ extern "C" {
 #include <bw_common.h>
 #include <bw_note_queue.h>
 
+/*! api {{{
+ *    #### bw_voice_alloc_mode
+ *  ```>>> */
 typedef enum 
 	bw_voice_alloc_mode_low,
 	bw_voice_alloc_mode_high
 } bw_voice_alloc_mode;
-
+/*! <<<```
+ *    #### bw_voice_alloc_opts
+ *  ```>>> */
 typedef struct {
 	bw_voice_alloc_mode	mode;
 	char			unison;
 
-	void (*note_on)(const void *BW_RESTRICT voice, unsigned char note, float velocity);
-	void (*note_off)(const void *BW_RESTRICT voice, float velocity);
-	unsigned char (*get_note)(const void *BW_RESTRICT voice);
-	char (*is_free)(const void *BW_RESTRICT voice);
+	void (*note_on)(void *BW_RESTRICT voice, unsigned char note, float velocity);
+	void (*note_off)(void *BW_RESTRICT voice, float velocity);
+	unsigned char (*get_note)(void *BW_RESTRICT voice);
+	char (*is_free)(void *BW_RESTRICT voice);
 } bw_voice_alloc_opts;
+/*! <<<```
+ *    #### bw_voice_alloc()
+ *  ```>>> */
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, int n_voices);
+/*! <<<```
+ *  }}} */
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, const void **BW_RESTRICT voices, int n_voices);
+/*** Implementation ***/
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, const void **BW_RESTRICT voices, int n_voices) {
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, int n_voices) {
 	for (unsigned char i = 0; i < queue->n_events; i++) {
 		bw_note_queue_event *ev = queue->events + i;
 		for (int j = 0; j < n_voices; j++)
@@ -58,7 +92,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 			}
 
 		if (ev->status.pressed) {
-			for (j = 0; j < n_voices; j++)
+			for (int j = 0; j < n_voices; j++)
 				if (opt->is_free(voices[j])) { 
 					opts->note_on(voices[j], ev->note, ev->status.velocity);
 					goto next_event;
@@ -66,7 +100,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 			int k = -1;
 			int v = ev->note;
-			for (j = 0; j < n_voices; j++) {
+			for (int j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
 				if (opts->mode == bw_voice_alloc_mode_low ? n > v : n < v) {
 					v = n;

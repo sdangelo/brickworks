@@ -39,6 +39,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_peak_process_multi()</code>.</li>
  *          <li>Fixed documentation for <code>bw_peak_set_peak_gain_lin()</code>
  *              and <code>bw_peak_set_gain_dB()</code>.</li>
  *        </ul>
@@ -131,6 +132,15 @@ static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_s
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_peak_process_multi()
+ *  ```>>> */
+static inline void bw_peak_process_multi(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
  *
  *    #### bw_peak_set_cutoff()
  *  ```>>> */
@@ -277,6 +287,15 @@ static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_s
 	for (int i = 0; i < n_samples; i++) {
 		bw_peak_update_coeffs_audio(coeffs);
 		y[i] = bw_peak_process1(coeffs, state, x[i]);
+	}
+}
+
+static inline void bw_peak_process_multi(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_peak_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_peak_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_peak_process1(coeffs, state[j], x[j][i]);
 	}
 }
 

@@ -125,6 +125,15 @@ static inline void bw_clip_process(bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_s
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
+ *    #### bw_clip_process_multi()
+ *  ```>>> */
+static inline void bw_clip_process_multi(bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
+ *
  *    #### bw_clip_set_bias()
  *  ```>>> */
 static inline void bw_clip_set_bias(bw_clip_coeffs *BW_RESTRICT coeffs, float value);
@@ -255,6 +264,21 @@ static inline void bw_clip_process(bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_s
 		for (int i = 0; i < n_samples; i++) {
 			bw_clip_update_coeffs_audio(coeffs);
 			y[i] = bw_clip_process1(coeffs, state, x[i]);
+		}
+}
+
+static inline void bw_clip_process_multi(bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	if (coeffs->gain_compensation)
+		for (int i = 0; i < n_samples; i++) {
+			bw_clip_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++)
+				y[j][i] = bw_clip_process1_comp(coeffs, state[j], x[j][i]);
+		}
+	else
+		for (int i = 0; i < n_samples; i++) {
+			bw_clip_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++)
+				y[j][i] = bw_clip_process1(coeffs, state[j], x[j][i]);
 		}
 }
 

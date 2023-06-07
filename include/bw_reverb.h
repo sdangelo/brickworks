@@ -119,16 +119,28 @@ static inline void bw_reverb_update_coeffs_audio(bw_reverb_coeffs *BW_RESTRICT c
  *  ```>>> */
 static inline void bw_reverb_process1(const bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, float xl, float xr, float *yl, float *yr);
 /*! <<<```
- *    Processes two input samples `xl` and `xr` using `coeffs`, while using and
- *    updating `state`. Writes the corresponding output samples `yl` and `yr`.
+ *    Processes one set of input samples `xl` (left) and `xr` (right) using
+ *    `coeffs`, while using and updating `state`. The left and right output
+ *    samples are put into `yl` (left) and `yr` (right) respectively.
  *
  *    #### bw_reverb_process()
  *  ```>>> */
 static inline void bw_reverb_process(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, const float *xl, const float *xr, float *yl, float *yr, int n_samples);
 /*! <<<```
- *    Processes the first `n_samples` of the input buffers `xl` and `xr` and
- *    fills the first `n_samples` of the output buffers `yl` and `yr`, while
- *    using and updating both `coeffs` and `state` (control and audio rate).
+ *    Processes the first `n_samples` of the input buffers `xl` (left) and `xr`
+ *    (right) and fills the first `n_samples` of the output buffers `yl` (left)
+ *    and `yr` (right), while using and updating both `coeffs` and `state`
+ *    (control and audio rate).
+ * 
+ *    #### bw_reverb_process_multi()
+ *  ```>>> */
+static inline void bw_reverb_process_multi(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state **BW_RESTRICT state, const float **xl, const float **xr, float **yl, float **yr, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `xl`
+ *    (left) and `xr` (right) and fills the first `n_samples` of the
+ *    `n_channels` output buffers `yl` (left) and `yr` (right), while using and
+ *    updating both the common `coeffs` and each of the `n_channels` `state`s
+ *    (control and audio rate).
  *
  *    #### bw_reverb_set_predelay()
  *  ```>>> */
@@ -548,6 +560,15 @@ static inline void bw_reverb_process(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_re
 	for (int i = 0; i < n_samples; i++) {
 		bw_reverb_update_coeffs_audio(coeffs);
 		bw_reverb_process1(coeffs, state, xl[i], xr[i], yl + i, yr + i);
+	}
+}
+
+static inline void bw_reverb_process_multi(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state **BW_RESTRICT state, const float **xl, const float **xr, float **yl, float **yr, int n_channels, int n_samples) {
+	bw_reverb_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_reverb_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			bw_reverb_process1(coeffs, state[j], xl[j][i], xr[j][i], yl[j] + i, yr[j] + i);
 	}
 }
 

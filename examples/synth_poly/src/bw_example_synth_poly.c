@@ -186,7 +186,26 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 		int n = instance->params[p_vco3_kbd] >= 0.5f ? instance->voices[i].note : 0;
 		bw_phase_gen_set_frequency(&instance->voices[i].vco1_phase_gen_coeffs, 440.f * bw_pow2f_3(f1 + 8.333333333333333e-2f * instance->voices[i].note));
 		bw_phase_gen_set_frequency(&instance->voices[i].vco2_phase_gen_coeffs, 440.f * bw_pow2f_3(f2 + 8.333333333333333e-2f * instance->voices[i].note));
-		bw_phase_gen_set_frequency(&instance->voices[i].vco3_phase_gen_coeffs, 440.f * bw_pow2f_3(f2 + 8.333333333333333e-2f * n));
+		bw_phase_gen_set_frequency(&instance->voices[i].vco3_phase_gen_coeffs, 440.f * bw_pow2f_3(f3 + 8.333333333333333e-2f * n));
+	}
+
+	for (int j = 0; j < N_VOICES; j++) {
+		bw_phase_gen_update_coeffs_ctrl(&instance->voices[i].vco1_phase_gen_coeffs);
+		bw_phase_gen_update_coeffs_ctrl(&instance->voices[i].vco2_phase_gen_coeffs);
+		bw_phase_gen_update_coeffs_ctrl(&instance->voices[i].vco3_phase_gen_coeffs);
+	}
+
+	for (int i = 0; i < n_samples; i++) {
+		for (int j = 0; j < N_VOICES; j++) {
+			bw_phase_gen_update_coeffs_audio(&instance->voices[i].vco1_phase_gen_coeffs);
+			bw_phase_gen_update_coeffs_audio(&instance->voices[i].vco2_phase_gen_coeffs);
+			bw_phase_gen_update_coeffs_audio(&instance->voices[i].vco3_phase_gen_coeffs);
+		}
+		
+		for (int j = 0; j < N_VOICES; j++) {
+			float p1, p1inc;
+			bw_phase_gen_process1(&instance->voices[i].vco1_phase_gen_coeffs, &instance->voices[i].vco1_phase_gen_state, &p1, &p1inc;
+		}
 	}
 
 	//...

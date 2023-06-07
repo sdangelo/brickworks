@@ -97,6 +97,15 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
  *    wet input buffer `x_wet` and fills the first `n_samples` of the output
  *    buffer `y`, while using and updating `coeffs` (control and audio rate).
  *
+ *    #### bw_drywet_process_multi()
+ *  ```>>> */
+static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float **x_dry, const float **x_wet, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` dry input buffers
+ *    `x_dry` and of the `n_channels` wet input buffers `x_wet`, and fills the
+ *    first `n_samples` of the `n_channels` output buffers `y`, while using and
+ *    updating the common `coeffs` (control and audio rate).
+ *
  *    #### bw_drywet_set_wet()
  *  ```>>> */
 static inline void bw_drywet_set_wet(bw_drywet_coeffs *BW_RESTRICT coeffs, float value);
@@ -155,6 +164,15 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
 	for (int i = 0; i < n_samples; i++) {
 		bw_drywet_update_coeffs_audio(coeffs);
 		y[i] = bw_drywet_process1(coeffs, x_dry[i], x_wet[i]);
+	}
+}
+
+static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float **x_dry, const float **x_wet, float **y, int n_channels, int n_samples) {
+	bw_drywet_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_drywet_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_drywet_process1(coeffs, x_dry[j][i], x_wet[j][i]);
 	}
 }
 

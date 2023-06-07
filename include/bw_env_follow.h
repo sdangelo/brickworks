@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Envelope follower made of a full-wave rectifier followed by
@@ -28,6 +28,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_env_follow_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>Moved header inclusions where most appropriate.</li>
@@ -122,6 +127,17 @@ static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeff
  *
  *    `y` may be `NULL`.
  *
+ *    #### bw_env_follow_process_multi()
+ *  ```>>> */
+static inline void bw_env_follow_process_multi(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
+ *
+ *    `y` or any element of `y` may be `NULL`.
+ *
  *    #### bw_env_follow_set_attack_tau()
  *  ```>>> */
 static inline void bw_env_follow_set_attack_tau(bw_env_follow_coeffs *BW_RESTRICT coeffs, float value);
@@ -204,6 +220,25 @@ static inline void bw_env_follow_process(bw_env_follow_coeffs *BW_RESTRICT coeff
 		for (int i = 0; i < n_samples; i++) {
 			bw_env_follow_update_coeffs_audio(coeffs);
 			bw_env_follow_process1(coeffs, state, x[i]);
+		}
+}
+
+static inline void bw_env_follow_process_multi(bw_env_follow_coeffs *BW_RESTRICT coeffs, bw_env_follow_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_env_follow_update_coeffs_ctrl(coeffs);
+	if (y != NULL)
+		for (int i = 0; i < n_samples; i++) {
+			bw_env_follow_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++) {
+				const float v = bw_env_follow_process1(coeffs, state[j], x[j][i]);
+				if (y[j] != NULL)
+					y[j][i] = v;
+			}
+		}
+	else
+		for (int i = 0; i < n_samples; i++) {
+			bw_env_follow_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++)
+				bw_env_follow_process1(coeffs, state[j], x[j][i]);
 		}
 }
 

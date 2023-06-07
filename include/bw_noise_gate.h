@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_env_follow bw_math bw_one_pole }}}
  *  description {{{
  *    Noise gate with independent sidechain input.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_noise_gate_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -110,6 +115,16 @@ static inline void bw_noise_gate_process(bw_noise_gate_coeffs *BW_RESTRICT coeff
  *    `n_samples` of the sidechain input buffer `x_sc`, and fills the first
  *    `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_noise_gate_process_multi()
+ *  ```>>> */
+static inline void bw_noise_gate_process_multi(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state **BW_RESTRICT state, const float **x, const float **x_sc, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    the first `n_samples` of the `n_channels` sidechain input buffers `x_sc`,
+ *    and fills the first `n_samples` of the `n_channels` output buffers `y`,
+ *    while using and updating both the common `coeffs` and each of the
+ *    `n_channels` `state`s (control and audio rate).
  *
  *    #### bw_noise_gate_set_thresh_lin()
  *  ```>>> */
@@ -230,6 +245,15 @@ static inline void bw_noise_gate_process(bw_noise_gate_coeffs *BW_RESTRICT coeff
 	for (int i = 0; i < n_samples; i++) {
 		bw_noise_gate_update_coeffs_audio(coeffs);
 		y[i] = bw_noise_gate_process1(coeffs, state, x[i], x_sc[i]);
+	}
+}
+
+static inline void bw_noise_gate_process_multi(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state **BW_RESTRICT state, const float **x, const float **x_sc, float **y, int n_channels, int n_samples) {
+	bw_noise_gate_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_noise_gate_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_noise_gate_process1(coeffs, state[j], x[j][i], x_sc[j][i]);
 	}
 }
 

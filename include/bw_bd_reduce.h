@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Bit depth reducer.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_bd_reduce_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -94,11 +99,19 @@ static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT
  *
  *    #### bw_bd_reduce_process()
  *  ```>>> */
-static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float* y, int n_samples);
+static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
  *    `coeffs` (control and audio rate).
+ *
+ *    #### bw_bd_reduce_process_multi()
+ *  ```>>> */
+static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating the common `coeffs` (control and audio rate).
  *
  *    #### bw_bd_reduce_set_bit_depth()
  *  ```>>> */
@@ -153,10 +166,17 @@ static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT
 	return coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + 0.5f);
 }
 
-static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float* y, int n_samples) {
+static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples) {
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_bd_reduce_process1(coeffs, x[i]);
+}
+
+static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples) {
+	bw_bd_reduce_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++)
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_bd_reduce_process1(coeffs, x[j][i]);
 }
 
 static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, char value) {

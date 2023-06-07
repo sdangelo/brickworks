@@ -27,9 +27,12 @@
  *    bandpass, and highpass outputs.
  *  }}}
  *  changelog {{{
-     <ul>
+ *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_svf_process_multi()</code>.</li>
+ *          <li>Fixed bug in <code>bw_svf_process()</code> when only
+ *              <code>y_hp</code> is <code>NULL</code>.</li>
  *          <li>Fixed prewarping-related stability bug.</li>
  *        </ul>
  *      </li>
@@ -139,6 +142,18 @@ static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_stat
  *    first `n_samples` of the output buffers `y_lp` (lowpass), `y_bp`
  *    (bandpass), and `y_hp` (highpass), if they are not `NULL`, while using and
  *    updating both `coeffs` and `state` (control and audio rate).
+ * 
+ *    #### bw_svf_process_multi()
+ *  ```>>> */
+static inline void bw_svf_process_multi(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state **BW_RESTRICT state, const float **x, float **y_lp, float **y_bp, float **y_hp, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y_lp`
+ *    (lowpass), `y_bp` (bandpass), and `y_hp` (highpass), while using and
+ *    updating both the common `coeffs` and each of the `n_channels` `state`s
+ *    (control and audio rate).
+ * 
+ *    `y_lp`, `y_bp`, and `y_hp`, or any of their elements may be `NULL`.
  *
  *    #### bw_svf_set_cutoff()
  *  ```>>> */
@@ -310,8 +325,8 @@ static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_stat
 			} else {
 				for (int i = 0; i < n_samples; i++) {
 					bw_svf_update_coeffs_audio(coeffs);
-					float v_lp;
-					bw_svf_process1(coeffs, state, x[i], &v_lp, y_bp + i, y_hp + i);
+					float v_hp;
+					bw_svf_process1(coeffs, state, x[i], y_lp + i, y_bp + i, &v_hp);
 				}
 			}
 		} else {
@@ -356,6 +371,110 @@ static inline void bw_svf_process(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_stat
 					bw_svf_update_coeffs_audio(coeffs);
 					float v_lp, v_bp, v_hp;
 					bw_svf_process1(coeffs, state, x[i], &v_lp, &v_bp, &v_hp);
+				}
+			}
+		}
+	}
+}
+
+static inline void bw_svf_process_multi(bw_svf_coeffs *BW_RESTRICT coeffs, bw_svf_state **BW_RESTRICT state, const float **x, float **y_lp, float **y_bp, float **y_hp, int n_channels, int n_samples) {
+	if (y_lp != NULL) {
+		if (y_bp != NULL) {
+			if (y_hp != NULL) {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_lp[j])
+							y_lp[j][i] = v_lp;
+						if (y_bp[j])
+							y_bp[j][i] = v_bp;
+						if (y_hp[j])
+							y_hp[j][i] = v_hp;
+					}
+				}
+			} else {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_lp[j])
+							y_lp[j][i] = v_lp;
+						if (y_bp[j])
+							y_bp[j][i] = v_bp;
+					}
+				}
+			}
+		} else {
+			if (y_hp != NULL) {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_lp[j])
+							y_lp[j][i] = v_lp;
+						if (y_hp[j])
+							y_hp[j][i] = v_hp;
+					}
+				}
+			} else {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_lp[j])
+							y_lp[j][i] = v_lp;
+					}
+				}
+			}
+		}
+	} else {
+		if (y_bp != NULL) {
+			if (y_hp != NULL) {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_bp[j])
+							y_bp[j][i] = v_bp;
+						if (y_hp[j])
+							y_hp[j][i] = v_hp;
+					}
+				}
+			} else {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_bp[j])
+							y_bp[j][i] = v_bp;
+					}
+				}
+			}
+		} else {
+			if (y_hp != NULL) {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+						if (y_hp[j])
+							y_hp[j][i] = v_hp;
+					}
+				}
+			} else {
+				for (int i = 0; i < n_samples; i++) {
+					bw_svf_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v_lp, v_bp, v_hp;
+						bw_svf_process1(coeffs, state[j], x[j][i], &v_lp, &v_bp, &v_hp);
+					}
 				}
 			}
 		}

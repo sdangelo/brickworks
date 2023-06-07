@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_gain bw_math bw_one_pole bw_svf }}}
  *  description {{{
  *    Second-order multimode filter.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_mm2_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added initial input value to
@@ -115,6 +120,15 @@ static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_stat
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_mm2_process_multi()
+ *  ```>>> */
+static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
  *
  *    #### bw_mm2_set_cutoff()
  *  ```>>> */
@@ -274,6 +288,15 @@ static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_stat
 	for (int i = 0; i < n_samples; i++) {
 		bw_mm2_update_coeffs_audio(coeffs);
 		y[i] = bw_mm2_process1(coeffs, state, x[i]);
+	}
+}
+
+static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_mm2_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_mm2_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_mm2_process1(coeffs, state[j], x[j][i]);
 	}
 }
 

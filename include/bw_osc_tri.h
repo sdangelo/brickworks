@@ -33,6 +33,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_osc_pulse_process_multi()</code>.</li>
  *          <li>Fixed typo in <code>bw_osc_tri_process1\*()</code>
  *              documentation.</li>
  *        </ul>
@@ -126,6 +127,19 @@ static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, con
  *
  *    If antialiasing is enabled, `x_phase_inc` must contain phase increment
  *    values, otherwise it is ignored and can be `NULL`.
+ *
+ *    #### bw_osc_tri_process_multi()
+ *  ```>>> */
+static inline void bw_osc_tri_process_multi(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
+ *    containing the normalized phase signals, and fills the first `n_samples`
+ *    of the `n_channels` output buffers `y`, while using and updating the
+ *    common `coeffs` (control and audio rate).
+ *
+ *    If antialiasing is enabled, `x_phase_inc` must contain `n_channels`
+ *    buffers of phase increment values, otherwise it is ignored and can be
+ *    `NULL`.
  *
  *    #### bw_osc_tri_set_antialiasing()
  *  ```>>> */
@@ -238,6 +252,21 @@ static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, con
 		for (int i = 0; i < n_samples; i++) {
 			bw_osc_tri_update_coeffs_audio(coeffs);
 			y[i] = bw_osc_tri_process1(coeffs, x[i]);
+		}
+}
+
+static inline void bw_osc_tri_process_multi(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples) {
+	if (coeffs->antialiasing)
+		for (int i = 0; i < n_samples; i++) {
+			bw_osc_tri_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++)
+				y[j][i] = bw_osc_tri_process1_antialias(coeffs, x[j][i], x_phase_inc[j][i]);
+		}
+	else
+		for (int i = 0; i < n_samples; i++) {
+			bw_osc_tri_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++)
+				y[j][i] = bw_osc_tri_process1(coeffs, x[j][i]);
 		}
 }
 

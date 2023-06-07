@@ -27,6 +27,13 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_pan_process_multi()</code>.</li>
+ *          <li><code>bw_pan_process()</code> does not accept <code>NULL</code>
+ *              buffers anymore.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -95,9 +102,17 @@ static inline void bw_pan_process1(const bw_pan_coeffs *BW_RESTRICT coeffs, floa
 static inline void bw_pan_process(bw_pan_coeffs *BW_RESTRICT coeffs, const float *x, float *y_l, float *y_r, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
- *    first `n_samples` of the output buffers `y_l` (left) and `y_r` (right), if
- *    they are not `NULL`, while using and updating `coeffs` (control and audio
- *    rate).
+ *    first `n_samples` of the output buffers `y_l` (left) and `y_r` (right),
+ *    while using and updating `coeffs` (control and audio rate).
+ *
+ *    #### bw_pan_process_multi()
+ *  ```>>> */
+static inline void bw_pan_process_multi(bw_pan_coeffs *BW_RESTRICT coeffs, const float **x, float **y_l, float **y_r, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y_l`
+ *    (left) and `y_r` (right), while using and updating the common `coeffs`
+ *    (control and audio rate).
  *
  *    #### bw_pan_set_pan()
  *  ```>>> */
@@ -171,33 +186,18 @@ static inline void bw_pan_process1(const bw_pan_coeffs *BW_RESTRICT coeffs, floa
 
 static inline void bw_pan_process(bw_pan_coeffs *BW_RESTRICT coeffs, const float *x, float *y_l, float *y_r, int n_samples) {
 	bw_pan_update_coeffs_ctrl(coeffs);
-	if (y_l != NULL) {
-		if (y_r != NULL) {
-			for (int i = 0; i < n_samples; i++) {
-				bw_pan_update_coeffs_audio(coeffs);
-				bw_pan_process1(coeffs, x[i], y_l + i, y_r + i);
-			}
-		} else {
-			for (int i = 0; i < n_samples; i++) {
-				bw_pan_update_coeffs_audio(coeffs);
-				float r;
-				bw_pan_process1(coeffs, x[i], y_l + i, &r);
-			}
-		}
-	} else {
-		if (y_r != NULL) {
-			for (int i = 0; i < n_samples; i++) {
-				bw_pan_update_coeffs_audio(coeffs);
-				float l;
-				bw_pan_process1(coeffs, x[i], &l, y_r + i);
-			}
-		} else {
-			for (int i = 0; i < n_samples; i++) {
-				bw_pan_update_coeffs_audio(coeffs);
-				float l, r;
-				bw_pan_process1(coeffs, x[i], &l, &r);
-			}
-		}
+	for (int i = 0; i < n_samples; i++) {
+		bw_pan_update_coeffs_audio(coeffs);
+		bw_pan_process1(coeffs, x[i], y_l + i, y_r + i);
+	}
+}
+
+static inline void bw_pan_process_multi(bw_pan_coeffs *BW_RESTRICT coeffs, const float **x, float **y_l, float **y_r, int n_channels, int n_samples) {
+	bw_pan_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_pan_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			bw_pan_process1(coeffs, x[j][i], y_l[j] + i, y_r[j] + i);
 	}
 }
 

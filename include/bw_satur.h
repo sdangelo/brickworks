@@ -40,6 +40,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_satur_process_multi()</code>.</li>
  *          <li>Fixed gain coefficient reset bug.</li>
  *          <li>Fixed initial state bug.</li>
  *        </ul>
@@ -135,6 +136,15 @@ static inline void bw_satur_process(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satu
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_satur_process_multi()
+ *  ```>>> */
+static inline void bw_satur_process_multi(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
  *
  *    #### bw_satur_set_bias()
  *  ```>>> */
@@ -273,6 +283,15 @@ static inline void bw_satur_process(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satu
 			bw_satur_update_coeffs_audio(coeffs);
 			y[i] = bw_satur_process1(coeffs, state, x[i]);
 		}
+}
+
+static inline void bw_satur_process_multi(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_satur_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_satur_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_satur_process1(coeffs, state[j], x[j][i]);
+	}
 }
 
 static inline void bw_satur_set_bias(bw_satur_coeffs *BW_RESTRICT coeffs, float value) {

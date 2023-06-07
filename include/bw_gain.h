@@ -29,6 +29,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_gain_process_multi()</code>.</li>
  *          <li>Added <code>bw_gain_get_gain()</code>.</li>
  *        </ul>
  *      </li>
@@ -114,6 +115,14 @@ static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const flo
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
  *    `coeffs` (control and audio rate).
+ *
+ *    #### bw_gain_process_multi()
+ *  ```>>> */
+static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating the common `coeffs` (control and audio rate).
  *
  *    #### bw_gain_set_gain_lin()
  *  ```>>> */
@@ -207,6 +216,15 @@ static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const flo
 	for (int i = 0; i < n_samples; i++) {
 		bw_gain_update_coeffs_audio(coeffs);
 		y[i] = bw_gain_process1(coeffs, x[i]);
+	}
+}
+
+static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples) {
+	bw_gain_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_gain_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_gain_process1(coeffs, x[j][i]);
 	}
 }
 

@@ -38,6 +38,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_chorus_process_multi()</code>.</li>
  *          <li>Updated mem_req/set API.</li>
  *          <li>Now properly setting feedforward delay on reset.</li>
  *        </ul>
@@ -137,6 +138,15 @@ static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_ch
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_chorus_process_multi()
+ *  ```>>> */
+static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
  *
  *    #### bw_chorus_set_rate()
  *  ```>>> */
@@ -268,6 +278,15 @@ static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_ch
 	for (int i = 0; i < n_samples; i++) {
 		bw_chorus_update_coeffs_audio(coeffs);
 		y[i] = bw_chorus_process1(coeffs, state, x[i]);
+	}
+}
+
+static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_chorus_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++) {
+		bw_chorus_update_coeffs_audio(coeffs);
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_chorus_process1(coeffs, state[j], x[j][i]);
 	}
 }
 

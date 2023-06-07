@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,19 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Slew-rate limiter with separate maximum increasing and decreasing rates.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_slew_lim_process_multi()</code>.</li>
+ *          <li>Fixed documentation of <code>bw_slew_lim_process()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -123,9 +129,22 @@ static inline float bw_slew_lim_process1_down(const bw_slew_lim_coeffs *BW_RESTR
  *  ```>>> */
 static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
- *    Lets the given `instance` process `n_samples` samples from the input
- *    buffer `x` and fills the corresponding `n_samples` samples in the output
- *    buffer `y`.
+ *    Processes the first `n_samples` of the input buffer `x` and fills the
+ *    first `n_samples` of the output buffer `y`, while using and updating both
+ *    `coeffs` and `state` (control and audio rate).
+ *
+ *    `y` may be `NULL`.
+ * 
+ *    #### bw_slew_lim_process_multi()
+ *  ```>>> */
+static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
+ *
+ *    `y` or any element of `y` may be `NULL`.
  *
  *    #### bw_slew_lim_set_max_rate()
  *  ```>>> */
@@ -242,7 +261,7 @@ static inline float bw_slew_lim_process1_down(const bw_slew_lim_coeffs *BW_RESTR
 
 static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
-	if (y) {
+	if (y != NULL) {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
 				for (int i = 0; i < n_samples; i++)
@@ -274,6 +293,64 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
 					bw_slew_lim_process1_down(coeffs, state, x[i]);
 			else
 				state->y_z1 = x[n_samples - 1];
+		}
+	}
+}
+
+static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_slew_lim_update_coeffs_ctrl(coeffs);
+	if (y != NULL) {
+		if (coeffs->max_rate_up != INFINITY) {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int j = 0; j < n_channels; j++)
+					if (y[j] != NULL)
+						for (int i = 0; i < n_samples; i++)
+							y[j][i] = bw_slew_lim_process1(coeffs, state[j], x[j][i]);
+					else
+						for (int i = 0; i < n_samples; i++)
+							bw_slew_lim_process1(coeffs, state[j], x[j][i]);
+			else
+				for (int j = 0; j < n_channels; j++)
+					for (int i = 0; i < n_samples; i++)
+						if (y[j] != NULL)
+							y[j][i] = bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
+						else
+							bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
+		} else {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int j = 0; j < n_channels; j++)
+					if (y[j] != NULL)
+						for (int i = 0; i < n_samples; i++)
+							y[i] = bw_slew_lim_process1_down(coeffs, state, x[i]);
+					else
+						for (int i = 0; i < n_samples; i++)
+							bw_slew_lim_process1_down(coeffs, state, x[i]);
+			else
+				for (int j = 0; j < n_channels; j++) {
+					if (y[j] != NULL)
+						for (int i = 0; i < n_samples; i++)
+							y[j][i] = x[j][i];
+					state[j]->y_z1 = x[j][n_samples - 1];
+				}
+		}
+	} else {
+		if (coeffs->max_rate_up != INFINITY) {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int j = 0; j < n_channels; j++)
+					for (int i = 0; i < n_samples; i++)
+						bw_slew_lim_process1(coeffs, state[j], x[j][i]);
+			else
+				for (int j = 0; j < n_channels; j++)
+					for (int i = 0; i < n_samples; i++)
+						bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
+		} else {
+			if (coeffs->max_rate_down != INFINITY)
+				for (int j = 0; j < n_channels; j++)
+					for (int i = 0; i < n_samples; i++)
+						bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
+			else
+				for (int j = 0; j < n_channels; j++)
+					state[j]->y_z1 = x[j][n_samples - 1];
 		}
 	}
 }

@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_env_follow bw_math bw_one_pole }}}
  *  description {{{
  *    Digital peak programme meter with adjustable integration time constant.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_ppm_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.3.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -116,6 +121,19 @@ static inline void bw_ppm_process(bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_stat
  *
  *    `y` may be `NULL`.
  *
+ *    #### bw_ppm_process_multi()
+ *  ```>>> */
+static inline void bw_ppm_process_multi(bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
+ * 
+ *    Output sample values are in dBFS.
+ *
+ *    `y` or any element of `y` may be `NULL`.
+ *
  *    #### bw_ppm_set_integration_time()
  *  ```>>> */
 static inline void bw_ppm_set_integration_tau(bw_ppm_coeffs *BW_RESTRICT coeffs, float value);
@@ -192,6 +210,25 @@ static inline void bw_ppm_process(bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_stat
 		for (int i = 0; i < n_samples; i++) {
 			bw_ppm_update_coeffs_audio(coeffs);
 			bw_ppm_process1(coeffs, state, x[i]);
+		}
+}
+
+static inline void bw_ppm_process_multi(bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_ppm_update_coeffs_ctrl(coeffs);
+	if (y != NULL)
+		for (int i = 0; i < n_samples; i++) {
+			bw_ppm_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++) {
+				const float v = bw_ppm_process1(coeffs, state[j], x[j][i]);
+				if (y[j] != NULL)
+					y[j][i] = v;
+			}
+		}
+	else
+		for (int i = 0; i < n_samples; i++) {
+			bw_ppm_update_coeffs_audio(coeffs);
+			for (int j = 0; j < n_channels; j++)
+				bw_ppm_process1(coeffs, state[j], x[j][i]);
 		}
 }
 

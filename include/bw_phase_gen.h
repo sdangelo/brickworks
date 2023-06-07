@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -29,6 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_phase_gen_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -129,7 +134,7 @@ static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTR
  *
  *    #### bw_phase_gen_process()
  *  ```>>> */
-static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float* y, float *y_phase_inc, int n_samples);
+static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float *y, float *y_phase_inc, int n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y`, while
  *    using and updating both `coeffs` and `state` (control and audio rate).
@@ -138,6 +143,21 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
  *    modulation (scale `1.f`/octave).
  *
  *    If `y_inc` is not `NULL`, it is filled with phase increment values.
+ *
+ *    #### bw_phase_gen_process_multi()
+ *  ```>>> */
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state **BW_RESTRICT state, const float **x_mod, float **y, float **y_phase_inc, int n_channels, int n_samples);
+/*! <<<```
+ *    Generates and fills the first `n_samples` of the `n_channels` output
+ *    buffers `y`, while using and updating both the common `coeffs` and each of
+ *    the `n_channels` `state`s (control and audio rate).
+ *
+ *    If `x_mod` and the channel-specific element are not `NULL`, this is used
+ *    as a source of exponential frequency modulation (scale `1.f`/octave) for
+ *    that channel.
+ *
+ *    If `y_inc` and the channel-specific element are not `NULL`, this is filled
+ *    with phase increment values for that channel.
  *
  *    #### bw_phase_gen_set_frequency()
  *  ```>>> */
@@ -290,6 +310,111 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v, v_phase_inc;
 					bw_phase_gen_process1(coeffs, state, &v, &v_phase_inc);
+				}
+		}
+	}
+}
+
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state **BW_RESTRICT state, const float **x_mod, float **y, float **y_phase_inc, int n_channels, int n_samples) {
+	bw_phase_gen_update_coeffs_ctrl(coeffs);
+	if (y != NULL) {
+		if (x_mod != NULL) {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						if (x_mod[j])
+							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
+						else
+							bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+						if (y[j])
+							y[j][i] = v;
+						if (y_phase_inc[j])
+							y_phase_inc[j][i] = v_phase_inc;
+					}
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						if (x_mod[j])
+							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
+						else
+							bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+						if (y[j])
+							y[j][i] = v;
+					}
+				}
+		} else {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+						if (y[j])
+							y[j][i] = v;
+						if (y_phase_inc[j])
+							y_phase_inc[j][i] = v_phase_inc;
+					}
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+						if (y[j])
+							y[j][i] = v;
+					}
+				}
+		}
+	} else {
+		if (x_mod != NULL) {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						if (x_mod[j])
+							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
+						else
+							bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+						if (y_phase_inc[j])
+							y_phase_inc[j][i] = v_phase_inc;
+					}
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						if (x_mod[j])
+							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
+						else
+							bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+					}
+				}
+		} else {
+			if (y_phase_inc != NULL)
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+						if (y_phase_inc[j])
+							y_phase_inc[j][i] = v_phase_inc;
+					}
+				}
+			else
+				for (int i = 0; i < n_samples; i++) {
+					bw_phase_gen_update_coeffs_audio(coeffs);
+					for (int j = 0; j < n_channels; j++) {
+						float v, v_phase_inc;
+						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
+					}
 				}
 		}
 	}

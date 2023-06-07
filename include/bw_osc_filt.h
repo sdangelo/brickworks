@@ -78,7 +78,7 @@ static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, f
  *
  *    #### bw_osc_filt_process()
  *  ```>>> */
-static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
+static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
@@ -107,7 +107,7 @@ static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, f
 	return y;
 }
 
-static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples) {
+static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_osc_filt_process1(state, x[i]);
 }

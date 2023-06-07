@@ -33,6 +33,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_delay_process_multi()</code>.</li>
  *          <li>Updated mem_req/set API.</li>
  *        </ul>
  *      </li>
@@ -112,14 +113,15 @@ static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, const bw_d
  *    Returns the interpolated value read from the delay line identified by
  *    `coeffs` and `state` by applying a delay of `di` + `df` samples.
  *
- *    `df` must be in [`0.f`, `1.f`) and `di` + `df` must not exceed the delay line
- *    length (maximum delay times the sample rate).
+ *    `df` must be in [`0.f`, `1.f`) and `di` + `df` must not exceed the delay
+ *    line length (maximum delay times the sample rate).
  *
  *    #### bw_delay_write()
  *  ```>>> */
 static void bw_delay_write(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float x);
 /*! <<<```
- *    Pushes the new sample `x` on the delay line identified by `coeffs` and `state.
+ *    Pushes the new sample `x` on the delay line identified by `coeffs` and
+ *    `state`.
  *
  *    #### bw_delay_update_coeffs_ctrl()
  *  ```>>> */
@@ -147,6 +149,15 @@ static inline void bw_delay_process(bw_delay_coeffs *BW_RESTRICT coeffs, bw_dela
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
+ *
+ *    #### bw_delay_process_multi()
+ *  ```>>> */
+static inline void bw_delay_process_multi(bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
  *
  *    #### bw_delay_set_delay()
  *  ```>>> */
@@ -253,6 +264,13 @@ static inline void bw_delay_process(bw_delay_coeffs *BW_RESTRICT coeffs, bw_dela
 	bw_delay_update_coeffs_ctrl(coeffs);
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_delay_process1(coeffs, state, x[i]);
+}
+
+static inline void bw_delay_process_multi(bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	bw_delay_update_coeffs_ctrl(coeffs);
+	for (int i = 0; i < n_samples; i++)
+		for (int j = 0; j < n_channels; j++)
+			y[j][i] = bw_delay_process1(coeffs, state[j], x[j][i]);
 }
 
 static inline void bw_delay_set_delay(bw_delay_coeffs *BW_RESTRICT coeffs, float value) {

@@ -42,6 +42,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_env_follow_process_multi()</code>.</li>
  *          <li>Added <code>gate</code> argument to
  *              <code>bw_env_gen_update_state_ctrl()</code> and
  *              <code>bw_env_gen_process()</code>, and removed gate
@@ -164,13 +165,24 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
  *
  *    #### bw_env_gen_process()
  *  ```>>> */
-static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float* y, int n_samples);
+static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, int n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y` using
  *    the given `gate` value (`0` for off, non-`0` for on), while using and
  *    updating both `coeffs` and `state` (control and audio rate).
  *
  *    `y` may be `NULL`.
+ *
+ *    #### bw_env_gen_process_multi()
+ *  ```>>> */
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state **BW_RESTRICT state, char *gate, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Generates and fills the first `n_samples` of the `n_channels` output
+ *    buffers `y` using the given `n_channels` `gate` values (`0` for off,
+ *    non-`0` for on), while using and updating both the common `coeffs` and
+ *    each of the `n_channels` `state`s (control and audio rate).
+ *
+ *    `y` or any element of `y` may be `NULL`.
  *
  *    #### bw_env_gen_set_attack()
  *  ```>>> */
@@ -350,7 +362,7 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
 	return v;
 }
 
-static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float* y, int n_samples) {
+static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, int n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	bw_env_gen_update_state_ctrl(coeffs, state, gate);
 	if (y != NULL)
@@ -359,6 +371,23 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
 	else
 		for (int i = 0; i < n_samples; i++)
 			bw_env_gen_process1(coeffs, state);
+}
+
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state **BW_RESTRICT state, char *gate, float **y, int n_channels, int n_samples) {
+	bw_env_gen_update_coeffs_ctrl(coeffs);
+	for (int j = 0; j < n_channels; j++)
+		bw_env_gen_update_state_ctrl(coeffs, state[j], gate[j]);
+	if (y != NULL)
+		for (int i = 0; i < n_samples; i++)
+			for (int j = 0; j < n_channels; j++) {
+				const float v = bw_env_gen_process1(coeffs, state[j]);
+				if (y[j] != NULL)
+					y[j][i] = v;
+			}
+	else
+		for (int i = 0; i < n_samples; i++)
+			for (int j = 0; j < n_channels; j++)
+				bw_env_gen_process1(coeffs, state[j]);
 }
 
 static inline void bw_env_gen_set_attack(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {

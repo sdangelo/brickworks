@@ -92,9 +92,10 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  * change at any time in future versions. Please, do not use it directly. */
 
 static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue) {
-	for (char i = 0; i < 128; i++)
-		queue->status[i] = { 0, 0.f };
+	for (int i = 0; i < 128; i++)
+		queue->status[i] = (bw_note_queue_status){ .pressed = 0, .velocity = 0.f };
 	queue->n_pressed = 0;
+	queue->n_events = 0;
 }
 
 static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue) {
@@ -113,14 +114,14 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
 	if (i == queue->n_events)
 		queue->n_events++;
 	else
-		went_off = queue->events[i].went_off || queue->events[i].velocity <= 0.f;
+		went_off = queue->events[i].went_off || !queue->events[i].status.pressed;
 
-	queue->events[i] = { note, { pressed, velocity }, went_off || force_went_off };
+	queue->events[i] = (bw_note_queue_event){ .note = note, .status = { pressed, velocity }, .went_off = went_off || force_went_off };
 	if (pressed && !queue->status[note].pressed)
 		queue->n_pressed++;
 	else if (!pressed && queue->status[note].pressed)
 		queue->n_pressed--;
-	queue->status[note] = { pressed, velocity };
+	queue->status[note] = (bw_note_queue_status){ .pressed = pressed, .velocity = velocity };
 }
 
 #ifdef __cplusplus

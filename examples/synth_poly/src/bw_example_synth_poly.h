@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include <bw_note_queue.h>
 #include <bw_phase_gen.h>
 #include <bw_osc_saw.h>
 #include <bw_osc_pulse.h>
@@ -100,6 +101,8 @@ struct _bw_example_synth_poly_voice {
 
 	unsigned char		note;
 	char			gate;
+	
+	float			buf[4][BUFFER_SIZE];
 };
 typedef struct _bw_example_synth_poly_voice bw_example_synth_poly_voice;
 
@@ -127,7 +130,7 @@ struct _bw_example_synth_poly {
 	bw_ppm_coeffs			ppm_coeffs;
 	bw_ppm_state			ppm_state;
 
-	bw_example_poly_synth_voice	voices[N_VOICES];
+	bw_example_synth_poly_voice	voices[N_VOICES];
 
 	// Parameters
 	float				params[p_n];
@@ -138,7 +141,7 @@ struct _bw_example_synth_poly {
 	float				mod_wheel;
 	
 	// Buffers
-	float				buf[4][BUFFER_SIZE];
+	float				buf[BUFFER_SIZE];
 };
 typedef struct _bw_example_synth_poly bw_example_synth_poly;
 

@@ -51,7 +51,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_voice_alloc_mode
  *  ```>>> */
-typedef enum 
+typedef enum {
 	bw_voice_alloc_mode_low,
 	bw_voice_alloc_mode_high
 } bw_voice_alloc_mode;
@@ -92,7 +92,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 		if (ev->status.pressed) {
 			for (int j = 0; j < n_voices; j++)
-				if (opt->is_free(voices[j])) { 
+				if (opts->is_free(voices[j])) { 
 					opts->note_on(voices[j], ev->note, ev->status.velocity);
 					goto next_event;
 				}
@@ -111,7 +111,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 		}
 
 		next_event:;
-	}	
+	}
 }
 
 #ifdef __cplusplus

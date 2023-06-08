@@ -49,6 +49,7 @@ code:
 * revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
 * sr-dependent vs cr-dependent coeffs? see synth poly example
 * bw_buf_copy (to be used in bw_slew_lim)?
+* C++ compound literals...
 
 build system:
 * make makefiles handle paths with spaces etc

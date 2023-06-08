@@ -102,7 +102,7 @@ struct _bw_example_synth_poly_voice {
 	unsigned char		note;
 	char			gate;
 	
-	float			buf[4][BUFFER_SIZE];
+	float			buf[5][BUFFER_SIZE];
 };
 typedef struct _bw_example_synth_poly_voice bw_example_synth_poly_voice;
 

@@ -32,9 +32,7 @@ code:
 * web examples: need to export memset?
 * bw_satur gain compensation to divide by actual gain (derivative) rather than gain parameter?
 * cite papers, thank authors
-* process1 and multi-channel
 * add initial state (x0) to reset state of lp1, ap1, mm1, hs1, ls1, others? all?
-* multichannel process (multiple buffers, non interleaved)
 * check unused param warning visual studio
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
@@ -50,6 +48,7 @@ code:
 * sr-dependent vs cr-dependent coeffs? see synth poly example
 * bw_buf_copy (to be used in bw_slew_lim)?
 * C++ compound literals...
+* multichannel api even where not needed?
 
 build system:
 * make makefiles handle paths with spaces etc

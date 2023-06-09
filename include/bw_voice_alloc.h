@@ -101,6 +101,18 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 			int v = ev->note;
 			for (int j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
+				if (!queue->status[n].pressed && (k < 0 || (opts->mode == bw_voice_alloc_mode_low ? n > v : n < v))) {
+					v = n;
+					k = j;
+				}
+			}
+			if (k >= 0) {
+				opts->note_on(voices[k], ev->note, ev->status.velocity);
+				continue;
+			}
+
+			for (int j = 0; j < n_voices; j++) {
+				int n = opts->get_note(voices[j]);
 				if (opts->mode == bw_voice_alloc_mode_low ? n > v : n < v) {
 					v = n;
 					k = j;

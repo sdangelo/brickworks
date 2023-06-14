@@ -49,6 +49,8 @@ code:
 * bw_buf_copy (to be used in bw_slew_lim)?
 * C++ compound literals...
 * multichannel api even where not needed?
+* x_y vs xy var names
+* don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
 
 build system:
 * make makefiles handle paths with spaces etc
@@ -57,3 +59,4 @@ build system:
 * make from... directories
 * recursive make?
 * make hashdeps (https://github.com/olipratt/hashdeps)?
+* VC, XCode, etc project files?

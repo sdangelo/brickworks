@@ -51,6 +51,7 @@ code:
 * multichannel api even where not needed?
 * x_y vs xy var names
 * don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
+* update state ctrl -> process ctrl?
 
 build system:
 * make makefiles handle paths with spaces etc
@@ -60,3 +61,4 @@ build system:
 * recursive make?
 * make hashdeps (https://github.com/olipratt/hashdeps)?
 * VC, XCode, etc project files?
+* single header(s)

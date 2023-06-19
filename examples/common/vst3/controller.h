@@ -36,6 +36,7 @@ class Controller : EditController {
 #endif
 public:
 	static FUnknown *createInstance(void *context) {
+		(void)context;
 		return (IEditController *) new Controller();
 	}
 

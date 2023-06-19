@@ -150,6 +150,16 @@ static inline void _sse2neon_mm_set_flush_zero_mode(unsigned int flag)
 
 Plugin::Plugin() {
 	setControllerClass(FUID(CTRL_GUID_1, CTRL_GUID_2, CTRL_GUID_3, CTRL_GUID_4));
+#ifdef P_MEM_REQ
+	this->mem = NULL;
+#endif
+}
+
+Plugin::~Plugin() {
+#ifdef P_MEM_REQ
+	if (this->mem)
+		free(this->mem);
+#endif
 }
 
 tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
@@ -194,6 +204,8 @@ tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
 #endif
 
 #ifdef P_MEM_REQ
+	if (this->mem)
+		free(this->mem);
 	this->mem = NULL;
 #endif
 
@@ -201,6 +213,15 @@ tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
 }
 
 tresult PLUGIN_API Plugin::terminate() {
+#ifdef P_MEM_REQ
+	if (this->mem) {
+		free(this->mem);
+		this->mem = NULL;
+	}
+#endif
+#ifdef P_FINI
+	P_FINI(&instance);
+#endif
 	return AudioEffect::terminate();
 }
 

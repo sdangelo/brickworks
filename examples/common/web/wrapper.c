@@ -108,6 +108,9 @@ void wrapper_free(wrapper w) {
 	if (w->mem)
 		free(w->mem);
 #endif
+#ifdef P_FINI
+	P_FINI(&w->instance);
+#endif
 	free(w);
 }
 

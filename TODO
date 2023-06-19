@@ -53,6 +53,7 @@ code:
 * don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
 * update state ctrl -> process ctrl?
 * mem req -> return value of set sample rate?
+* peak gain + Q ???
 
 build system:
 * make makefiles handle paths with spaces etc
@@ -63,4 +64,4 @@ build system:
 * make hashdeps (https://github.com/olipratt/hashdeps)?
 * VC, XCode, etc project files?
 * single header(s)
-* cross compile
+* cross compile (rpi etc.)

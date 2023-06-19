@@ -50,7 +50,7 @@ struct config_parameter {
 #define COMPANY_WEBSITE		"https://www.orastron.com/"
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
-#define PLUGIN_NAME		"bw_example_fxpp_svf"
+#define PLUGIN_NAME		"bw_example_fxpp_hp1"
 #define PLUGIN_VERSION		"0.5.0"
 
 #define NUM_BUSES_IN		1
@@ -66,23 +66,22 @@ static struct config_io_bus config_buses_out[NUM_BUSES_OUT] = {
 	{ "Audio out", 1, 0, 0, IO_MONO }
 };
 
-#define NUM_PARAMETERS		2
+#define NUM_PARAMETERS		1
 
 static struct config_parameter config_parameters[NUM_PARAMETERS] = {
-	{ "Cutoff", "Cutoff", "Hz", 0, 0, 0, 0.5f },
-	{ "Q", "Q", "", 0, 0, 0, 0.f }
+	{ "Cutoff", "Cutoff", "Hz", 0, 0, 0, 0.5f }
 };
 
 // Internal API
 
-#include "bw_example_fxpp_svf.h"
+#include "bw_example_fxpp_hp1.h"
 
-#define P_TYPE				bw_example_fxpp_svf
-#define P_INIT				bw_example_fxpp_svf_init
-#define P_SET_SAMPLE_RATE		bw_example_fxpp_svf_set_sample_rate
-#define P_RESET				bw_example_fxpp_svf_reset
-#define P_PROCESS			bw_example_fxpp_svf_process
-#define P_SET_PARAMETER			bw_example_fxpp_svf_set_parameter
-#define P_GET_PARAMETER			bw_example_fxpp_svf_get_parameter
+#define P_TYPE				bw_example_fxpp_hp1
+#define P_INIT				bw_example_fxpp_hp1_init
+#define P_SET_SAMPLE_RATE		bw_example_fxpp_hp1_set_sample_rate
+#define P_RESET				bw_example_fxpp_hp1_reset
+#define P_PROCESS			bw_example_fxpp_hp1_process
+#define P_SET_PARAMETER			bw_example_fxpp_hp1_set_parameter
+#define P_GET_PARAMETER			bw_example_fxpp_hp1_get_parameter
 
 #endif

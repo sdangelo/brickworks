@@ -26,9 +26,9 @@
 
 namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
-	class PEAK {
+	class Peak {
 	public:
-		PEAK();
+		Peak();
 
 		void setSampleRate(float sampleRate);
 		void reset(float x0 = 0.f);
@@ -39,8 +39,8 @@ namespace Brickworks {
 
 		void setCutoff(float value);
 		void setQ(float value);
-		void setDcGainLin(float value);
-		void setDcGainDB(float value);
+		void setPeakGainLin(float value);
+		void setPeakGainDB(float value);
 		void setBandwidth(float value);
 		void setUseBandwidth(bool value);
 
@@ -51,26 +51,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	PEAK<N_CHANNELS>::PEAK() {
+	Peak<N_CHANNELS>::Peak() {
 		bw_peak_init(&coeffs);
 		for (unsigned int i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setSampleRate(float sampleRate) {
+	void Peak<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_peak_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::reset(float x0) {
+	void Peak<N_CHANNELS>::reset(float x0) {
 		bw_peak_reset_coeffs(&coeffs);
 		for (unsigned int i = 0; i < N_CHANNELS; i++)
 			bw_peak_reset_state(&coeffs, states + i, x0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::process(
+	void Peak<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -78,32 +78,32 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setCutoff(float value) {
+	void Peak<N_CHANNELS>::setCutoff(float value) {
 		bw_peak_set_cutoff(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setQ(float value) {
+	void Peak<N_CHANNELS>::setQ(float value) {
 		bw_peak_set_Q(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setPeakGainLin(float value) {
+	void Peak<N_CHANNELS>::setPeakGainLin(float value) {
 		bw_peak_set_peak_gain_lin(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setPeakGainDB(float value) {
+	void Peak<N_CHANNELS>::setPeakGainDB(float value) {
 		bw_peak_set_peak_gain_dB(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setBandwidth(float value) {
+	void Peak<N_CHANNELS>::setBandwidth(float value) {
 		bw_peak_set_bandwidth(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PEAK<N_CHANNELS>::setUseBandwidth(bool value) {
+	void Peak<N_CHANNELS>::setUseBandwidth(bool value) {
 		bw_peak_set_use_bandwidth(&coeffs, value);
 	}
 }

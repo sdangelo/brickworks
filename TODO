@@ -63,3 +63,4 @@ build system:
 * make hashdeps (https://github.com/olipratt/hashdeps)?
 * VC, XCode, etc project files?
 * single header(s)
+* cross compile

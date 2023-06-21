@@ -31,6 +31,7 @@
  *        <ul>
  *          <li>Added <code>bw_slew_lim_process_multi()</code>.</li>
  *          <li>Fixed documentation of <code>bw_slew_lim_process()</code>.</li>
+ *          <li>Fixed unused parameter warnings.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
@@ -229,6 +230,7 @@ static inline void bw_slew_lim_reset_coeffs(bw_slew_lim_coeffs *BW_RESTRICT coef
 }
 
 static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float y_z1) {
+	(void)coeffs;
 	state->y_z1 = y_z1;
 }
 
@@ -239,6 +241,7 @@ static inline void bw_slew_lim_update_coeffs_ctrl(bw_slew_lim_coeffs *BW_RESTRIC
 }
 
 static inline void bw_slew_lim_update_coeffs_audio(bw_slew_lim_coeffs *BW_RESTRICT coeffs) {
+	(void)coeffs;
 }
 
 static inline float bw_slew_lim_process1(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float x) {
@@ -321,10 +324,10 @@ static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coe
 				for (int j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
 						for (int i = 0; i < n_samples; i++)
-							y[i] = bw_slew_lim_process1_down(coeffs, state, x[i]);
+							y[j][i] = bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 					else
 						for (int i = 0; i < n_samples; i++)
-							bw_slew_lim_process1_down(coeffs, state, x[i]);
+							bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
 				for (int j = 0; j < n_channels; j++) {
 					if (y[j] != NULL)

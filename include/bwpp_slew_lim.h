@@ -40,7 +40,6 @@ namespace Brickworks {
 		void setMaxRate(float value);
 		void setMaxRateUp(float value);
 		void setMaxRateDown(float value);
-		void setStickyMode(bw_slew_lim_sticky_mode value);
 		
 		float getYZ1(BW_SIZE_T channel);
 

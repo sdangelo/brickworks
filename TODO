@@ -55,6 +55,7 @@ code:
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
 * bwpp -> bwxx
+* float -> double, etc. ?
 
 build system:
 * make makefiles handle paths with spaces etc

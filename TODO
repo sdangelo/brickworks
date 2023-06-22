@@ -54,6 +54,7 @@ code:
 * update state ctrl -> process ctrl?
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
+* bwpp -> bwxx
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -18,10 +18,10 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_FXPP_CLIP_H
-#define _BW_EXAMPLE_FXPP_CLIP_H
+#ifndef _BW_EXAMPLE_FXPP_DIST_H
+#define _BW_EXAMPLE_FXPP_DIST_H
 
-#include <bwpp_clip.h>
+#include <bwpp_dist.h>
 #include <bwpp_src_int.h>
 
 using namespace Brickworks;
@@ -29,16 +29,17 @@ using namespace Brickworks;
 extern "C" {
 
 enum {
-	p_bias,
-	p_gain,
+	p_dist,
+	p_tone,
+	p_volume,
 	p_n
 };
 
 #define BUF_SIZE	32
 
-struct _bw_example_fxpp_clip {
+struct _bw_example_fxpp_dist {
 	// Sub-components
-	Clip<1>		clip;
+	Dist<1>		dist;
 	SRCInt<1>	srcUp;
 	SRCInt<1>	srcDown;
 
@@ -48,16 +49,16 @@ struct _bw_example_fxpp_clip {
 	// Buffers
 	float		buf[BUF_SIZE];
 
-	_bw_example_fxpp_clip() : srcUp(2), srcDown(-2) {}
+	_bw_example_fxpp_dist() : srcUp(2), srcDown(-2) {}
 };
-typedef struct _bw_example_fxpp_clip bw_example_fxpp_clip;
+typedef struct _bw_example_fxpp_dist bw_example_fxpp_dist;
 
-void bw_example_fxpp_clip_init(bw_example_fxpp_clip *instance);
-void bw_example_fxpp_clip_set_sample_rate(bw_example_fxpp_clip *instance, float sample_rate);
-void bw_example_fxpp_clip_reset(bw_example_fxpp_clip *instance);
-void bw_example_fxpp_clip_process(bw_example_fxpp_clip *instance, const float** x, float** y, int n_samples);
-void bw_example_fxpp_clip_set_parameter(bw_example_fxpp_clip *instance, int index, float value);
-float bw_example_fxpp_clip_get_parameter(bw_example_fxpp_clip *instance, int index);
+void bw_example_fxpp_dist_init(bw_example_fxpp_dist *instance);
+void bw_example_fxpp_dist_set_sample_rate(bw_example_fxpp_dist *instance, float sample_rate);
+void bw_example_fxpp_dist_reset(bw_example_fxpp_dist *instance);
+void bw_example_fxpp_dist_process(bw_example_fxpp_dist *instance, const float** x, float** y, int n_samples);
+void bw_example_fxpp_dist_set_parameter(bw_example_fxpp_dist *instance, int index, float value);
+float bw_example_fxpp_dist_get_parameter(bw_example_fxpp_dist *instance, int index);
 
 }
 

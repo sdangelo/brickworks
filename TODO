@@ -56,6 +56,8 @@ code:
 * peak gain + Q ???
 * bwpp -> bwxx
 * float -> double, etc. ?
+* sr_reduce reset_coeffs? update_coeffs? process_multi?
+* src(_int) process_multi?
 
 build system:
 * make makefiles handle paths with spaces etc

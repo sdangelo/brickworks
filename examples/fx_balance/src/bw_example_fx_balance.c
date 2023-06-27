@@ -39,12 +39,8 @@ void bw_example_fx_balance_reset(bw_example_fx_balance *instance) {
 
 void bw_example_fx_balance_process(bw_example_fx_balance *instance, const float** x, float** y, int n_samples) {
 	bw_balance_process(&instance->balance_coeffs, x[0], x[1], y[0], y[1], n_samples);
-	bw_ppm_update_coeffs_ctrl(&instance->ppm_coeffs);
-	for (int i = 0; i < n_samples; i++) {
-		bw_ppm_update_coeffs_audio(&instance->ppm_coeffs);
-		bw_ppm_process1(&instance->ppm_coeffs, &instance->ppm_l_state, y[0][i]);
-		bw_ppm_process1(&instance->ppm_coeffs, &instance->ppm_r_state, y[1][i]);
-	}
+	bw_ppm_state *ppm_states[2] = { &instance->ppm_l_state, &instance->ppm_r_state };
+	bw_ppm_process_multi(&instance->ppm_coeffs, ppm_states, (const float **)y, NULL, 2, n_samples);
 }
 
 void bw_example_fx_balance_set_parameter(bw_example_fx_balance *instance, int index, float value) {

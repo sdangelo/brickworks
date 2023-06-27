@@ -18,17 +18,17 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef BWPP_WAH_H
-#define BWPP_WAH_H
+#ifndef BWPP_GAIN_H
+#define BWPP_GAIN_H
 
-#include <bw_wah.h>
+#include <bw_gain.h>
 #include <array>
 
 namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
-	class Wah {
+	class Gain {
 	public:
-		Wah();
+		Gain();
 
 		void setSampleRate(float sampleRate);
 		void reset();
@@ -37,44 +37,57 @@ namespace Brickworks {
 			std::array<float *, N_CHANNELS> y,
 			int nSamples);
 
-		void setWah(float value);
+		void setGainLin(float value);
+		void setGainDB(float value);
+		void setSmoothTau(float value);
+		
+		float getGain();
 
 	private:
-		bw_wah_coeffs	 coeffs;
-		bw_wah_state	 states[N_CHANNELS];
-		bw_wah_state	*statesP[N_CHANNELS];
+		bw_gain_coeffs	 coeffs;
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Wah<N_CHANNELS>::Wah() {
-		bw_wah_init(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
+	Gain<N_CHANNELS>::Gain() {
+		bw_gain_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_wah_set_sample_rate(&coeffs, sampleRate);
+	void Gain<N_CHANNELS>::setSampleRate(float sampleRate) {
+		bw_gain_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::reset() {
-		bw_wah_reset_coeffs(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_wah_reset_state(&coeffs, states + i);
+	void Gain<N_CHANNELS>::reset() {
+		bw_gain_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::process(
+	void Gain<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		bw_wah_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+		bw_gain_process_multi(&coeffs, x.data(), y.data(), N_CHANNELS, nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setWah(float value) {
-		bw_wah_set_wah(&coeffs, value);
+	void Gain<N_CHANNELS>::setGainLin(float value) {
+		bw_gain_set_gain_lin(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	void Gain<N_CHANNELS>::setGainDB(float value) {
+		bw_gain_set_gain_dB(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	void Gain<N_CHANNELS>::setSmoothTau(float value) {
+		bw_gain_set_smooth_tau(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	float Gain<N_CHANNELS>::getGain() {
+		return bw_gain_get_gain(&coeffs);
 	}
 }
 

@@ -53,7 +53,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	NoiseGate<N_CHANNELS>::NoiseGate() {
 		bw_noise_gate_init(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
@@ -65,7 +65,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	void NoiseGate<N_CHANNELS>::reset() {
 		bw_noise_gate_reset_coeffs(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_noise_gate_reset_state(&coeffs, states + i);
 	}
 	

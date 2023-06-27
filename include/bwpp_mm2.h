@@ -55,7 +55,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	MM2<N_CHANNELS>::MM2() {
 		bw_mm2_init(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
@@ -67,7 +67,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	void MM2<N_CHANNELS>::reset(float x0) {
 		bw_mm2_reset_coeffs(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_mm2_reset_state(&coeffs, states + i, x0);
 	}
 	

@@ -59,6 +59,7 @@ code:
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
 * src(_int) process_multi?
 * fix definitions leading to X ** -> const X ** error https://isocpp.org/wiki/faq/const-correctness#constptrptr-conversion, fix fx_balance, fx_pan, synth_poly
+* drywet -> dry_wet, ringmod -> ring_mod, etc?
 
 build system:
 * make makefiles handle paths with spaces etc

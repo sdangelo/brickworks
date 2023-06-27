@@ -48,7 +48,7 @@ namespace Brickworks {
 	
 	template<BW_SIZE_T N_CHANNELS>
 	void SRCInt<N_CHANNELS>::reset(float x0) {
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_src_int_reset_state(&coeffs, states + i, x0);
 	}
 	
@@ -57,7 +57,7 @@ namespace Brickworks {
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nInSamples) {
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_src_int_process(&coeffs, states + i, x.data()[i], y.data()[i], nInSamples);
 	}
 }

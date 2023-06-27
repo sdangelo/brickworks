@@ -52,7 +52,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	SlewLim<N_CHANNELS>::SlewLim() {
 		bw_slew_lim_init(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
@@ -64,7 +64,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	void SlewLim<N_CHANNELS>::reset(float y_z1) {
 		bw_slew_lim_reset_coeffs(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_slew_lim_reset_state(&coeffs, states + i, y_z1);
 	}
 	

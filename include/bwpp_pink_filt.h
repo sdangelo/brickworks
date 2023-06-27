@@ -3,11 +3,11 @@
  *
  * Copyright (C) 2023 Orastron Srl unipersonale
  *
- * Brickworks is free software: you can redistribute it and/or modify
+ * Brickworks is free software: you can repink_filtribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
  *
- * Brickworks is distributed in the hope that it will be useful,
+ * Brickworks is pink_filtributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -18,17 +18,17 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef BWPP_WAH_H
-#define BWPP_WAH_H
+#ifndef BWPP_PINK_FILT_H
+#define BWPP_PINK_FILT_H
 
-#include <bw_wah.h>
+#include <bw_pink_filt.h>
 #include <array>
 
 namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
-	class Wah {
+	class PinkFilt {
 	public:
-		Wah();
+		PinkFilt();
 
 		void setSampleRate(float sampleRate);
 		void reset();
@@ -37,44 +37,49 @@ namespace Brickworks {
 			std::array<float *, N_CHANNELS> y,
 			int nSamples);
 
-		void setWah(float value);
+		void setSampleRateScaling(bool value);
+		
+		float getScalingK();
 
 	private:
-		bw_wah_coeffs	 coeffs;
-		bw_wah_state	 states[N_CHANNELS];
-		bw_wah_state	*statesP[N_CHANNELS];
+		bw_pink_filt_coeffs	 coeffs;
+		bw_pink_filt_state	 states[N_CHANNELS];
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Wah<N_CHANNELS>::Wah() {
-		bw_wah_init(&coeffs);
+	PinkFilt<N_CHANNELS>::PinkFilt() {
+		bw_pink_filt_init(&coeffs);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	void PinkFilt<N_CHANNELS>::setSampleRate(float sampleRate) {
+		bw_pink_filt_set_sample_rate(&coeffs, sampleRate);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	void PinkFilt<N_CHANNELS>::reset() {
+		bw_pink_filt_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
+			bw_pink_filt_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_wah_set_sample_rate(&coeffs, sampleRate);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::reset() {
-		bw_wah_reset_coeffs(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_wah_reset_state(&coeffs, states + i);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::process(
+	void PinkFilt<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		bw_wah_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+			bw_pink_filt_process(&coeffs, x.data()[i], y.data()[i], nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setWah(float value) {
-		bw_wah_set_wah(&coeffs, value);
+	void PinkFilt<N_CHANNELS>::setSampleRateScaling(bool value) {
+		bw_pink_filt_set_sample_rate_scaling(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	float PinkFilt<N_CHANNELS>::getScalingK(float value) {
+		return bw_pink_filt_get_scaling_k(&coeffs);
 	}
 }
 

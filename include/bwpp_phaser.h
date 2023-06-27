@@ -50,7 +50,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	Phaser<N_CHANNELS>::Phaser() {
 		bw_phaser_init(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
@@ -62,7 +62,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	void Phaser<N_CHANNELS>::reset() {
 		bw_phaser_reset_coeffs(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_phaser_reset_state(&coeffs, states + i);
 	}
 	

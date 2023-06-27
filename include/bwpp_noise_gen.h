@@ -57,7 +57,7 @@ namespace Brickworks {
 	void NoiseGen<N_CHANNELS>::process(
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		for (int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_noise_gen_process(&coeffs, y.data()[i], nSamples);
 	}
 	

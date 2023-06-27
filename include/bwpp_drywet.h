@@ -18,63 +18,65 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef BWPP_WAH_H
-#define BWPP_WAH_H
+#ifndef BWPP_DRYWET_H
+#define BWPP_DRYWET_H
 
-#include <bw_wah.h>
+#include <bw_drywet.h>
 #include <array>
 
 namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
-	class Wah {
+	class DryWet {
 	public:
-		Wah();
+		DryWet();
 
 		void setSampleRate(float sampleRate);
 		void reset();
 		void process(
-			std::array<const float *, N_CHANNELS> x,
+			std::array<const float *, N_CHANNELS> x_dry,
+			std::array<const float *, N_CHANNELS> x_wet,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples);
 
-		void setWah(float value);
+		void setWet(float value);
+		void setSmoothTau(float value);
 
 	private:
-		bw_wah_coeffs	 coeffs;
-		bw_wah_state	 states[N_CHANNELS];
-		bw_wah_state	*statesP[N_CHANNELS];
+		bw_drywet_coeffs	 coeffs;
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Wah<N_CHANNELS>::Wah() {
-		bw_wah_init(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
+	DryWet<N_CHANNELS>::DryWet() {
+		bw_drywet_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_wah_set_sample_rate(&coeffs, sampleRate);
+	void DryWet<N_CHANNELS>::setSampleRate(float sampleRate) {
+		bw_drywet_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::reset() {
-		bw_wah_reset_coeffs(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_wah_reset_state(&coeffs, states + i);
+	void DryWet<N_CHANNELS>::reset() {
+		bw_drywet_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x,
+	void DryWet<N_CHANNELS>::process(
+			std::array<const float *, N_CHANNELS> x_dry,
+			std::array<const float *, N_CHANNELS> x_wet,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		bw_wah_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+		bw_drywet_process_multi(&coeffs, x_dry.data(), x_wet.data(), y.data(), N_CHANNELS, nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setWah(float value) {
-		bw_wah_set_wah(&coeffs, value);
+	void DryWet<N_CHANNELS>::setWet(float value) {
+		bw_drywet_set_wet(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	void DryWet<N_CHANNELS>::setSmoothTau(float value) {
+		bw_drywet_set_smooth_tau(&coeffs, value);
 	}
 }
 

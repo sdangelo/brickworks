@@ -18,17 +18,17 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef BWPP_WAH_H
-#define BWPP_WAH_H
+#ifndef BWPP_ENV_FOLLOW_H
+#define BWPP_ENV_FOLLOW_H
 
-#include <bw_wah.h>
+#include <bw_env_follow.h>
 #include <array>
 
 namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
-	class Wah {
+	class EnvFollow {
 	public:
-		Wah();
+		EnvFollow();
 
 		void setSampleRate(float sampleRate);
 		void reset();
@@ -37,44 +37,57 @@ namespace Brickworks {
 			std::array<float *, N_CHANNELS> y,
 			int nSamples);
 
-		void setWah(float value);
+		void setAttackTau(float value);
+		void setReleaseTau(float value);
+		
+		float getYZ1(BW_SIZE_T channel);
 
 	private:
-		bw_wah_coeffs	 coeffs;
-		bw_wah_state	 states[N_CHANNELS];
-		bw_wah_state	*statesP[N_CHANNELS];
+		bw_env_follow_coeffs	 coeffs;
+		bw_env_follow_state	 states[N_CHANNELS];
+		bw_env_follow_state	*statesP[N_CHANNELS];
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Wah<N_CHANNELS>::Wah() {
-		bw_wah_init(&coeffs);
+	EnvFollow<N_CHANNELS>::EnvFollow() {
+		bw_env_follow_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_wah_set_sample_rate(&coeffs, sampleRate);
+	void EnvFollow<N_CHANNELS>::setSampleRate(float sampleRate) {
+		bw_env_follow_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::reset() {
-		bw_wah_reset_coeffs(&coeffs);
+	void EnvFollow<N_CHANNELS>::reset() {
+		bw_env_follow_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_wah_reset_state(&coeffs, states + i);
+			bw_env_follow_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::process(
+	void EnvFollow<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		bw_wah_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+		bw_env_follow_process_multi(&coeffs, x.data(), y.data(), N_CHANNELS, nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setWah(float value) {
-		bw_wah_set_wah(&coeffs, value);
+	void EnvFollow<N_CHANNELS>::setAttackTau(float value) {
+		bw_env_follow_set_attack_tau(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	void EnvFollow<N_CHANNELS>::setReleaseTau(float value) {
+		bw_env_follow_set_release_tau(&coeffs, value);
+	}
+	
+	template<BW_SIZE_T N_CHANNELS>
+	float EnvFollow<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+		return bw_env_follow_get_y_z1(states + channel);
 	}
 }
 

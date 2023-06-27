@@ -50,7 +50,7 @@ namespace Brickworks {
 	
 	template<BW_SIZE_T N_CHANNELS>
 	void SRReduce<N_CHANNELS>::reset() {
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_sr_reduce_reset_state(&coeffs, states + i);
 	}
 	
@@ -59,7 +59,7 @@ namespace Brickworks {
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_sr_reduce_process(&coeffs, states + i, x.data()[i], y.data()[i], nSamples);
 	}
 	

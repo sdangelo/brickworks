@@ -57,7 +57,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	OnePole<N_CHANNELS>::OnePole() {
 		bw_one_pole_init(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
@@ -69,7 +69,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	void OnePole<N_CHANNELS>::reset(float y_z1) {
 		bw_one_pole_reset_coeffs(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_one_pole_reset_state(&coeffs, states + i, y_z1);
 	}
 	

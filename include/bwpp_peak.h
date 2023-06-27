@@ -53,7 +53,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	Peak<N_CHANNELS>::Peak() {
 		bw_peak_init(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
@@ -65,7 +65,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	void Peak<N_CHANNELS>::reset(float x0) {
 		bw_peak_reset_coeffs(&coeffs);
-		for (unsigned int i = 0; i < N_CHANNELS; i++)
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_peak_reset_state(&coeffs, states + i, x0);
 	}
 	

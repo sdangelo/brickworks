@@ -20,11 +20,10 @@
 
 #include "bw_example_synthpp_simple.h"
 
-#include "bw_buf.h"
+#include <bw_buf.h>
 
 void bw_example_synthpp_simple_init(bw_example_synthpp_simple *instance) {
 	instance->oscPulse.setAntialiasing(true);
-	instance->rand_state = 0xbaddecaf600dfeed;
 }
 
 void bw_example_synthpp_simple_set_sample_rate(bw_example_synthpp_simple *instance, float sample_rate) {
@@ -70,8 +69,6 @@ void bw_example_synthpp_simple_process(bw_example_synthpp_simple *instance, cons
 }
 
 void bw_example_synthpp_simple_set_parameter(bw_example_synthpp_simple *instance, int index, float value) {
-	if (instance->params[index] == value)
-		return;
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:

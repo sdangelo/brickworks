@@ -63,6 +63,7 @@ code:
 * allow nullptr in C++ wrappers where process_multi arg can be NULL
 * src post filt?
 * bw_env_gen process_multi gate const?
+* c++ get coeffs/state? or public?
 
 build system:
 * make makefiles handle paths with spaces etc

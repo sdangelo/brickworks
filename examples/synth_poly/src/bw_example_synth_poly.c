@@ -56,11 +56,8 @@ void bw_example_synth_poly_init(bw_example_synth_poly *instance) {
 	bw_osc_tri_set_antialiasing(&instance->vco1_tri_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco2_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco2_tri_coeffs, 1);
-	bw_gain_set_gain_lin(&instance->vco2_gain_coeffs, 0.f);
 	bw_osc_pulse_set_antialiasing(&instance->vco3_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco3_tri_coeffs, 1);
-	bw_gain_set_gain_lin(&instance->vco3_gain_coeffs, 0.f);
-	bw_gain_set_gain_lin(&instance->noise_gain_coeffs, 0.f);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	
 	instance->rand_state = 0xbaddecaf600dfeed;
@@ -337,8 +334,6 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 }
 
 void bw_example_synth_poly_set_parameter(bw_example_synth_poly *instance, int index, float value) {
-	if (instance->params[index] == value)
-		return;
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:

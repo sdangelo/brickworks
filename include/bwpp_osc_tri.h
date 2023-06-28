@@ -75,7 +75,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscTri<N_CHANNELS>::setSlope(bool value) {
+	void OscTri<N_CHANNELS>::setSlope(float value) {
 		bw_osc_tri_set_slope(&coeffs, value);
 	}
 }

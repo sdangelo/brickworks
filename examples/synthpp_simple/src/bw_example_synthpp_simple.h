@@ -63,7 +63,6 @@ struct _bw_example_synthpp_simple {
 	float		params[p_n];
 
 	// States
-	uint64_t	rand_state;
 	int		note;
 	
 	// Buffers

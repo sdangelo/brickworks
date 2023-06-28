@@ -31,8 +31,6 @@ void bw_example_synth_simple_init(bw_example_synth_simple *instance) {
 	bw_ppm_init(&instance->ppm_coeffs);
 	
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse_coeffs, 1);
-	
-	instance->rand_state = 0xbaddecaf600dfeed;
 }
 
 void bw_example_synth_simple_set_sample_rate(bw_example_synth_simple *instance, float sample_rate) {
@@ -82,8 +80,6 @@ void bw_example_synth_simple_process(bw_example_synth_simple *instance, const fl
 }
 
 void bw_example_synth_simple_set_parameter(bw_example_synth_simple *instance, int index, float value) {
-	if (instance->params[index] == value)
-		return;
 	instance->params[index] = value;
 	switch (index) {
 	case p_volume:

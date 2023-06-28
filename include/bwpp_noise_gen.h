@@ -67,7 +67,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float NoiseGen<N_CHANNELS>::getScalingK(float value) {
+	float NoiseGen<N_CHANNELS>::getScalingK() {
 		return bw_noise_gen_get_scaling_k(&coeffs);
 	}
 }

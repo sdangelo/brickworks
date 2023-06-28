@@ -58,7 +58,6 @@ namespace Brickworks {
 	
 	template<BW_SIZE_T N_CHANNELS>
 	void PinkFilt<N_CHANNELS>::reset() {
-		bw_pink_filt_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_pink_filt_reset_state(&coeffs, states + i);
 	}
@@ -69,7 +68,7 @@ namespace Brickworks {
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_pink_filt_process(&coeffs, x.data()[i], y.data()[i], nSamples);
+			bw_pink_filt_process(&coeffs, states + i, x.data()[i], y.data()[i], nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
@@ -78,7 +77,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float PinkFilt<N_CHANNELS>::getScalingK(float value) {
+	float PinkFilt<N_CHANNELS>::getScalingK() {
 		return bw_pink_filt_get_scaling_k(&coeffs);
 	}
 }

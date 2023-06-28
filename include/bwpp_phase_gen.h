@@ -31,7 +31,7 @@ namespace Brickworks {
 		PhaseGen();
 
 		void setSampleRate(float sampleRate);
-		void reset();
+		void reset(float phase_0 = 0.f);
 		void process(
 			std::array<const float *, N_CHANNELS> x_mod,
 			std::array<float *, N_CHANNELS> y,
@@ -60,10 +60,10 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PhaseGen<N_CHANNELS>::reset() {
+	void PhaseGen<N_CHANNELS>::reset(float phase_0) {
 		bw_phase_gen_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_phase_gen_reset_state(&coeffs, states + i);
+			bw_phase_gen_reset_state(&coeffs, states + i, phase_0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>

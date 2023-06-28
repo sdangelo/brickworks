@@ -75,7 +75,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscPulse<N_CHANNELS>::setPulseWidth(bool value) {
+	void OscPulse<N_CHANNELS>::setPulseWidth(float value) {
 		bw_osc_pulse_set_pulse_width(&coeffs, value);
 	}
 }

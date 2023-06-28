@@ -50,7 +50,7 @@ namespace Brickworks {
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_osc_filt_process(states + i, x.data(), y.data(), nSamples);
+			bw_osc_filt_process(states + i, x.data()[i], y.data()[i], nSamples);
 	}
 }
 

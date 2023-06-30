@@ -47,26 +47,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Fuzz<N_CHANNELS>::Fuzz() {
+	inline Fuzz<N_CHANNELS>::Fuzz() {
 		bw_fuzz_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Fuzz<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Fuzz<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_fuzz_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Fuzz<N_CHANNELS>::reset() {
+	inline void Fuzz<N_CHANNELS>::reset() {
 		bw_fuzz_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_fuzz_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Fuzz<N_CHANNELS>::process(
+	inline void Fuzz<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -74,12 +74,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Fuzz<N_CHANNELS>::setFuzz(float value) {
+	inline void Fuzz<N_CHANNELS>::setFuzz(float value) {
 		bw_fuzz_set_fuzz(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Fuzz<N_CHANNELS>::setVolume(float value) {
+	inline void Fuzz<N_CHANNELS>::setVolume(float value) {
 		bw_fuzz_set_volume(&coeffs, value);
 	}
 }

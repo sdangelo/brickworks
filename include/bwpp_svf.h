@@ -51,26 +51,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	SVF<N_CHANNELS>::SVF() {
+	inline SVF<N_CHANNELS>::SVF() {
 		bw_svf_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void SVF<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_svf_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::reset(float x0) {
+	inline void SVF<N_CHANNELS>::reset(float x0) {
 		bw_svf_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_svf_reset_state(&coeffs, states + i, x0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::process(
+	inline void SVF<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y_lp,
 			std::array<float *, N_CHANNELS> y_bp,
@@ -80,22 +80,22 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::setCutoff(float value) {
+	inline void SVF<N_CHANNELS>::setCutoff(float value) {
 		bw_svf_set_cutoff(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::setQ(float value) {
+	inline void SVF<N_CHANNELS>::setQ(float value) {
 		bw_svf_set_Q(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
+	inline void SVF<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
 		bw_svf_set_prewarp_at_cutoff(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SVF<N_CHANNELS>::setPrewarpFreq(float value) {
+	inline void SVF<N_CHANNELS>::setPrewarpFreq(float value) {
 		bw_svf_set_prewarp_freq(&coeffs, value);
 	}
 }

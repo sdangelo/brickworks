@@ -45,22 +45,22 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	RingMod<N_CHANNELS>::RingMod() {
+	inline RingMod<N_CHANNELS>::RingMod() {
 		bw_ringmod_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void RingMod<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void RingMod<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_ringmod_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void RingMod<N_CHANNELS>::reset() {
+	inline void RingMod<N_CHANNELS>::reset() {
 		bw_ringmod_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void RingMod<N_CHANNELS>::process(
+	inline void RingMod<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x_mod,
 			std::array<const float *, N_CHANNELS> x_car,
 			std::array<float *, N_CHANNELS> y,
@@ -69,7 +69,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void RingMod<N_CHANNELS>::setAmount(float value) {
+	inline void RingMod<N_CHANNELS>::setAmount(float value) {
 		bw_ringmod_set_amount(&coeffs, value);
 	}
 }

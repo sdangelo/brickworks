@@ -49,26 +49,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	EnvFollow<N_CHANNELS>::EnvFollow() {
+	inline EnvFollow<N_CHANNELS>::EnvFollow() {
 		bw_env_follow_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvFollow<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void EnvFollow<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_env_follow_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvFollow<N_CHANNELS>::reset() {
+	inline void EnvFollow<N_CHANNELS>::reset() {
 		bw_env_follow_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_env_follow_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvFollow<N_CHANNELS>::process(
+	inline void EnvFollow<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -76,17 +76,17 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvFollow<N_CHANNELS>::setAttackTau(float value) {
+	inline void EnvFollow<N_CHANNELS>::setAttackTau(float value) {
 		bw_env_follow_set_attack_tau(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvFollow<N_CHANNELS>::setReleaseTau(float value) {
+	inline void EnvFollow<N_CHANNELS>::setReleaseTau(float value) {
 		bw_env_follow_set_release_tau(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float EnvFollow<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+	inline float EnvFollow<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
 		return bw_env_follow_get_y_z1(states + channel);
 	}
 }

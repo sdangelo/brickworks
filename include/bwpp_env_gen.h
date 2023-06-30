@@ -52,26 +52,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	EnvGen<N_CHANNELS>::EnvGen() {
+	inline EnvGen<N_CHANNELS>::EnvGen() {
 		bw_env_gen_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void EnvGen<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_env_gen_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::reset() {
+	inline void EnvGen<N_CHANNELS>::reset() {
 		bw_env_gen_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_env_gen_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::process(
+	inline void EnvGen<N_CHANNELS>::process(
 			std::array<char, N_CHANNELS> gate,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -79,32 +79,32 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::setAttack(float value) {
+	inline void EnvGen<N_CHANNELS>::setAttack(float value) {
 		bw_env_gen_set_attack(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::setDecay(float value) {
+	inline void EnvGen<N_CHANNELS>::setDecay(float value) {
 		bw_env_gen_set_decay(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::setSustain(float value) {
+	inline void EnvGen<N_CHANNELS>::setSustain(float value) {
 		bw_env_gen_set_sustain(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void EnvGen<N_CHANNELS>::setRelease(float value) {
+	inline void EnvGen<N_CHANNELS>::setRelease(float value) {
 		bw_env_gen_set_release(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	bw_env_gen_phase EnvGen<N_CHANNELS>::getPhase(BW_SIZE_T channel) {
+	inline bw_env_gen_phase EnvGen<N_CHANNELS>::getPhase(BW_SIZE_T channel) {
 		return bw_env_gen_get_phase(states + channel);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float EnvGen<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+	inline float EnvGen<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
 		return bw_env_gen_get_y_z1(states + channel);
 	}
 }

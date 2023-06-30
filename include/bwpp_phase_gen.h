@@ -48,26 +48,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	PhaseGen<N_CHANNELS>::PhaseGen() {
+	inline PhaseGen<N_CHANNELS>::PhaseGen() {
 		bw_phase_gen_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PhaseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void PhaseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_phase_gen_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PhaseGen<N_CHANNELS>::reset(float phase_0) {
+	inline void PhaseGen<N_CHANNELS>::reset(float phase_0) {
 		bw_phase_gen_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_phase_gen_reset_state(&coeffs, states + i, phase_0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PhaseGen<N_CHANNELS>::process(
+	inline void PhaseGen<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x_mod,
 			std::array<float *, N_CHANNELS> y,
 			std::array<float *, N_CHANNELS> y_phase_inc,
@@ -76,12 +76,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PhaseGen<N_CHANNELS>::setFrequency(float value) {
+	inline void PhaseGen<N_CHANNELS>::setFrequency(float value) {
 		bw_phase_gen_set_frequency(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PhaseGen<N_CHANNELS>::setPortamentoTau(float value) {
+	inline void PhaseGen<N_CHANNELS>::setPortamentoTau(float value) {
 		bw_phase_gen_set_portamento_tau(&coeffs, value);
 	}
 }

@@ -46,26 +46,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	AP1<N_CHANNELS>::AP1() {
+	inline AP1<N_CHANNELS>::AP1() {
 		bw_ap1_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void AP1<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void AP1<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_ap1_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void AP1<N_CHANNELS>::reset(float x0) {
+	inline void AP1<N_CHANNELS>::reset(float x0) {
 		bw_ap1_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_ap1_reset_state(&coeffs, states + i, x0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void AP1<N_CHANNELS>::process(
+	inline void AP1<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -73,7 +73,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void AP1<N_CHANNELS>::setCutoff(float value) {
+	inline void AP1<N_CHANNELS>::setCutoff(float value) {
 		bw_ap1_set_cutoff(&coeffs, value);
 	}
 }

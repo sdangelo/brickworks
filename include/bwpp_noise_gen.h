@@ -44,17 +44,17 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	NoiseGen<N_CHANNELS>::NoiseGen(uint64_t *BW_RESTRICT state) {
+	inline NoiseGen<N_CHANNELS>::NoiseGen(uint64_t *BW_RESTRICT state) {
 		bw_noise_gen_init(&coeffs, state);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void NoiseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void NoiseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_noise_gen_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void NoiseGen<N_CHANNELS>::process(
+	inline void NoiseGen<N_CHANNELS>::process(
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
@@ -62,12 +62,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void NoiseGen<N_CHANNELS>::setSampleRateScaling(bool value) {
+	inline void NoiseGen<N_CHANNELS>::setSampleRateScaling(bool value) {
 		bw_noise_gen_set_sample_rate_scaling(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float NoiseGen<N_CHANNELS>::getScalingK() {
+	inline float NoiseGen<N_CHANNELS>::getScalingK() {
 		return bw_noise_gen_get_scaling_k(&coeffs);
 	}
 }

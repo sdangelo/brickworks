@@ -46,22 +46,22 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Balance<N_CHANNELS>::Balance() {
+	inline Balance<N_CHANNELS>::Balance() {
 		bw_balance_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Balance<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Balance<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_balance_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Balance<N_CHANNELS>::reset() {
+	inline void Balance<N_CHANNELS>::reset() {
 		bw_balance_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Balance<N_CHANNELS>::process(
+	inline void Balance<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x_l,
 			std::array<const float *, N_CHANNELS> x_r,
 			std::array<float *, N_CHANNELS> y_l,
@@ -71,7 +71,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Balance<N_CHANNELS>::setBalance(float value) {
+	inline void Balance<N_CHANNELS>::setBalance(float value) {
 		bw_balance_set_balance(&coeffs, value);
 	}
 }

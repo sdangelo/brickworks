@@ -32,7 +32,7 @@ namespace Brickworks {
 			int nSamples);
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void oscSinProcess(
+	inline void oscSinProcess(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {

@@ -47,23 +47,23 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	PinkFilt<N_CHANNELS>::PinkFilt() {
+	inline PinkFilt<N_CHANNELS>::PinkFilt() {
 		bw_pink_filt_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PinkFilt<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void PinkFilt<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_pink_filt_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PinkFilt<N_CHANNELS>::reset() {
+	inline void PinkFilt<N_CHANNELS>::reset() {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_pink_filt_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PinkFilt<N_CHANNELS>::process(
+	inline void PinkFilt<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -72,12 +72,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PinkFilt<N_CHANNELS>::setSampleRateScaling(bool value) {
+	inline void PinkFilt<N_CHANNELS>::setSampleRateScaling(bool value) {
 		bw_pink_filt_set_sample_rate_scaling(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float PinkFilt<N_CHANNELS>::getScalingK() {
+	inline float PinkFilt<N_CHANNELS>::getScalingK() {
 		return bw_pink_filt_get_scaling_k(&coeffs);
 	}
 }

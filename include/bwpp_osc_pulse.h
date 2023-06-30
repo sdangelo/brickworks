@@ -46,22 +46,22 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	OscPulse<N_CHANNELS>::OscPulse() {
+	inline OscPulse<N_CHANNELS>::OscPulse() {
 		bw_osc_pulse_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscPulse<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void OscPulse<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_osc_pulse_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscPulse<N_CHANNELS>::reset() {
+	inline void OscPulse<N_CHANNELS>::reset() {
 		bw_osc_pulse_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscPulse<N_CHANNELS>::process(
+	inline void OscPulse<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<const float *, N_CHANNELS> x_phase_inc,
 			std::array<float *, N_CHANNELS> y,
@@ -70,12 +70,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscPulse<N_CHANNELS>::setAntialiasing(bool value) {
+	inline void OscPulse<N_CHANNELS>::setAntialiasing(bool value) {
 		bw_osc_pulse_set_antialiasing(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscPulse<N_CHANNELS>::setPulseWidth(float value) {
+	inline void OscPulse<N_CHANNELS>::setPulseWidth(float value) {
 		bw_osc_pulse_set_pulse_width(&coeffs, value);
 	}
 }

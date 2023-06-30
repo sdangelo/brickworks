@@ -48,26 +48,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Phaser<N_CHANNELS>::Phaser() {
+	inline Phaser<N_CHANNELS>::Phaser() {
 		bw_phaser_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Phaser<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Phaser<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_phaser_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Phaser<N_CHANNELS>::reset() {
+	inline void Phaser<N_CHANNELS>::reset() {
 		bw_phaser_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_phaser_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Phaser<N_CHANNELS>::process(
+	inline void Phaser<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -75,17 +75,17 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Phaser<N_CHANNELS>::setRate(float value) {
+	inline void Phaser<N_CHANNELS>::setRate(float value) {
 		bw_phaser_set_rate(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Phaser<N_CHANNELS>::setCenter(float value) {
+	inline void Phaser<N_CHANNELS>::setCenter(float value) {
 		bw_phaser_set_center(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Phaser<N_CHANNELS>::setAmount(float value) {
+	inline void Phaser<N_CHANNELS>::setAmount(float value) {
 		bw_phaser_set_amount(&coeffs, value);
 	}
 }

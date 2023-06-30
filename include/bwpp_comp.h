@@ -53,26 +53,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Comp<N_CHANNELS>::Comp() {
+	inline Comp<N_CHANNELS>::Comp() {
 		bw_comp_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Comp<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_comp_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::reset() {
+	inline void Comp<N_CHANNELS>::reset() {
 		bw_comp_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_comp_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::process(
+	inline void Comp<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<const float *, N_CHANNELS> xSC,
 			std::array<float *, N_CHANNELS> y,
@@ -81,37 +81,37 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setTreshLin(float value) {
+	inline void Comp<N_CHANNELS>::setTreshLin(float value) {
 		bw_comp_set_thresh_lin(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setTreshDBFS(float value) {
+	inline void Comp<N_CHANNELS>::setTreshDBFS(float value) {
 		bw_comp_set_thresh_dBFS(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setRatio(float value) {
+	inline void Comp<N_CHANNELS>::setRatio(float value) {
 		bw_comp_set_ratio(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setAttackTau(float value) {
+	inline void Comp<N_CHANNELS>::setAttackTau(float value) {
 		bw_comp_set_attack_tau(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setReleaseTau(float value) {
+	inline void Comp<N_CHANNELS>::setReleaseTau(float value) {
 		bw_comp_set_release_tau(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setGainLin(float value) {
+	inline void Comp<N_CHANNELS>::setGainLin(float value) {
 		bw_comp_set_gain_lin(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Comp<N_CHANNELS>::setGainDB(float value) {
+	inline void Comp<N_CHANNELS>::setGainDB(float value) {
 		bw_comp_set_gain_dB(&coeffs, value);
 	}
 }

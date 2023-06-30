@@ -47,26 +47,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Trem<N_CHANNELS>::Trem() {
+	inline Trem<N_CHANNELS>::Trem() {
 		bw_trem_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Trem<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Trem<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_trem_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Trem<N_CHANNELS>::reset() {
+	inline void Trem<N_CHANNELS>::reset() {
 		bw_trem_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_trem_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Trem<N_CHANNELS>::process(
+	inline void Trem<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -74,12 +74,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Trem<N_CHANNELS>::setRate(float value) {
+	inline void Trem<N_CHANNELS>::setRate(float value) {
 		bw_trem_set_rate(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Trem<N_CHANNELS>::setAmount(float value) {
+	inline void Trem<N_CHANNELS>::setAmount(float value) {
 		bw_trem_set_amount(&coeffs, value);
 	}
 }

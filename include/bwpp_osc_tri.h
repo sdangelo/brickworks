@@ -46,22 +46,22 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	OscTri<N_CHANNELS>::OscTri() {
+	inline OscTri<N_CHANNELS>::OscTri() {
 		bw_osc_tri_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscTri<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void OscTri<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_osc_tri_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscTri<N_CHANNELS>::reset() {
+	inline void OscTri<N_CHANNELS>::reset() {
 		bw_osc_tri_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscTri<N_CHANNELS>::process(
+	inline void OscTri<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<const float *, N_CHANNELS> x_phase_inc,
 			std::array<float *, N_CHANNELS> y,
@@ -70,12 +70,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscTri<N_CHANNELS>::setAntialiasing(bool value) {
+	inline void OscTri<N_CHANNELS>::setAntialiasing(bool value) {
 		bw_osc_tri_set_antialiasing(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscTri<N_CHANNELS>::setSlope(float value) {
+	inline void OscTri<N_CHANNELS>::setSlope(float value) {
 		bw_osc_tri_set_slope(&coeffs, value);
 	}
 }

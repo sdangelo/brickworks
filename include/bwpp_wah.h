@@ -46,26 +46,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Wah<N_CHANNELS>::Wah() {
+	inline Wah<N_CHANNELS>::Wah() {
 		bw_wah_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_wah_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::reset() {
+	inline void Wah<N_CHANNELS>::reset() {
 		bw_wah_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_wah_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::process(
+	inline void Wah<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -73,7 +73,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Wah<N_CHANNELS>::setWah(float value) {
+	inline void Wah<N_CHANNELS>::setWah(float value) {
 		bw_wah_set_wah(&coeffs, value);
 	}
 }

@@ -64,6 +64,7 @@ code:
 * src post filt?
 * bw_env_gen process_multi gate const?
 * c++ get coeffs/state? or public?
+* bw_buf invert src dest order?
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -50,26 +50,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	MM1<N_CHANNELS>::MM1() {
+	inline MM1<N_CHANNELS>::MM1() {
 		bw_mm1_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void MM1<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_mm1_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::reset(float x0) {
+	inline void MM1<N_CHANNELS>::reset(float x0) {
 		bw_mm1_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_mm1_reset_state(&coeffs, states + i, x0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::process(
+	inline void MM1<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -77,27 +77,27 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::setCutoff(float value) {
+	inline void MM1<N_CHANNELS>::setCutoff(float value) {
 		bw_mm1_set_cutoff(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
+	inline void MM1<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
 		bw_mm1_set_prewarp_at_cutoff(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::setPrewarpFreq(float value) {
+	inline void MM1<N_CHANNELS>::setPrewarpFreq(float value) {
 		bw_mm1_set_prewarp_freq(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::setCoeffX(float value) {
+	inline void MM1<N_CHANNELS>::setCoeffX(float value) {
 		bw_mm1_set_coeff_x(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void MM1<N_CHANNELS>::setCoeffLp(float value) {
+	inline void MM1<N_CHANNELS>::setCoeffLp(float value) {
 		bw_mm1_set_coeff_lp(&coeffs, value);
 	}
 }

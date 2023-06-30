@@ -43,12 +43,12 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	OscSaw<N_CHANNELS>::OscSaw() {
+	inline OscSaw<N_CHANNELS>::OscSaw() {
 		bw_osc_saw_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscSaw<N_CHANNELS>::process(
+	inline void OscSaw<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<const float *, N_CHANNELS> x_phase_inc,
 			std::array<float *, N_CHANNELS> y,
@@ -58,7 +58,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscSaw<N_CHANNELS>::setAntialiasing(bool value) {
+	inline void OscSaw<N_CHANNELS>::setAntialiasing(bool value) {
 		bw_osc_saw_set_antialiasing(&coeffs, value);
 	}
 }

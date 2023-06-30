@@ -49,26 +49,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	LS2<N_CHANNELS>::LS2() {
+	inline LS2<N_CHANNELS>::LS2() {
 		bw_ls2_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void LS2<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_ls2_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::reset(float x0) {
+	inline void LS2<N_CHANNELS>::reset(float x0) {
 		bw_ls2_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_ls2_reset_state(&coeffs, states + i, x0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::process(
+	inline void LS2<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -76,22 +76,22 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::setCutoff(float value) {
+	inline void LS2<N_CHANNELS>::setCutoff(float value) {
 		bw_ls2_set_cutoff(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::setQ(float value) {
+	inline void LS2<N_CHANNELS>::setQ(float value) {
 		bw_ls2_set_Q(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::setDcGainLin(float value) {
+	inline void LS2<N_CHANNELS>::setDcGainLin(float value) {
 		bw_ls2_set_dc_gain_lin(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void LS2<N_CHANNELS>::setDcGainDB(float value) {
+	inline void LS2<N_CHANNELS>::setDcGainDB(float value) {
 		bw_ls2_set_dc_gain_dB(&coeffs, value);
 	}
 }

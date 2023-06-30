@@ -43,17 +43,17 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	BDReduce<N_CHANNELS>::BDReduce() {
+	inline BDReduce<N_CHANNELS>::BDReduce() {
 		bw_bd_reduce_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void BDReduce<N_CHANNELS>::reset() {
+	inline void BDReduce<N_CHANNELS>::reset() {
 		bw_bd_reduce_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void BDReduce<N_CHANNELS>::process(
+	inline void BDReduce<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -61,7 +61,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void BDReduce<N_CHANNELS>::setBitDepth(char value) {
+	inline void BDReduce<N_CHANNELS>::setBitDepth(char value) {
 		bw_bd_reduce_set_bit_depth(&coeffs, value);
 	}
 }

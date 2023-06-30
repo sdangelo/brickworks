@@ -39,13 +39,13 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscFilt<N_CHANNELS>::reset() {
+	inline void OscFilt<N_CHANNELS>::reset() {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_osc_filt_reset_state(states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void OscFilt<N_CHANNELS>::process(
+	inline void OscFilt<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {

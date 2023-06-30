@@ -42,18 +42,18 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	SRCInt<N_CHANNELS>::SRCInt(int ratio) {
+	inline SRCInt<N_CHANNELS>::SRCInt(int ratio) {
 		bw_src_int_init(&coeffs, ratio);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SRCInt<N_CHANNELS>::reset(float x0) {
+	inline void SRCInt<N_CHANNELS>::reset(float x0) {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_src_int_reset_state(&coeffs, states + i, x0);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SRCInt<N_CHANNELS>::process(
+	inline void SRCInt<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nInSamples) {

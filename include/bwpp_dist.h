@@ -48,26 +48,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Dist<N_CHANNELS>::Dist() {
+	inline Dist<N_CHANNELS>::Dist() {
 		bw_dist_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Dist<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Dist<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_dist_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Dist<N_CHANNELS>::reset() {
+	inline void Dist<N_CHANNELS>::reset() {
 		bw_dist_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_dist_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Dist<N_CHANNELS>::process(
+	inline void Dist<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -75,17 +75,17 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Dist<N_CHANNELS>::setDistortion(float value) {
+	inline void Dist<N_CHANNELS>::setDistortion(float value) {
 		bw_dist_set_distortion(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Dist<N_CHANNELS>::setTone(float value) {
+	inline void Dist<N_CHANNELS>::setTone(float value) {
 		bw_dist_set_tone(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Dist<N_CHANNELS>::setVolume(float value) {
+	inline void Dist<N_CHANNELS>::setVolume(float value) {
 		bw_dist_set_volume(&coeffs, value);
 	}
 }

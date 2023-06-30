@@ -48,26 +48,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Satur<N_CHANNELS>::Satur() {
+	inline Satur<N_CHANNELS>::Satur() {
 		bw_satur_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Satur<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Satur<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_satur_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Satur<N_CHANNELS>::reset() {
+	inline void Satur<N_CHANNELS>::reset() {
 		bw_satur_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_satur_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Satur<N_CHANNELS>::process(
+	inline void Satur<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -75,17 +75,17 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Satur<N_CHANNELS>::setBias(float value) {
+	inline void Satur<N_CHANNELS>::setBias(float value) {
 		bw_satur_set_bias(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Satur<N_CHANNELS>::setGain(float value) {
+	inline void Satur<N_CHANNELS>::setGain(float value) {
 		bw_satur_set_gain(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Satur<N_CHANNELS>::setGainCompensation(bool value) {
+	inline void Satur<N_CHANNELS>::setGainCompensation(bool value) {
 		bw_satur_set_gain_compensation(&coeffs, value);
 	}
 }

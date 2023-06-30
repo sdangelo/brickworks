@@ -45,22 +45,22 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	Pan<N_CHANNELS>::Pan() {
+	inline Pan<N_CHANNELS>::Pan() {
 		bw_pan_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Pan<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void Pan<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_pan_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Pan<N_CHANNELS>::reset() {
+	inline void Pan<N_CHANNELS>::reset() {
 		bw_pan_reset_coeffs(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Pan<N_CHANNELS>::process(
+	inline void Pan<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y_l,
 			std::array<float *, N_CHANNELS> y_r,
@@ -69,7 +69,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void Pan<N_CHANNELS>::setPan(float value) {
+	inline void Pan<N_CHANNELS>::setPan(float value) {
 		bw_pan_set_pan(&coeffs, value);
 	}
 }

@@ -48,26 +48,26 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	PPM<N_CHANNELS>::PPM() {
+	inline PPM<N_CHANNELS>::PPM() {
 		bw_ppm_init(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PPM<N_CHANNELS>::setSampleRate(float sampleRate) {
+	inline void PPM<N_CHANNELS>::setSampleRate(float sampleRate) {
 		bw_ppm_set_sample_rate(&coeffs, sampleRate);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PPM<N_CHANNELS>::reset() {
+	inline void PPM<N_CHANNELS>::reset() {
 		bw_ppm_reset_coeffs(&coeffs);
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_ppm_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PPM<N_CHANNELS>::process(
+	inline void PPM<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -75,12 +75,12 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void PPM<N_CHANNELS>::setIntegrationTau(float value) {
+	inline void PPM<N_CHANNELS>::setIntegrationTau(float value) {
 		bw_ppm_set_integration_tau(&coeffs, value);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	float PPM<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+	inline float PPM<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
 		return bw_ppm_get_y_z1(states + channel);
 	}
 }

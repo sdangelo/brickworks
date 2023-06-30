@@ -44,18 +44,18 @@ namespace Brickworks {
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
-	SRReduce<N_CHANNELS>::SRReduce() {
+	inline SRReduce<N_CHANNELS>::SRReduce() {
 		bw_sr_reduce_init(&coeffs);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SRReduce<N_CHANNELS>::reset() {
+	inline void SRReduce<N_CHANNELS>::reset() {
 		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
 			bw_sr_reduce_reset_state(&coeffs, states + i);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SRReduce<N_CHANNELS>::process(
+	inline void SRReduce<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
@@ -64,7 +64,7 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	void SRReduce<N_CHANNELS>::setRatio(float value) {
+	inline void SRReduce<N_CHANNELS>::setRatio(float value) {
 		bw_sr_reduce_set_ratio(&coeffs, value);
 	}
 }

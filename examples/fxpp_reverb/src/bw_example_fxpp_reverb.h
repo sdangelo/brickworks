@@ -18,38 +18,39 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_FXPP_VIBRATO_H
-#define _BW_EXAMPLE_FXPP_VIBRATO_H
+#ifndef _BW_EXAMPLE_FXPP_REVERB_H
+#define _BW_EXAMPLE_FXPP_REVERB_H
 
-#include <bwpp_chorus.h>
+#include <bwpp_reverb.h>
 
 using namespace Brickworks;
 
 extern "C" {
 
 enum {
-	p_rate,
-	p_depth,
+	p_predelay,
+	p_bandwidth,
+	p_damping,
+	p_decay,
+	p_drywet,
 	p_n
 };
 
-struct _bw_example_fxpp_vibrato {
+struct _bw_example_fxpp_reverb {
 	// Sub-components
-	Chorus<1>	chorus;
+	Reverb<1>	reverb;
 
 	// Parameters
 	float		params[p_n];
-
-	_bw_example_fxpp_vibrato() : chorus(0.005f) {}
 };
-typedef struct _bw_example_fxpp_vibrato bw_example_fxpp_vibrato;
+typedef struct _bw_example_fxpp_reverb bw_example_fxpp_reverb;
 
-void bw_example_fxpp_vibrato_init(bw_example_fxpp_vibrato *instance);
-void bw_example_fxpp_vibrato_set_sample_rate(bw_example_fxpp_vibrato *instance, float sample_rate);
-void bw_example_fxpp_vibrato_reset(bw_example_fxpp_vibrato *instance);
-void bw_example_fxpp_vibrato_process(bw_example_fxpp_vibrato *instance, const float** x, float** y, int n_samples);
-void bw_example_fxpp_vibrato_set_parameter(bw_example_fxpp_vibrato *instance, int index, float value);
-float bw_example_fxpp_vibrato_get_parameter(bw_example_fxpp_vibrato *instance, int index);
+void bw_example_fxpp_reverb_init(bw_example_fxpp_reverb *instance);
+void bw_example_fxpp_reverb_set_sample_rate(bw_example_fxpp_reverb *instance, float sample_rate);
+void bw_example_fxpp_reverb_reset(bw_example_fxpp_reverb *instance);
+void bw_example_fxpp_reverb_process(bw_example_fxpp_reverb *instance, const float** x, float** y, int n_samples);
+void bw_example_fxpp_reverb_set_parameter(bw_example_fxpp_reverb *instance, int index, float value);
+float bw_example_fxpp_reverb_get_parameter(bw_example_fxpp_reverb *instance, int index);
 
 }
 

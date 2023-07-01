@@ -18,35 +18,36 @@
  * File author: Stefano D'Angelo
  */
 
-#ifndef _BW_EXAMPLE_FXPP_DELAY_H
-#define _BW_EXAMPLE_FXPP_DELAY_H
+#ifndef _BW_EXAMPLE_FXPP_CHORUS_H
+#define _BW_EXAMPLE_FXPP_CHORUS_H
 
-#include <bwpp_delay.h>
+#include <bwpp_chorus.h>
 
 using namespace Brickworks;
 
 extern "C" {
 
 enum {
-	p_delay,
+	p_rate,
+	p_depth,
 	p_n
 };
 
-struct _bw_example_fxpp_delay {
+struct _bw_example_fxpp_chorus {
 	// Sub-components
-	Delay<1>	delay;
+	Chorus<1>	chorus;
 
 	// Parameters
 	float		params[p_n];
 };
-typedef struct _bw_example_fxpp_delay bw_example_fxpp_delay;
+typedef struct _bw_example_fxpp_chorus bw_example_fxpp_chorus;
 
-void bw_example_fxpp_delay_init(bw_example_fxpp_delay *instance);
-void bw_example_fxpp_delay_set_sample_rate(bw_example_fxpp_delay *instance, float sample_rate);
-void bw_example_fxpp_delay_reset(bw_example_fxpp_delay *instance);
-void bw_example_fxpp_delay_process(bw_example_fxpp_delay *instance, const float** x, float** y, int n_samples);
-void bw_example_fxpp_delay_set_parameter(bw_example_fxpp_delay *instance, int index, float value);
-float bw_example_fxpp_delay_get_parameter(bw_example_fxpp_delay *instance, int index);
+void bw_example_fxpp_chorus_init(bw_example_fxpp_chorus *instance);
+void bw_example_fxpp_chorus_set_sample_rate(bw_example_fxpp_chorus *instance, float sample_rate);
+void bw_example_fxpp_chorus_reset(bw_example_fxpp_chorus *instance);
+void bw_example_fxpp_chorus_process(bw_example_fxpp_chorus *instance, const float** x, float** y, int n_samples);
+void bw_example_fxpp_chorus_set_parameter(bw_example_fxpp_chorus *instance, int index, float value);
+float bw_example_fxpp_chorus_get_parameter(bw_example_fxpp_chorus *instance, int index);
 
 }
 

@@ -28,7 +28,7 @@ namespace Brickworks {
 	template<BW_SIZE_T N_CHANNELS>
 	class Chorus {
 	public:
-		Chorus(float maxDelay = 1.f);
+		Chorus(float maxDelay = 0.01f);
 		~Chorus();
 
 		void setSampleRate(float sampleRate);

@@ -103,11 +103,6 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	inline void Comb<N_CHANNELS>::setDelayFB(float value) {
-		bw_comb_set_delay_fb(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
 	inline void Comb<N_CHANNELS>::setCoeffBlend(float value) {
 		bw_comb_set_coeff_blend(&coeffs, value);
 	}

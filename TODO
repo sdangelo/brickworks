@@ -63,7 +63,7 @@ code:
 * allow nullptr in C++ wrappers where process_multi arg can be NULL
 * src post filt?
 * bw_env_gen process_multi gate const?
-* c++ get coeffs/state? or public?
+* c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * bw_buf invert src dest order?
 
 build system:

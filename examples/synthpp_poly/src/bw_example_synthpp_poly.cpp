@@ -145,7 +145,7 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 	for (int i = 0; i < N_VOICES; i++)
 		voices[i] = (void *)(instance->voices + i);
 	bw_voice_alloc(&alloc_opts, &instance->noteQueue.queue, voices, N_VOICES);
-	bw_note_queue_clear(&instance->noteQueue.queue);
+	instance->noteQueue.clear();
 	
 	const float df1 =
 		6.f * instance->params[p_vco1_coarse] - 3.f

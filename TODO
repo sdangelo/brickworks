@@ -2,6 +2,7 @@
 -----
 
 code:
+* synth poly stuck notes
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
 * should rather use backward Euler in bw_onepole?

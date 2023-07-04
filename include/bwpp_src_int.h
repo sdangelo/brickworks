@@ -31,7 +31,7 @@ namespace Brickworks {
 		SRCInt(int ratio);
 		
 		void reset(float x0 = 0.f);
-		void process(
+		std::array<int, N_CHANNELS> process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nInSamples);
@@ -39,11 +39,14 @@ namespace Brickworks {
 	private:
 		bw_src_int_coeffs	 coeffs;
 		bw_src_int_state	 states[N_CHANNELS];
+		bw_src_int_state	*statesP[N_CHANNELS];
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
 	inline SRCInt<N_CHANNELS>::SRCInt(int ratio) {
 		bw_src_int_init(&coeffs, ratio);
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
@@ -53,12 +56,13 @@ namespace Brickworks {
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
-	inline void SRCInt<N_CHANNELS>::process(
+	inline std::array<int, N_CHANNELS> SRCInt<N_CHANNELS>::process(
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nInSamples) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_src_int_process(&coeffs, states + i, x.data()[i], y.data()[i], nInSamples);
+		std::array<int, N_CHANNELS> ret;
+		bw_src_int_process_multi(&coeffs, statesP, x.data(), y.data(), ret.data(), N_CHANNELS, nInSamples);
+		return ret;
 	}
 }
 

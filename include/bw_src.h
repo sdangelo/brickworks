@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Aribtrary-ratio IIR sample rate converter.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_src_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -86,6 +91,20 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
  *    After the call `n_in_samples` and `n_out_samples` will contain the actual
  *    number of consumed input samples and generated output samples,
  *    respectively.
+ *
+ *    #### bw_src_process_multi()
+ *  ```>>> */
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int **n_in_samples, int **n_out_samples);
+/*! <<<```
+ *    Processes at most the first `n_in_samples[i]` of each input buffer `x[i]`
+ *    and fills the corresponding output buffer `y[i]` with at most
+ *    `n_out_samples[i]` using `coeffs`, while using and updating each
+ *    `state[i]`.
+ *
+ *    After the call each element in `n_in_samples` and `n_out_samples` will
+ *    contain the actual number of consumed input samples and generated output
+ *    samples, respectively, for each of the `n_channels` input/output buffer
+ *    couples.
  *  }}} */
 
 /*** Implementation ***/
@@ -219,6 +238,11 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 	}
 	*n_in_samples = i;
 	*n_out_samples = j;
+}
+
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int **n_in_samples, int **n_out_samples) {
+	for (int i = 0; i < n_channels; i++)
+		bw_src_process(coeffs, state[i], x[i], y[i], n_in_samples[i], n_out_samples[i]);
 }
 
 #ifdef __cplusplus

@@ -40,11 +40,14 @@ namespace Brickworks {
 	private:
 		bw_src_coeffs	 coeffs;
 		bw_src_state	 states[N_CHANNELS];
+		bw_src_state	*statesP[N_CHANNELS];
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
 	inline SRC<N_CHANNELS>::SRC(float ratio) {
 		bw_src_init(&coeffs, ratio);
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
@@ -59,8 +62,7 @@ namespace Brickworks {
 			std::array<float *, N_CHANNELS> y,
 			std::array<int *, N_CHANNELS> nInSamples,
 			std::array<int *, N_CHANNELS> nOutSamples) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_src_process(&coeffs, states + i, x.data()[i], y.data()[i], nInSamples.data()[i], nOutSamples.data()[i]);
+		bw_src_process_multi(coeffs, statesP, x.data(), y.data(), N_CHANNELS, nInSamples.data(), nOutSamples.data());
 	}
 }
 

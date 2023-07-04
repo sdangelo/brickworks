@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Integer-ratio IIR sample rate converter.
@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_src_int_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>First release.</li>
@@ -95,6 +100,22 @@ static inline int bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs
  *    divided by `-ratio` and then rounded towards positive infinity.
  *
  *    Returns the number of generated output samples.
+ *
+ *    #### bw_src_int_process_multi()
+ *  ```>>> */
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state **BW_RESTRICT state, const float **x, float **y, int *n, int n_channels, int n_in_samples);
+/*! <<<```
+ *    Processes the first `n_in_samples` of the `n_channels` input buffers `x`
+ *    and fills the `n_channels` output buffers `y` using `coeffs`, while using
+ *    and updating each of the `n_channels` `state`s.
+ *
+ *    The number of generated output samples in each output buffer will be
+ *    `ratio` times `n_in_samples` if `ratio` is positive, otherwise at most
+ *    `n_in_samples` divided by `-ratio` and then rounded towards positive
+ *    infinity.
+ *
+ *    `n` is filled with the number of generated output samples for each output
+ *    buffer, if not `NULL`.
  *  }}} */
 
 /*** Implementation ***/
@@ -190,6 +211,15 @@ static inline int bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs
 		}
 	}
 	return n;
+}
+
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state **BW_RESTRICT state, const float **x, float **y, int *n, int n_channels, int n_in_samples) {
+	if (n != NULL)
+		for (int i = 0; i < n_channels; i++)
+			n[i] = bw_src_int_process(coeffs, state[i], x[i], y[i], n_in_samples);
+	else
+		for (int i = 0; i < n_channels; i++)
+			bw_src_int_process(coeffs, state[i], x[i], y[i], n_in_samples);
 }
 
 #ifdef __cplusplus

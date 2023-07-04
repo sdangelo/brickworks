@@ -29,6 +29,7 @@
  *    <ul>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_buf_*_multi()</code>.</li>
  *          <li>Added <code>bw_buf_neg()</code>.</li>
  *        </ul>
  *      </li>
@@ -97,6 +98,53 @@ static inline void bw_buf_mul(float *dest, const float *src1, const float *src2,
 /*! <<<```
  *    Multiplies the first `n_elems` of `src1` and `src2` and stores the results
  *    in the first `n_elems` of `dest`.
+ *
+ *    #### bw_buf_fill_multi()
+ *  ```>>> */
+static inline void bw_buf_fill_multi(float **dest, float k, int n_channels, int n_elems);
+/*! <<<```
+ *    Sets the first `n_elems` in each of the `n_channels` buffers `dest` to
+ *    `k`.
+ *
+ *    #### bw_buf_neg_multi()
+ *  ```>>> */
+static inline void bw_buf_neg_multi(float **dest, const float **src, int n_channels, int n_elems);
+/*! <<<```
+ *    Inverts the sign of the first `n_elems` in each of the `n_channels`
+ *    buffers `src` and stores the results in the first `n_elems` in each of the
+ *    `n_channels` buffers `dest`.
+ *
+ *    #### bw_buf_add_multi()
+ *  ```>>> */
+static inline void bw_buf_add_multi(float **dest, const float **src, float k, int n_channels, int n_elems);
+/*! <<<```
+ *    Adds `k` to the first `n_elems` in each of the `n_channels` buffers `src`
+ *    and stores the results in the first `n_elems` in each of the `n_channels`
+ *    buffers `dest`.
+ *
+ *    #### bw_buf_scale_multi()
+ *  ```>>> */
+static inline void bw_buf_scale_multi(float **dest, const float **src, float k, int n_channels, int n_elems);
+/*! <<<```
+ *    Multiplies the first `n_elems` in each of the `n_channels` buffers `src`
+ *    by `k` and stores the results in the first `n_elems` in each of the
+ *    `n_channels` buffers `dest`.
+ *
+ *    #### bw_buf_mix_multi()
+ *  ```>>> */
+static inline void bw_buf_mix_multi(float **dest, const float **src1, const float **src2, int n_channels, int n_elems);
+/*! <<<```
+ *    Adds the first `n_elems` in each of the `n_channels` buffers `src1` and
+ *    `src2` and stores the results in the first `n_elems` in each of the
+ *    `n_channels` buffers `dest`.
+ *
+ *    #### bw_buf_mul_multi()
+ *  ```>>> */
+static inline void bw_buf_mul_multi(float **dest, const float **src1, const float **src2, int n_channels, int n_elems);
+/*! <<<```
+ *    Multiplies the first `n_elems` in each of the `n_channels` buffers `src1`
+ *    and `src2` and stores the results in the first `n_elems` in each of the
+ *    `n_channels` buffers `dest`.
  *  }}} */
 
 /*** Implementation ***/
@@ -132,6 +180,36 @@ static inline void bw_buf_mix(float *dest, const float *src1, const float *src2,
 static inline void bw_buf_mul(float *dest, const float *src1, const float *src2, int n_elems) {
 	for (int i = 0; i < n_elems; i++)
 		dest[i] = src1[i] * src2[i];
+}
+
+static inline void bw_buf_fill_multi(float **dest, float k, int n_channels, int n_elems) {
+	for (int i = 0; i < n_channels; i++)
+		bw_buf_fill(dest[i], k, n_elems);
+}
+
+static inline void bw_buf_neg_multi(float **dest, const float **src, int n_channels, int n_elems) {
+	for (int i = 0; i < n_channels; i++)
+		bw_buf_neg(dest[i], src[i], n_elems);
+}
+
+static inline void bw_buf_add_multi(float **dest, const float **src, float k, int n_channels, int n_elems) {
+	for (int i = 0; i < n_channels; i++)
+		bw_buf_add(dest[i], src[i], k, n_elems);
+}
+
+static inline void bw_buf_scale_multi(float **dest, const float **src, float k, int n_channels, int n_elems) {
+	for (int i = 0; i < n_channels; i++)
+		bw_buf_scale(dest[i], src[i], k, n_elems);
+}
+
+static inline void bw_buf_mix_multi(float **dest, const float **src1, const float **src2, int n_channels, int n_elems) {
+	for (int i = 0; i < n_channels; i++)
+		bw_buf_mix(dest[i], src1[i], src2[i], n_elems);
+}
+
+static inline void bw_buf_mul_multi(float **dest, const float **src1, const float **src2, int n_channels, int n_elems) {
+	for (int i = 0; i < n_channels; i++)
+		bw_buf_mul(dest[i], src1[i], src2[i], n_elems);
 }
 
 #ifdef __cplusplus

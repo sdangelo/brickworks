@@ -53,8 +53,7 @@ namespace Brickworks {
 			std::array<const float *, N_CHANNELS> x_phase_inc,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_osc_saw_process(&coeffs, x.data()[i], x_phase_inc.data()[i], y.data()[i], nSamples);
+		bw_osc_saw_process_multi(&coeffs, x.data(), x_phase_inc.data(), y.data(), N_CHANNELS, nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>

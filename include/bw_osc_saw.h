@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Sawtooth oscillator waveshaper with PolyBLEP antialiasing.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_osc_saw_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -91,10 +96,22 @@ static inline void bw_osc_saw_process(bw_osc_saw_coeffs *BW_RESTRICT coeffs, con
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
- *    buffer `y`, while using and updating `coeffs`.
+ *    buffer `y`, while using `coeffs`.
  *
  *    If antialiasing is enabled, `x_phase_inc` must contain phase increment
  *    values, otherwise it is ignored and can be `NULL`.
+ *
+ *    #### bw_osc_saw_process_multi()
+ *  ```>>> */
+static inline void bw_osc_saw_process_multi(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
+ *    containing the normalized phase signals, and fills the first `n_samples`
+ *    of the `n_samples` output buffers `y`, while using `coeffs`.
+ *
+ *    If antialiasing is enabled, each of the `n_channels` buffers pointed by
+ *    `x_phase_inc` must contain phase increment values, otherwise `x_phase_inc`
+ *    is ignored and can be `NULL`.
  *
  *    #### bw_osc_saw_set_antialiasing()
  *  ```>>> */
@@ -156,6 +173,15 @@ static inline void bw_osc_saw_process(bw_osc_saw_coeffs *BW_RESTRICT coeffs, con
 	else
 		for (int i = 0; i < n_samples; i++)
 			y[i] = bw_osc_saw_process1(coeffs, x[i]);
+}
+
+static inline void bw_osc_saw_process_multi(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples) {
+	if (x_phase_inc != NULL)
+		for (int i = 0; i < n_channels; i++)
+			bw_osc_saw_process(coeffs, x[i], x_phase_inc[i], y[i], n_samples);
+	else
+		for (int i = 0; i < n_channels; i++)
+			bw_osc_saw_process(coeffs, x[i], NULL, y[i], n_samples);
 }
 
 static inline void bw_osc_saw_set_antialiasing(bw_osc_saw_coeffs *BW_RESTRICT coeffs, char value) {

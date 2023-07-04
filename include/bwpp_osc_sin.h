@@ -36,8 +36,7 @@ namespace Brickworks {
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_osc_sin_process(x.data()[i], y.data()[i], nSamples);
+		bw_osc_sin_process_multi(x.data(), y.data(), N_CHANNELS, nSamples);
 	}
 }
 

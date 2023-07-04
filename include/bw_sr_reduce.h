@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Sample rate reducer.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_sr_reduce_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -88,11 +93,20 @@ static inline float bw_sr_reduce_process1(const bw_sr_reduce_coeffs *BW_RESTRICT
  *
  *    #### bw_sr_reduce_process()
  *  ```>>> */
-static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
+static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using `coeffs` and
- *    using and updating `state` (control and audio rate).
+ *    both using and updating `state` (control and audio rate).
+ *
+ *    #### bw_sr_reduce_process_multi()
+ *  ```>>> */
+static inline void bw_sr_reduce_process_multi(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using the common `coeffs` and both using and updating each of the
+ *    `n_channels` `state`s.
  *
  *    #### bw_sr_reduce_set_ratio()
  *  ```>>> */
@@ -140,9 +154,14 @@ static inline float bw_sr_reduce_process1(const bw_sr_reduce_coeffs *BW_RESTRICT
 	return state->y_z1;
 }
 
-static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float* y, int n_samples) {
+static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_sr_reduce_process1(coeffs, state, x[i]);
+}
+
+static inline void bw_sr_reduce_process_multi(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	for (int i = 0; i < n_channels; i++)
+		bw_sr_reduce_process(coeffs, state[i], x[i], y[i], n_samples);
 }
 
 static inline void bw_sr_reduce_set_ratio(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, float value) {

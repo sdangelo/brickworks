@@ -1,9 +1,11 @@
+1.0.0
+-----
+
 code:
-* blep etc in a module?
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
+* should rather use backward Euler in bw_onepole?
 * one pole process const input? (return also if const out)
-* optimize triangle generation for constant pulse width
 * web examples construction/destruction
 * web effect mono->stereo and stereo->mono inputs? or display "input needs to be n channels"?
 * check const restrict etc.
@@ -13,27 +15,17 @@ code:
 * should clip slope in triangle?
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
-* compute bit depth reduction only when input changes? (state, option?)
 * common smoothing policy (as control rate as possible?) - smoothing control?
-* avoid "force" in coeffs update by using inline functions?
-* should rather use backward Euler in bw_onepole?
-* csch for bw_peak bandwidth -> Q, inv sqrt ls2 hs2
-* sample rate-constant coeffs? (pan case)
-* pan process with no out: should just reset coeffs?
 * trace calls (debug)
 * svf bandpass out polarity too confusing (inverted in mm2)?
 * better common config.h (less stuff maybe, or more stuff - decide)
-* separate tests an examples?
-* define common midi CCs for examples
+* pan process with no out: should just reset coeffs?
 * get_y_z1, common strategy?
 * sqrt(0) and corner cases, common strategy?
-* MEM_REQ_ROUGH() macro?
 * use BW_SIZE_T, check constant types
-* web examples: need to export memset?
 * bw_satur gain compensation to divide by actual gain (derivative) rather than gain parameter?
 * cite papers, thank authors
 * add initial state (x0) to reset state of lp1, ap1, mm1, hs1, ls1, others? all?
-* check unused param warning visual studio
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
@@ -41,13 +33,10 @@ code:
 * bw_math: review types
 * src inside distortions? w/ control from outside?
 * bw_fuzz gain compensation?
-* remove union value = {.f = v};? (std c++ latest)
+* remove union value = {.f = v};? (std c++ latest) - C++ compound literals...
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
 * revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
-* sr-dependent vs cr-dependent coeffs? see synth poly example
-* bw_buf_copy (to be used in bw_slew_lim)?
-* C++ compound literals...
 * multichannel api even where not needed?
 * x_y vs xy var names
 * don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
@@ -55,16 +44,37 @@ code:
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
 * bwpp -> bwxx
-* float -> double, etc. ?
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
 * src(_int) process_multi?
 * fix definitions leading to X ** -> const X ** error https://isocpp.org/wiki/faq/const-correctness#constptrptr-conversion, fix fx_balance, fx_pan, synth_poly
 * drywet -> dry_wet, ringmod -> ring_mod, etc?
 * allow nullptr in C++ wrappers where process_multi arg can be NULL
-* src post filt?
+* better src filter
 * bw_env_gen process_multi gate const?
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * bw_buf invert src dest order?
+* check unititialized warnings
+
+build system:
+* single header generation
+
+post 1.0.0
+----------
+
+code:
+* blep etc in a module?
+* optimize triangle generation for constant pulse width
+* compute bit depth reduction only when input changes? (state, option?)
+* avoid "force" in coeffs update by using inline functions?
+* csch for bw_peak bandwidth -> Q, inv sqrt ls2 hs2
+* separate tests and examples?
+* define common midi CCs for examples
+* MEM_REQ_ROUGH() macro?
+* web examples: need to export memset?
+* check unused param warning visual studio
+* float -> double, etc. ?
+* bw_buf_copy (to be used in bw_slew_lim)?
+* src post filt?
 
 build system:
 * make makefiles handle paths with spaces etc
@@ -76,3 +86,9 @@ build system:
 * VC, XCode, etc project files?
 * single header(s)
 * cross compile (rpi etc.)
+
+--
+
+code:
+* sample rate-constant coeffs? (pan case)
+* sr-dependent vs cr-dependent coeffs? see synth poly example

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math }}}
  *  description {{{
  *    Sinusoidal oscillator waveshaper.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_osc_sin_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -64,11 +69,19 @@ static inline float bw_osc_sin_process1(float x);
  *
  *    #### bw_osc_sin_process()
  *  ```>>> */
-static inline void bw_osc_sin_process(const float *x, float* y, int n_samples);
+static inline void bw_osc_sin_process(const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
  *    buffer `y`.
+ *
+ *    #### bw_osc_sin_process_multi()
+ *  ```>>> */
+static inline void bw_osc_sin_process_multi(const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
+ *    containing the normalized phase signals, and fills the first `n_samples`
+ *    of the `n_channels` output buffers `y`.
  *  }}} */
 
 /*** Implementation ***/
@@ -82,9 +95,14 @@ static inline float bw_osc_sin_process1(float x) {
 	return bw_sin2pif_3(x);
 }
 
-static inline void bw_osc_sin_process(const float *x, float* y, int n_samples) {
+static inline void bw_osc_sin_process(const float *x, float *y, int n_samples) {
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_osc_sin_process1(x[i]);
+}
+
+static inline void bw_osc_sin_process_multi(const float **x, float **y, int n_channels, int n_samples) {
+	for (int i = 0; i < n_channels; i++)
+		bw_osc_sin_process(x[i], y[i], n_samples);
 }
 
 #ifdef __cplusplus

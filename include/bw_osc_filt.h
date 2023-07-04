@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    Post-filter to decolorate oscillator waveshapers when antialiasing is on.
@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_osc_filt_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -83,6 +88,14 @@ static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, con
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
  *    `state`.
+ *
+ *    #### bw_osc_filt_process_multi()
+ *  ```>>> */
+static inline void bw_osc_filt_process_multi(bw_osc_filt_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using and updating each of the `n_channels` `state`s.
  *  }}} */
 
 /*** Implementation ***/
@@ -110,6 +123,11 @@ static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, f
 static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
 	for (int i = 0; i < n_samples; i++)
 		y[i] = bw_osc_filt_process1(state, x[i]);
+}
+
+static inline void bw_osc_filt_process_multi(bw_osc_filt_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	for (int i = 0; i < n_channels; i++)
+		bw_osc_filt_process(state[i], x[i], y[i], n_samples);
 }
 
 #ifdef __cplusplus

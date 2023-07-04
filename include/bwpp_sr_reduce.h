@@ -41,11 +41,14 @@ namespace Brickworks {
 	private:
 		bw_sr_reduce_coeffs	 coeffs;
 		bw_sr_reduce_state	 states[N_CHANNELS];
+		bw_sr_reduce_state	*statesP[N_CHANNELS];
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
 	inline SRReduce<N_CHANNELS>::SRReduce() {
 		bw_sr_reduce_init(&coeffs);
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
@@ -59,8 +62,7 @@ namespace Brickworks {
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_sr_reduce_process(&coeffs, states + i, x.data()[i], y.data()[i], nSamples);
+		bw_sr_reduce_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>

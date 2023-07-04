@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.2.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_math bw_rand }}}
  *  description {{{
  *    Generator of white noise with uniform distribution.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_noise_gen_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>
@@ -90,6 +95,13 @@ static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs,
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y` using
  *    `coeffs`.
+ *
+ *    #### bw_noise_gen_process_multi()
+ *  ```>>> */
+static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Generates and fills the first `n_samples` of the `n_channels` output
+ *    buffers `y` using `coeffs`.
  *
  *    #### bw_noise_gen_set_sample_rate_scaling()
  *  ```>>> */
@@ -154,6 +166,11 @@ static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs,
 	else
 		for (int i = 0; i < n_samples; i++)
 			y[i] = bw_noise_gen_process1_scaling(coeffs);
+}
+
+static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float **y, int n_channels, int n_samples) {
+	for (int i = 0; i < n_channels; i++)
+		bw_noise_gen_process(coeffs, y[i], n_samples);
 }
 
 static inline void bw_noise_gen_set_sample_rate_scaling(bw_noise_gen_coeffs *BW_RESTRICT coeffs, char value) {

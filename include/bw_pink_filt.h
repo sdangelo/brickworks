@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config }}}
  *  description {{{
  *    Pinking filter.
@@ -34,6 +34,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_pink_filt_process_multi()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Fixed unused parameter warnings.</li>
@@ -116,11 +121,20 @@ static inline float bw_pink_filt_process1_scaling(const bw_pink_filt_coeffs *BW_
  *
  *    #### bw_pink_filt_process()
  *  ```>>> */
-static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float* y, int n_samples);
+static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
- *    first `n_samples` of the output buffer `y`, while using and updating both
- *    `coeffs` and `state` (control and audio rate).
+ *    first `n_samples` of the output buffer `y`, while using `coeffs` and
+ *    both using and updating `state`.
+ * 
+ *    #### bw_pink_filt_process_multi()
+ *  ```>>> */
+static inline void bw_pink_filt_process_multi(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+/*! <<<```
+ *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
+ *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
+ *    using the common `coeffs` and both using and updating each of the
+ *    `n_channels` `state`s.
  *
  *    #### bw_pink_filt_set_sample_rate_scaling()
  *  ```>>> */
@@ -205,6 +219,11 @@ static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs,
 	else
 		for (int i = 0; i < n_samples; i++)
 			y[i] = bw_pink_filt_process1(coeffs, state, x[i]);
+}
+
+static inline void bw_pink_filt_process_multi(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+	for (int i = 0; i < n_channels; i++)
+		bw_pink_filt_process(coeffs, state[i], x[i], y[i], n_samples);
 }
 
 static inline void bw_pink_filt_set_sample_rate_scaling(bw_pink_filt_coeffs *BW_RESTRICT coeffs, char value) {

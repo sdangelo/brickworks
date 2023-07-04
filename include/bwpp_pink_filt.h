@@ -44,11 +44,14 @@ namespace Brickworks {
 	private:
 		bw_pink_filt_coeffs	 coeffs;
 		bw_pink_filt_state	 states[N_CHANNELS];
+		bw_pink_filt_state	*statesP[N_CHANNELS];
 	};
 	
 	template<BW_SIZE_T N_CHANNELS>
 	inline PinkFilt<N_CHANNELS>::PinkFilt() {
 		bw_pink_filt_init(&coeffs);
+		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+			statesP[i] = states + i;
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>
@@ -67,8 +70,7 @@ namespace Brickworks {
 			std::array<const float *, N_CHANNELS> x,
 			std::array<float *, N_CHANNELS> y,
 			int nSamples) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_pink_filt_process(&coeffs, states + i, x.data()[i], y.data()[i], nSamples);
+		bw_pink_filt_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 	}
 	
 	template<BW_SIZE_T N_CHANNELS>

@@ -197,6 +197,8 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 	
 	float *b0[N_VOICES], *b1[N_VOICES], *b2[N_VOICES], *b3[N_VOICES], *b4[N_VOICES];
 	char gates[N_VOICES];
+	bw_osc_filt_state *osc_filt_states[N_VOICES];
+	bw_pink_filt_state *pink_filt_states[N_VOICES];
 	bw_env_gen_state *vcf_env_gen_states[N_VOICES], *vca_env_gen_states[N_VOICES];
 	for (int j = 0; j < N_VOICES; j++) {
 		b0[j] = instance->voices[j].buf[0];
@@ -205,6 +207,8 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 		b3[j] = instance->voices[j].buf[3];
 		b4[j] = instance->voices[j].buf[4];
 		gates[j] = instance->voices[j].gate;
+		osc_filt_states[j] = &instance->voices[j].osc_filt_state;
+		pink_filt_states[j] = &instance->voices[j].pink_filt_state;
 		vcf_env_gen_states[j] = &instance->voices[j].vcf_env_gen_state;
 		vca_env_gen_states[j] = &instance->voices[j].vca_env_gen_state;
 	}
@@ -222,20 +226,17 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 			bw_osc_pulse_process_multi(&instance->vco3_pulse_coeffs, (const float **)b0, (const float **)b1, b0, N_VOICES, n);
 			bw_osc_tri_reset_coeffs(&instance->vco3_tri_coeffs);
 		} else {
-			for (int j = 0; j < N_VOICES; j++)
-				bw_osc_saw_process(&instance->vco_saw_coeffs, b0[j], b1[j], b0[j], n);
+			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)b0, (const float **)b1, b0, N_VOICES, n);
 			bw_osc_pulse_reset_coeffs(&instance->vco3_pulse_coeffs);
 			bw_osc_tri_reset_coeffs(&instance->vco3_tri_coeffs);
 		}
 		
-		for (int j = 0; j < N_VOICES; j++)
-			bw_noise_gen_process(&instance->noise_gen_coeffs, b1[j], n);
+		bw_noise_gen_process_multi(&instance->noise_gen_coeffs, b1, N_VOICES, n);
 		if (instance->params[p_noise_color] >= 0.5f)
-			for (int j = 0; j < N_VOICES; j++)
-				bw_pink_filt_process(&instance->pink_filt_coeffs, &instance->voices[j].pink_filt_state, b1[j], b1[j], n);
+			bw_pink_filt_process_multi(&instance->pink_filt_coeffs, pink_filt_states, (const float **)b1, b1, N_VOICES, n);
 		else
 			for (int j = 0; j < N_VOICES; j++)
-				bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->voices[j].pink_filt_state); // FIXME: calling this here is sloppy coding
+				bw_pink_filt_reset_state(&instance->pink_filt_coeffs, pink_filt_states[j]); // FIXME: calling this here is sloppy coding
 		for (int j = 0; j < N_VOICES; j++)
 			bw_buf_scale(b1[j], b1[j], 5.f, n);
 		
@@ -257,8 +258,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 			bw_osc_pulse_process_multi(&instance->vco1_pulse_coeffs, (const float **)b3, (const float **)b4, b3, N_VOICES, n);
 			bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
 		} else {
-			for (int j = 0; j < N_VOICES; j++)
-				bw_osc_saw_process(&instance->vco_saw_coeffs, b3[j], b4[j], b3[j], n);
+			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)b3, (const float **)b4, b3, N_VOICES, n);
 			bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);
 			bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
 		}
@@ -274,8 +274,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 			bw_osc_pulse_process_multi(&instance->vco2_pulse_coeffs, (const float **)b2, (const float **)b4, b2, N_VOICES, n);
 			bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
 		} else {
-			for (int j = 0; j < N_VOICES; j++)
-				bw_osc_saw_process(&instance->vco_saw_coeffs, b2[j], b4[j], b2[j], n);
+			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)b2, (const float **)b4, b2, N_VOICES, n);
 			bw_osc_pulse_reset_coeffs(&instance->vco2_pulse_coeffs);
 			bw_osc_tri_reset_coeffs(&instance->vco2_tri_coeffs);
 		}
@@ -289,8 +288,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 			bw_buf_mix(b0[j], b0[j], b3[j], n);
 		}
 		
-		for (int j = 0; j < N_VOICES; j++)
-			bw_osc_filt_process(&instance->voices[j].osc_filt_state, b0[j], b0[j], n);
+		bw_osc_filt_process_multi(osc_filt_states, (const float **)b0, b0, N_VOICES, n);
 		
 		const float k = instance->params[p_noise_color] >= 0.5f
 			? 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)

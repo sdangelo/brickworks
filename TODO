@@ -1,23 +1,33 @@
+0.5.0
+-----
+
+code:
+* missing doc
+* check all examples again
+* synth poly stuck notes?
+* check sustain synth mono (poly?) on daisy
+
+0.6.0
+-----
+
+code:
+* android, ios
+* debugging (design by contract?, trace calls?)
+
 1.0.0
 -----
 
 code:
-* synth poly stuck notes?
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
 * should rather use backward Euler in bw_onepole?
 * one pole process const input? (return also if const out)
-* web examples construction/destruction
-* web effect mono->stereo and stereo->mono inputs? or display "input needs to be n channels"?
 * check const restrict etc.
 * define BW_RESTRICT to __restrict or similar when the compiler supports it
 * empty functions etc. to keep consistency and forward compatibility?
 * float in [-1,1] for velocity, pitch bend, mod wheel
 * should clip slope in triangle?
-* fix vst3 mapped values (visible in Ableton Live) and short names
-* polish examples (ranges, etc.)
 * common smoothing policy (as control rate as possible?) - smoothing control?
-* trace calls (debug)
 * svf bandpass out polarity too confusing (inverted in mm2)?
 * better common config.h (less stuff maybe, or more stuff - decide)
 * pan process with no out: should just reset coeffs?
@@ -74,6 +84,10 @@ code:
 * float -> double, etc. ?
 * bw_buf_copy (to be used in bw_slew_lim)?
 * src post filt?
+* web examples construction/destruction
+* web effect mono->stereo and stereo->mono inputs? or display "input needs to be n channels"?
+* fix vst3 mapped values (visible in Ableton Live) and short names
+* polish examples (ranges, etc.)
 
 build system:
 * make makefiles handle paths with spaces etc

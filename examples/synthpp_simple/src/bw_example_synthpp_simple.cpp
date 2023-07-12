@@ -87,7 +87,7 @@ void bw_example_synthpp_simple_set_parameter(bw_example_synthpp_simple *instance
 		instance->svf.setQ(0.5f + 9.5f * value);
 		break;
 	case p_attack:
-		instance->envGen.setAttack(value);
+		instance->envGen.setAttack(bw_maxf(0.002f, value));
 		break;
 	case p_decay:
 		instance->envGen.setDecay(value);
@@ -96,7 +96,7 @@ void bw_example_synthpp_simple_set_parameter(bw_example_synthpp_simple *instance
 		instance->envGen.setSustain(value);
 		break;
 	case p_release:
-		instance->envGen.setRelease(value);
+		instance->envGen.setRelease(bw_maxf(0.002f, value));
 		break;
 	}
 }

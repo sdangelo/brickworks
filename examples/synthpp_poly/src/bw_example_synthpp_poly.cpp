@@ -353,7 +353,7 @@ void bw_example_synthpp_poly_set_parameter(bw_example_synthpp_poly *instance, in
 		instance->vcfEnvGen.setRelease(value);
 		break;
 	case p_vca_attack:
-		instance->vcaEnvGen.setAttack(value);
+		instance->vcaEnvGen.setAttack(bw_maxf(0.002f, value));
 		break;
 	case p_vca_decay:
 		instance->vcaEnvGen.setDecay(value);
@@ -362,7 +362,7 @@ void bw_example_synthpp_poly_set_parameter(bw_example_synthpp_poly *instance, in
 		instance->vcaEnvGen.setSustain(value);
 		break;
 	case p_vca_release:
-		instance->vcaEnvGen.setRelease(value);
+		instance->vcaEnvGen.setRelease(bw_maxf(0.002f, value));
 		break;
 	}
 }

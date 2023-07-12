@@ -382,7 +382,7 @@ void bw_example_synth_poly_set_parameter(bw_example_synth_poly *instance, int in
 		bw_env_gen_set_release(&instance->vcf_env_gen_coeffs, value);
 		break;
 	case p_vca_attack:
-		bw_env_gen_set_attack(&instance->vca_env_gen_coeffs, value);
+		bw_env_gen_set_attack(&instance->vca_env_gen_coeffs, bw_maxf(0.002f, value));
 		break;
 	case p_vca_decay:
 		bw_env_gen_set_decay(&instance->vca_env_gen_coeffs, value);
@@ -391,7 +391,7 @@ void bw_example_synth_poly_set_parameter(bw_example_synth_poly *instance, int in
 		bw_env_gen_set_sustain(&instance->vca_env_gen_coeffs, value);
 		break;
 	case p_vca_release:
-		bw_env_gen_set_release(&instance->vca_env_gen_coeffs, value);
+		bw_env_gen_set_release(&instance->vca_env_gen_coeffs, bw_maxf(0.002f, value));
 		break;
 	}
 }

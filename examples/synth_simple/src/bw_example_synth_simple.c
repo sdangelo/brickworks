@@ -98,7 +98,7 @@ void bw_example_synth_simple_set_parameter(bw_example_synth_simple *instance, in
 		bw_svf_set_Q(&instance->svf_coeffs, 0.5f + 9.5f * value);
 		break;
 	case p_attack:
-		bw_env_gen_set_attack(&instance->env_gen_coeffs, value);
+		bw_env_gen_set_attack(&instance->env_gen_coeffs, bw_maxf(0.002f, value));
 		break;
 	case p_decay:
 		bw_env_gen_set_decay(&instance->env_gen_coeffs, value);
@@ -107,7 +107,7 @@ void bw_example_synth_simple_set_parameter(bw_example_synth_simple *instance, in
 		bw_env_gen_set_sustain(&instance->env_gen_coeffs, value);
 		break;
 	case p_release:
-		bw_env_gen_set_release(&instance->env_gen_coeffs, value);
+		bw_env_gen_set_release(&instance->env_gen_coeffs, bw_maxf(0.002f, value));
 		break;
 	}
 }

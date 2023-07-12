@@ -25,19 +25,31 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	void oscSinProcess(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void oscSinProcess(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_osc_sin_process_multi(x.data(), y.data(), N_CHANNELS, nSamples);
-	}
+
+/*! api {{{
+ *    ##### Brickworks::oscSinProcess
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+void oscSinProcess(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
+/*! <<<```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+template<BW_SIZE_T N_CHANNELS>
+inline void oscSinProcess(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_osc_sin_process_multi(x.data(), y.data(), N_CHANNELS, nSamples);
+}
+
 }
 
 #endif

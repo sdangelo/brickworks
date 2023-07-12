@@ -25,99 +25,111 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class MM2 {
-	public:
-		MM2();
 
-		void setSampleRate(float sampleRate);
-		void reset(float x0 = 0.f);
-		void process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
+/*! api {{{
+ *    ##### Brickworks::MM2
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class MM2 {
+public:
+	MM2();
 
-		void setCutoff(float value);
-		void setQ(float value);
-		void setPrewarpAtCutoff(bool value);
-		void setPrewarpFreq(float value);
-		void setCoeffX(float value);
-		void setCoeffLp(float value);
-		void setCoeffBp(float value);
-		void setCoeffHp(float value);
+	void setSampleRate(float sampleRate);
+	void reset(float x0 = 0.f);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
 
-	private:
-		bw_mm2_coeffs	 coeffs;
-		bw_mm2_state	 states[N_CHANNELS];
-		bw_mm2_state	*statesP[N_CHANNELS];
-	};
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline MM2<N_CHANNELS>::MM2() {
-		bw_mm2_init(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_mm2_set_sample_rate(&coeffs, sampleRate);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::reset(float x0) {
-		bw_mm2_reset_coeffs(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_mm2_reset_state(&coeffs, states + i, x0);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_mm2_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setCutoff(float value) {
-		bw_mm2_set_cutoff(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setQ(float value) {
-		bw_mm2_set_Q(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
-		bw_mm2_set_prewarp_at_cutoff(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setPrewarpFreq(float value) {
-		bw_mm2_set_prewarp_freq(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setCoeffX(float value) {
-		bw_mm2_set_coeff_x(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setCoeffLp(float value) {
-		bw_mm2_set_coeff_lp(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setCoeffBp(float value) {
-		bw_mm2_set_coeff_bp(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void MM2<N_CHANNELS>::setCoeffHp(float value) {
-		bw_mm2_set_coeff_hp(&coeffs, value);
-	}
+	void setCutoff(float value);
+	void setQ(float value);
+	void setPrewarpAtCutoff(bool value);
+	void setPrewarpFreq(float value);
+	void setCoeffX(float value);
+	void setCoeffLp(float value);
+	void setCoeffBp(float value);
+	void setCoeffHp(float value);
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_mm2_coeffs	 coeffs;
+	bw_mm2_state	 states[N_CHANNELS];
+	bw_mm2_state	*statesP[N_CHANNELS];
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline MM2<N_CHANNELS>::MM2() {
+	bw_mm2_init(&coeffs);
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_mm2_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::reset(float x0) {
+	bw_mm2_reset_coeffs(&coeffs);
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		bw_mm2_reset_state(&coeffs, states + i, x0);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_mm2_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCutoff(float value) {
+	bw_mm2_set_cutoff(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setQ(float value) {
+	bw_mm2_set_Q(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
+	bw_mm2_set_prewarp_at_cutoff(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setPrewarpFreq(float value) {
+	bw_mm2_set_prewarp_freq(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffX(float value) {
+	bw_mm2_set_coeff_x(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffLp(float value) {
+	bw_mm2_set_coeff_lp(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffBp(float value) {
+	bw_mm2_set_coeff_bp(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffHp(float value) {
+	bw_mm2_set_coeff_hp(&coeffs, value);
+}
+
 }
 
 #endif

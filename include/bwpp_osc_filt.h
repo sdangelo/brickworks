@@ -25,41 +25,53 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class OscFilt {
-	public:
-		OscFilt();
-		
-		void reset();
-		void process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
 
-	private:
-		bw_osc_filt_state	 states[N_CHANNELS];
-		bw_osc_filt_state	*statesP[N_CHANNELS];
-	};
+/*! api {{{
+ *    ##### Brickworks::OscFilt
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class OscFilt {
+public:
+	OscFilt();
 	
-	template<BW_SIZE_T N_CHANNELS>
-	inline OscFilt<N_CHANNELS>::OscFilt() {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void OscFilt<N_CHANNELS>::reset() {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_osc_filt_reset_state(states + i);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void OscFilt<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_osc_filt_process_multi(statesP, x.data(), y.data(), N_CHANNELS, nSamples);
-	}
+	void reset();
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_osc_filt_state	 states[N_CHANNELS];
+	bw_osc_filt_state	*statesP[N_CHANNELS];
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline OscFilt<N_CHANNELS>::OscFilt() {
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void OscFilt<N_CHANNELS>::reset() {
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		bw_osc_filt_reset_state(states + i);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void OscFilt<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_osc_filt_process_multi(statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+}
+
 }
 
 #endif

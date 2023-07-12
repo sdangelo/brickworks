@@ -25,53 +25,65 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class RingMod {
-	public:
-		RingMod();
 
-		void setSampleRate(float sampleRate);
-		void reset();
-		void process(
-			std::array<const float *, N_CHANNELS> x_mod,
-			std::array<const float *, N_CHANNELS> x_car,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
+/*! api {{{
+ *    ##### Brickworks::RingMod
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class RingMod {
+public:
+	RingMod();
 
-		void setAmount(float value);
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		std::array<const float *, N_CHANNELS> x_mod,
+		std::array<const float *, N_CHANNELS> x_car,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
 
-	private:
-		bw_ringmod_coeffs	 coeffs;
-	};
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline RingMod<N_CHANNELS>::RingMod() {
-		bw_ringmod_init(&coeffs);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void RingMod<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_ringmod_set_sample_rate(&coeffs, sampleRate);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void RingMod<N_CHANNELS>::reset() {
-		bw_ringmod_reset_coeffs(&coeffs);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void RingMod<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x_mod,
-			std::array<const float *, N_CHANNELS> x_car,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_ringmod_process_multi(&coeffs, statesP, x_mod.data(), x_car.data(), y.data(), N_CHANNELS, nSamples);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void RingMod<N_CHANNELS>::setAmount(float value) {
-		bw_ringmod_set_amount(&coeffs, value);
-	}
+	void setAmount(float value);
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_ringmod_coeffs	 coeffs;
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline RingMod<N_CHANNELS>::RingMod() {
+	bw_ringmod_init(&coeffs);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void RingMod<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_ringmod_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void RingMod<N_CHANNELS>::reset() {
+	bw_ringmod_reset_coeffs(&coeffs);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void RingMod<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x_mod,
+		std::array<const float *, N_CHANNELS> x_car,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_ringmod_process_multi(&coeffs, statesP, x_mod.data(), x_car.data(), y.data(), N_CHANNELS, nSamples);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void RingMod<N_CHANNELS>::setAmount(float value) {
+	bw_ringmod_set_amount(&coeffs, value);
+}
+
 }
 
 #endif

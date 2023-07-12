@@ -25,63 +25,75 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class PinkFilt {
-	public:
-		PinkFilt();
 
-		void setSampleRate(float sampleRate);
-		void reset();
-		void process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
+/*! api {{{
+ *    ##### Brickworks::PinkFilt
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class PinkFilt {
+public:
+	PinkFilt();
 
-		void setSampleRateScaling(bool value);
-		
-		float getScalingK();
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
 
-	private:
-		bw_pink_filt_coeffs	 coeffs;
-		bw_pink_filt_state	 states[N_CHANNELS];
-		bw_pink_filt_state	*statesP[N_CHANNELS];
-	};
+	void setSampleRateScaling(bool value);
 	
-	template<BW_SIZE_T N_CHANNELS>
-	inline PinkFilt<N_CHANNELS>::PinkFilt() {
-		bw_pink_filt_init(&coeffs);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void PinkFilt<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_pink_filt_set_sample_rate(&coeffs, sampleRate);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void PinkFilt<N_CHANNELS>::reset() {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_pink_filt_reset_state(&coeffs, states + i);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void PinkFilt<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_pink_filt_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void PinkFilt<N_CHANNELS>::setSampleRateScaling(bool value) {
-		bw_pink_filt_set_sample_rate_scaling(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline float PinkFilt<N_CHANNELS>::getScalingK() {
-		return bw_pink_filt_get_scaling_k(&coeffs);
-	}
+	float getScalingK();
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_pink_filt_coeffs	 coeffs;
+	bw_pink_filt_state	 states[N_CHANNELS];
+	bw_pink_filt_state	*statesP[N_CHANNELS];
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline PinkFilt<N_CHANNELS>::PinkFilt() {
+	bw_pink_filt_init(&coeffs);
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void PinkFilt<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_pink_filt_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void PinkFilt<N_CHANNELS>::reset() {
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		bw_pink_filt_reset_state(&coeffs, states + i);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void PinkFilt<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_pink_filt_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void PinkFilt<N_CHANNELS>::setSampleRateScaling(bool value) {
+	bw_pink_filt_set_sample_rate_scaling(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline float PinkFilt<N_CHANNELS>::getScalingK() {
+	return bw_pink_filt_get_scaling_k(&coeffs);
+}
+
 }
 
 #endif

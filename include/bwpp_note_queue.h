@@ -24,27 +24,39 @@
 #include <bw_note_queue.h>
 
 namespace Brickworks {
-	class NoteQueue {
-	public:
-		NoteQueue();
-		
-		void clear();
-		void add(unsigned char note, bool pressed, float velocity, bool force_went_off);
-		
-		bw_note_queue	queue;
-	};
+
+/*! api {{{
+ *    ##### Brickworks::NoteQueue
+ *  ```>>> */
+class NoteQueue {
+public:
+	NoteQueue();
 	
-	inline NoteQueue::NoteQueue() {
-		bw_note_queue_reset(&queue);
-	}
+	void clear();
+	void add(unsigned char note, bool pressed, float velocity, bool force_went_off);
 	
-	inline void NoteQueue::clear() {
-		bw_note_queue_clear(&queue);
-	}
-	
-	inline void NoteQueue::add(unsigned char note, bool pressed, float velocity, bool force_went_off) {
-		bw_note_queue_add(&queue, note, pressed, velocity, force_went_off);
-	}
+	bw_note_queue	queue;
+};
+/*! <<<```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+inline NoteQueue::NoteQueue() {
+	bw_note_queue_reset(&queue);
+}
+
+inline void NoteQueue::clear() {
+	bw_note_queue_clear(&queue);
+}
+
+inline void NoteQueue::add(unsigned char note, bool pressed, float velocity, bool force_went_off) {
+	bw_note_queue_add(&queue, note, pressed, velocity, force_went_off);
+}
+
 }
 
 #endif

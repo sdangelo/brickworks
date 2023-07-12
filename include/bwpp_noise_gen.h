@@ -25,50 +25,62 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class NoiseGen {
-	public:
-		NoiseGen(uint64_t *BW_RESTRICT state);
 
-		void setSampleRate(float sampleRate);
-		void process(
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
+/*! api {{{
+ *    ##### Brickworks::NoiseGen
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class NoiseGen {
+public:
+	NoiseGen(uint64_t *BW_RESTRICT state);
 
-		void setSampleRateScaling(bool value);
-		
-		float getScalingK();
+	void setSampleRate(float sampleRate);
+	void process(
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
 
-	private:
-		bw_noise_gen_coeffs	 coeffs;
-	};
+	void setSampleRateScaling(bool value);
 	
-	template<BW_SIZE_T N_CHANNELS>
-	inline NoiseGen<N_CHANNELS>::NoiseGen(uint64_t *BW_RESTRICT state) {
-		bw_noise_gen_init(&coeffs, state);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void NoiseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_noise_gen_set_sample_rate(&coeffs, sampleRate);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void NoiseGen<N_CHANNELS>::process(
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_noise_gen_process_multi(&coeffs, y.data(), N_CHANNELS, nSamples);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void NoiseGen<N_CHANNELS>::setSampleRateScaling(bool value) {
-		bw_noise_gen_set_sample_rate_scaling(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline float NoiseGen<N_CHANNELS>::getScalingK() {
-		return bw_noise_gen_get_scaling_k(&coeffs);
-	}
+	float getScalingK();
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_noise_gen_coeffs	 coeffs;
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline NoiseGen<N_CHANNELS>::NoiseGen(uint64_t *BW_RESTRICT state) {
+	bw_noise_gen_init(&coeffs, state);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_noise_gen_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::process(
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_noise_gen_process_multi(&coeffs, y.data(), N_CHANNELS, nSamples);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::setSampleRateScaling(bool value) {
+	bw_noise_gen_set_sample_rate_scaling(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline float NoiseGen<N_CHANNELS>::getScalingK() {
+	return bw_noise_gen_get_scaling_k(&coeffs);
+}
+
 }
 
 #endif

@@ -25,59 +25,71 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class DryWet {
-	public:
-		DryWet();
 
-		void setSampleRate(float sampleRate);
-		void reset();
-		void process(
-			std::array<const float *, N_CHANNELS> x_dry,
-			std::array<const float *, N_CHANNELS> x_wet,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples);
+/*! api {{{
+ *    ##### Brickworks::DryWet
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class DryWet {
+public:
+	DryWet();
 
-		void setWet(float value);
-		void setSmoothTau(float value);
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		std::array<const float *, N_CHANNELS> x_dry,
+		std::array<const float *, N_CHANNELS> x_wet,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples);
 
-	private:
-		bw_drywet_coeffs	 coeffs;
-	};
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline DryWet<N_CHANNELS>::DryWet() {
-		bw_drywet_init(&coeffs);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void DryWet<N_CHANNELS>::setSampleRate(float sampleRate) {
-		bw_drywet_set_sample_rate(&coeffs, sampleRate);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void DryWet<N_CHANNELS>::reset() {
-		bw_drywet_reset_coeffs(&coeffs);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void DryWet<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x_dry,
-			std::array<const float *, N_CHANNELS> x_wet,
-			std::array<float *, N_CHANNELS> y,
-			int nSamples) {
-		bw_drywet_process_multi(&coeffs, x_dry.data(), x_wet.data(), y.data(), N_CHANNELS, nSamples);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void DryWet<N_CHANNELS>::setWet(float value) {
-		bw_drywet_set_wet(&coeffs, value);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void DryWet<N_CHANNELS>::setSmoothTau(float value) {
-		bw_drywet_set_smooth_tau(&coeffs, value);
-	}
+	void setWet(float value);
+	void setSmoothTau(float value);
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_drywet_coeffs	 coeffs;
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline DryWet<N_CHANNELS>::DryWet() {
+	bw_drywet_init(&coeffs);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void DryWet<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_drywet_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void DryWet<N_CHANNELS>::reset() {
+	bw_drywet_reset_coeffs(&coeffs);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void DryWet<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x_dry,
+		std::array<const float *, N_CHANNELS> x_wet,
+		std::array<float *, N_CHANNELS> y,
+		int nSamples) {
+	bw_drywet_process_multi(&coeffs, x_dry.data(), x_wet.data(), y.data(), N_CHANNELS, nSamples);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void DryWet<N_CHANNELS>::setWet(float value) {
+	bw_drywet_set_wet(&coeffs, value);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void DryWet<N_CHANNELS>::setSmoothTau(float value) {
+	bw_drywet_set_smooth_tau(&coeffs, value);
+}
+
 }
 
 #endif

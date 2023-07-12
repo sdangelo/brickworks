@@ -25,45 +25,57 @@
 #include <array>
 
 namespace Brickworks {
-	template<BW_SIZE_T N_CHANNELS>
-	class SRC {
-	public:
-		SRC(float ratio);
-		
-		void reset(float x0 = 0.f);
-		void process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			std::array<int *, N_CHANNELS> nInSamples,
-			std::array<int *, N_CHANNELS> nOutSamples);
 
-	private:
-		bw_src_coeffs	 coeffs;
-		bw_src_state	 states[N_CHANNELS];
-		bw_src_state	*statesP[N_CHANNELS];
-	};
+/*! api {{{
+ *    ##### Brickworks::SRC
+ *  ```>>> */
+template<BW_SIZE_T N_CHANNELS>
+class SRC {
+public:
+	SRC(float ratio);
 	
-	template<BW_SIZE_T N_CHANNELS>
-	inline SRC<N_CHANNELS>::SRC(float ratio) {
-		bw_src_init(&coeffs, ratio);
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			statesP[i] = states + i;
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void SRC<N_CHANNELS>::reset(float x0) {
-		for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
-			bw_src_reset_state(&coeffs, states + i, x0);
-	}
-	
-	template<BW_SIZE_T N_CHANNELS>
-	inline void SRC<N_CHANNELS>::process(
-			std::array<const float *, N_CHANNELS> x,
-			std::array<float *, N_CHANNELS> y,
-			std::array<int *, N_CHANNELS> nInSamples,
-			std::array<int *, N_CHANNELS> nOutSamples) {
-		bw_src_process_multi(coeffs, statesP, x.data(), y.data(), N_CHANNELS, nInSamples.data(), nOutSamples.data());
-	}
+	void reset(float x0 = 0.f);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		std::array<int *, N_CHANNELS> nInSamples,
+		std::array<int *, N_CHANNELS> nOutSamples);
+/*! <<<... }```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_src_coeffs	 coeffs;
+	bw_src_state	 states[N_CHANNELS];
+	bw_src_state	*statesP[N_CHANNELS];
+};
+
+template<BW_SIZE_T N_CHANNELS>
+inline SRC<N_CHANNELS>::SRC(float ratio) {
+	bw_src_init(&coeffs, ratio);
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void SRC<N_CHANNELS>::reset(float x0) {
+	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+		bw_src_reset_state(&coeffs, states + i, x0);
+}
+
+template<BW_SIZE_T N_CHANNELS>
+inline void SRC<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		std::array<int *, N_CHANNELS> nInSamples,
+		std::array<int *, N_CHANNELS> nOutSamples) {
+	bw_src_process_multi(coeffs, statesP, x.data(), y.data(), N_CHANNELS, nInSamples.data(), nOutSamples.data());
+}
+
 }
 
 #endif

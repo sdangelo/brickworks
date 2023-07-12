@@ -86,7 +86,7 @@ typedef enum {
  *    Distance metrics for sticky behavior:
  *     * `bw_one_pole_sticky_mode_abs`: absolute difference (|`out` - `in`|);
  *     * `bw_one_pole_sticky_mode_rel`: relative difference with respect to
- *       input (|`out` - `in`| / |`in`|);
+ *       input (|`out` - `in`| / |`in`|).
  *
  *    #### bw_one_pole_init()
  *  ```>>> */

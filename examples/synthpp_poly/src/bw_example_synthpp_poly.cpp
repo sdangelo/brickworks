@@ -132,7 +132,6 @@ static char is_free(void *BW_RESTRICT voice) {
 	return !v->gate && phase == bw_env_gen_phase_off;
 }
 
-#include <stdio.h>
 void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const float** x, float** y, int n_samples) {
 	// FIXME: control-rate modulations are asynchronous here...
 	// it's all good as long as hosts gives us buffers whose length is a multiple of 32,
@@ -140,7 +139,7 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 	
 	(void)x;
 
-	static bw_voice_alloc_opts alloc_opts = { bw_voice_alloc_mode_low, note_on, note_off, get_note, is_free };
+	static bw_voice_alloc_opts alloc_opts = { bw_voice_alloc_priority_low, note_on, note_off, get_note, is_free };
 	void *voices[N_VOICES];
 	for (int i = 0; i < N_VOICES; i++)
 		voices[i] = (void *)(instance->voices + i);

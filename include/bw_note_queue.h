@@ -23,9 +23,10 @@
  *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config }}}
  *  description {{{
- *    Note queue.
+ *    Simple data structure that helps keeping track of note on/off events and
+ *    pressed key status.
  *
- *    ...
+ *    It is not concerned with timing.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -55,6 +56,10 @@ typedef struct {
 	float		velocity;	// negative = unknown / not available
 } bw_note_queue_status;
 /*! <<<```
+ *    Note status:
+ *     * `pressed`: whether the note is pressed (non-`0`) or not (`0`);
+ *     * `velocity`: velocity in [`0.f`, `1.f`].
+ *
  *    #### bw_note_queue_event
  *  ```>>> */
 typedef struct {
@@ -63,6 +68,12 @@ typedef struct {
 	char			went_off;
 } bw_note_queue_event;
 /*! <<<```
+ *    Note on/off event:
+ *     * `note`: note number in [`0`, `127`];
+ *     * `status`: note status;
+ *     * `went_off`: whether a note off event fired on the same note (non-`0`)
+ *       or not (`0`) -- see `bw_note_queue`.
+ *
  *    #### bw_note_queue
  *  ```>>> */
 typedef struct {
@@ -72,18 +83,39 @@ typedef struct {
 	unsigned char		n_pressed;
 } bw_note_queue;
 /*! <<<```
+ *    Note on/off event queue and pressed key status:
+ *     * `events`: events since the reset/clear -- the order is not meaningful
+ *       and it contains maximum one event per note number, so that the last
+ *       event added for a given note overwrites the previous if it exists;
+ *       `went_off` is set to non-`0` in case of a note off event or when
+ *       overwriting an event whose `went_off` was already non-`0`;
+ *     * `n_events`: number of elements in `events`;
+ *     * `status`: current status of all notes;
+ *     * `n_pressed`: number of currently pressed keys.
+ *
  *    #### bw_note_queue_reset()
  *  ```>>> */
 static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue);
 /*! <<<```
+ *    Clear both the event queue (no events) and the note statuses (all notes
+ *    off, all velocities `0.f`) in `queue`.
+ *
  *    #### bw_note_queue_clear()
  *  ```>>> */
 static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue);
 /*! <<<```
+ *    Clears the event queue (no events) in `queue` without affecting the note
+ *    statuses.
+ *
  *    #### bw_note_queue_add()
  *  ```>>> */
 static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off);
 /*! <<<```
+ *    Adds a new event to `queue` with the specified `note` number, `pressed`
+ *    value, and `velocity`.
+ *
+ *    If `force_went_off` is set to non-`0`, `went_off` is always set to
+ *    non-`0`.
  *  }}} */
 
 /*** Implementation ***/

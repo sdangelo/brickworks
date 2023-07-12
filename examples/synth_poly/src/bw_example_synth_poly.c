@@ -167,7 +167,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 	
 	(void)x;
 	
-	static bw_voice_alloc_opts alloc_opts = { bw_voice_alloc_mode_low, note_on, note_off, get_note, is_free };
+	static bw_voice_alloc_opts alloc_opts = { bw_voice_alloc_priority_low, note_on, note_off, get_note, is_free };
 	void *voices[N_VOICES];
 	for (int i = 0; i < N_VOICES; i++)
 		voices[i] = (void *)(instance->voices + i);

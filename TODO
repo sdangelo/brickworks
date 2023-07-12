@@ -63,6 +63,7 @@ code:
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * bw_buf invert src dest order?
 * check unititialized warnings
+* voice alloc mode -> voice alloc priority
 
 build system:
 * single header generation

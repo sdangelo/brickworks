@@ -23,9 +23,7 @@
  *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_note_queue }}}
  *  description {{{
- *    Basic voice allocator.
- *
- *    ...
+ *    Basic voice allocator with low/high note priority.
  *  }}}
  *  changelog {{{
  *    <ul>
@@ -49,17 +47,21 @@ extern "C" {
 #include <bw_note_queue.h>
 
 /*! api {{{
- *    #### bw_voice_alloc_mode
+ *    #### bw_voice_alloc_priority
  *  ```>>> */
 typedef enum {
-	bw_voice_alloc_mode_low,
-	bw_voice_alloc_mode_high
-} bw_voice_alloc_mode;
+	bw_voice_alloc_priority_low,
+	bw_voice_alloc_priority_high
+} bw_voice_alloc_priority;
 /*! <<<```
+ *    Note priority:
+ *     * `bw_voice_alloc_priority_low`: low note priority;
+ *     * `bw_voice_alloc_priority_high`: high note priority.
+ *
  *    #### bw_voice_alloc_opts
  *  ```>>> */
 typedef struct {
-	bw_voice_alloc_mode	mode;
+	bw_voice_alloc_priority	priority;
 
 	void (*note_on)(void *BW_RESTRICT voice, unsigned char note, float velocity);
 	void (*note_off)(void *BW_RESTRICT voice, float velocity);
@@ -67,10 +69,27 @@ typedef struct {
 	char (*is_free)(void *BW_RESTRICT voice);
 } bw_voice_alloc_opts;
 /*! <<<```
+ *    Voice allocation options:
+ *     * `priority`: note priority;
+ *     * `note_on`: note on callback, where `voice` is an opaque pointer to the
+ *       chosen voice, `note` is the note number, and `velocity` is the note
+ *       velocity in [`0.f`, `1.f`];
+ *     * `note_off`: note off callback, where `voice` is an opaque pointer to
+ *       the chosen voice and `velocity` is the note velocity in [`0.f`, `1.f`];
+ *     * `get_note`: callback that returns the note number associated to the
+ *       given `voice`;
+ *     * `is_free`: callback that returns whether the given `voice` is free
+ *       (non-`0`) or not (`0`);
+ *
  *    #### bw_voice_alloc()
  *  ```>>> */
 void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, int n_voices);
 /*! <<<```
+ *    It performs voice allocation according to `opts` and using the events in
+ *    `queue`.
+ *
+ *    `voices` is the array of opaque voice pointers and `n_voices` indicates
+ *    the number of elements in `voices`.
  *  }}} */
 
 /*** Implementation ***/
@@ -101,7 +120,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 			int v = ev->note;
 			for (int j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
-				if (!queue->status[n].pressed && (k < 0 || (opts->mode == bw_voice_alloc_mode_low ? n > v : n < v))) {
+				if (!queue->status[n].pressed && (k < 0 || (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v))) {
 					v = n;
 					k = j;
 				}
@@ -113,7 +132,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 			for (int j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
-				if (opts->mode == bw_voice_alloc_mode_low ? n > v : n < v) {
+				if (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v) {
 					v = n;
 					k = j;
 				}

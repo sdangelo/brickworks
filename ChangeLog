@@ -1,3 +1,37 @@
+0.5.0
+-----
+  * Added new bw_fuzz, bw_clip, bw_dist, bw_drive, bw_drywet, bw_reverb,
+    bw_note_queue, and bw_voice_alloc modules.
+  * Added new fx_fuzz, fx_clip, fx_dist, fx_drive, fx_reverb, synth_poly,
+    fx_lp1, fx_one_pole, and fx_slew_lim examples.
+  * Added C++ wrappers for all dsp modules and for bw_buf.
+  * Added new corresponding C++ examples for each C example.
+  * Added multichannel API to all dsp modules and to bw_buf.
+  * Added new bw_buf_neg() routine to bw_buf.
+  * Added new bw_gain_get_gain() function to bw_gain.
+  * Changed mem_req/set API in bw_delay, bw_comb, bw_chorus, bw_reverb.
+  * Turned gate parameter into a control-rate input in bw_env_gen.
+  * bw_balance_process() and bw_pan_process() do not accept NULL buffers
+    anymore.
+  * Made VST3 and web examples' common code stricter and more redundant w.r.t.
+    memory usage and finalization.
+  * Fixed bug in bw_svf_process() occurring when only y_hp was NULL.
+  * Fixed prewarping-related instability bug in bw_svf.
+  * Fixed inverted-polarity modulation in bw_ringmod.
+  * Fixed coefficients' reset in bw_phaser and bw_chorus.
+  * Fixed initial conditions in bw_satur.
+  * Fixed unused variable warnings in VST3 and Daisy Seed examples' common code.
+  * Fixed unused variable warnings in bw_slew_lim.
+  * Fixed left shift of negative value warnings in bw_math.
+  * Fixed typos in the documentaion of bw_peak, bw_comp, bw_osc_tri,
+    bw_ringmod, bw_balance, and bw_slew_lim.
+  * Fixed code tags and heading levels in documentation of several modules.
+  * Fixed setting of default parameter values in synth_simple and synth_mono.
+  * Updated examples to use multichannel APIs where possible.
+  * Removed useless random state from synth_simple.
+  * Now forcing minimum attack and release times for VCAs of synth examples.
+  * Build system updated to emit as many compilation warnings as possible.
+
 0.4.0
 -----
   * Added new bw_ringmod, bw_trem, bw_phaser, bw_delay, bw_src_int, bw_src,

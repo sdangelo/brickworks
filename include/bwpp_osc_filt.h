@@ -39,7 +39,9 @@ public:
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
 		int nSamples);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

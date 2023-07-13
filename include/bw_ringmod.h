@@ -32,6 +32,7 @@
  *          <li>Added <code>bw_ringmod_process_multi()</code>.</li>
  *          <li>Fixed inverted-polarity modulation.</li>
  *          <li>"modulator signal" -> "modulation signal" in documentation.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

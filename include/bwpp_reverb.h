@@ -49,7 +49,9 @@ public:
 	void setDamping(float value);
 	void setDecay(float value);
 	void setWet(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

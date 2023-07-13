@@ -41,7 +41,9 @@ public:
 		int nSamples);
 	
 	void setAntialiasing(bool value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

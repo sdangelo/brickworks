@@ -47,7 +47,9 @@ public:
 	void setRatio(float value);
 	void setAttackTau(float value);
 	void setReleaseTau(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

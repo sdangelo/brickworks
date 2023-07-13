@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.3.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_common bw_config bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Stereo panner.
@@ -32,6 +32,7 @@
  *          <li>Added <code>bw_pan_process_multi()</code>.</li>
  *          <li><code>bw_pan_process()</code> does not accept <code>NULL</code>
  *              buffers anymore.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:

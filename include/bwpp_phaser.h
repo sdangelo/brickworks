@@ -44,7 +44,9 @@ public:
 	void setRate(float value);
 	void setCenter(float value);
 	void setAmount(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

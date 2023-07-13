@@ -42,7 +42,9 @@ public:
 		int nSamples);
 
 	void setCutoff(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

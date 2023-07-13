@@ -49,7 +49,9 @@ public:
 	void setReleaseTau(float value);
 	void setGainLin(float value);
 	void setGainDB(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

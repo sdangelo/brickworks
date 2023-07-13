@@ -33,6 +33,7 @@
  *          <li><code>bw_balance_process()</code> does not accept
  *              <code>NULL</code> buffers anymore.</li>
  *          <li>Fixed documentation of <code>bw_balance_process1()</code>.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:

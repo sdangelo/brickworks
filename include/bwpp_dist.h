@@ -44,7 +44,9 @@ public:
 	void setDistortion(float value);
 	void setTone(float value);
 	void setVolume(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

@@ -43,7 +43,9 @@ public:
 		int nSamples);
 
 	void setAmount(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

@@ -44,7 +44,9 @@ public:
 
 	void setWet(float value);
 	void setSmoothTau(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

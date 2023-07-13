@@ -45,7 +45,9 @@ public:
 	void setReleaseTau(float value);
 	
 	float getYZ1(BW_SIZE_T channel);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

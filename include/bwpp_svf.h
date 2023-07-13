@@ -47,7 +47,9 @@ public:
 	void setQ(float value);
 	void setPrewarpAtCutoff(bool value);
 	void setPrewarpFreq(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

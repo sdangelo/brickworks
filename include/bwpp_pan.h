@@ -43,7 +43,9 @@ public:
 		int nSamples);
 
 	void setPan(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

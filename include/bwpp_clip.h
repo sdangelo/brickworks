@@ -44,7 +44,9 @@ public:
 	void setBias(float value);
 	void setGain(float value);
 	void setGainCompensation(bool value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

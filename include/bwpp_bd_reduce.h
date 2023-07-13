@@ -41,7 +41,9 @@ public:
 		int nSamples);
 
 	void setBitDepth(char value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

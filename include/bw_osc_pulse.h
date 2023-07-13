@@ -34,6 +34,7 @@
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_osc_pulse_process_multi()</code>.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

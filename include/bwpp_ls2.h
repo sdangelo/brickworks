@@ -45,7 +45,9 @@ public:
 	void setQ(float value);
 	void setDcGainLin(float value);
 	void setDcGainDB(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

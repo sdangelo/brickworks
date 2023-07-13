@@ -46,7 +46,9 @@ public:
 	void setSmoothTau(float value);
 	
 	float getGain();
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

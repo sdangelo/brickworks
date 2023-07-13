@@ -49,7 +49,9 @@ public:
 	void setCoeffLp(float value);
 	void setCoeffBp(float value);
 	void setCoeffHp(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

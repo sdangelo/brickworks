@@ -41,7 +41,9 @@ public:
 		int nSamples);
 
 	void setRatio(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

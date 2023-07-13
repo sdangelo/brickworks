@@ -39,6 +39,7 @@
  *          <li>Added new smooth_tau parameter.</li>
  *          <li>Changed gain parameter API to express values in linear gain
  *              and dB.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:

@@ -44,7 +44,9 @@ public:
 		int nSamples);
 
 	void setBalance(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

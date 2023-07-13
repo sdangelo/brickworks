@@ -43,7 +43,9 @@ public:
 
 	void setCutoff(float value);
 	void setQ(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

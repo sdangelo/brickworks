@@ -34,6 +34,7 @@
  *          <li>Fixed bug in <code>bw_svf_process()</code> when only
  *              <code>y_hp</code> is <code>NULL</code>.</li>
  *          <li>Fixed prewarping-related stability bug.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

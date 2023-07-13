@@ -48,7 +48,9 @@ public:
 	void setCoeffX(float value);
 	void setCoeffMod(float value);
 	void setCoeffFB(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

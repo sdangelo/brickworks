@@ -44,7 +44,9 @@ public:
 	
 	void setAntialiasing(bool value);
 	void setSlope(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

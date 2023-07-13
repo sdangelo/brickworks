@@ -46,7 +46,9 @@ public:
 	void setPrewarpFreq(float value);
 	void setCoeffX(float value);
 	void setCoeffLp(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

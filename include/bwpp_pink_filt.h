@@ -44,7 +44,9 @@ public:
 	void setSampleRateScaling(bool value);
 	
 	float getScalingK();
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

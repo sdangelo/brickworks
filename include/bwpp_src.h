@@ -40,7 +40,9 @@ public:
 		std::array<float *, N_CHANNELS> y,
 		std::array<int *, N_CHANNELS> nInSamples,
 		std::array<int *, N_CHANNELS> nOutSamples);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

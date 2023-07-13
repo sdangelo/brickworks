@@ -36,6 +36,7 @@
  *          <li>Added <code>bw_osc_pulse_process_multi()</code>.</li>
  *          <li>Fixed typo in <code>bw_osc_tri_process1\*()</code>
  *              documentation.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

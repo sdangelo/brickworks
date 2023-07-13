@@ -51,7 +51,9 @@ public:
 	void setStickyMode(bw_one_pole_sticky_mode value);
 	
 	float getYZ1(BW_SIZE_T channel);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

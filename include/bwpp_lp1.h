@@ -44,7 +44,9 @@ public:
 	void setCutoff(float value);
 	void setPrewarpAtCutoff(bool value);
 	void setPrewarpFreq(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

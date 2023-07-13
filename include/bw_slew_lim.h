@@ -32,6 +32,7 @@
  *          <li>Added <code>bw_slew_lim_process_multi()</code>.</li>
  *          <li>Fixed documentation of <code>bw_slew_lim_process()</code>.</li>
  *          <li>Fixed unused parameter warnings.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:

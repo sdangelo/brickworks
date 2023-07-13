@@ -41,6 +41,7 @@
  *          <li>Added <code>bw_chorus_process_multi()</code>.</li>
  *          <li>Updated mem_req/set API.</li>
  *          <li>Now properly setting feedforward delay on reset.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

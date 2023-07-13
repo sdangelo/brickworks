@@ -42,7 +42,9 @@ public:
 		int nSamples);
 
 	void setWah(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

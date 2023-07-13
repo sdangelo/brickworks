@@ -48,7 +48,9 @@ public:
 	void setDelay(float value);
 	
 	BW_SIZE_T getLength();
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

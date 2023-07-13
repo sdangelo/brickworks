@@ -47,6 +47,7 @@
  *              <code>bw_env_gen_update_state_ctrl()</code> and
  *              <code>bw_env_gen_process()</code>, and removed gate
  *              parameter.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

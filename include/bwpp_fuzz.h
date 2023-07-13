@@ -43,7 +43,9 @@ public:
 
 	void setFuzz(float value);
 	void setVolume(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

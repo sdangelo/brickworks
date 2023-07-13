@@ -45,7 +45,9 @@ public:
 	void setQ(float value);
 	void setHighGainLin(float value);
 	void setHighGainDB(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

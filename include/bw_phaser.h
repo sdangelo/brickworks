@@ -35,6 +35,7 @@
  *        <ul>
  *          <li>Added <code>bw_phaser_process_multi()</code>.</li>
  *          <li>Now properly setting allpass cutoff on reset.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

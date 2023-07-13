@@ -48,7 +48,9 @@ public:
 	
 	bw_env_gen_phase getPhase(BW_SIZE_T channel);
 	float getYZ1(BW_SIZE_T channel);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

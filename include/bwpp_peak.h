@@ -47,7 +47,9 @@ public:
 	void setPeakGainDB(float value);
 	void setBandwidth(float value);
 	void setUseBandwidth(bool value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

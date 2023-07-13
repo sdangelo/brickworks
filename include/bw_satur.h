@@ -43,6 +43,7 @@
  *          <li>Added <code>bw_satur_process_multi()</code>.</li>
  *          <li>Fixed gain coefficient reset bug.</li>
  *          <li>Fixed initial state bug.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

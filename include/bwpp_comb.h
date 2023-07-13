@@ -47,7 +47,9 @@ public:
 	void setCoeffBlend(float value);
 	void setCoeffFF(float value);
 	void setCoeffFB(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

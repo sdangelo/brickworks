@@ -42,6 +42,7 @@
  *          <li>Added <code>bw_peak_process_multi()</code>.</li>
  *          <li>Fixed documentation for <code>bw_peak_set_peak_gain_lin()</code>
  *              and <code>bw_peak_set_gain_dB()</code>.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

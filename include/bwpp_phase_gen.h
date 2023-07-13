@@ -44,7 +44,9 @@ public:
 
 	void setFrequency(float value);
 	void setPortamentoTau(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

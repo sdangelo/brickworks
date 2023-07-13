@@ -41,6 +41,7 @@
  *        <ul>
  *          <li>Added <code>bw_comb_process_multi()</code>.</li>
  *          <li>Updated mem_req/set API.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *    </ul>

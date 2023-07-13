@@ -35,6 +35,7 @@
  *        <ul>
  *          <li>Added <code>bw_delay_process_multi()</code>.</li>
  *          <li>Updated mem_req/set API.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:

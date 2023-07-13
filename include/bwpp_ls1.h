@@ -44,7 +44,9 @@ public:
 	void setCutoff(float value);
 	void setDcGainLin(float value);
 	void setDcGainDB(float value);
-/*! <<<... }```
+/*! <<<...
+ *  }
+ *  ```
  *  }}} */
 
 /*** Implementation ***/

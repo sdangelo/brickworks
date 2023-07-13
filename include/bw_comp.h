@@ -34,6 +34,7 @@
  *          <li>Added <code>bw_comp_process_multi()</code>.</li>
  *          <li>Fixed typo in <code>bw_comp_set_ratio()</code>
  *              documentation.</li>
+ *          <li>Added C++ wrapper.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.3.0</strong>:

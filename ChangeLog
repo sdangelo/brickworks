@@ -24,7 +24,7 @@
   * Fixed unused variable warnings in bw_slew_lim.
   * Fixed left shift of negative value warnings in bw_math.
   * Fixed typos in the documentaion of bw_peak, bw_comp, bw_osc_tri,
-    bw_ringmod, bw_balance, and bw_slew_lim.
+    bw_ringmod, bw_balance, bw_slew_lim, and bw_common.
   * Fixed code tags and heading levels in documentation of several modules.
   * Fixed setting of default parameter values in synth_simple and synth_mono.
   * Updated examples to use multichannel APIs where possible.

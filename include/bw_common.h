@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ foundation }}}
- *  version {{{ 0.4.0 }}}
+ *  version {{{ 0.5.0 }}}
  *  requires {{{ bw_config }}}
  *  description {{{
  *    A common header to make sure that a bunch of basic definitions are
@@ -28,6 +28,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.5.0</strong>:
+ *        <ul>
+ *          <li>Fixed typo in the documentation of <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added <code>BW_SIZE_T</code>.</li>
@@ -67,7 +72,7 @@
  *    #### NULL and BW_SIZE_T
  *    If `NULL` or `BW_SIZE_T` are not defined, then `stddef.h` is `#include`d.
  *
- *    If `BW_SIZE_T` is not defined, the it is defined as `size_t`.
+ *    If `BW_SIZE_T` is not defined, then it is defined as `size_t`.
  *  >>> */
 #if !defined(NULL) || !defined(BW_SIZE_T)
 # include <stddef.h>

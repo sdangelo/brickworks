@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_SATUR_H
 #define _BW_EXAMPLE_FXPP_SATUR_H
 
+#include "platform.h"
+
 #include <bwpp_satur.h>
 #include <bwpp_src_int.h>
 

@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "platform.h"
+
 #include <bw_dist.h>
 #include <bw_src_int.h>
 

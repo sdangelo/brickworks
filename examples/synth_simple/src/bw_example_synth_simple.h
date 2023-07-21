@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "platform.h"
+
 #include <bw_math.h>
 #include <bw_phase_gen.h>
 #include <bw_osc_pulse.h>

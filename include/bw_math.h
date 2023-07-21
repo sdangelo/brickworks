@@ -49,8 +49,8 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.4.0 }}}
- *  requires {{{ bw_common bw_config }}}
+ *  version {{{ 0.6.0 }}}
+ *  requires {{{ bw_common }}}
  *  description {{{
  *    A collection of mathematical routines that strive to be better suited to
  *    DSP than, e.g., those supplied by your C standard library.
@@ -70,6 +70,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.4.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_ceilf()</code>, <code>bw_intfracf()</code>,

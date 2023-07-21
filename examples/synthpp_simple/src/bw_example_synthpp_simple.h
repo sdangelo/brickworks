@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_SYNTHPP_SIMPLE_H
 #define _BW_EXAMPLE_SYNTHPP_SIMPLE_H
 
+#include "platform.h"
+
 #include <bwpp_phase_gen.h>
 #include <bwpp_osc_pulse.h>
 #include <bwpp_osc_filt.h>

@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_SYNTHPP_MONO_H
 #define _BW_EXAMPLE_SYNTHPP_MONO_H
 
+#include "platform.h"
+
 #include <bwpp_note_queue.h>
 #include <bwpp_phase_gen.h>
 #include <bwpp_osc_saw.h>

@@ -20,10 +20,9 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
+ *  version {{{ 0.6.0 }}}
  *  requires {{{
- *    bw_ap1 bw_common bw_config bw_lp1 bw_math bw_one_pole bw_osc_sin
- *    bw_phase_gen
+ *    bw_ap1 bw_common bw_lp1 bw_math bw_one_pole bw_osc_sin bw_phase_gen
  *  }}}
  *  description {{{
  *    Phaser containing 4 1st-order allpass filters modulated by a sinusoidal
@@ -31,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_phaser_process_multi()</code>.</li>

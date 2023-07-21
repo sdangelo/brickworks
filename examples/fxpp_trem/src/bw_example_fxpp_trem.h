@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_TREM_H
 #define _BW_EXAMPLE_FXPP_TREM_H
 
+#include "platform.h"
+
 #include <bwpp_trem.h>
 
 using namespace Brickworks;

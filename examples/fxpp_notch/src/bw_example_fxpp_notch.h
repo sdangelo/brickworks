@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_NOTCH_H
 #define _BW_EXAMPLE_FXPP_NOTCH_H
 
+#include "platform.h"
+
 #include <bwpp_notch.h>
 
 using namespace Brickworks;

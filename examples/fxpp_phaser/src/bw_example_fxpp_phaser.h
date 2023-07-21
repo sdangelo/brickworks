@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_PHASER_H
 #define _BW_EXAMPLE_FXPP_PHASER_H
 
+#include "platform.h"
+
 #include <bwpp_phaser.h>
 
 using namespace Brickworks;

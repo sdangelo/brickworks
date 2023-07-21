@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "platform.h"
+
 #include <bw_pan.h>
 #include <bw_ppm.h>
 #include <bw_math.h>

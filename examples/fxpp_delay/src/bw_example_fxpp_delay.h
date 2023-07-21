@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_DELAY_H
 #define _BW_EXAMPLE_FXPP_DELAY_H
 
+#include "platform.h"
+
 #include <bwpp_delay.h>
 
 using namespace Brickworks;

@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_BALANCE_H
 #define _BW_EXAMPLE_FXPP_BALANCE_H
 
+#include "platform.h"
+
 #include <bwpp_balance.h>
 #include <bwpp_ppm.h>
 

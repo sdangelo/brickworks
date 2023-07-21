@@ -20,15 +20,20 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
+ *  version {{{ 0.6.0 }}}
  *  requires {{{
- *    bw_common bw_config bw_math bw_one_pole bw_osc_sin bw_phase_gen bw_ringmod
+ *    bw_common bw_math bw_one_pole bw_osc_sin bw_phase_gen bw_ringmod
  *  }}}
  *  description {{{
  *    Tremolo with variable speed and amount.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_trem_process_multi()</code>.</li>

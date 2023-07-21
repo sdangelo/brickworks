@@ -20,14 +20,19 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
- *  requires {{{ bw_common bw_config bw_math bw_one_pole }}}
+ *  version {{{ 0.6.0 }}}
+ *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Envelope follower made of a full-wave rectifier followed by
  *    [bw_one_pole](bw_one_pole) one-pole filter (6 dB/oct).
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_env_follow_process_multi()</code>.</li>

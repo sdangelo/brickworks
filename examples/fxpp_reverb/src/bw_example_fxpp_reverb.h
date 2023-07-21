@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_REVERB_H
 #define _BW_EXAMPLE_FXPP_REVERB_H
 
+#include "platform.h"
+
 #include <bwpp_reverb.h>
 
 using namespace Brickworks;

@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_PAN_H
 #define _BW_EXAMPLE_FXPP_PAN_H
 
+#include "platform.h"
+
 #include <bwpp_pan.h>
 #include <bwpp_ppm.h>
 

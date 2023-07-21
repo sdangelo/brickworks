@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_SLEW_LIM_H
 #define _BW_EXAMPLE_FXPP_SLEW_LIM_H
 
+#include "platform.h"
+
 #include <bwpp_slew_lim.h>
 
 using namespace Brickworks;

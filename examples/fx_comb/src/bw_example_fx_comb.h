@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "platform.h"
+
 #include <bw_comb.h>
 
 enum {

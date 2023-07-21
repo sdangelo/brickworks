@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_VIBRATO_H
 #define _BW_EXAMPLE_FXPP_VIBRATO_H
 
+#include "platform.h"
+
 #include <bwpp_chorus.h>
 
 using namespace Brickworks;

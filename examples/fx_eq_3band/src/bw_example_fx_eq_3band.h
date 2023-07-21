@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "platform.h"
+
 #include <bw_ls2.h>
 #include <bw_hs2.h>
 #include <bw_peak.h>

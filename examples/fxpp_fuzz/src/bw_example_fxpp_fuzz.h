@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_FUZZ_H
 #define _BW_EXAMPLE_FXPP_FUZZ_H
 
+#include "platform.h"
+
 #include <bwpp_fuzz.h>
 #include <bwpp_src_int.h>
 

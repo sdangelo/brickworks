@@ -20,8 +20,8 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.5.0 }}}
- *  requires {{{ bw_common bw_config }}}
+ *  version {{{ 0.6.0 }}}
+ *  requires {{{ bw_common }}}
  *  description {{{
  *    Simple data structure that helps keeping track of note on/off events and
  *    pressed key status.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>First release.</li>

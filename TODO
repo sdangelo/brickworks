@@ -56,6 +56,9 @@ code:
 * bw_buf invert src dest order?
 * check unititialized warnings
 * voice alloc mode -> voice alloc priority
+* should remove bw_config?
+* use custom NDEBUG?
+* NULL (C) vs BW_SIZE_T (non-C)...?
 
 build system:
 * single header generation

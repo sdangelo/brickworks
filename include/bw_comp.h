@@ -20,15 +20,20 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
+ *  version {{{ 0.6.0 }}}
  *  requires {{{
- *    bw_common bw_config bw_env_follow bw_gain bw_math bw_one_pole
+ *    bw_common bw_env_follow bw_gain bw_math bw_one_pole
  *  }}}
  *  description {{{
  *    Feedforward compressor/limiter with independent sidechain input.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_comp_process_multi()</code>.</li>

@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
- *  requires {{{ bw_common bw_config bw_math }}}
+ *  version {{{ 0.6.0 }}}
+ *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Aribtrary-ratio IIR sample rate converter.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_src_process_multi()</code>.</li>

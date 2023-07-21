@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "platform.h"
+
 #include <bw_note_queue.h>
 #include <bw_phase_gen.h>
 #include <bw_osc_saw.h>

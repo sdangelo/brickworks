@@ -20,10 +20,10 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
+ *  version {{{ 0.6.0 }}}
  *  requires {{{
- *    bw_buf bw_comb bw_common bw_config bw_delay bw_gain bw_math bw_one_pole
- *    bw_osc_sin bw_phase_gen
+ *    bw_buf bw_comb bw_common bw_delay bw_gain bw_math bw_one_pole bw_osc_sin
+ *    bw_phase_gen
  *  }}}
  *  description {{{
  *    Chorus / vibrato / flanger with variable rate and amount.
@@ -36,6 +36,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_chorus_process_multi()</code>.</li>

@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_EQ_3BAND_H
 #define _BW_EXAMPLE_FXPP_EQ_3BAND_H
 
+#include "platform.h"
+
 #include <bwpp_ls2.h>
 #include <bwpp_hs2.h>
 #include <bwpp_peak.h>

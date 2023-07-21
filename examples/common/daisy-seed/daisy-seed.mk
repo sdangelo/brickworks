@@ -19,4 +19,5 @@ CPPFLAGS += \
 CFLAGS += \
 	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
-	-I${ROOT_DIR}/../../../include
+	-I${ROOT_DIR}/../../../include \
+	-I${ROOT_DIR}/../../common/daisy-seed

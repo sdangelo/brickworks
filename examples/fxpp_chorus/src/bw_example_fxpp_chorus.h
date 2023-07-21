@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_CHORUS_H
 #define _BW_EXAMPLE_FXPP_CHORUS_H
 
+#include "platform.h"
+
 #include <bwpp_chorus.h>
 
 using namespace Brickworks;

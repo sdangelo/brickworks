@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_LS1_H
 #define _BW_EXAMPLE_FXPP_LS1_H
 
+#include "platform.h"
+
 #include <bwpp_ls1.h>
 
 using namespace Brickworks;

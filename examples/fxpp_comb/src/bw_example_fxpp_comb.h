@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_COMB_H
 #define _BW_EXAMPLE_FXPP_COMB_H
 
+#include "platform.h"
+
 #include <bwpp_comb.h>
 
 using namespace Brickworks;

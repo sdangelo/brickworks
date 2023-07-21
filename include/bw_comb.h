@@ -20,9 +20,9 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
+ *  version {{{ 0.6.0 }}}
  *  requires {{{
- *    bw_buf bw_common bw_config bw_delay bw_gain bw_math bw_one_pole
+ *    bw_buf bw_common bw_delay bw_gain bw_math bw_one_pole
  *  }}}
  *  description {{{
  *    Comb filter / delay effect with feedforward and feedback paths.
@@ -37,6 +37,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_comb_process_multi()</code>.</li>

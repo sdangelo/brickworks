@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_NOISE_GATE_H
 #define _BW_EXAMPLE_FXPP_NOISE_GATE_H
 
+#include "platform.h"
+
 #include <bwpp_noise_gate.h>
 
 using namespace Brickworks;

@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_DRIVE_H
 #define _BW_EXAMPLE_FXPP_DRIVE_H
 
+#include "platform.h"
+
 #include <bwpp_drive.h>
 #include <bwpp_src_int.h>
 

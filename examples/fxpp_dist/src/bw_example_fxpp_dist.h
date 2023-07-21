@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_DIST_H
 #define _BW_EXAMPLE_FXPP_DIST_H
 
+#include "platform.h"
+
 #include <bwpp_dist.h>
 #include <bwpp_src_int.h>
 

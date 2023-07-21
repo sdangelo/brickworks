@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022 Orastron Srl unipersonale
+ * Copyright (C) 2022, 2023 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.2.0 }}}
- *  requires {{{ bw_common bw_config }}}
+ *  version {{{ 0.6.0 }}}
+ *  requires {{{ bw_common }}}
  *  description {{{
  *    Pseudo-random number generators.
  *
@@ -34,6 +34,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.2.0</strong>:
  *        <ul>
  *          <li>Refactored API.</li>

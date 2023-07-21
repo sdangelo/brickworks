@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_CLIP_H
 #define _BW_EXAMPLE_FXPP_CLIP_H
 
+#include "platform.h"
+
 #include <bwpp_clip.h>
 #include <bwpp_src_int.h>
 

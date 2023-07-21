@@ -20,8 +20,8 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.5.0 }}}
- *  requires {{{ bw_common bw_config }}}
+ *  version {{{ 0.6.0 }}}
+ *  requires {{{ bw_common }}}
  *  description {{{
  *    Post-filter to decolorate oscillator waveshapers when antialiasing is on.
  *
@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>0.6.0</strong>:
+ *        <ul>
+ *          <li>Removed dependency on bw_config.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.5.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_osc_filt_process_multi()</code>.</li>

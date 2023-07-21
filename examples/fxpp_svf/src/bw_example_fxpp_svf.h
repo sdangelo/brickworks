@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FXPP_SVF_H
 #define _BW_EXAMPLE_FXPP_SVF_H
 
+#include "platform.h"
+
 #include <bwpp_svf.h>
 
 using namespace Brickworks;

@@ -47,7 +47,8 @@
  *          <li>Removed dependency on bw_config.</li>
  *          <li>Removed <code>bw_omega_3log()</code> and
  *              <code>bw_omega_3lognr()</code>.
- *          <li>Fixed <code>bw_pow10f_3()</code>.</li>
+ *          <li>Fixed <code>bw_pow10f_3()</code> and
+ *              <code>bw_acoshf_3()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:
@@ -791,7 +792,7 @@ static inline float bw_asinhf_3(float x) {
 static inline float bw_acoshf_3(float x) {
 	BW_ASSERT(bw_isfinite(x));
 	BW_ASSERT(x >= 1.f);
-	const float y = x == 0.f ? 0.f : bw_logf_3((x >= 4096.f ? x : bw_sqrtf_2(x * x + 1.f)) + x);
+	const float y = bw_logf_3((x >= 8192.f ? x : bw_sqrtf_2(x * x - 1.f)) + x);
 	BW_ASSERT(bw_isfinite(y));
 	return y;
 }

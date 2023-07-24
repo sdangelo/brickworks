@@ -29,6 +29,7 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
  *        </ul>
  *      </li>
@@ -165,61 +166,61 @@ static inline void bw_buf_fill(float *dest, float k, BW_SIZE_T n_elems) {
 	for (BW_SIZE_T i = 0; i < n_elems; i++)
 		dest[i] = k;
 
-	BW_ASSERT(!bw_has_nan(dest, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
 static inline void bw_buf_neg(float *dest, const float *src, BW_SIZE_T n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
-	BW_ASSERT(!bw_has_nan(src, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 
 	for (BW_SIZE_T i = 0; i < n_elems; i++)
 		dest[i] = -src[i];
 
-	BW_ASSERT(!bw_has_nan(dest, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
 static inline void bw_buf_add(float *dest, const float *src, float k, BW_SIZE_T n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
-	BW_ASSERT(!bw_has_nan(src, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
 
 	for (BW_SIZE_T i = 0; i < n_elems; i++)
 		dest[i] = k + src[i];
 
-	BW_ASSERT(!bw_has_nan(dest, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
 static inline void bw_buf_scale(float *dest, const float *src, float k, BW_SIZE_T n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
-	BW_ASSERT(!bw_has_nan(src, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
 
 	for (BW_SIZE_T i = 0; i < n_elems; i++)
 		dest[i] = k * src[i];
 
-	BW_ASSERT(!bw_has_nan(dest, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
 static inline void bw_buf_mix(float *dest, const float *src1, const float *src2, BW_SIZE_T n_elems) {
 	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_elems != 0));
-	BW_ASSERT(!bw_has_nan(src1, n_elems));
-	BW_ASSERT(!bw_has_nan(src2, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
 
 	for (BW_SIZE_T i = 0; i < n_elems; i++)
 		dest[i] = src1[i] + src2[i];
 
-	BW_ASSERT(!bw_has_nan(dest, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
 static inline void bw_buf_mul(float *dest, const float *src1, const float *src2, BW_SIZE_T n_elems) {
 	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_elems != 0));
-	BW_ASSERT(!bw_has_nan(src1, n_elems));
-	BW_ASSERT(!bw_has_nan(src2, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
 
 	for (BW_SIZE_T i = 0; i < n_elems; i++)
 		dest[i] = src1[i] * src2[i];
 
-	BW_ASSERT(!bw_has_nan(dest, n_elems));
+	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
 static inline void bw_buf_fill_multi(float **dest, float k, BW_SIZE_T n_channels, BW_SIZE_T n_elems) {

@@ -116,11 +116,22 @@
  *    WRITEME
  *  >>> */
 #ifdef NDEBUG
-# define BW_ASSERT(ignore) ((void)0)
+# define BW_ASSERT(ignore)	((void)0)
+# define BW_ASSERT_DEEP(ignore)	((void)0)
 #else
-# ifndef BW_ASSERT
+# if !defined(BW_ASSERT) || !defined(BW_ASSERT_DEEP)
 #  include <assert.h>
+# endif
+# ifndef BW_ASSERT
 #  define BW_ASSERT assert
+# endif
+# ifdef BW_DEBUG_DEEP
+#  ifndef BW_ASSERT_DEEP
+#   define BW_ASSERT_DEEP BW_ASSERT
+#  endif
+# else
+#  undef BW_ASSERT_DEEP
+#  define BW_ASSERT_DEEP(ignore) ((void)0)
 # endif
 #endif
 /*! ...

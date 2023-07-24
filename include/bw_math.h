@@ -16,35 +16,6 @@
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
  * File author: Stefano D'Angelo
- *
- * Part of the code in this file is derived from omega.h by Stefano D'Angelo,
- * which is released under the following conditions:
- *
- * Copyright (C) 2019 Stefano D'Angelo
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * Such part is itself based on the theory in
- *
- * S. D'Angelo, L. Gabrielli, and L. Turchet, "Fast Approximation of the
- * Lambert W Function for Virtual Analog Modeling", 22nd Intl. Conf. Digital
- * Audio Effects (DAFx-19), Birmingham, UK, September 2019.
  */
 
 /*!
@@ -72,7 +43,11 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
+ *          <li>Removed <code>bw_omega_3log()</code> and
+ *              <code>bw_omega_3lognr()</code>.
+ *          <li>Fixed <code>bw_pow10f_3()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.4.0</strong>:
@@ -532,35 +507,57 @@ static inline float bw_absf(float x) {
 }
 
 static inline float bw_min0xf(float x) {
-	return 0.5f * (x - bw_absf(x));
+	BW_ASSERT(bw_isfinite(x));
+	const float y = 0.5f * (x - bw_absf(x));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_max0xf(float x) {
-	return 0.5f * (x + bw_absf(x));
+	BW_ASSERT(bw_isfinite(x));
+	const float y = 0.5f * (x + bw_absf(x));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_minf(float a, float b) {
-	return a + bw_min0xf(b - a);
+	BW_ASSERT(bw_isfinite(a));
+	BW_ASSERT(bw_isfinite(b));
+	const float y = a + bw_min0xf(b - a);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_maxf(float a, float b) {
-	return a + bw_max0xf(b - a);
+	BW_ASSERT(bw_isfinite(a));
+	BW_ASSERT(bw_isfinite(b));
+	const float y = a + bw_max0xf(b - a);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_clipf(float x, float m, float M) {
-	return bw_minf(bw_maxf(x, m), M);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_isfinite(m));
+	BW_ASSERT(bw_isfinite(M));
+	const float y = bw_minf(bw_maxf(x, m), M);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_truncf(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	_bw_floatint v = {.f = x};
 	int32_t ex = (v.i & 0x7f800000) >> 23;
 	int32_t m = (~0u) << bw_clipi32(150 - ex, 0, 23);
 	m &= bw_signfilli32(126 - ex) | 0x80000000;
 	v.i &= m;
+	BW_ASSERT(bw_isfinite(v.f));
 	return v.f;
 }
 
 static inline float bw_roundf(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	_bw_floatint v = {.f = x};
 	int32_t ex = (v.i & 0x7f800000) >> 23;
 	int32_t sh = bw_clipi32(150 - ex, 0, 23);
@@ -572,28 +569,39 @@ static inline float bw_roundf(float x) {
 	int32_t ms = bw_signfilli32((v.i & mr) << (32 - sh));
 	v.i &= mt;
 	s.i &= ms;
-	return v.f + s.f;
+	const float y = v.f + s.f;
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_floorf(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
 	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
 	_bw_floatint s = {.f = 1.f};
 	s.i &= bw_signfilli32(t.i & y.i);
-	return t.f - s.f;
+	const float y = t.f - s.f;
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_ceilf(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
 	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
 	_bw_floatint s = {.f = 1.f};
 	s.i &= bw_signfilli32(~t.i & y.i);
-	return t.f + s.f;
+	const float y = t.f + s.f;
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline void bw_intfracf(float x, float *i, float *f) {
+	BW_ASSERT(bw_isfinite(x));
 	*i = bw_floorf(x);
 	*f = x - *i;
+	BW_ASSERT(bw_isfinite(*i));
+	BW_ASSERT(bw_isfinite(*f));
 }
 
 static inline float bw_rcpf_2(float x) {
@@ -605,50 +613,86 @@ static inline float bw_rcpf_2(float x) {
 }
 
 static inline float bw_sin2pif_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	x = x - bw_floorf(x);
 	float xp1 = x + x - 1.f;
 	float xp2 = bw_absf(xp1);
 	float xp = 1.570796326794897f - 1.570796326794897f * bw_absf(xp2 + xp2 - 1.f);
-	return -bw_copysignf(1.f, xp1) * (xp + xp * xp * (-0.05738534102710938f - 0.1107398163618408f * xp));
+	const float y = -bw_copysignf(1.f, xp1) * (xp + xp * xp * (-0.05738534102710938f - 0.1107398163618408f * xp));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_sinf_3(float x) {
-	return bw_sin2pif_3(0.1591549430918953f * x);
+	BW_ASSERT(bw_isfinite(x));
+	const float y = bw_sin2pif_3(0.1591549430918953f * x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_cos2pif_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	return bw_sin2pif_3(x + 0.25f);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_cosf_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	return bw_cos2pif_3(0.1591549430918953f * x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_tan2pif_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT((x - 0.5f * bw_floorf(x + x) <= 0.249840845056908f)
+			|| (x - 0.5f * bw_floorf(x + x) >= 0.250159154943092f));
 	return bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_tanf_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT((x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) <= 1.569796326794897f)
+			|| (x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) >= 1.571796326794896f));
 	x = 0.1591549430918953f * x;
-	return bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
+	const float y = bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_log2f_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= 1.175494350822287e-38f);
 	_bw_floatint v = {.f = x};
 	int e = v.i >> 23;
 	v.i = (v.i & 0x007fffff) | 0x3f800000;
-	return (float)e - 129.213475204444817f + v.f * (3.148297929334117f + v.f * (-1.098865286222744f + v.f * 0.1640425613334452f));
+	const float y = (float)e - 129.213475204444817f + v.f * (3.148297929334117f + v.f * (-1.098865286222744f + v.f * 0.1640425613334452f));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_logf_3(float x) {
-	return 0.693147180559945f * bw_log2f_3(x);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= 1.175494350822287e-38f);
+	const float y = 0.693147180559945f * bw_log2f_3(x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_log10f_3(float x) {
-	return 0.3010299956639811f * bw_log2f_3(x);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= 1.175494350822287e-38f);
+	const float y = 0.3010299956639811f * bw_log2f_3(x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_pow2f_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x <= 127.999f);
 	if (x < -126.f)
 		return 0.f;
 	_bw_floatint v = {.f = x};
@@ -656,75 +700,100 @@ static inline float bw_pow2f_3(float x) {
 	int l = xi - ((v.i >> 31) & 1);
 	float f = x - (float)l;
 	v.i = (l + 127) << 23;
-	return v.f + v.f * f * (0.6931471805599453f + f * (0.2274112777602189f + f * 0.07944154167983575f));
+	const float y = v.f + v.f * f * (0.6931471805599453f + f * (0.2274112777602189f + f * 0.07944154167983575f));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_expf_3(float x) {
-	return bw_pow2f_3(1.442695040888963f * x);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x <= 88.722f);
+	const float y = bw_pow2f_3(1.442695040888963f * x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_pow10f_3(float x) {
-	return 3.321928094887363f * bw_pow2f_3(x);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x <= 38.531f);
+	const float y = bw_pow2f_3(3.321928094887363f * x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_dB2linf_3(float x) {
-	return bw_pow2f_3(0.1660964047443682f * x);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x <= 770.630f);
+	const float y = bw_pow2f_3(0.1660964047443682f * x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_lin2dBf_3(float x) {
-	return 20.f * bw_log10f_3(x);
-}
-
-static inline float bw_omega_3log(float x) {
-	static const float x1 = -3.341459552768620f;
-	static const float x2 = 8.f;
-	static const float a = -1.314293149877800e-3f;
-	static const float b = 4.775931364975583e-2f;
-	static const float c = 3.631952663804445e-1f;
-	static const float d = 6.313183464296682e-1f;
-	x = bw_maxf(x, x1);
-	return x <= x2 ? d + x * (c + x * (b + x * a)) : x - bw_logf_3(x);
-}
-
-static inline float bw_omega_3lognr(float x) {
-	// omega(x) ~ x with relative error smaller than epsilon (2^-23) for x > 1.6e8)
-	// (need to avoid big arguments for bw_rcpf_2())
-	if (x > 1.6e8f)
-		return x;
-	float y = bw_omega_3log(x);
-	return y - (y - bw_expf_3(x - y)) * bw_rcpf_2(y + 1.f);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= 1.175494350822287e-38f);
+	const float y = 20.f * bw_log10f_3(x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_sqrtf_2(float x) {
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= 0.f);
+	if (x < 8.077935669463161e-28f) {
+		const float y = 3.518437208883201e13f * x;
+		BW_ASSERT(bw_isfinite(y));
+		return y;
+	}
 	_bw_floatint v = {.f = x};
 	v.u = (((v.u - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
 	float r = bw_rcpf_2(x);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
+	BW_ASSERT(bw_isfinite(v.f));
 	return v.f;
 }
 
 static inline float bw_tanhf_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
-	return xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
+	const float y = xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_sinhf_3(float x) {
-	return 0.5f * (bw_expf_3(x) - bw_expf_3(-x));
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= -88.722f && x <= 88.722f);
+	const float y = 0.5f * (bw_expf_3(x) - bw_expf_3(-x));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_coshf_3(float x) {
-	return 0.5f * (bw_expf_3(x) + bw_expf_3(-x));
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= -88.722f && x <= 88.722f);
+	const float y = 0.5f * (bw_expf_3(x) + bw_expf_3(-x));
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_asinhf_3(float x) {
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= -1.7e38f && x <= 1.7e38f);
 	float a = bw_absf(x);
-	return bw_copysignf(bw_logf_3(bw_sqrtf_2(a * a + 1.f) + a), x);
+	const float y = bw_copysignf(bw_logf_3((a >= 4096.f ? a : bw_sqrtf_2(a * a + 1.f)) + a), x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 static inline float bw_acoshf_3(float x) {
-	return x == 0.f ? 0.f : bw_logf_3(bw_sqrtf_2(x * x + 1.f) + x);
+	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(x >= 1.f);
+	const float y = x == 0.f ? 0.f : bw_logf_3((x >= 4096.f ? x : bw_sqrtf_2(x * x + 1.f)) + x);
+	BW_ASSERT(bw_isfinite(y));
+	return y;
 }
 
 #ifdef __cplusplus

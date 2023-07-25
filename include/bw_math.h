@@ -371,28 +371,6 @@ static inline float bw_lin2dBf_3(float x);
  *
  *    Absolute error < 0.032, relative error < 1.5%.
  * 
- *    #### bw_omega_3log()
- *  ```>>> */
-static inline float bw_omega_3log(float x);
-/*! <<<```
- *    Returns an approximation of `omega(x)`, where `omega` is the <a
- *    href="https://en.wikipedia.org/wiki/Wright_omega_function"
- *    target="_blank">Wright omega function</a>.
- *
- *    Absolute error < 0.27, relative error < 14.6% for non-negative input and
- *    decreasing with increasing input, goes rapidly to 100% for progressively
- *    more negative input.
- *
- *    #### bw_omega_3lognr()
- *  ```>>> */
-static inline float bw_omega_3lognr(float x);
-/*! <<<```
- *    Returns an approximation of `omega(x)`, where `omega` is the <a
- *    href="https://en.wikipedia.org/wiki/Wright_omega_function"
- *    target="_blank">Wright omega function</a>.
- *
- *    Absolute error < 0.045, relative error < 3.7%.
- *
  *    #### bw_sqrtf_2()
  *  ```>>> */
 static inline float bw_sqrtf_2(float x);
@@ -508,57 +486,57 @@ static inline float bw_absf(float x) {
 }
 
 static inline float bw_min0xf(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	const float y = 0.5f * (x - bw_absf(x));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_max0xf(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	const float y = 0.5f * (x + bw_absf(x));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_minf(float a, float b) {
-	BW_ASSERT(bw_isfinite(a));
-	BW_ASSERT(bw_isfinite(b));
+	BW_ASSERT(bw_is_finite(a));
+	BW_ASSERT(bw_is_finite(b));
 	const float y = a + bw_min0xf(b - a);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_maxf(float a, float b) {
-	BW_ASSERT(bw_isfinite(a));
-	BW_ASSERT(bw_isfinite(b));
+	BW_ASSERT(bw_is_finite(a));
+	BW_ASSERT(bw_is_finite(b));
 	const float y = a + bw_max0xf(b - a);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_clipf(float x, float m, float M) {
-	BW_ASSERT(bw_isfinite(x));
-	BW_ASSERT(bw_isfinite(m));
-	BW_ASSERT(bw_isfinite(M));
+	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(bw_is_finite(m));
+	BW_ASSERT(bw_is_finite(M));
 	const float y = bw_minf(bw_maxf(x, m), M);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_truncf(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	_bw_floatint v = {.f = x};
 	int32_t ex = (v.i & 0x7f800000) >> 23;
 	int32_t m = (~0u) << bw_clipi32(150 - ex, 0, 23);
 	m &= bw_signfilli32(126 - ex) | 0x80000000;
 	v.i &= m;
-	BW_ASSERT(bw_isfinite(v.f));
+	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }
 
 static inline float bw_roundf(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	_bw_floatint v = {.f = x};
 	int32_t ex = (v.i & 0x7f800000) >> 23;
 	int32_t sh = bw_clipi32(150 - ex, 0, 23);
@@ -571,38 +549,38 @@ static inline float bw_roundf(float x) {
 	v.i &= mt;
 	s.i &= ms;
 	const float y = v.f + s.f;
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_floorf(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
 	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
 	_bw_floatint s = {.f = 1.f};
 	s.i &= bw_signfilli32(t.i & y.i);
-	const float y = t.f - s.f;
-	BW_ASSERT(bw_isfinite(y));
-	return y;
+	const float r = t.f - s.f;
+	BW_ASSERT(bw_is_finite(r));
+	return r;
 }
 
 static inline float bw_ceilf(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
 	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
 	_bw_floatint s = {.f = 1.f};
 	s.i &= bw_signfilli32(~t.i & y.i);
-	const float y = t.f + s.f;
-	BW_ASSERT(bw_isfinite(y));
-	return y;
+	const float r = t.f + s.f;
+	BW_ASSERT(bw_is_finite(r));
+	return r;
 }
 
 static inline void bw_intfracf(float x, float *i, float *f) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	*i = bw_floorf(x);
 	*f = x - *i;
-	BW_ASSERT(bw_isfinite(*i));
-	BW_ASSERT(bw_isfinite(*f));
+	BW_ASSERT(bw_is_finite(*i));
+	BW_ASSERT(bw_is_finite(*f));
 }
 
 static inline float bw_rcpf_2(float x) {
@@ -614,85 +592,85 @@ static inline float bw_rcpf_2(float x) {
 }
 
 static inline float bw_sin2pif_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	x = x - bw_floorf(x);
 	float xp1 = x + x - 1.f;
 	float xp2 = bw_absf(xp1);
 	float xp = 1.570796326794897f - 1.570796326794897f * bw_absf(xp2 + xp2 - 1.f);
 	const float y = -bw_copysignf(1.f, xp1) * (xp + xp * xp * (-0.05738534102710938f - 0.1107398163618408f * xp));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_sinf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	const float y = bw_sin2pif_3(0.1591549430918953f * x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_cos2pif_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
-	return bw_sin2pif_3(x + 0.25f);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(x));
+	const float y = bw_sin2pif_3(x + 0.25f);
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_cosf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
-	return bw_cos2pif_3(0.1591549430918953f * x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(x));
+	const float y = bw_cos2pif_3(0.1591549430918953f * x);
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_tan2pif_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x - 0.5f * bw_floorf(x + x) <= 0.249840845056908f)
 			|| (x - 0.5f * bw_floorf(x + x) >= 0.250159154943092f));
-	return bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
-	BW_ASSERT(bw_isfinite(y));
+	const float y = bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_tanf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) <= 1.569796326794897f)
 			|| (x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) >= 1.571796326794896f));
 	x = 0.1591549430918953f * x;
 	const float y = bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_log2f_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	_bw_floatint v = {.f = x};
 	int e = v.i >> 23;
 	v.i = (v.i & 0x007fffff) | 0x3f800000;
 	const float y = (float)e - 129.213475204444817f + v.f * (3.148297929334117f + v.f * (-1.098865286222744f + v.f * 0.1640425613334452f));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_logf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	const float y = 0.693147180559945f * bw_log2f_3(x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_log10f_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	const float y = 0.3010299956639811f * bw_log2f_3(x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_pow2f_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 127.999f);
 	if (x < -126.f)
 		return 0.f;
@@ -702,48 +680,48 @@ static inline float bw_pow2f_3(float x) {
 	float f = x - (float)l;
 	v.i = (l + 127) << 23;
 	const float y = v.f + v.f * f * (0.6931471805599453f + f * (0.2274112777602189f + f * 0.07944154167983575f));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_expf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 88.722f);
 	const float y = bw_pow2f_3(1.442695040888963f * x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_pow10f_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 38.531f);
 	const float y = bw_pow2f_3(3.321928094887363f * x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_dB2linf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 770.630f);
 	const float y = bw_pow2f_3(0.1660964047443682f * x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_lin2dBf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	const float y = 20.f * bw_log10f_3(x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_sqrtf_2(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 0.f);
 	if (x < 8.077935669463161e-28f) {
 		const float y = 3.518437208883201e13f * x;
-		BW_ASSERT(bw_isfinite(y));
+		BW_ASSERT(bw_is_finite(y));
 		return y;
 	}
 	_bw_floatint v = {.f = x};
@@ -751,49 +729,49 @@ static inline float bw_sqrtf_2(float x) {
 	float r = bw_rcpf_2(x);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
-	BW_ASSERT(bw_isfinite(v.f));
+	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }
 
 static inline float bw_tanhf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
 	const float y = xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_sinhf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -88.722f && x <= 88.722f);
 	const float y = 0.5f * (bw_expf_3(x) - bw_expf_3(-x));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_coshf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -88.722f && x <= 88.722f);
 	const float y = 0.5f * (bw_expf_3(x) + bw_expf_3(-x));
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_asinhf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -1.7e38f && x <= 1.7e38f);
 	float a = bw_absf(x);
 	const float y = bw_copysignf(bw_logf_3((a >= 4096.f ? a : bw_sqrtf_2(a * a + 1.f)) + a), x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
 static inline float bw_acoshf_3(float x) {
-	BW_ASSERT(bw_isfinite(x));
+	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.f);
 	const float y = bw_logf_3((x >= 8192.f ? x : bw_sqrtf_2(x * x - 1.f)) + x);
-	BW_ASSERT(bw_isfinite(y));
+	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 

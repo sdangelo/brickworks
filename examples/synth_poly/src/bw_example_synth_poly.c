@@ -404,7 +404,7 @@ float bw_example_synth_poly_get_parameter(bw_example_synth_poly *instance, int i
 }
 
 void bw_example_synth_poly_note_on(bw_example_synth_poly *instance, char note, char velocity) {
-	bw_note_queue_add(&instance->note_queue, note, velocity != 0, velocity, 0);
+	bw_note_queue_add(&instance->note_queue, note, velocity != 0, (1.f / 127.f) * velocity, 0);
 }
 
 void bw_example_synth_poly_note_off(bw_example_synth_poly *instance, char note) {

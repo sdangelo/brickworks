@@ -12,11 +12,13 @@ SYSTEM_FILES_DIR = ${LIBDAISY_DIR}/core
 include ${SYSTEM_FILES_DIR}/Makefile
 
 CPPFLAGS += \
+	-DNDEBUG \
 	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../../include
 
 CFLAGS += \
+	-DNDEBUG \
 	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../../include \

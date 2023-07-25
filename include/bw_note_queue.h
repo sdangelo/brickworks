@@ -32,6 +32,7 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
  *        </ul>
  *      </li>
@@ -121,6 +122,12 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  *
  *    If `force_went_off` is set to non-`0`, `went_off` is always set to
  *    non-`0`.
+ *
+ *    #### bw_note_queue_add()
+ *  ```>>> */
+static inline char bw_note_queue_is_valid(bw_note_queue *BW_RESTRICT queue);
+/*! <<<```
+ *    WRITEME
  *  }}} */
 
 /*** Implementation ***/
@@ -129,17 +136,26 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  * change at any time in future versions. Please, do not use it directly. */
 
 static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue) {
+	BW_ASSERT(queue != NULL);
 	for (int i = 0; i < 128; i++)
 		queue->status[i] = (bw_note_queue_status){ .pressed = 0, .velocity = 0.f };
 	queue->n_pressed = 0;
 	queue->n_events = 0;
+	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 }
 
 static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue) {
+	BW_ASSERT(queue != NULL);
+	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 	queue->n_events = 0;
 }
 
 static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off) {
+	BW_ASSERT(queue != NULL);
+	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
+	BW_ASSERT(note < 128);
+	BW_ASSERT(bw_is_finite(velocity) && velocity <= 1.f);
+
 	if (!pressed && !queue->status[note].pressed)
 		return;
 
@@ -159,6 +175,37 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
 	else if (!pressed && queue->status[note].pressed)
 		queue->n_pressed--;
 	queue->status[note] = (bw_note_queue_status){ .pressed = pressed, .velocity = velocity };
+
+	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
+}
+
+static inline char bw_note_queue_is_valid(bw_note_queue *BW_RESTRICT queue) {
+	BW_ASSERT(queue != NULL);
+
+	if (queue->n_events >= 128 || queue->n_pressed >= 128)
+		return 0;
+
+	for (int i = 0; i < (int)queue->n_events; i++) {
+		bw_note_queue_event *ev = queue->events + i;
+		if (ev->note >= 128 || !bw_is_finite(ev->status.velocity) || ev->status.velocity > 1.f)
+			return 0;
+		for (int j = 0; j < i; j++) {
+			bw_note_queue_event *ev2 = queue->events + j;
+			if (ev2->note == ev->note)
+				return 0;
+		}
+	}
+
+	int cnt = 0;
+	for (int i = 0; i < 128; i++) {
+		bw_note_queue_status *st = queue->status + i;
+		if (st->pressed)
+			cnt++;
+		if (!bw_is_finite(st->velocity) || st->velocity > 1.f)
+			return 0;
+	}
+
+	return cnt == queue->n_pressed;
 }
 
 #ifdef __cplusplus

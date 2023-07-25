@@ -36,6 +36,7 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
  *        </ul>
  *      </li>
@@ -90,6 +91,7 @@ static inline float bw_randf(uint64_t *BW_RESTRICT state);
  * change at any time in future versions. Please, do not use it directly. */
 
 static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
+	BW_ASSERT(state != NULL);
 	// Permuted Congruential Generator,
 	// taken from https://nullprogram.com/blog/2017/09/21/
 	*state = *state * 0x9b60933458e17d7d + 0xd737232eeccdf7ed;
@@ -97,6 +99,7 @@ static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
 }
 
 static inline float bw_randf(uint64_t *BW_RESTRICT state) {
+	BW_ASSERT(state != NULL);
 	return  (2.f / (float)UINT32_MAX) * (float)bw_randu32(state) - 1.f;
 }
 

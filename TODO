@@ -84,6 +84,7 @@ code:
 * web effect mono->stereo and stereo->mono inputs? or display "input needs to be n channels"?
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
+* dump data structures (see note queue) and indicate error precisely
 
 build system:
 * make makefiles handle paths with spaces etc

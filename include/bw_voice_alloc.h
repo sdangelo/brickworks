@@ -29,6 +29,7 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
  *        </ul>
  *      </li>
@@ -88,7 +89,7 @@ typedef struct {
  *
  *    #### bw_voice_alloc()
  *  ```>>> */
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, int n_voices);
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, BW_SIZE_T n_voices);
 /*! <<<```
  *    It performs voice allocation according to `opts` and using the events in
  *    `queue`.
@@ -102,7 +103,17 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, int n_voices) {
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, BW_SIZE_T n_voices) {
+	BW_ASSERT(opts != NULL);
+	BW_ASSERT(opts->priority == bw_voice_alloc_priority_low || opts->priority == bw_voice_alloc_priority_high);
+	BW_ASSERT(n_voices == 0 || opts->note_on != NULL);
+	BW_ASSERT(n_voices == 0 || opts->note_off != NULL);
+	BW_ASSERT(n_voices == 0 || opts->get_note != NULL);
+	BW_ASSERT(n_voices == 0 || opts->is_free != NULL);
+	BW_ASSERT(queue != NULL);
+	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
+	BW_ASSERT(n_voices == 0 || voices != NULL);
+
 	for (unsigned char i = 0; i < queue->n_events; i++) {
 		bw_note_queue_event *ev = queue->events + i;
 		for (int j = 0; j < n_voices; j++)

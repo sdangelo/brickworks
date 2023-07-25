@@ -375,7 +375,7 @@ float bw_example_synthpp_poly_get_parameter(bw_example_synthpp_poly *instance, i
 }
 
 void bw_example_synthpp_poly_note_on(bw_example_synthpp_poly *instance, char note, char velocity) {
-	instance->noteQueue.add(note, velocity != 0, velocity, false);
+	instance->noteQueue.add(note, velocity != 0, (1.f / 127.f) * velocity, false);
 }
 
 void bw_example_synthpp_poly_note_off(bw_example_synthpp_poly *instance, char note) {

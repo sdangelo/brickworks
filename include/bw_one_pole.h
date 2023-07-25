@@ -33,6 +33,7 @@
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Removed dependency on bw_config.</li>
+ *          <li>Fixed bug when setting very high cutoff values.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.5.0</strong>:
@@ -346,9 +347,11 @@ static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT
 static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_CUTOFF_UP)
-			coeffs->mA1u = bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_up);
+			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_up);
+			// tau < 1 ns is instantaneous for any practical purpose
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_CUTOFF_DOWN)
-			coeffs->mA1d = bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_down);
+			coeffs->mA1d = coeffs->cutoff_down > 1.591549430918953e8f ? 0.f : bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_down);
+			// as before
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_STICKY_THRESH)
 			coeffs->st2 = coeffs->sticky_thresh * coeffs->sticky_thresh;
 		coeffs->param_changed = 0;

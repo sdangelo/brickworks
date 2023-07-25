@@ -125,7 +125,7 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  *
  *    #### bw_note_queue_add()
  *  ```>>> */
-static inline char bw_note_queue_is_valid(bw_note_queue *BW_RESTRICT queue);
+static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue);
 /*! <<<```
  *    WRITEME
  *  }}} */
@@ -179,7 +179,7 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 }
 
-static inline char bw_note_queue_is_valid(bw_note_queue *BW_RESTRICT queue) {
+static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue) {
 	BW_ASSERT(queue != NULL);
 
 	if (queue->n_events >= 128 || queue->n_pressed >= 128)

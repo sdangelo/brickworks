@@ -32,6 +32,10 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li><code>bw_one_pole_process()</code> and
+ *              <code>bw_one_pole_process_multi()</code> now use
+ *              <code>BW_SIZE_T</code> to count samples and channels.</li>
+ *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
  *          <li>Fixed bug when setting very high cutoff values.</li>
  *        </ul>
@@ -168,7 +172,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeff
  *
  *    #### bw_one_pole_process()
  *  ```>>> */
-static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, BW_SIZE_T n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -178,7 +182,7 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_one_pole_process_multi()
  *  ```>>> */
-static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, BW_SIZE_T n_channels, BW_SIZE_T n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -290,6 +294,18 @@ static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT c
 static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state);
 /*! <<<```
  *    Returns the last output sample as stored in `state`.
+ *
+ *    #### bw_one_pole_coeffs_is_valid()
+ *  ```>>> */
+static inline char bw_one_pole_coeffs_is_valid(const bw_one_pole_coeffs *BW_RESTRICT coeffs);
+/*! <<<```
+ *    WRITEME
+ *
+ *    #### bw_one_pole_state_is_valid()
+ *  ```>>> */
+static inline char bw_one_pole_state_is_valid(const bw_one_pole_state *BW_RESTRICT state);
+/*! <<<```
+ *    WRITEME
  *  }}} */
 
 /*** Implementation ***/
@@ -299,24 +315,44 @@ static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT st
 
 #include <bw_math.h>
 
-struct _bw_one_pole_coeffs {
-	// Coefficients
-	float			Ttm2pi;
+#ifdef BW_DEBUG_DEEP
+enum _bw_one_pole_coeffs_state {
+	_bw_one_pole_coeffs_state_invalid,
+	_bw_one_pole_coeffs_state_init,
+	_bw_one_pole_coeffs_state_set_sample_rate,
+	_bw_one_pole_coeffs_state_reset_coeffs,
+};
+#endif
 
-	float			mA1u;
-	float			mA1d;
-	float			st2;
+struct _bw_one_pole_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum _bw_one_pole_coeffs_state	state;
+	uint32_t			reset_id;
+#endif
+
+	// Coefficients
+	float				Ttm2pi;
+
+	float				mA1u;
+	float				mA1d;
+	float				st2;
 
 	// Parameters
-	float			cutoff_up;
-	float			cutoff_down;
-	float			sticky_thresh;
-	bw_one_pole_sticky_mode sticky_mode;
-	int			param_changed;
+	float				cutoff_up;
+	float				cutoff_down;
+	float				sticky_thresh;
+	bw_one_pole_sticky_mode		sticky_mode;
+	int				param_changed;
 };
 
 struct _bw_one_pole_state {
-	float	y_z1;
+#ifdef BW_DEBUG_DEEP
+	uint32_t	hash;
+	uint32_t	coeffs_reset_id;
+#endif
+
+	float		y_z1;
 };
 
 #define _BW_ONE_POLE_PARAM_CUTOFF_UP		1
@@ -324,27 +360,36 @@ struct _bw_one_pole_state {
 #define _BW_ONE_POLE_PARAM_STICKY_THRESH	(1<<2)
 
 static inline void bw_one_pole_init(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
 	coeffs->cutoff_up = INFINITY;
 	coeffs->cutoff_down = INFINITY;
 	coeffs->sticky_thresh = 0.f;
 	coeffs->sticky_mode = bw_one_pole_sticky_mode_abs;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->hash = bw_hash_sdbm("bw_one_pole_coeffs");
+	coeffs->state = _bw_one_pole_coeffs_state_init;
+	coeffs->reset_id = coeffs->hash + 1;
+#endif
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 }
 
 static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+
 	coeffs->Ttm2pi = -6.283185307179586f / sample_rate;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = _bw_one_pole_coeffs_state_set_sample_rate;
+#endif
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == _bw_one_pole_coeffs_state_set_sample_rate);
 }
 
-static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
-	coeffs->param_changed = ~0;
-	bw_one_pole_update_coeffs_ctrl(coeffs);
-}
-
-static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float y_z1) {
-	(void)coeffs;
-	state->y_z1 = y_z1;
-}
-
-static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+static inline void _bw_one_pole_do_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_CUTOFF_UP)
 			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_up);
@@ -358,86 +403,236 @@ static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRIC
 	}
 }
 
+static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_set_sample_rate);
+
+	coeffs->param_changed = ~0;
+	_bw_one_pole_do_update_coeffs_ctrl(coeffs);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = _bw_one_pole_coeffs_state_reset_coeffs;
+	coeffs->reset_id++;
+#endif
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == _bw_one_pole_coeffs_state_reset_coeffs);
+}
+
+static inline void bw_one_pole_reset_state(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float y_z1) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT(bw_is_finite(y_z1));
+
+	(void)coeffs;
+	state->y_z1 = y_z1;
+
+#ifdef BW_DEBUG_DEEP
+	state->hash = bw_hash_sdbm("bw_one_pole_state");
+	state->coeffs_reset_id = coeffs->reset_id;
+#endif
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+}
+
+static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	
+	_bw_one_pole_do_update_coeffs_ctrl(coeffs);
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+}
+
 static inline void bw_one_pole_update_coeffs_audio(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	
 	(void)coeffs;
 }
 
 static inline float bw_one_pole_process1(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(x));
+	
 	const float y = x + coeffs->mA1u * (state->y_z1 - x);
 	state->y_z1 = y;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(y));
+	
 	return y;
 }
 
 static inline float bw_one_pole_process1_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(x));
+	
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2)
 		y = x;
 	state->y_z1 = y;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(y));
+	
 	return y;
 }
 
 static inline float bw_one_pole_process1_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(x));
+	
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2 * x * x)
 		y = x;
 	state->y_z1 = y;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(y));
+	
 	return y;
 }
 
 static inline float bw_one_pole_process1_asym(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(x));
+	
 	const float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	state->y_z1 = y;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(y));
+	
 	return y;
 }
 
 static inline float bw_one_pole_process1_asym_sticky_abs(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(x));
+	
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2)
 		y = x;
 	state->y_z1 = y;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(y));
+	
 	return y;
 }
 
 static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, float x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(x));
+	
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
 	if (d * d <= coeffs->st2 * x * x)
 		y = x;
 	state->y_z1 = y;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(bw_is_finite(y));
+	
 	return y;
 }
 
-static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, BW_SIZE_T n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT(n_samples == 0 || x != NULL);
+	BW_ASSERT_DEEP(!bw_has_nan(x, n_samples));
+	
 	bw_one_pole_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
 				else
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (int i = 0; i < n_samples; i++)
+				for (BW_SIZE_T i = 0; i < n_samples; i++)
 					y[i] = bw_one_pole_process1_asym(coeffs, state, x[i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
 				else
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (int i = 0; i < n_samples; i++)
+				for (BW_SIZE_T i = 0; i < n_samples; i++)
 					y[i] = bw_one_pole_process1(coeffs, state, x[i]);
 			}
 		}
@@ -445,93 +640,104 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
 				else
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (int i = 0; i < n_samples; i++)
+				for (BW_SIZE_T i = 0; i < n_samples; i++)
 					bw_one_pole_process1_asym(coeffs, state, x[i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
 				else
-					for (int i = 0; i < n_samples; i++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
 						bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (int i = 0; i < n_samples; i++)
+				for (BW_SIZE_T i = 0; i < n_samples; i++)
 					bw_one_pole_process1(coeffs, state, x[i]);
 			}
 		}
 	}
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(!bw_has_nan(y, n_samples));
 }
 
-static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, BW_SIZE_T n_channels, BW_SIZE_T n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
+	//...
+	
 	bw_one_pole_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_asym_sticky_abs(coeffs, state[j], x[j][i]);
 						else
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								bw_one_pole_process1_asym_sticky_abs(coeffs, state[j], x[j][i]);
 						
 				else
-					for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_asym_sticky_rel(coeffs, state[j], x[j][i]);
 						else
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								bw_one_pole_process1_asym_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (int j = 0; j < n_channels; j++)
+				for (BW_SIZE_T j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
-						for (int i = 0; i < n_samples; i++)
+						for (BW_SIZE_T i = 0; i < n_samples; i++)
 							y[j][i] = bw_one_pole_process1_asym(coeffs, state[j], x[j][i]);
 					else
-						for (int i = 0; i < n_samples; i++)
+						for (BW_SIZE_T i = 0; i < n_samples; i++)
 							bw_one_pole_process1_asym(coeffs, state[j], x[j][i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_sticky_abs(coeffs, state[j], x[j][i]);
 						else
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								bw_one_pole_process1_sticky_abs(coeffs, state[j], x[j][i]);
 				else
-					for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_sticky_rel(coeffs, state[j], x[j][i]);
 						else
-							for (int i = 0; i < n_samples; i++)
+							for (BW_SIZE_T i = 0; i < n_samples; i++)
 								bw_one_pole_process1_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (int j = 0; j < n_channels; j++)
+				for (BW_SIZE_T j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
-						for (int i = 0; i < n_samples; i++)
+						for (BW_SIZE_T i = 0; i < n_samples; i++)
 							y[j][i] = bw_one_pole_process1(coeffs, state[j], x[j][i]);
 					else
-						for (int i = 0; i < n_samples; i++)
+						for (BW_SIZE_T i = 0; i < n_samples; i++)
 							bw_one_pole_process1(coeffs, state[j], x[j][i]);
 			}
 		}
@@ -539,87 +745,185 @@ static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coe
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int i = 0; i < n_samples; i++)
-						for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (BW_SIZE_T j = 0; j < n_channels; j++)
 							bw_one_pole_process1_asym_sticky_abs(coeffs, state[j], x[j][i]);
 				else
-					for (int i = 0; i < n_samples; i++)
-						for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (BW_SIZE_T j = 0; j < n_channels; j++)
 							bw_one_pole_process1_asym_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (int i = 0; i < n_samples; i++)
-					for (int j = 0; j < n_channels; j++)
+				for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (BW_SIZE_T j = 0; j < n_channels; j++)
 						bw_one_pole_process1_asym(coeffs, state[j], x[j][i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (int i = 0; i < n_samples; i++)
-						for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (BW_SIZE_T j = 0; j < n_channels; j++)
 							bw_one_pole_process1_sticky_abs(coeffs, state[j], x[j][i]);
 				else
-					for (int i = 0; i < n_samples; i++)
-						for (int j = 0; j < n_channels; j++)
+					for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (BW_SIZE_T j = 0; j < n_channels; j++)
 							bw_one_pole_process1_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (int i = 0; i < n_samples; i++)
-					for (int j = 0; j < n_channels; j++)
+				for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (BW_SIZE_T j = 0; j < n_channels; j++)
 						bw_one_pole_process1(coeffs, state[j], x[j][i]);
 			}
 		}
 	}
+	
+	//...
 }
 
 static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+	
 	bw_one_pole_set_cutoff_up(coeffs, value);
 	bw_one_pole_set_cutoff_down(coeffs, value);
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_cutoff_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+	
 	if (coeffs->cutoff_up != value) {
 		coeffs->cutoff_up = value;
 		coeffs->param_changed |= _BW_ONE_POLE_PARAM_CUTOFF_UP;
 	}
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_cutoff_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+	
 	if (coeffs->cutoff_down != value) {
 		coeffs->cutoff_down = value;
 		coeffs->param_changed |= _BW_ONE_POLE_PARAM_CUTOFF_DOWN;
 	}
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_tau(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+	
 	bw_one_pole_set_tau_up(coeffs, value);
 	bw_one_pole_set_tau_down(coeffs, value);
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+	
 	bw_one_pole_set_cutoff_up(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
 	// tau < 1 ns is instantaneous for any practical purpose
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+	
 	bw_one_pole_set_cutoff_down(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
 	// as before
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_sticky_thresh(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	//...
+	
 	if (coeffs->sticky_thresh != value) {
 		coeffs->sticky_thresh = value;
 		coeffs->param_changed |= _BW_ONE_POLE_PARAM_STICKY_THRESH;
 	}
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline void bw_one_pole_set_sticky_mode(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_sticky_mode value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
+	//...
+	
 	coeffs->sticky_mode = value;
+	
+	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_init);
 }
 
 static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT state) {
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	
 	return state->y_z1;
+}
+
+static inline char bw_one_pole_coeffs_is_valid(const bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->hash != bw_hash_sdbm("bw_one_pole_coeffs"))
+		return 0;
+#endif
+	//...
+
+	return 1;
+}
+
+static inline char bw_one_pole_state_is_valid(const bw_one_pole_state *BW_RESTRICT state) {
+	BW_ASSERT(state != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (state->hash != bw_hash_sdbm("bw_one_pole_state"))
+		return 0;
+#endif
+
+	return bw_is_finite(state->y_z1);
 }
 
 #undef _BW_ONE_POLE_PARAM_CUTOFF_UP

@@ -3,12 +3,12 @@
 
 code:
 * android, ios
-* debugging (design by contract?, trace calls?)
 
 1.0.0
 -----
 
 code:
+* debugging
 * check all examples again
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
@@ -59,9 +59,10 @@ code:
 * should remove bw_config?
 * use custom NDEBUG?
 * NULL (C) vs BW_SIZE_T (non-C)...?
+* clearly specify that state is tied to a particular set of coeffs (1:N)
 
 build system:
-* single header generation
+* single header generation (vs modules in bwp... to think about)
 
 post 1.0.0
 ----------

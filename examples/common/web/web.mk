@@ -58,11 +58,11 @@ build/web/module.wasm: ${SOURCES} | build/web
 build/web/index.html: ${INDEX} | build/web
 	cp ${INDEX} $@
 
-build/web/processor.js: ${ROOT_DIR}/config.js ${ROOT_DIR}/../../common/web/processor.js | build/web
-	cat ${ROOT_DIR}/config.js ${ROOT_DIR}/../../common/web//processor.js > $@
+build/web/processor.js: ${ROOT_DIR}/../src/config.js ${ROOT_DIR}/../../common/web/processor.js | build/web
+	cat ${ROOT_DIR}/../src/config.js ${ROOT_DIR}/../../common/web//processor.js > $@
 
-build/web/config.js: ${ROOT_DIR}/config.js | build/web
-	cp ${ROOT_DIR}/config.js $@
+build/web/config.js: ${ROOT_DIR}/../src/config.js | build/web
+	cp $^ $@
 
 build/web/key.pem: build/web/cert.pem
 

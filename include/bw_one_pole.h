@@ -910,6 +910,7 @@ static inline char bw_one_pole_coeffs_is_valid(const bw_one_pole_coeffs *BW_REST
 	if (coeffs->hash != bw_hash_sdbm("bw_one_pole_coeffs"))
 		return 0;
 #endif
+	(void)coeffs;
 	//...
 
 	return 1;

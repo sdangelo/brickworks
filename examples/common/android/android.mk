@@ -1,6 +1,7 @@
 COMMON_DIR := ${ROOT_DIR}/../../common/android
 BUILD_TOOLS_DIR := ${HOME}/Android/Sdk/build-tools/34.0.0
 ANDROIDX_DIR := ${HOME}/Android/androidx
+MINIAUDIO_DIR := ${ROOT_DIR}/../../../../miniaudio
 
 JAR_FILE := ${HOME}/Android/Sdk/platforms/android-34/android.jar
 ANDROIDX_CORE_FILE := ${ANDROIDX_DIR}/core-1.10.1.jar
@@ -26,6 +27,7 @@ CXXFLAGS := \
 	-I${ROOT_DIR}/../src \
 	-I${COMMON_DIR} \
 	-I${ROOT_DIR}/../../../include \
+	-I${MINIAUDIO_DIR} \
 	-O3 \
 	-Wall \
 	-Wextra \
@@ -39,7 +41,7 @@ LDFLAGS := \
 	-landroid
 
 SOURCES_COMMON := \
-	${COMMON_DIR}/jni.cpp
+	build/gen/jni.cpp
 
 JARS := \
 	${JAR_FILE} \
@@ -49,6 +51,8 @@ JARS := \
 	${KOTLIN_STDLIB_FILE} \
 	${KOTLINX_COROUTINES_CORE_FILE} \
 	${KOTLINX_COROUTINES_CORE_JVM_FILE}
+
+JNI_NAME := $(shell echo ${NAME} | sed 's:_:_1:g')
 
 all: build/${NAME}.apk
 
@@ -61,7 +65,7 @@ build/gen/keystore.jks: | build/gen
 build/gen/${NAME}.aligned.apk: build/gen/${NAME}.unsigned.apk
 	${ZIPALIGN} -f -p 4 $^ $@
 
-build/gen/${NAME}.unsigned.apk: build/apk/classes.dex build/gen/AndroidManifest.xml build/assets/index.html build/assets/config.js | build/gen
+build/gen/${NAME}.unsigned.apk: build/apk/classes.dex build/gen/AndroidManifest.xml build/assets/index.html build/assets/config.js build/apk/lib/armeabi-v7a/lib${NAME}.so| build/gen
 	${AAPT} package -f -M build/gen/AndroidManifest.xml -A build/assets -I ${JAR_FILE} -I ${ANDROIDX_CORE_FILE} -I ${ANDROIDX_LIFECYCLE_COMMON_FILE} -I ${ANDROIDX_VERSIONEDPARCELABLE_FILE} -I ${KOTLIN_STDLIB_FILE} -I ${KOTLINX_COROUTINES_CORE_FILE} -I ${KOTLINX_COROUTINES_CORE_JVM_FILE} -F $@ build/apk
 	
 build/apk/classes.dex: build/apk/my_classes.jar
@@ -72,6 +76,9 @@ build/apk/my_classes.jar: build/obj/com/orastron/${NAME}/MainActivity.class buil
 
 build/apk/lib/armeabi-v7a/lib${NAME}.so: ${SOURCES} | build/apk/lib/armeabi-v7a
 	${CXX} $^ ${CXXFLAGS} ${LDFLAGS} -o $@
+	
+build/gen/jni.cpp: ${COMMON_DIR}/jni.cpp | build/gen
+	cat $^ | sed s:@JNI_NAME@:${JNI_NAME}:g > $@
 
 build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class: build/obj/com/orastron/${NAME}/MainActivity.class
 

@@ -12,6 +12,15 @@ import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends Activity {
+	static {
+		System.loadLibrary("@NAME@");
+	}
+
+	public native boolean nativeAudioStart();
+	public native void nativeAudioStop();
+	public native float nativeGetParameter(int i);
+	public native void nativeSetParameter(int i, float v);
+
 	private WebView webView;
 
 	public class WebAppInterface {
@@ -21,9 +30,28 @@ public class MainActivity extends Activity {
 		}
 
 		@JavascriptInterface
-		public boolean requestAudioPermission() {
+		public void requestAudioPermission() {
 			ActivityCompat.requestPermissions(MainActivity.this, new String[] { android.Manifest.permission.RECORD_AUDIO }, 0);
-			return false;
+		}
+
+		@JavascriptInterface
+		public boolean audioStart() {
+			return nativeAudioStart();
+		}
+
+		@JavascriptInterface
+		public void audioStop() {
+			nativeAudioStop();
+		}
+
+		@JavascriptInterface
+		public float getParameter(int i) {
+			return nativeGetParameter(i);
+		}
+
+		@JavascriptInterface
+		public void setParameter(int i, float v) {
+			nativeSetParameter(i, v);
 		}
 	}
 

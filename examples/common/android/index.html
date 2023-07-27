@@ -2,35 +2,72 @@
   <head>
     <script type="text/javascript" src="config.js"></script>
     <script type="text/javascript">
-var hasAudioPermission = Android.hasAudioPermission();
+var hasAudioPermission = true;
+for (var i = 0; i < buses.length; i++)
+	if (!buses[i].output) {
+		hasAudioPermission = Android.hasAudioPermission();
+		break;
+	}
+var audioStarted = false;
 var topButtonElem;
+var outParamInterval;
 
 window.onload = function () {
 	topButtonElem = document.getElementById("topButton");
+	var paramsElem = document.getElementById("params");
+
 	topButtonElem.value = hasAudioPermission ? "START" : "INIT";
 	topButtonElem.addEventListener("click", function () {
 		if (hasAudioPermission) {
-			for (var i = 0; i < parameters.length; i++) {
-				var div = document.createElement("div");
-				document.body.appendChild(div);
+			if (audioStarted) {
+				clearInterval(outParamInterval);
+				Android.audioStop();
 
-				var label = document.createElement("label");
-				label.innerText = parameters[i].name;
-				div.appendChild(label);
+				paramsElem.innerHTML = "";
 
-				div.appendChild(document.createElement("br"));
+				topButtonElem.value = "START";
+				audioStarted = false;
+			} else {
+				if (Android.audioStart()) {
+					for (var i = 0; i < parameters.length; i++) {
+						var div = document.createElement("div");
+						paramsElem.appendChild(div);
 
-				var range = document.createElement("input");
-				range.classList.add("range");
-				range.setAttribute("type", "range");
-				range.setAttribute("id", "p" + i);
-				range.setAttribute("min", 0);
-				range.setAttribute("max", 1);
-				range.setAttribute("step", parameters[i].step ? 1 / parameters[i].step : "any");
-				range.value = parameters[i].defaultValue;
-				if (parameters[i].output)
-					range.setAttribute("readonly", true);
-				div.appendChild(range);
+						var label = document.createElement("label");
+						label.innerText = parameters[i].name;
+						div.appendChild(label);
+
+						div.appendChild(document.createElement("br"));
+
+						var range = document.createElement("input");
+						range.classList.add("range");
+						range.setAttribute("type", "range");
+						range.setAttribute("id", "p" + i);
+						range.setAttribute("min", 0);
+						range.setAttribute("max", 1);
+						range.setAttribute("step", parameters[i].step ? 1 / parameters[i].step : "any");
+						range.value = parameters[i].defaultValue;
+						if (parameters[i].output)
+							range.setAttribute("readonly", "readonly");
+						else
+							range.addEventListener("input",
+								function (ev) {
+									Android.setParameter(i, e.target.value);
+								});
+						div.appendChild(range);
+					}
+
+					outParamInterval = setInterval(
+						function () {
+							for (var i = 0; i < parameters.length; i++)
+								if (parameters[i].output)
+									document.getElementById("p" + i).value = Android.getParameter(i);
+						}, 50);
+					    
+					topButtonElem.value = "STOP";
+					audioStarted = true;
+	    			} else
+					alert("Could not start audio");
 			}
 		}
 		else
@@ -59,5 +96,6 @@ function gotAudioPermission() {
   </head>
   <body>
     <input id="topButton" type="button">
+    <div id="params"></div>
   </body>
 </html>

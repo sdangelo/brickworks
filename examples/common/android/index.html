@@ -2,13 +2,62 @@
   <head>
     <script type="text/javascript" src="config.js"></script>
     <script type="text/javascript">
+var hasAudioPermission = Android.hasAudioPermission();
+var topButtonElem;
+
 window.onload = function () {
-	var elemDiv = document.createElement('pre');
-	elemDiv.innerText = JSON.stringify(parameters, null, 2);
-	document.body.appendChild(elemDiv);
+	topButtonElem = document.getElementById("topButton");
+	topButtonElem.value = hasAudioPermission ? "START" : "INIT";
+	topButtonElem.addEventListener("click", function () {
+		if (hasAudioPermission) {
+			for (var i = 0; i < parameters.length; i++) {
+				var div = document.createElement("div");
+				document.body.appendChild(div);
+
+				var label = document.createElement("label");
+				label.innerText = parameters[i].name;
+				div.appendChild(label);
+
+				div.appendChild(document.createElement("br"));
+
+				var range = document.createElement("input");
+				range.classList.add("range");
+				range.setAttribute("type", "range");
+				range.setAttribute("id", "p" + i);
+				range.setAttribute("min", 0);
+				range.setAttribute("max", 1);
+				range.setAttribute("step", parameters[i].step ? 1 / parameters[i].step : "any");
+				range.value = parameters[i].defaultValue;
+				if (parameters[i].output)
+					range.setAttribute("readonly", true);
+				div.appendChild(range);
+			}
+		}
+		else
+			Android.requestAudioPermission();
+	});
 };
+
+function gotAudioPermission() {
+	hasAudioPermission = true;
+	topButtonElem.value = "START";
+}
     </script>
+    <style>
+#topButton {
+	width: 100%;
+	background-color: #04aa6d;
+	color: white;
+	padding: 0.5em;
+	text-align: center;
+}
+
+.range {
+	width: 80%;
+}
+    </style>
   </head>
   <body>
+    <input id="topButton" type="button">
   </body>
 </html>

@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 
 		@JavascriptInterface
 		public void setParameter(int i, float v) {
-			nativeSetParameter(i, v);
+			nativeSetParameter(i, v * 0.001f);
 		}
 	}
 

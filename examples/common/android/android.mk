@@ -1,20 +1,23 @@
 COMMON_DIR := ${ROOT_DIR}/../../common/android
-BUILD_TOOLS_DIR := ${HOME}/Android/Sdk/build-tools/34.0.0
+ANDROID_SDK_DIR := ${HOME}/Android/Sdk
+ANDROID_NDK_DIR := ${ANDROID_SDK_DIR}/ndk/25.1.8937393
 ANDROIDX_DIR := ${HOME}/Android/androidx
+KOTLIN_DIR := ${HOME}/Android/kotlin
 MINIAUDIO_DIR := ${ROOT_DIR}/../../../../miniaudio
 
-JAR_FILE := ${HOME}/Android/Sdk/platforms/android-34/android.jar
+BUILD_TOOLS_DIR := ${ANDROID_SDK_DIR}/build-tools/34.0.0
+
+JAR_FILE := ${ANDROID_SDK_DIR}/platforms/android-34/android.jar
 ANDROIDX_CORE_FILE := ${ANDROIDX_DIR}/core-1.10.1.jar
 ANDROIDX_LIFECYCLE_COMMON_FILE := ${ANDROIDX_DIR}/lifecycle-common-2.6.1.jar
 ANDROIDX_VERSIONEDPARCELABLE_FILE := ${ANDROIDX_DIR}/versionedparcelable-1.1.1.jar
-KOTLIN_STDLIB_FILE := ${HOME}/Android/kotlin/kotlin-stdlib-1.9.0.jar
-KOTLINX_COROUTINES_CORE_FILE := ${HOME}/Android/kotlin/kotlinx-coroutines-core-1.7.3.jar
-KOTLINX_COROUTINES_CORE_JVM_FILE := ${HOME}/Android/kotlin/kotlinx-coroutines-core-jvm-1.7.3.jar
+KOTLIN_STDLIB_FILE := ${KOTLIN_DIR}/kotlin-stdlib-1.9.0.jar
+KOTLINX_COROUTINES_CORE_FILE := ${KOTLIN_DIR}/kotlinx-coroutines-core-1.7.3.jar
+KOTLINX_COROUTINES_CORE_JVM_FILE := ${KOTLIN_DIR}/kotlinx-coroutines-core-jvm-1.7.3.jar
 
 JAVAC := javac
-KOTLINC := kotlinc
 KEYTOOL := keytool
-CXX := ${HOME}/Android/Sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi23-clang++
+CXX := ${ANDROID_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi23-clang++
 ADB := ${HOME}/Android/Sdk/platform-tools/adb
 APKSIGNER := ${BUILD_TOOLS_DIR}/apksigner
 ZIPALIGN := ${BUILD_TOOLS_DIR}/zipalign

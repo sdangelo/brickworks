@@ -82,7 +82,8 @@ wrapper wrapper_new(float sample_rate) {
 
 #if NUM_PARAMETERS != 0
 	for (int i = 0; i < NUM_PARAMETERS; i++)
-		wrapper_set_parameter(ret, i, config_parameters[i].defaultValueUnmapped);
+		if (!config_parameters[i].out)
+			wrapper_set_parameter(ret, i, config_parameters[i].defaultValueUnmapped);
 #endif
 
 	P_SET_SAMPLE_RATE(&ret->instance, sample_rate);

@@ -51,12 +51,12 @@ struct config_parameter {
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
 #define PLUGIN_NAME		"bw_example_fx_reverb"
-#define PLUGIN_VERSION		"0.5.0"
+#define PLUGIN_VERSION		"0.6.0"
 
 #define NUM_BUSES_IN		1
 #define NUM_BUSES_OUT		1
-#define NUM_CHANNELS_IN		1
-#define NUM_CHANNELS_OUT	1
+#define NUM_CHANNELS_IN		2
+#define NUM_CHANNELS_OUT	2
 
 static struct config_io_bus config_buses_in[NUM_BUSES_IN] = {
 	{ "Audio in", 0, 0, 0, IO_STEREO }

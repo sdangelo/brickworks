@@ -49,11 +49,13 @@ window.onload = function () {
 						range.value = parameters[i].defaultValue;
 						if (parameters[i].output)
 							range.setAttribute("readonly", "readonly");
-						else
+						else {
+							let index = i;
 							range.addEventListener("input",
 								function (ev) {
-									Android.setParameter(i, e.target.value);
+									Android.setParameter(index, ev.target.value * 1000);
 								});
+						}
 						div.appendChild(range);
 					}
 

@@ -199,7 +199,8 @@ tresult PLUGIN_API Plugin::initialize(FUnknown *context) {
 #if NUM_PARAMETERS != 0
 	for (int i = 0; i < NUM_PARAMETERS; i++) {
 		parameters[i] = config_parameters[i].defaultValueUnmapped;
-		P_SET_PARAMETER(&instance, i, parameters[i]);
+		if (!config_parameters[i].out)
+			P_SET_PARAMETER(&instance, i, parameters[i]);
 	}
 #endif
 

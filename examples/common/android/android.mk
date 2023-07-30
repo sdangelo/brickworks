@@ -1,6 +1,6 @@
 COMMON_DIR := ${ROOT_DIR}/../../common/android
 ANDROID_SDK_DIR := ${HOME}/Android/Sdk
-ANDROID_NDK_DIR := ${ANDROID_SDK_DIR}/ndk/25.1.8937393
+ANDROID_NDK_DIR := ${ANDROID_SDK_DIR}/ndk/25.2.9519653
 ANDROIDX_DIR := ${HOME}/Android/androidx
 KOTLIN_DIR := ${HOME}/Android/kotlin
 MINIAUDIO_DIR := ${ROOT_DIR}/../../../../miniaudio

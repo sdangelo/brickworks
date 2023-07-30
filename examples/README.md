@@ -66,8 +66,8 @@ Effect examples report output parameter values and CPU usage statistics via USB 
 
 Android examples are built without the help of Android Studio or Gradle. You'll however need to have a recent enough JDK (we need `javac` and `keytool`), as well as to download the latest stable:
 
-- Android SDK (https://developer.android.com/studio/index.html#command-line-tools-only);
-- Android NDK (https://developer.android.com/ndk/downloads);
+- Android SDK (https://developer.android.com/studio/index.html) \*;
+- Android NDK (https://developer.android.com/ndk/downloads) \*;
 - `.jar`s and `.aar`s (and you'll also need to manually extract the inner `.jar` from each `.aar`, which are just ZIP files) for:
   - AndroidX Core (https://mvnrepository.com/artifact/androidx.core/core);
   - AndroidX Lifecycle Common (https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-common)
@@ -78,6 +78,8 @@ Android examples are built without the help of Android Studio or Gradle. You'll 
 - `miniaudio.h` library (http://miniaud.io/).
 
 Then you'll probably also need to adjust paths in `common/android/android.mk`.
+
+\* You can install both the needed parts of the Android SDK and the NDK by downloading the so-called "command line tools" (https://developer.android.com/studio#command-line-tools-only) and using the included `sdkmanager` program. In such case you need to install the following packages: "platforms;android-*latest*",  "build-tools;*latest*", "platform-tools", and "ndk;*latest*".
 
 ### Build
 

@@ -186,11 +186,11 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
 		return 0;
 
 	for (int i = 0; i < (int)queue->n_events; i++) {
-		bw_note_queue_event *ev = queue->events + i;
+		const bw_note_queue_event *ev = queue->events + i;
 		if (ev->note >= 128 || !bw_is_finite(ev->status.velocity) || ev->status.velocity > 1.f)
 			return 0;
 		for (int j = 0; j < i; j++) {
-			bw_note_queue_event *ev2 = queue->events + j;
+			const bw_note_queue_event *ev2 = queue->events + j;
 			if (ev2->note == ev->note)
 				return 0;
 		}
@@ -198,7 +198,7 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
 
 	int cnt = 0;
 	for (int i = 0; i < 128; i++) {
-		bw_note_queue_status *st = queue->status + i;
+		const bw_note_queue_status *st = queue->status + i;
 		if (st->pressed)
 			cnt++;
 		if (!bw_is_finite(st->velocity) || st->velocity > 1.f)

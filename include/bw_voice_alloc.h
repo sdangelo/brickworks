@@ -29,6 +29,8 @@
  *    <ul>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
+ *          <li>Now using <code>BW_SIZE_T</code> to count voices in
+ *              <code>bw_voice_alloc()</code>.
  *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
  *        </ul>
@@ -116,7 +118,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 	for (unsigned char i = 0; i < queue->n_events; i++) {
 		bw_note_queue_event *ev = queue->events + i;
-		for (int j = 0; j < n_voices; j++)
+		for (BW_SIZE_T j = 0; j < n_voices; j++)
 			if (!opts->is_free(voices[j]) && opts->get_note(voices[j]) == ev->note) {
 				if (!ev->status.pressed || ev->went_off)
 					opts->note_off(voices[j], ev->status.velocity);
@@ -126,7 +128,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 			}
 
 		if (ev->status.pressed) {
-			for (int j = 0; j < n_voices; j++)
+			for (BW_SIZE_T j = 0; j < n_voices; j++)
 				if (opts->is_free(voices[j])) { 
 					opts->note_on(voices[j], ev->note, ev->status.velocity);
 					goto next_event;
@@ -134,7 +136,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 			int k = -1;
 			int v = ev->note;
-			for (int j = 0; j < n_voices; j++) {
+			for (BW_SIZE_T j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
 				if (!queue->status[n].pressed && (k < 0 || (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v))) {
 					v = n;
@@ -146,7 +148,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 				continue;
 			}
 
-			for (int j = 0; j < n_voices; j++) {
+			for (BW_SIZE_T j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
 				if (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v) {
 					v = n;

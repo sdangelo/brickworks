@@ -17,7 +17,11 @@ KOTLINX_COROUTINES_CORE_JVM_FILE := ${KOTLIN_DIR}/kotlinx-coroutines-core-jvm-1.
 
 JAVAC := javac
 KEYTOOL := keytool
-CXX := ${ANDROID_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi23-clang++
+ifdef SYNTH
+CXX := ${ANDROID_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi29-clang++
+else
+CXX := ${ANDROID_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi26-clang++
+endif
 ADB := ${HOME}/Android/Sdk/platform-tools/adb
 APKSIGNER := ${BUILD_TOOLS_DIR}/apksigner
 ZIPALIGN := ${BUILD_TOOLS_DIR}/zipalign
@@ -43,6 +47,10 @@ LDFLAGS := \
 	-llog \
 	-landroid
 
+ifdef SYNTH
+LDFLAGS += -lamidi
+endif
+
 SOURCES_COMMON := \
 	build/gen/jni.cpp
 
@@ -56,6 +64,14 @@ JARS := \
 	${KOTLINX_COROUTINES_CORE_JVM_FILE}
 
 JNI_NAME := $(shell echo ${NAME} | sed 's:_:_1:g')
+
+ifdef SYNTH
+ANDROID_MANIFEST_SOURCE := ${COMMON_DIR}/AndroidManifest-synth.xml
+MAIN_ACTIVITY_SOURCE := ${COMMON_DIR}/MainActivity-synth.java
+else
+ANDROID_MANIFEST_SOURCE := ${COMMON_DIR}/AndroidManifest-fx.xml
+MAIN_ACTIVITY_SOURCE := ${COMMON_DIR}/MainActivity-fx.java
+endif
 
 all: build/${NAME}.apk
 
@@ -71,11 +87,19 @@ build/gen/${NAME}.aligned.apk: build/gen/${NAME}.unsigned.apk
 build/gen/${NAME}.unsigned.apk: build/apk/classes.dex build/gen/AndroidManifest.xml build/assets/index.html build/assets/config.js build/apk/lib/armeabi-v7a/lib${NAME}.so| build/gen
 	${AAPT} package -f -M build/gen/AndroidManifest.xml -A build/assets -I ${JAR_FILE} -I ${ANDROIDX_CORE_FILE} -I ${ANDROIDX_LIFECYCLE_COMMON_FILE} -I ${ANDROIDX_VERSIONEDPARCELABLE_FILE} -I ${KOTLIN_STDLIB_FILE} -I ${KOTLINX_COROUTINES_CORE_FILE} -I ${KOTLINX_COROUTINES_CORE_JVM_FILE} -F $@ build/apk
 	
+ifdef SYNTH
 build/apk/classes.dex: build/apk/my_classes.jar
-	cd build/apk && ${BUILD_TOOLS_DIR}/d8 --min-api 21 ../../$^ ${JARS} && cd ../..
+	cd build/apk && ${D8} --min-api 29 ../../$^ ${JARS} && cd ../..
+
+build/apk/my_classes.jar: build/obj/com/orastron/${NAME}/MainActivity.class build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface$$MidiDeviceCallback.class build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface$$1.class | build/apk
+	${D8} build/obj/com/orastron/${NAME}/MainActivity.class 'build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class' 'build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface$$MidiDeviceCallback.class' 'build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface$$1.class' --min-api 29 --output $@ --no-desugaring
+else
+build/apk/classes.dex: build/apk/my_classes.jar
+	cd build/apk && ${D8} --min-api 26 ../../$^ ${JARS} && cd ../..
 
 build/apk/my_classes.jar: build/obj/com/orastron/${NAME}/MainActivity.class build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class | build/apk
-	${D8} build/obj/com/orastron/${NAME}/MainActivity.class 'build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class' --output $@ --no-desugaring
+	${D8} build/obj/com/orastron/${NAME}/MainActivity.class 'build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class' --min-api 26 --output $@ --no-desugaring
+endif
 
 build/apk/lib/armeabi-v7a/lib${NAME}.so: ${SOURCES} | build/apk/lib/armeabi-v7a
 	${CXX} $^ ${CXXFLAGS} ${LDFLAGS} -o $@
@@ -88,10 +112,10 @@ build/obj/com/orastron/${NAME}/MainActivity$$WebAppInterface.class: build/obj/co
 build/obj/com/orastron/${NAME}/MainActivity.class: build/gen/com/orastron/${NAME}/MainActivity.java | build/obj
 	${JAVAC} -classpath "${JAR_FILE}:${ANDROIDX_CORE_FILE}:${ANDROIDX_LIFECYCLE_COMMON_FILE}:${ANDROIDX_VERSIONEDPARCELABLE_FILE}:${KOTLIN_STDLIB_FILE}:${KOTLINX_COROUTINES_CORE_FILE}:${KOTLINX_COROUTINES_CORE_JVM_FILE}" -d build/obj build/gen/com/orastron/${NAME}/MainActivity.java
 
-build/gen/com/orastron/${NAME}/MainActivity.java: ${COMMON_DIR}/MainActivity.java | build/gen/com/orastron/${NAME}
+build/gen/com/orastron/${NAME}/MainActivity.java: ${MAIN_ACTIVITY_SOURCE} | build/gen/com/orastron/${NAME}
 	cat $^ | sed s:@NAME@:${NAME}:g > $@
 
-build/gen/AndroidManifest.xml: ${COMMON_DIR}/AndroidManifest.xml | build/gen/com/orastron/${NAME}
+build/gen/AndroidManifest.xml: ${ANDROID_MANIFEST_SOURCE} | build/gen/com/orastron/${NAME}
 	cat $^ | sed s:@NAME@:${NAME}:g > $@
 
 build/assets/index.html: ${COMMON_DIR}/index.html | build/assets

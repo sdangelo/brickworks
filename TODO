@@ -86,6 +86,8 @@ code:
 * fix vst3 mapped values (visible in Ableton Live) and short names
 * polish examples (ranges, etc.)
 * dump data structures (see note queue) and indicate error precisely
+* process (multi) no update
+* examples cpu usage
 
 build system:
 * make makefiles handle paths with spaces etc

@@ -60,6 +60,44 @@ To upload the firmware:
 
 Effect examples report output parameter values and CPU usage statistics via USB serial. You can read the output by, e.g., `screen /dev/ttyACM0`.
 
+## Android
+
+### Prerequisites
+
+Android examples are built without the help of Android Studio or Gradle. You'll however need to have a recent enough JDK (we need `javac` and `keytool`), as well as to download the latest stable:
+
+- Android SDK (https://developer.android.com/studio/index.html#command-line-tools-only);
+- Android NDK (https://developer.android.com/ndk/downloads);
+- `.jar`s and `.aar`s (and you'll also need to manually extract the inner `.jar` from each `.aar`, which are just ZIP files) for:
+  - AndroidX Core (https://mvnrepository.com/artifact/androidx.core/core);
+  - AndroidX Lifecycle Common (https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-common)
+  - AndroidX VersionedParcelable (https://mvnrepository.com/artifact/androidx.versionedparcelable/versionedparcelable)
+  - Kotlin Stdlib (https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib);
+  - Koltin Coroutines Core (https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core);
+  - Koltin Coroutines Core JVM (https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm);
+- `miniaudio.h` library (http://miniaud.io/).
+
+Then you'll probably also need to adjust paths in `common/android/android.mk`.
+
+### Build
+
+In order to build just type `make`. You'll find the resulting `.apk` file in `build`.
+
+### Installation
+
+If all went fine, you can branch your device and install using `make install`.
+
+Otherwise, you can also install manually, but please remember to first uninstall the application from the device (`adb install -r` is not sufficient as the signature might have changed while building).
+
+### Usage and known issues
+
+Effect examples process audio input signals, therefore they will require permission to use the capture device.
+
+Synth examples use input MIDI. While they are coded to support hotplugging, this doesn't seem to work as expected on the devices we tested. You'll need to press "STOP" and then "START" again after plugging a new device.
+
 ## Thanks
 
-Thanks to [Mads Kjeldgaard](https://madskjeldgaard.dk/) for publishing [instructions to build for the Daisy Seed and uploading the firmware](https://madskjeldgaard.dk/posts/daisy-setup/).
+Thanks to:
+
+- [Mads Kjeldgaard](https://madskjeldgaard.dk/) for publishing [instructions to build for the Daisy Seed and uploading the firmware](https://madskjeldgaard.dk/posts/daisy-setup/);
+- [Hereket](https://hereket.github.io/) for providing instructions on [how to build an Android app without Android Studio or Gradle](https://hereket.github.io/posts/android_from_command_line/).

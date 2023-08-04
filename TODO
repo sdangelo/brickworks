@@ -1,9 +1,3 @@
-0.6.0
------
-
-code:
-* android, ios
-
 1.0.0
 -----
 
@@ -100,7 +94,7 @@ build system:
 * VC, XCode, etc project files?
 * single header(s)
 * cross compile (rpi etc.)
-* consider tuist (https://tuist.io/), bazel (https://bazel.build/), pants (https://www.pantsbuild.org/), buck (https://buck2.build/), please (https://please.build/index.html) for mobile apps
+* better use of xcodegen (see xcode warnings) and/or consider tuist (https://tuist.io/), bazel (https://bazel.build/), pants (https://www.pantsbuild.org/), buck (https://buck2.build/), please (https://please.build/index.html) for mobile apps
 * homogenize android and ios common code (e.g., same index)
 
 --

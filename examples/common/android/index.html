@@ -22,6 +22,7 @@
 -->
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <script type="text/javascript" src="config.js"></script>
     <script type="text/javascript">
 var hasAudioPermission = true;
@@ -75,7 +76,7 @@ window.onload = function () {
 							let index = i;
 							range.addEventListener("input",
 								function (ev) {
-									Android.setParameter(index, ev.target.value * 1000);
+									Android.setParameter(index, parseFloat(ev.target.value));
 								});
 						}
 						div.appendChild(range);
@@ -108,6 +109,7 @@ function gotAudioPermission() {
 * {
 	margin: 0;
 	padding: 0;
+	user-select: none;
 }
 
 body {

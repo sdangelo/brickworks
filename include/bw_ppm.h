@@ -33,6 +33,8 @@
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Removed dependency on bw_config.</li>
+ *          <li>Fixed bug by forcing <code>-INFINITY</code> output when signal
+ *              level is below -600 dB.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.5.0</strong>:
@@ -200,7 +202,7 @@ static inline void bw_ppm_update_coeffs_audio(bw_ppm_coeffs *BW_RESTRICT coeffs)
 
 static inline float bw_ppm_process1(const bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state *BW_RESTRICT state, float x) {
 	const float yl = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x);
-	const float y = yl > 0.f ? bw_lin2dBf_3(yl) : -INFINITY;
+	const float y = yl >= 1e-30f ? bw_lin2dBf_3(yl) : -INFINITY; // -600 dB is quiet enough
 	state->y_z1 = y;
 	return y;
 }

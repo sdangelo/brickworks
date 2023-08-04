@@ -38,6 +38,7 @@
  *        <ul>
  *          <li>Added debugging code.</li>
  *          <li>Removed dependency on bw_config.</li>
+ *          <li>Fixed harmless warning in <code>bw_randu32()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.2.0</strong>:
@@ -95,7 +96,7 @@ static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
 	// Permuted Congruential Generator,
 	// taken from https://nullprogram.com/blog/2017/09/21/
 	*state = *state * 0x9b60933458e17d7d + 0xd737232eeccdf7ed;
-	return *state >> (29 - (*state >> 61));
+	return (uint32_t)(*state >> (29 - (*state >> 61)));
 }
 
 static inline float bw_randf(uint64_t *BW_RESTRICT state) {

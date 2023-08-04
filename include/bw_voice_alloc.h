@@ -134,16 +134,18 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 					goto next_event;
 				}
 
-			int k = -1;
+			char found = 0;
+			BW_SIZE_T k;
 			int v = ev->note;
 			for (BW_SIZE_T j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
 				if (!queue->status[n].pressed && (k < 0 || (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v))) {
 					v = n;
 					k = j;
+					found = 1;
 				}
 			}
-			if (k >= 0) {
+			if (found) {
 				opts->note_on(voices[k], ev->note, ev->status.velocity);
 				continue;
 			}
@@ -153,9 +155,10 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 				if (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v) {
 					v = n;
 					k = j;
+					found = 1;
 				}
 			}
-			if (k >= 0)
+			if (found)
 				opts->note_on(voices[k], ev->note, ev->status.velocity);
 		}
 

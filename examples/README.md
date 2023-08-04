@@ -97,6 +97,28 @@ Effect examples process audio input signals, therefore they will require permiss
 
 Synth examples use input MIDI. While they are coded to support hotplugging, this doesn't seem to work as expected on the devices we tested. You'll need to press "STOP" and then "START" again after plugging a new device.
 
+## iOS
+
+### Prerequisites
+
+iOS examples are not directly built by the supplied Makefiles. These rather generate the corresponding XCode projects and required files.
+
+For this to work you need to have the latest [Xcode](https://developer.apple.com/xcode/) and [XcodeGen](https://github.com/yonaskolb/XcodeGen) installed.
+
+### Build
+
+Typing `make` will generate the required Xcode project in `build/gen`.
+
+You'll need to open it and select a development team (click on the project root in the left side pane, then choose the "Signing & Capabilities" tab, and finally pick a "Team").
+
+At this point you can build and run as with any other iOS app.
+
+### Usage
+
+Effect examples process audio input signals, therefore they will require permission to use the capture device.
+
+Synth examples use input MIDI and support hotplugging.
+
 ## Thanks
 
 Thanks to:

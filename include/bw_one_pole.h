@@ -299,13 +299,23 @@ static inline float bw_one_pole_get_y_z1(const bw_one_pole_state *BW_RESTRICT st
  *  ```>>> */
 static inline char bw_one_pole_coeffs_is_valid(const bw_one_pole_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
- *    WRITEME
+ *    Tries to determine whether `coeffs` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `coeffs` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_one_pole_coeffs`.
  *
  *    #### bw_one_pole_state_is_valid()
  *  ```>>> */
 static inline char bw_one_pole_state_is_valid(const bw_one_pole_state *BW_RESTRICT state);
 /*! <<<```
- *    WRITEME
+ *    Tries to determine whether `state` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `state` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_one_pole_state`.
  *  }}} */
 
 /*** Implementation ***/

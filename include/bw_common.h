@@ -112,10 +112,25 @@
 #endif
 /*! ...
  *
- *    #### BW_ASSERT
- *    WRITEME
+ *    #### BW_ASSERT and BW_ASSERT_DEEP
+ *    If `NDEBUG` is defined then "calls" to both `BW_ASSERT` and
+ *    `BW_ASSERT_DEEP` will be stripped away by the preprocessor.
+ *
+ *    Whether `NDEBUG` is defined or not, "calls" to `BW_ASSERT_DEEP` will still
+ *    be stripped anyway if `BW_DEBUG_DEEP` is not defined.
+ *
+ *    In all other cases, `BW_ASSERT` and `BW_ASSERT_DEEP` can either be
+ *    provided by you, otherwise `BW_ASSERT` is defined as `assert` (and
+ *    `assert.h` is `#include`d) and `BW_ASSERT_DEEP` is defined as `BW_ASSERT`.
+ *
+ *    `BW_ASSERT` is meant to perform rapid/basic validity checks (e.g., input
+ *    pointer is not `NULL`, input `float` number is finite), while
+ *    `BW_ASSERT_DEEP` should be used for deeper checks (e.g., validate data
+ *    structures and internal states).
  *  >>> */
 #ifdef NDEBUG
+# undef BW_ASSERT
+# undef BW_ASSERT_DEEP
 # define BW_ASSERT(ignore)	((void)0)
 # define BW_ASSERT_DEEP(ignore)	((void)0)
 #else
@@ -140,44 +155,48 @@
  *  ```>>> */
 static inline char bw_is_inf(float x);
 /*! <<<```
- *    WRITEME
+ *    Returns non-`0` if `x` is positive or negative infinity, `0` otherwise.
  *
  *    #### bw_is_nan()
  *  ```>>> */
 static inline char bw_is_nan(float x);
 /*! <<<```
- *    WRITEME
+ *    Returns non-`0` if `x` is NaN, `0` otherwise.
  *
  *    #### bw_is_finite()
  *  ```>>> */
 static inline char bw_is_finite(float x);
 /*! <<<```
- *    WRITEME
+ *    Returns non-`0` if `x` is finite (neither NaN nor positive or negative
+ *    infinity), `0` otherwise.
  *
  *    #### bw_has_inf()
  *  ```>>> */
 static inline char bw_has_inf(const float *x, BW_SIZE_T n_elems);
 /*! <<<```
- *    WRITEME
+ *    Scans the fist `n_elems` in buffer `x` and returns non-`0` if it contains
+ *    at least one positive or negative inifinity value, `0` otherwise.
  *
  *    #### bw_has_nan()
  *  ```>>> */
 static inline char bw_has_nan(const float *x, BW_SIZE_T n_elems);
 /*! <<<```
- *    WRITEME
+ *    Scans the fist `n_elems` in buffer `x` and returns non-`0` if it contains
+ *    at least one NaN value, `0` otherwise.
  *
  *    #### bw_has_only_finite()
  *  ```>>> */
 static inline char bw_has_only_finite(const float *x, BW_SIZE_T n_elems);
 /*! <<<```
- *    WRITEME
+ *    Scans the fist `n_elems` in buffer `x` and returns non-`0` if it only
+ *    finds finite values (neither NaN nor positive or negative infinity), `0`
+ *    otherwise.
  *
  *    #### bw_hash_sdbm()
  *  ```>>> */
 static inline uint32_t bw_hash_sdbm(const char *string);
 /*! <<<```
- *    WRITEME
- *
+ *    Returns the sdbm hash of the given `string`.
  *  }}} */
 
 /*** Implementation ***/

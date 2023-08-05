@@ -127,7 +127,12 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  *  ```>>> */
 static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue);
 /*! <<<```
- *    WRITEME
+ *    Tries to determine whether `queue` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `queue` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_note_queue`.
  *  }}} */
 
 /*** Implementation ***/

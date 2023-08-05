@@ -123,7 +123,7 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  *    If `force_went_off` is set to non-`0`, `went_off` is always set to
  *    non-`0`.
  *
- *    #### bw_note_queue_add()
+ *    #### bw_note_queue_is_valid()
  *  ```>>> */
 static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue);
 /*! <<<```

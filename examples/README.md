@@ -103,7 +103,9 @@ Synth examples use input MIDI. While they are coded to support hotplugging, this
 
 iOS examples are not directly built by the supplied Makefiles. These rather generate the corresponding XCode projects and required files.
 
-For this to work you need to have the latest [Xcode](https://developer.apple.com/xcode/) and [XcodeGen](https://github.com/yonaskolb/XcodeGen) installed.
+For this to work you need to have the latest [Xcode](https://developer.apple.com/xcode/) and [XcodeGen](https://github.com/yonaskolb/XcodeGen) installed, as well as a copy of the latest [`miniaudio.h`](http://miniaud.io/).
+
+Finally, you might need to adjust header search path for miniaudio in `build/common/ios/project.yml`.
 
 ### Build
 

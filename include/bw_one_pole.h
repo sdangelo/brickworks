@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    One-pole (6 dB/oct) lowpass filter with unitary DC gain, separate attack
@@ -30,6 +30,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Now using <code>size_t</code> instead of
+ *              <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li><code>bw_one_pole_process()</code> and
@@ -172,7 +178,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeff
  *
  *    #### bw_one_pole_process()
  *  ```>>> */
-static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, BW_SIZE_T n_samples);
+static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -182,7 +188,7 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_one_pole_process_multi()
  *  ```>>> */
-static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, BW_SIZE_T n_channels, BW_SIZE_T n_samples);
+static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -606,7 +612,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(const bw_one_pole_coeff
 	return y;
 }
 
-static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, BW_SIZE_T n_samples) {
+static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
@@ -621,28 +627,28 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
 				else
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (BW_SIZE_T i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					y[i] = bw_one_pole_process1_asym(coeffs, state, x[i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
 				else
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						y[i] = bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (BW_SIZE_T i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					y[i] = bw_one_pole_process1(coeffs, state, x[i]);
 			}
 		}
@@ -650,28 +656,28 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_one_pole_process1_asym_sticky_abs(coeffs, state, x[i]);
 				else
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_one_pole_process1_asym_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (BW_SIZE_T i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					bw_one_pole_process1_asym(coeffs, state, x[i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_one_pole_process1_sticky_abs(coeffs, state, x[i]);
 				else
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_one_pole_process1_sticky_rel(coeffs, state, x[i]);
 			}
 			else {
-				for (BW_SIZE_T i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					bw_one_pole_process1(coeffs, state, x[i]);
 			}
 		}
@@ -684,7 +690,7 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
 	BW_ASSERT_DEEP(!bw_has_nan(y, n_samples));
 }
 
-static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, BW_SIZE_T n_channels, BW_SIZE_T n_samples) {
+static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float **x, float **y, size_t n_channels, size_t n_samples) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= _bw_one_pole_coeffs_state_reset_coeffs);
@@ -695,59 +701,59 @@ static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coe
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_asym_sticky_abs(coeffs, state[j], x[j][i]);
 						else
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								bw_one_pole_process1_asym_sticky_abs(coeffs, state[j], x[j][i]);
 						
 				else
-					for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_asym_sticky_rel(coeffs, state[j], x[j][i]);
 						else
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								bw_one_pole_process1_asym_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (BW_SIZE_T j = 0; j < n_channels; j++)
+				for (size_t j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
-						for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = bw_one_pole_process1_asym(coeffs, state[j], x[j][i]);
 					else
-						for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							bw_one_pole_process1_asym(coeffs, state[j], x[j][i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_sticky_abs(coeffs, state[j], x[j][i]);
 						else
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								bw_one_pole_process1_sticky_abs(coeffs, state[j], x[j][i]);
 				else
-					for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t j = 0; j < n_channels; j++)
 						if (y[j] != NULL)
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								y[j][i] = bw_one_pole_process1_sticky_rel(coeffs, state[j], x[j][i]);
 						else
-							for (BW_SIZE_T i = 0; i < n_samples; i++)
+							for (size_t i = 0; i < n_samples; i++)
 								bw_one_pole_process1_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (BW_SIZE_T j = 0; j < n_channels; j++)
+				for (size_t j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
-						for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = bw_one_pole_process1(coeffs, state[j], x[j][i]);
 					else
-						for (BW_SIZE_T i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							bw_one_pole_process1(coeffs, state[j], x[j][i]);
 			}
 		}
@@ -755,34 +761,34 @@ static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coe
 		if (coeffs->mA1u != coeffs->mA1d) {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
-						for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
+						for (size_t j = 0; j < n_channels; j++)
 							bw_one_pole_process1_asym_sticky_abs(coeffs, state[j], x[j][i]);
 				else
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
-						for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
+						for (size_t j = 0; j < n_channels; j++)
 							bw_one_pole_process1_asym_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (BW_SIZE_T i = 0; i < n_samples; i++)
-					for (BW_SIZE_T j = 0; j < n_channels; j++)
+				for (size_t i = 0; i < n_samples; i++)
+					for (size_t j = 0; j < n_channels; j++)
 						bw_one_pole_process1_asym(coeffs, state[j], x[j][i]);
 			}
 		}
 		else {
 			if (coeffs->st2 != 0.f) {
 				if (coeffs->sticky_mode == bw_one_pole_sticky_mode_abs)
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
-						for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
+						for (size_t j = 0; j < n_channels; j++)
 							bw_one_pole_process1_sticky_abs(coeffs, state[j], x[j][i]);
 				else
-					for (BW_SIZE_T i = 0; i < n_samples; i++)
-						for (BW_SIZE_T j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
+						for (size_t j = 0; j < n_channels; j++)
 							bw_one_pole_process1_sticky_rel(coeffs, state[j], x[j][i]);
 			}
 			else {
-				for (BW_SIZE_T i = 0; i < n_samples; i++)
-					for (BW_SIZE_T j = 0; j < n_channels; j++)
+				for (size_t i = 0; i < n_samples; i++)
+					for (size_t j = 0; j < n_channels; j++)
 						bw_one_pole_process1(coeffs, state[j], x[j][i]);
 			}
 		}

@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{
  *    bw_buf bw_common bw_delay bw_drywet bw_gain bw_lp1 bw_math bw_one_pole
  *    bw_osc_sin bw_phase_gen
@@ -35,6 +35,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Now using <code>size_t</code> instead of
+ *              <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Removed dependency on bw_config.</li>
@@ -85,7 +91,7 @@ static inline void bw_reverb_set_sample_rate(bw_reverb_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_reverb_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_reverb_mem_req(const bw_reverb_coeffs *BW_RESTRICT coeffs);
+static inline size_t bw_reverb_mem_req(const bw_reverb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_reverb_mem_set()` using `coeffs`.
@@ -233,30 +239,30 @@ struct _bw_reverb_coeffs {
 	// Coefficients
 	float			fs;
 	float			T;
-	BW_SIZE_T		id1;
-	BW_SIZE_T		id2;
-	BW_SIZE_T		id3;
-	BW_SIZE_T		id4;
-	BW_SIZE_T		dd2;
-	BW_SIZE_T		dd4;
-	BW_SIZE_T		d1;
-	BW_SIZE_T		d2;
-	BW_SIZE_T		d3;
-	BW_SIZE_T		d4;
-	BW_SIZE_T		dl1;
-	BW_SIZE_T		dl2;
-	BW_SIZE_T		dl3;
-	BW_SIZE_T		dl4;
-	BW_SIZE_T		dl5;
-	BW_SIZE_T		dl6;
-	BW_SIZE_T		dl7;
-	BW_SIZE_T		dr1;
-	BW_SIZE_T		dr2;
-	BW_SIZE_T		dr3;
-	BW_SIZE_T		dr4;
-	BW_SIZE_T		dr5;
-	BW_SIZE_T		dr6;
-	BW_SIZE_T		dr7;
+	size_t			id1;
+	size_t			id2;
+	size_t			id3;
+	size_t			id4;
+	size_t			dd2;
+	size_t			dd4;
+	size_t			d1;
+	size_t			d2;
+	size_t			d3;
+	size_t			d4;
+	size_t			dl1;
+	size_t			dl2;
+	size_t			dl3;
+	size_t			dl4;
+	size_t			dl5;
+	size_t			dl6;
+	size_t			dl7;
+	size_t			dr1;
+	size_t			dr2;
+	size_t			dr3;
+	size_t			dr4;
+	size_t			dr5;
+	size_t			dr6;
+	size_t			dr7;
 
 	float			s;
 	float			diff2;
@@ -338,33 +344,33 @@ static inline void bw_reverb_set_sample_rate(bw_reverb_coeffs *BW_RESTRICT coeff
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	coeffs->fs = sample_rate;
 	coeffs->T = 1.f / sample_rate;
-	coeffs->id1 = (BW_SIZE_T)bw_roundf(coeffs->fs * (142.f / 29761.f));
-	coeffs->id2 = (BW_SIZE_T)bw_roundf(coeffs->fs * (107.f / 29761.f));
-	coeffs->id3 = (BW_SIZE_T)bw_roundf(coeffs->fs * (379.f / 29761.f));
-	coeffs->id4 = (BW_SIZE_T)bw_roundf(coeffs->fs * (277.f / 29761.f));
-	coeffs->dd2 = (BW_SIZE_T)bw_roundf(coeffs->fs * (1800.f / 29761.f));
-	coeffs->dd4 = (BW_SIZE_T)bw_roundf(coeffs->fs * (2656.f / 29761.f));
-	coeffs->d1 = (BW_SIZE_T)bw_roundf(coeffs->fs * (4453.f / 29761.f));
-	coeffs->d2 = (BW_SIZE_T)bw_roundf(coeffs->fs * (3720.f / 29761.f));
-	coeffs->d3 = (BW_SIZE_T)bw_roundf(coeffs->fs * (4217.f / 29761.f));
-	coeffs->d4 = (BW_SIZE_T)bw_roundf(coeffs->fs * (3163.f / 29761.f));
-	coeffs->dl1 = (BW_SIZE_T)bw_roundf(coeffs->fs * (266.f / 29761.f));
-	coeffs->dl2 = (BW_SIZE_T)bw_roundf(coeffs->fs * (2974.f / 29761.f));
-	coeffs->dl3 = (BW_SIZE_T)bw_roundf(coeffs->fs * (1913.f / 29761.f));
-	coeffs->dl4 = (BW_SIZE_T)bw_roundf(coeffs->fs * (1996.f / 29761.f));
-	coeffs->dl5 = (BW_SIZE_T)bw_roundf(coeffs->fs * (1990.f / 29761.f));
-	coeffs->dl6 = (BW_SIZE_T)bw_roundf(coeffs->fs * (187.f / 29761.f));
-	coeffs->dl7 = (BW_SIZE_T)bw_roundf(coeffs->fs * (1066.f / 29761.f));
-	coeffs->dr1 = (BW_SIZE_T)bw_roundf(coeffs->fs * (353.f / 29761.f));
-	coeffs->dr2 = (BW_SIZE_T)bw_roundf(coeffs->fs * (3627.f / 29761.f));
-	coeffs->dr3 = (BW_SIZE_T)bw_roundf(coeffs->fs * (1228.f / 29761.f));
-	coeffs->dr4 = (BW_SIZE_T)bw_roundf(coeffs->fs * (2673.f / 29761.f));
-	coeffs->dr5 = (BW_SIZE_T)bw_roundf(coeffs->fs * (2111.f / 29761.f));
-	coeffs->dr6 = (BW_SIZE_T)bw_roundf(coeffs->fs * (335.f / 29761.f));
-	coeffs->dr7 = (BW_SIZE_T)bw_roundf(coeffs->fs * (121.f / 29761.f));
+	coeffs->id1 = (size_t)bw_roundf(coeffs->fs * (142.f / 29761.f));
+	coeffs->id2 = (size_t)bw_roundf(coeffs->fs * (107.f / 29761.f));
+	coeffs->id3 = (size_t)bw_roundf(coeffs->fs * (379.f / 29761.f));
+	coeffs->id4 = (size_t)bw_roundf(coeffs->fs * (277.f / 29761.f));
+	coeffs->dd2 = (size_t)bw_roundf(coeffs->fs * (1800.f / 29761.f));
+	coeffs->dd4 = (size_t)bw_roundf(coeffs->fs * (2656.f / 29761.f));
+	coeffs->d1 = (size_t)bw_roundf(coeffs->fs * (4453.f / 29761.f));
+	coeffs->d2 = (size_t)bw_roundf(coeffs->fs * (3720.f / 29761.f));
+	coeffs->d3 = (size_t)bw_roundf(coeffs->fs * (4217.f / 29761.f));
+	coeffs->d4 = (size_t)bw_roundf(coeffs->fs * (3163.f / 29761.f));
+	coeffs->dl1 = (size_t)bw_roundf(coeffs->fs * (266.f / 29761.f));
+	coeffs->dl2 = (size_t)bw_roundf(coeffs->fs * (2974.f / 29761.f));
+	coeffs->dl3 = (size_t)bw_roundf(coeffs->fs * (1913.f / 29761.f));
+	coeffs->dl4 = (size_t)bw_roundf(coeffs->fs * (1996.f / 29761.f));
+	coeffs->dl5 = (size_t)bw_roundf(coeffs->fs * (1990.f / 29761.f));
+	coeffs->dl6 = (size_t)bw_roundf(coeffs->fs * (187.f / 29761.f));
+	coeffs->dl7 = (size_t)bw_roundf(coeffs->fs * (1066.f / 29761.f));
+	coeffs->dr1 = (size_t)bw_roundf(coeffs->fs * (353.f / 29761.f));
+	coeffs->dr2 = (size_t)bw_roundf(coeffs->fs * (3627.f / 29761.f));
+	coeffs->dr3 = (size_t)bw_roundf(coeffs->fs * (1228.f / 29761.f));
+	coeffs->dr4 = (size_t)bw_roundf(coeffs->fs * (2673.f / 29761.f));
+	coeffs->dr5 = (size_t)bw_roundf(coeffs->fs * (2111.f / 29761.f));
+	coeffs->dr6 = (size_t)bw_roundf(coeffs->fs * (335.f / 29761.f));
+	coeffs->dr7 = (size_t)bw_roundf(coeffs->fs * (121.f / 29761.f));
 }
 
-static inline BW_SIZE_T bw_reverb_mem_req(const bw_reverb_coeffs *BW_RESTRICT coeffs) {
+static inline size_t bw_reverb_mem_req(const bw_reverb_coeffs *BW_RESTRICT coeffs) {
 	return bw_delay_mem_req(&coeffs->predelay_coeffs)
 		+ bw_delay_mem_req(&coeffs->delay_id1_coeffs)
 		+ bw_delay_mem_req(&coeffs->delay_id2_coeffs)
@@ -506,10 +512,10 @@ static inline void bw_reverb_process1(const bw_reverb_coeffs *BW_RESTRICT coeffs
 
 	float dd1if, dd1f;
 	bw_intfracf(coeffs->fs * ((672.f / 29761.f) + coeffs->s), &dd1if, &dd1f);
-	const BW_SIZE_T dd1i = (BW_SIZE_T)dd1if;
+	const size_t dd1i = (size_t)dd1if;
 	float dd3if, dd3f;
 	bw_intfracf(coeffs->fs * ((908.f / 29761.f) + coeffs->s), &dd3if, &dd3f);
-	const BW_SIZE_T dd3i = (BW_SIZE_T)dd3if;
+	const size_t dd3i = (size_t)dd3if;
 
 	const float n24 = bw_delay_read(&coeffs->delay_dd1_coeffs, &state->delay_dd1_state, dd1i, dd1f);
 	const float n23 = s1 + 0.7f * n24;

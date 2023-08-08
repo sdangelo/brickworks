@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::HP1
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class HP1 {
 public:
 	HP1();
@@ -58,26 +58,26 @@ private:
 	bw_hp1_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline HP1<N_CHANNELS>::HP1() {
 	bw_hp1_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_hp1_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::reset(float x0) {
 	bw_hp1_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_hp1_reset_state(&coeffs, states + i, x0);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -85,7 +85,7 @@ inline void HP1<N_CHANNELS>::process(
 	bw_hp1_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::setCutoff(float value) {
 	bw_hp1_set_cutoff(&coeffs, value);
 }

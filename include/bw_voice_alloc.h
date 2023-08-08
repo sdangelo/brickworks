@@ -20,13 +20,19 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_common bw_note_queue }}}
  *  description {{{
  *    Basic voice allocator with low/high note priority.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Now using <code>size_t</code> instead of
+ *              <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_SIZE_T</code> to count voices in
@@ -91,7 +97,7 @@ typedef struct {
  *
  *    #### bw_voice_alloc()
  *  ```>>> */
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, BW_SIZE_T n_voices);
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, size_t n_voices);
 /*! <<<```
  *    It performs voice allocation according to `opts` and using the events in
  *    `queue`.
@@ -105,7 +111,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, BW_SIZE_T n_voices) {
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, size_t n_voices) {
 	BW_ASSERT(opts != NULL);
 	BW_ASSERT(opts->priority == bw_voice_alloc_priority_low || opts->priority == bw_voice_alloc_priority_high);
 	BW_ASSERT(n_voices == 0 || opts->note_on != NULL);
@@ -118,7 +124,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 	for (unsigned char i = 0; i < queue->n_events; i++) {
 		bw_note_queue_event *ev = queue->events + i;
-		for (BW_SIZE_T j = 0; j < n_voices; j++)
+		for (size_t j = 0; j < n_voices; j++)
 			if (!opts->is_free(voices[j]) && opts->get_note(voices[j]) == ev->note) {
 				if (!ev->status.pressed || ev->went_off)
 					opts->note_off(voices[j], ev->status.velocity);
@@ -128,15 +134,15 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 			}
 
 		if (ev->status.pressed) {
-			for (BW_SIZE_T j = 0; j < n_voices; j++)
+			for (size_t j = 0; j < n_voices; j++)
 				if (opts->is_free(voices[j])) { 
 					opts->note_on(voices[j], ev->note, ev->status.velocity);
 					goto next_event;
 				}
 
-			BW_SIZE_T k = n_voices;
+			size_t k = n_voices;
 			int v = ev->note;
-			for (BW_SIZE_T j = 0; j < n_voices; j++) {
+			for (size_t j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
 				if (!queue->status[n].pressed && (k == n_voices || (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v))) {
 					v = n;
@@ -148,7 +154,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 				continue;
 			}
 
-			for (BW_SIZE_T j = 0; j < n_voices; j++) {
+			for (size_t j = 0; j < n_voices; j++) {
 				int n = opts->get_note(voices[j]);
 				if (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v) {
 					v = n;

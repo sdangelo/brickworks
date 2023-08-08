@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::OscPulse
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class OscPulse {
 public:
 	OscPulse();
@@ -58,22 +58,22 @@ private:
 	bw_osc_pulse_coeffs	 coeffs;
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline OscPulse<N_CHANNELS>::OscPulse() {
 	bw_osc_pulse_init(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_osc_pulse_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::reset() {
 	bw_osc_pulse_reset_coeffs(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<const float *, N_CHANNELS> x_phase_inc,
@@ -82,12 +82,12 @@ inline void OscPulse<N_CHANNELS>::process(
 	bw_osc_pulse_process_multi(&coeffs, x.data(), x_phase_inc.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::setAntialiasing(bool value) {
 	bw_osc_pulse_set_antialiasing(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::setPulseWidth(float value) {
 	bw_osc_pulse_set_pulse_width(&coeffs, value);
 }

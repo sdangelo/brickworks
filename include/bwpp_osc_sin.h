@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::oscSinProcess
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 void oscSinProcess(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -42,7 +42,7 @@ void oscSinProcess(
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void oscSinProcess(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,

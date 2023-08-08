@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{
  *    bw_buf bw_comb bw_common bw_delay bw_gain bw_math bw_one_pole bw_osc_sin
  *    bw_phase_gen
@@ -36,6 +36,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Now using <code>size_t</code> instead of
+ *              <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Removed dependency on bw_config.</li>
@@ -95,7 +101,7 @@ static inline void bw_chorus_set_sample_rate(bw_chorus_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_chorus_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeffs);
+static inline size_t bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_chorus_mem_set()` using `coeffs`.
@@ -240,7 +246,7 @@ static inline void bw_chorus_set_sample_rate(bw_chorus_coeffs *BW_RESTRICT coeff
 	bw_comb_set_sample_rate(&coeffs->comb_coeffs, sample_rate);
 }
 
-static inline BW_SIZE_T bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeffs) {
+static inline size_t bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeffs) {
 	return bw_comb_mem_req(&coeffs->comb_coeffs);
 }
 

@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Fuzz
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Fuzz {
 public:
 	Fuzz();
@@ -59,26 +59,26 @@ private:
 	bw_fuzz_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Fuzz<N_CHANNELS>::Fuzz() {
 	bw_fuzz_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Fuzz<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_fuzz_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Fuzz<N_CHANNELS>::reset() {
 	bw_fuzz_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_fuzz_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Fuzz<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -86,12 +86,12 @@ inline void Fuzz<N_CHANNELS>::process(
 	bw_fuzz_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Fuzz<N_CHANNELS>::setFuzz(float value) {
 	bw_fuzz_set_fuzz(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Fuzz<N_CHANNELS>::setVolume(float value) {
 	bw_fuzz_set_volume(&coeffs, value);
 }

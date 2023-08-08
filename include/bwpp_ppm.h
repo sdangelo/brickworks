@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::PPM
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class PPM {
 public:
 	PPM();
@@ -43,7 +43,7 @@ public:
 
 	void setIntegrationTau(float value);
 	
-	float getYZ1(BW_SIZE_T channel);
+	float getYZ1(size_t channel);
 /*! <<<...
  *  }
  *  ```
@@ -60,26 +60,26 @@ private:
 	bw_ppm_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline PPM<N_CHANNELS>::PPM() {
 	bw_ppm_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void PPM<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_ppm_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void PPM<N_CHANNELS>::reset() {
 	bw_ppm_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_ppm_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void PPM<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -87,13 +87,13 @@ inline void PPM<N_CHANNELS>::process(
 	bw_ppm_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void PPM<N_CHANNELS>::setIntegrationTau(float value) {
 	bw_ppm_set_integration_tau(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
-inline float PPM<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+template<size_t N_CHANNELS>
+inline float PPM<N_CHANNELS>::getYZ1(size_t channel) {
 	return bw_ppm_get_y_z1(states + channel);
 }
 

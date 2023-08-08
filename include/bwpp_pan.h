@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Pan
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Pan {
 public:
 	Pan();
@@ -57,22 +57,22 @@ private:
 	bw_pan_coeffs	 coeffs;
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Pan<N_CHANNELS>::Pan() {
 	bw_pan_init(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Pan<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_pan_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Pan<N_CHANNELS>::reset() {
 	bw_pan_reset_coeffs(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Pan<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y_l,
@@ -81,7 +81,7 @@ inline void Pan<N_CHANNELS>::process(
 	bw_pan_process_multi(&coeffs, x.data(), y_l.data(), y_r.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Pan<N_CHANNELS>::setPan(float value) {
 	bw_pan_set_pan(&coeffs, value);
 }

@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Reverb
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Reverb {
 public:
 	Reverb();
@@ -66,40 +66,40 @@ private:
 	void			*mem;
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Reverb<N_CHANNELS>::Reverb() {
 	bw_reverb_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 	mem = nullptr;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Reverb<N_CHANNELS>::~Reverb() {
 	if (mem != nullptr)
 		operator delete(mem);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_reverb_set_sample_rate(&coeffs, sampleRate);
-	BW_SIZE_T req = bw_reverb_mem_req(&coeffs);
+	size_t req = bw_reverb_mem_req(&coeffs);
 	if (mem != nullptr)
 		operator delete(mem);
 	mem = operator new(req * N_CHANNELS);
 	void *m = mem;
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++, m = static_cast<char *>(m) + req)
+	for (size_t i = 0; i < N_CHANNELS; i++, m = static_cast<char *>(m) + req)
 		bw_reverb_mem_set(&coeffs, states + i, m);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::reset() {
 	bw_reverb_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_reverb_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> xl,
 		std::array<const float *, N_CHANNELS> xr,
@@ -109,27 +109,27 @@ inline void Reverb<N_CHANNELS>::process(
 	bw_reverb_process_multi(&coeffs, statesP, xl.data(), xr.data(), yl.data(), yr.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::setPredelay(float value) {
 	bw_reverb_set_predelay(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::setBandwidth(float value) {
 	bw_reverb_set_bandwidth(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::setDamping(float value) {
 	bw_reverb_set_damping(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::setDecay(float value) {
 	bw_reverb_set_decay(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::setWet(float value) {
 	bw_reverb_set_wet(&coeffs, value);
 }

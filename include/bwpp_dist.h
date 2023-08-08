@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Dist
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Dist {
 public:
 	Dist();
@@ -60,26 +60,26 @@ private:
 	bw_dist_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Dist<N_CHANNELS>::Dist() {
 	bw_dist_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Dist<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_dist_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Dist<N_CHANNELS>::reset() {
 	bw_dist_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_dist_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Dist<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -87,17 +87,17 @@ inline void Dist<N_CHANNELS>::process(
 	bw_dist_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Dist<N_CHANNELS>::setDistortion(float value) {
 	bw_dist_set_distortion(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Dist<N_CHANNELS>::setTone(float value) {
 	bw_dist_set_tone(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Dist<N_CHANNELS>::setVolume(float value) {
 	bw_dist_set_volume(&coeffs, value);
 }

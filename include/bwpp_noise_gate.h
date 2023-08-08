@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::NoiseGate
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class NoiseGate {
 public:
 	NoiseGate();
@@ -63,26 +63,26 @@ private:
 	bw_noise_gate_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline NoiseGate<N_CHANNELS>::NoiseGate() {
 	bw_noise_gate_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_noise_gate_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::reset() {
 	bw_noise_gate_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_noise_gate_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<const float *, N_CHANNELS> xSC,
@@ -91,27 +91,27 @@ inline void NoiseGate<N_CHANNELS>::process(
 	bw_noise_gate_process_multi(&coeffs, statesP, x.data(), xSC.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setTreshLin(float value) {
 	bw_noise_gate_set_thresh_lin(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setTreshDBFS(float value) {
 	bw_noise_gate_set_thresh_dBFS(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setRatio(float value) {
 	bw_noise_gate_set_ratio(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setAttackTau(float value) {
 	bw_noise_gate_set_attack_tau(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setReleaseTau(float value) {
 	bw_noise_gate_set_release_tau(&coeffs, value);
 }

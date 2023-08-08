@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Balance
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Balance {
 public:
 	Balance();
@@ -58,22 +58,22 @@ private:
 	bw_balance_coeffs	 coeffs;
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Balance<N_CHANNELS>::Balance() {
 	bw_balance_init(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_balance_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::reset() {
 	bw_balance_reset_coeffs(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x_l,
 		std::array<const float *, N_CHANNELS> x_r,
@@ -83,7 +83,7 @@ inline void Balance<N_CHANNELS>::process(
 	bw_balance_process_multi(&coeffs, x_l.data(), x_r.data(), y_l.data(), y_r.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::setBalance(float value) {
 	bw_balance_set_balance(&coeffs, value);
 }

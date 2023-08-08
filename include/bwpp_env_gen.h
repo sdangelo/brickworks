@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::EnvGen
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class EnvGen {
 public:
 	EnvGen();
@@ -46,8 +46,8 @@ public:
 	void setSustain(float value);
 	void setRelease(float value);
 	
-	bw_env_gen_phase getPhase(BW_SIZE_T channel);
-	float getYZ1(BW_SIZE_T channel);
+	bw_env_gen_phase getPhase(size_t channel);
+	float getYZ1(size_t channel);
 /*! <<<...
  *  }
  *  ```
@@ -64,26 +64,26 @@ private:
 	bw_env_gen_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline EnvGen<N_CHANNELS>::EnvGen() {
 	bw_env_gen_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_env_gen_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::reset() {
 	bw_env_gen_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_env_gen_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::process(
 		std::array<char, N_CHANNELS> gate,
 		std::array<float *, N_CHANNELS> y,
@@ -91,33 +91,33 @@ inline void EnvGen<N_CHANNELS>::process(
 	bw_env_gen_process_multi(&coeffs, statesP, gate.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setAttack(float value) {
 	bw_env_gen_set_attack(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setDecay(float value) {
 	bw_env_gen_set_decay(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setSustain(float value) {
 	bw_env_gen_set_sustain(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setRelease(float value) {
 	bw_env_gen_set_release(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
-inline bw_env_gen_phase EnvGen<N_CHANNELS>::getPhase(BW_SIZE_T channel) {
+template<size_t N_CHANNELS>
+inline bw_env_gen_phase EnvGen<N_CHANNELS>::getPhase(size_t channel) {
 	return bw_env_gen_get_phase(states + channel);
 }
 
-template<BW_SIZE_T N_CHANNELS>
-inline float EnvGen<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+template<size_t N_CHANNELS>
+inline float EnvGen<N_CHANNELS>::getYZ1(size_t channel) {
 	return bw_env_gen_get_y_z1(states + channel);
 }
 

@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::OnePole
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class OnePole {
 public:
 	OnePole();
@@ -50,7 +50,7 @@ public:
 	void setStickyThresh(float value);
 	void setStickyMode(bw_one_pole_sticky_mode value);
 	
-	float getYZ1(BW_SIZE_T channel);
+	float getYZ1(size_t channel);
 /*! <<<...
  *  }
  *  ```
@@ -67,26 +67,26 @@ private:
 	bw_one_pole_state	*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline OnePole<N_CHANNELS>::OnePole() {
 	bw_one_pole_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_one_pole_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::reset(float y_z1) {
 	bw_one_pole_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_one_pole_reset_state(&coeffs, states + i, y_z1);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -94,48 +94,48 @@ inline void OnePole<N_CHANNELS>::process(
 	bw_one_pole_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setCutoff(float value) {
 	bw_one_pole_set_cutoff(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setCutoffUp(float value) {
 	bw_one_pole_set_cutoff_up(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setCutoffDown(float value) {
 	bw_one_pole_set_cutoff_down(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setTau(float value) {
 	bw_one_pole_set_tau(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setTauUp(float value) {
 	bw_one_pole_set_tau_up(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setTauDown(float value) {
 	bw_one_pole_set_tau_down(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setStickyThresh(float value) {
 	bw_one_pole_set_sticky_thresh(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::setStickyMode(bw_one_pole_sticky_mode value) {
 	bw_one_pole_set_sticky_mode(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
-inline float OnePole<N_CHANNELS>::getYZ1(BW_SIZE_T channel) {
+template<size_t N_CHANNELS>
+inline float OnePole<N_CHANNELS>::getYZ1(size_t channel) {
 	return bw_one_pole_get_y_z1(states + channel);
 }
 

@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::SVF
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class SVF {
 public:
 	SVF();
@@ -63,26 +63,26 @@ private:
 	bw_svf_state		*statesP[N_CHANNELS];
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline SVF<N_CHANNELS>::SVF() {
 	bw_svf_init(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_svf_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::reset(float x0) {
 	bw_svf_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_svf_reset_state(&coeffs, states + i, x0);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y_lp,
@@ -92,22 +92,22 @@ inline void SVF<N_CHANNELS>::process(
 	bw_svf_process_multi(&coeffs, statesP, x.data(), y_lp.data(), y_bp.data(), y_hp.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::setCutoff(float value) {
 	bw_svf_set_cutoff(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::setQ(float value) {
 	bw_svf_set_Q(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
 	bw_svf_set_prewarp_at_cutoff(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::setPrewarpFreq(float value) {
 	bw_svf_set_prewarp_freq(&coeffs, value);
 }

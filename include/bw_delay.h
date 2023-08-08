@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_buf bw_common bw_math }}}
  *  description {{{
  *    Interpolated delay line, not smoothed.
@@ -31,6 +31,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Now using <code>size_t</code> instead of
+ *              <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Removed dependency on bw_config.</li>
@@ -89,7 +95,7 @@ static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_delay_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_mem_req(const bw_delay_coeffs *BW_RESTRICT coeffs);
+static inline size_t bw_delay_mem_req(const bw_delay_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_delay_mem_set()` using `coeffs`.
@@ -114,7 +120,7 @@ static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_delay_read()
  *  ```>>> */
-static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, const bw_delay_state *BW_RESTRICT state, BW_SIZE_T di, float df);
+static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, const bw_delay_state *BW_RESTRICT state, size_t di, float df);
 /*! <<<```
  *    Returns the interpolated value read from the delay line identified by
  *    `coeffs` and `state` by applying a delay of `di` + `df` samples.
@@ -175,7 +181,7 @@ static inline void bw_delay_set_delay(bw_delay_coeffs *BW_RESTRICT coeffs, float
  *
  *    #### bw_delay_get_length()
  *  ```>>> */
-static inline BW_SIZE_T bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coeffs);
+static inline size_t bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the length of the delay line in samples.
  *  }}} */
@@ -190,21 +196,21 @@ static inline BW_SIZE_T bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT c
 
 struct _bw_delay_coeffs {
 	// Coefficients
-	float		fs;
-	BW_SIZE_T	len;
+	float	fs;
+	size_t	len;
 
-	BW_SIZE_T	di;
-	float		df;
+	size_t	di;
+	float	df;
 
 	// Parameters
-	float		max_delay;
-	float		delay;
-	char		delay_changed;
+	float	max_delay;
+	float	delay;
+	char	delay_changed;
 };
 
 struct _bw_delay_state {
-	float		*buf;
-	BW_SIZE_T	 idx;
+	float	*buf;
+	size_t	 idx;
 };
 
 static inline void bw_delay_init(bw_delay_coeffs *BW_RESTRICT coeffs, float max_delay) {
@@ -214,10 +220,10 @@ static inline void bw_delay_init(bw_delay_coeffs *BW_RESTRICT coeffs, float max_
 
 static inline void bw_delay_set_sample_rate(bw_delay_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	coeffs->fs = sample_rate;
-	coeffs->len = (BW_SIZE_T)bw_ceilf(coeffs->fs * coeffs->max_delay) + 1;
+	coeffs->len = (size_t)bw_ceilf(coeffs->fs * coeffs->max_delay) + 1;
 }
 
-static inline BW_SIZE_T bw_delay_mem_req(const bw_delay_coeffs *BW_RESTRICT coeffs) {
+static inline size_t bw_delay_mem_req(const bw_delay_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->len * sizeof(float);
 }
 
@@ -236,9 +242,9 @@ static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeff
 	state->idx = 0;
 }
 
-static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, const bw_delay_state *BW_RESTRICT state, BW_SIZE_T di, float df) {
-	const BW_SIZE_T n = (state->idx + (state->idx >= di ? 0 : coeffs->len)) - di;
-	const BW_SIZE_T p = (n ? n : coeffs->len) - 1;
+static float bw_delay_read(const bw_delay_coeffs *BW_RESTRICT coeffs, const bw_delay_state *BW_RESTRICT state, size_t di, float df) {
+	const size_t n = (state->idx + (state->idx >= di ? 0 : coeffs->len)) - di;
+	const size_t p = (n ? n : coeffs->len) - 1;
 	return state->buf[n] + df * (state->buf[p] - state->buf[n]);
 }
 
@@ -252,7 +258,7 @@ static inline void bw_delay_update_coeffs_ctrl(bw_delay_coeffs *BW_RESTRICT coef
 	if (coeffs->delay_changed) {
 		float i;
 		bw_intfracf(coeffs->fs * coeffs->delay, &i, &coeffs->df);
-		coeffs->di = (BW_SIZE_T)i;
+		coeffs->di = (size_t)i;
 		coeffs->delay_changed = 0;
 	}
 }
@@ -286,7 +292,7 @@ static inline void bw_delay_set_delay(bw_delay_coeffs *BW_RESTRICT coeffs, float
 	}
 }
 
-static inline BW_SIZE_T bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coeffs) {
+static inline size_t bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coeffs) {
 	return coeffs->len;
 }
 

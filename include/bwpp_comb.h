@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Comb
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Comb {
 public:
 	Comb(float maxDelay = 1.f);
@@ -64,40 +64,40 @@ private:
 	void		*mem;
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Comb<N_CHANNELS>::Comb(float maxDelay) {
 	bw_comb_init(&coeffs, maxDelay);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		statesP[i] = states + i;
 	mem = nullptr;
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Comb<N_CHANNELS>::~Comb() {
 	if (mem != nullptr)
 		operator delete(mem);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_comb_set_sample_rate(&coeffs, sampleRate);
-	BW_SIZE_T req = bw_comb_mem_req(&coeffs);
+	size_t req = bw_comb_mem_req(&coeffs);
 	if (mem != nullptr)
 		operator delete(mem);
 	mem = operator new(req * N_CHANNELS);
 	void *m = mem;
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++, m = static_cast<char *>(m) + req)
+	for (size_t i = 0; i < N_CHANNELS; i++, m = static_cast<char *>(m) + req)
 		bw_comb_mem_set(&coeffs, states + i, m);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::reset() {
 	bw_comb_reset_coeffs(&coeffs);
-	for (BW_SIZE_T i = 0; i < N_CHANNELS; i++)
+	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_comb_reset_state(&coeffs, states + i);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -105,27 +105,27 @@ inline void Comb<N_CHANNELS>::process(
 	bw_comb_process_multi(&coeffs, statesP, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::setDelayFF(float value) {
 	bw_comb_set_delay_ff(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::setDelayFB(float value) {
 	bw_comb_set_delay_fb(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::setCoeffBlend(float value) {
 	bw_comb_set_coeff_blend(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::setCoeffFF(float value) {
 	bw_comb_set_coeff_ff(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::setCoeffFB(float value) {
 	bw_comb_set_coeff_fb(&coeffs, value);
 }

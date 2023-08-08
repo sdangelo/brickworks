@@ -29,7 +29,7 @@ namespace Brickworks {
 /*! api {{{
  *    ##### Brickworks::Gain
  *  ```>>> */
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 class Gain {
 public:
 	Gain();
@@ -60,22 +60,22 @@ private:
 	bw_gain_coeffs	 coeffs;
 };
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline Gain<N_CHANNELS>::Gain() {
 	bw_gain_init(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::setSampleRate(float sampleRate) {
 	bw_gain_set_sample_rate(&coeffs, sampleRate);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::reset() {
 	bw_gain_reset_coeffs(&coeffs);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -83,22 +83,22 @@ inline void Gain<N_CHANNELS>::process(
 	bw_gain_process_multi(&coeffs, x.data(), y.data(), N_CHANNELS, nSamples);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::setGainLin(float value) {
 	bw_gain_set_gain_lin(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::setGainDB(float value) {
 	bw_gain_set_gain_dB(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::setSmoothTau(float value) {
 	bw_gain_set_smooth_tau(&coeffs, value);
 }
 
-template<BW_SIZE_T N_CHANNELS>
+template<size_t N_CHANNELS>
 inline float Gain<N_CHANNELS>::getGain() {
 	return bw_gain_get_gain(&coeffs);
 }

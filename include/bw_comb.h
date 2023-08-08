@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{
  *    bw_buf bw_common bw_delay bw_gain bw_math bw_one_pole
  *  }}}
@@ -37,6 +37,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Now using <code>size_t</code> instead of
+ *              <code>BW_SIZE_T</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Removed dependency on bw_config.</li>
@@ -96,7 +102,7 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
  *
  *    #### bw_comb_mem_req()
  *  ```>>> */
-static inline BW_SIZE_T bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs);
+static inline size_t bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the size, in bytes, of contiguous memory to be supplied to
  *    `bw_comb_mem_set()` using `coeffs`.
@@ -219,9 +225,9 @@ struct _bw_comb_coeffs {
 	// Coefficients
 	float			fs;
 
-	BW_SIZE_T		dffi;
+	size_t		dffi;
 	float			dfff;
-	BW_SIZE_T		dfbi;
+	size_t		dfbi;
 	float			dfbf;
 
 	// Parameters
@@ -258,7 +264,7 @@ static inline void bw_comb_set_sample_rate(bw_comb_coeffs *BW_RESTRICT coeffs, f
 	coeffs->fs = sample_rate;
 }
 
-static inline BW_SIZE_T bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs) {
+static inline size_t bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs) {
 	return bw_delay_mem_req(&coeffs->delay_coeffs);
 }
 
@@ -272,11 +278,11 @@ static inline void _bw_comb_do_update_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs,
 	float delay_fb_cur = bw_one_pole_get_y_z1(&coeffs->smooth_delay_fb_state);
 	if (force || delay_ff_cur != coeffs->delay_ff) {
 		delay_ff_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
-		const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
+		const size_t len = bw_delay_get_length(&coeffs->delay_coeffs);
 		const float dff = bw_maxf(coeffs->fs * delay_ff_cur, 0.f);
 		float dffif;
 		bw_intfracf(dff, &dffif, &coeffs->dfff);
-		coeffs->dffi = (BW_SIZE_T)dffif;
+		coeffs->dffi = (size_t)dffif;
 		if (coeffs->dffi >= len) {
 			coeffs->dffi = len;
 			coeffs->dfff = 0.f;
@@ -284,11 +290,11 @@ static inline void _bw_comb_do_update_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs,
 	}
 	if (force || delay_fb_cur != coeffs->delay_fb) {
 		delay_fb_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
-		const BW_SIZE_T len = bw_delay_get_length(&coeffs->delay_coeffs);
+		const size_t len = bw_delay_get_length(&coeffs->delay_coeffs);
 		const float dfb = bw_maxf(coeffs->fs * delay_fb_cur, 1.f) - 1.f;
 		float dfbif;
 		bw_intfracf(dfb, &dfbif, &coeffs->dfbf);
-		coeffs->dfbi = (BW_SIZE_T)dfbif;
+		coeffs->dfbi = (size_t)dfbif;
 		if (coeffs->dfbi >= len) {
 			coeffs->dfbi = len;
 			coeffs->dfbf = 0.f;

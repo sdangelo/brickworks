@@ -1,6 +1,6 @@
 CC := clang
 CFLAGS := \
-	-DNDEBUG \
+	-DBW_NO_DEBUG \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../common/web \
 	-I${ROOT_DIR}/../../../include \

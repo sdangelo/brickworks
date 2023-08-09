@@ -1,0 +1,536 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <bw_math.h>
+
+int n_ok = 0;
+int n_ko = 0;
+
+#define TEST_F(expr, expected) \
+{ \
+	union { float f; uint32_t u; } v_expr, v_expected; \
+	v_expr.f = expr; \
+	v_expected.f = expected; \
+	if (expr == v_expected.f) { \
+		printf("[OK] %s = %g\n", #expr, v_expected.f); \
+		n_ok++; \
+	} else { \
+		printf("[KO] %s = %g [0x%x] (expected %g [0x%x]) - line %d\n", #expr, v_expr.f, v_expr.u, v_expected.f, v_expected.u, __LINE__); \
+		n_ko++; \
+	} \
+}
+
+#define TEST_BW_INTFRAC(val, expected_i, expected_f) \
+{ \
+	union { float f; uint32_t u; } v_res_i, v_res_f, v_expected_i, v_expected_f; \
+	v_expected_i.f = expected_i; \
+	v_expected_f.f = expected_f; \
+	bw_intfracf(val, &v_res_i.f, &v_res_f.f); \
+	if (v_res_i.f == v_expected_i.f && v_res_f.f == v_expected_f.f) { \
+		printf("[OK] bw_intfracf(%g) = %g, %g\n", val, expected_i, expected_f); \
+		n_ok++; \
+	} else { \
+		printf("[KO] bw_intfracf(%g) = %g [0x%x], %g [0x%x] (expected %g [0x%x], %g [0x%x]) - line %d\n", val, v_res_i.f, v_res_i.u, v_res_f.f, v_res_f.u, v_expected_i.f, v_expected_i.u, v_expected_f.f, v_expected_f.u, __LINE__); \
+		n_ko++; \
+	} \
+}
+
+int main() {
+	printf("\nbw_math unit tests\n");
+	printf("------------------\n\n");
+
+	TEST_F(bw_copysignf(INFINITY, INFINITY), INFINITY);
+	TEST_F(bw_copysignf(INFINITY, -INFINITY), -INFINITY);
+	TEST_F(bw_copysignf(INFINITY, 1e3f), INFINITY);
+	TEST_F(bw_copysignf(INFINITY, -1e3f), -INFINITY);
+	TEST_F(bw_copysignf(INFINITY, 1.f), INFINITY);
+	TEST_F(bw_copysignf(INFINITY, -1.f), -INFINITY);
+	TEST_F(bw_copysignf(INFINITY, 1e-3f), INFINITY);
+	TEST_F(bw_copysignf(INFINITY, -1e-3f), -INFINITY);
+	TEST_F(bw_copysignf(INFINITY, 0.f), INFINITY);
+	TEST_F(bw_copysignf(INFINITY, -0.f), -INFINITY);
+	TEST_F(bw_copysignf(1e3f, INFINITY), 1e3f);
+	TEST_F(bw_copysignf(1e3f, -INFINITY), -1e3f);
+	TEST_F(bw_copysignf(1e3f, 1e3f), 1e3f);
+	TEST_F(bw_copysignf(1e3f, -1e3f), -1e3f);
+	TEST_F(bw_copysignf(1e3f, 1.f), 1e3f);
+	TEST_F(bw_copysignf(1e3f, -1.f), -1e3f);
+	TEST_F(bw_copysignf(1e3f, 1e-3f), 1e3f);
+	TEST_F(bw_copysignf(1e3f, -1e-3f), -1e3f);
+	TEST_F(bw_copysignf(1e3f, 0.f), 1e3f);
+	TEST_F(bw_copysignf(1e3f, -0.f), -1e3f);
+	TEST_F(bw_copysignf(1.f, INFINITY), 1.f);
+	TEST_F(bw_copysignf(1.f, -INFINITY), -1.f);
+	TEST_F(bw_copysignf(1.f, 1e3f), 1.f);
+	TEST_F(bw_copysignf(1.f, -1e3f), -1.f);
+	TEST_F(bw_copysignf(1.f, 1.f), 1.f);
+	TEST_F(bw_copysignf(1.f, -1.f), -1.f);
+	TEST_F(bw_copysignf(1.f, 1e-3f), 1.f);
+	TEST_F(bw_copysignf(1.f, -1e-3f), -1.f);
+	TEST_F(bw_copysignf(1.f, 0.f), 1.f);
+	TEST_F(bw_copysignf(1.f, -0.f), -1.f);
+	TEST_F(bw_copysignf(1e-3f, INFINITY), 1e-3f);
+	TEST_F(bw_copysignf(1e-3f, -INFINITY), -1e-3f);
+	TEST_F(bw_copysignf(1e-3f, 1e3f), 1e-3f);
+	TEST_F(bw_copysignf(1e-3f, -1e3f), -1e-3f);
+	TEST_F(bw_copysignf(1e-3f, 1.f), 1e-3f);
+	TEST_F(bw_copysignf(1e-3f, -1.f), -1e-3f);
+	TEST_F(bw_copysignf(1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_copysignf(1e-3f, -1e-3f), -1e-3f);
+	TEST_F(bw_copysignf(1e-3f, 0.f), 1e-3f);
+	TEST_F(bw_copysignf(1e-3f, -0.f), -1e-3f);
+	TEST_F(bw_copysignf(0.f, INFINITY), 0.f);
+	TEST_F(bw_copysignf(0.f, -INFINITY), -0.f);
+	TEST_F(bw_copysignf(0.f, 1e3f), 0.f);
+	TEST_F(bw_copysignf(0.f, -1e3f), -0.f);
+	TEST_F(bw_copysignf(0.f, 1.f), 0.f);
+	TEST_F(bw_copysignf(0.f, -1.f), -0.f);
+	TEST_F(bw_copysignf(0.f, 1e-3f), 0.f);
+	TEST_F(bw_copysignf(0.f, -1e-3f), -0.f);
+	TEST_F(bw_copysignf(0.f, 0.f), 0.f);
+	TEST_F(bw_copysignf(0.f, -0.f), -0.f);
+	TEST_F(bw_copysignf(-INFINITY, INFINITY), INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, -INFINITY), -INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, 1e3f), INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, -1e3f), -INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, 1.f), INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, -1.f), -INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, 1e-3f), INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, -1e-3f), -INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, 0.f), INFINITY);
+	TEST_F(bw_copysignf(-INFINITY, -0.f), -INFINITY);
+	TEST_F(bw_copysignf(-1e3f, INFINITY), 1e3f);
+	TEST_F(bw_copysignf(-1e3f, -INFINITY), -1e3f);
+	TEST_F(bw_copysignf(-1e3f, 1e3f), 1e3f);
+	TEST_F(bw_copysignf(-1e3f, -1e3f), -1e3f);
+	TEST_F(bw_copysignf(-1e3f, 1.f), 1e3f);
+	TEST_F(bw_copysignf(-1e3f, -1.f), -1e3f);
+	TEST_F(bw_copysignf(-1e3f, 1e-3f), 1e3f);
+	TEST_F(bw_copysignf(-1e3f, -1e-3f), -1e3f);
+	TEST_F(bw_copysignf(-1e3f, 0.f), 1e3f);
+	TEST_F(bw_copysignf(-1e3f, -0.f), -1e3f);
+	TEST_F(bw_copysignf(-1.f, INFINITY), 1.f);
+	TEST_F(bw_copysignf(-1.f, -INFINITY), -1.f);
+	TEST_F(bw_copysignf(-1.f, 1e3f), 1.f);
+	TEST_F(bw_copysignf(-1.f, -1e3f), -1.f);
+	TEST_F(bw_copysignf(-1.f, 1.f), 1.f);
+	TEST_F(bw_copysignf(-1.f, -1.f), -1.f);
+	TEST_F(bw_copysignf(-1.f, 1e-3f), 1.f);
+	TEST_F(bw_copysignf(-1.f, -1e-3f), -1.f);
+	TEST_F(bw_copysignf(-1.f, 0.f), 1.f);
+	TEST_F(bw_copysignf(-1.f, -0.f), -1.f);
+	TEST_F(bw_copysignf(-1e-3f, INFINITY), 1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, -INFINITY), -1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, 1e3f), 1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, -1e3f), -1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, 1.f), 1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, -1.f), -1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, -1e-3f), -1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, 0.f), 1e-3f);
+	TEST_F(bw_copysignf(-1e-3f, -0.f), -1e-3f);
+	TEST_F(bw_copysignf(-0.f, INFINITY), 0.f);
+	TEST_F(bw_copysignf(-0.f, -INFINITY), -0.f);
+	TEST_F(bw_copysignf(-0.f, 1e3f), 0.f);
+	TEST_F(bw_copysignf(-0.f, -1e3f), -0.f);
+	TEST_F(bw_copysignf(-0.f, 1.f), 0.f);
+	TEST_F(bw_copysignf(-0.f, -1.f), -0.f);
+	TEST_F(bw_copysignf(-0.f, 1e-3f), 0.f);
+	TEST_F(bw_copysignf(-0.f, -1e-3f), -0.f);
+	TEST_F(bw_copysignf(-0.f, 0.f), 0.f);
+	TEST_F(bw_copysignf(-0.f, -0.f), -0.f);
+	
+	TEST_F(bw_signf(INFINITY), 1.f);
+	TEST_F(bw_signf(-INFINITY), -1.f);
+	TEST_F(bw_signf(1e3f), 1.f);
+	TEST_F(bw_signf(-1e3f), -1.f);
+	TEST_F(bw_signf(1.f), 1.f);
+	TEST_F(bw_signf(-1.f), -1.f);
+	TEST_F(bw_signf(1e-3f), 1.f);
+	TEST_F(bw_signf(-1e-3f), -1.f);
+	TEST_F(bw_signf(0.f), 0.f);
+	TEST_F(bw_signf(-0.f), 0.f);
+	
+	TEST_F(bw_absf(INFINITY), INFINITY);
+	TEST_F(bw_absf(-INFINITY), INFINITY);
+	TEST_F(bw_absf(1e3f), 1e3f);
+	TEST_F(bw_absf(-1e3f), 1e3f);
+	TEST_F(bw_absf(1.f), 1.f);
+	TEST_F(bw_absf(-1.f), 1.f);
+	TEST_F(bw_absf(1e-3f), 1e-3f);
+	TEST_F(bw_absf(-1e-3f), 1e-3f);
+	TEST_F(bw_absf(0.f), 0.f);
+	TEST_F(bw_absf(-0.f), 0.f);
+	
+	TEST_F(bw_min0f(INFINITY), 0.f);
+	TEST_F(bw_min0f(-INFINITY), -INFINITY);
+	TEST_F(bw_min0f(1e3f), 0.f);
+	TEST_F(bw_min0f(-1e3f), -1e3f);
+	TEST_F(bw_min0f(1.f), 0.f);
+	TEST_F(bw_min0f(-1.f), -1.f);
+	TEST_F(bw_min0f(1e-3f), 0.f);
+	TEST_F(bw_min0f(-1e-3f), -1e-3f);
+	TEST_F(bw_min0f(0.f), 0.f);
+	TEST_F(bw_min0f(-0.f), -0.f);
+	
+	TEST_F(bw_max0f(INFINITY), INFINITY);
+	TEST_F(bw_max0f(-INFINITY), 0.f);
+	TEST_F(bw_max0f(1e3f), 1e3f);
+	TEST_F(bw_max0f(-1e3f), 0.f);
+	TEST_F(bw_max0f(1.f), 1.f);
+	TEST_F(bw_max0f(-1.f), 0.f);
+	TEST_F(bw_max0f(1e-3f), 1e-3f);
+	TEST_F(bw_max0f(-1e-3f), 0.f);
+	TEST_F(bw_max0f(0.f), 0.f);
+	TEST_F(bw_max0f(-0.f), 0.f);
+	
+	TEST_F(bw_minf(INFINITY, INFINITY), INFINITY);
+	TEST_F(bw_minf(INFINITY, 1e3f), 1e3f);
+	TEST_F(bw_minf(INFINITY, 1.f), 1.f);
+	TEST_F(bw_minf(INFINITY, 1e-3f), 1e-3f);
+	TEST_F(bw_minf(INFINITY, 0.f), 0.f);
+	TEST_F(bw_minf(INFINITY, -1e-3f), -1e-3f);
+	TEST_F(bw_minf(INFINITY, -1.f), -1.f);
+	TEST_F(bw_minf(INFINITY, -1e3f), -1e3f);
+	TEST_F(bw_minf(INFINITY, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(1e3f, INFINITY), 1e3f);
+	TEST_F(bw_minf(1e3f, 1e3f), 1e3f);
+	TEST_F(bw_minf(1e3f, 1.f), 1.f);
+	TEST_F(bw_minf(1e3f, 1e-3f), 1e-3f);
+	TEST_F(bw_minf(1e3f, 0.f), 0.f);
+	TEST_F(bw_minf(1e3f, -1e-3f), -1e-3f);
+	TEST_F(bw_minf(1e3f, -1.f), -1.f);
+	TEST_F(bw_minf(1e3f, -1e3f), -1e3f);
+	TEST_F(bw_minf(1e3f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(1.f, INFINITY), 1.f);
+	TEST_F(bw_minf(1.f, 1e3f), 1.f);
+	TEST_F(bw_minf(1.f, 1.f), 1.f);
+	TEST_F(bw_minf(1.f, 1e-3f), 1e-3f);
+	TEST_F(bw_minf(1.f, 0.f), 0.f);
+	TEST_F(bw_minf(1.f, -1e-3f), -1e-3f);
+	TEST_F(bw_minf(1.f, -1.f), -1.f);
+	TEST_F(bw_minf(1.f, -1e3f), -1e3f);
+	TEST_F(bw_minf(1.f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(1e-3f, INFINITY), 1e-3f);
+	TEST_F(bw_minf(1e-3f, 1e3f), 1e-3f);
+	TEST_F(bw_minf(1e-3f, 1.f), 1e-3f);
+	TEST_F(bw_minf(1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_minf(1e-3f, 0.f), 0.f);
+	TEST_F(bw_minf(1e-3f, -1e-3f), -1e-3f);
+	TEST_F(bw_minf(1e-3f, -1.f), -1.f);
+	TEST_F(bw_minf(1e-3f, -1e3f), -1e3f);
+	TEST_F(bw_minf(1e-3f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(0.f, INFINITY), 0.f);
+	TEST_F(bw_minf(0.f, 1e3f), 0.f);
+	TEST_F(bw_minf(0.f, 1.f), 0.f);
+	TEST_F(bw_minf(0.f, 1e-3f), 0.f);
+	TEST_F(bw_minf(0.f, 0.f), 0.f);
+	TEST_F(bw_minf(0.f, -1e-3f), -1e-3f);
+	TEST_F(bw_minf(0.f, -1.f), -1.f);
+	TEST_F(bw_minf(0.f, -1e3f), -1e3f);
+	TEST_F(bw_minf(0.f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(-1e-3f, INFINITY), -1e-3f);
+	TEST_F(bw_minf(-1e-3f, 1e3f), -1e-3f);
+	TEST_F(bw_minf(-1e-3f, 1.f), -1e-3f);
+	TEST_F(bw_minf(-1e-3f, 1e-3f), -1e-3f);
+	TEST_F(bw_minf(-1e-3f, 0.f), -1e-3f);
+	TEST_F(bw_minf(-1e-3f, -1e-3f), -1e-3f);
+	TEST_F(bw_minf(-1e-3f, -1.f), -1.f);
+	TEST_F(bw_minf(-1e-3f, -1e3f), -1e3f);
+	TEST_F(bw_minf(-1e-3f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(-1.f, INFINITY), -1.f);
+	TEST_F(bw_minf(-1.f, 1e3f), -1.f);
+	TEST_F(bw_minf(-1.f, 1.f), -1.f);
+	TEST_F(bw_minf(-1.f, 1e-3f), -1.f);
+	TEST_F(bw_minf(-1.f, 0.f), -1.f);
+	TEST_F(bw_minf(-1.f, -1e-3f), -1.f);
+	TEST_F(bw_minf(-1.f, -1.f), -1.f);
+	TEST_F(bw_minf(-1.f, -1e3f), -1e3f);
+	TEST_F(bw_minf(-1.f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(-1e3f, INFINITY), -1e3f);
+	TEST_F(bw_minf(-1e3f, 1e3f), -1e3f);
+	TEST_F(bw_minf(-1e3f, 1.f), -1e3f);
+	TEST_F(bw_minf(-1e3f, 1e-3f), -1e3f);
+	TEST_F(bw_minf(-1e3f, 0.f), -1e3f);
+	TEST_F(bw_minf(-1e3f, -1e-3f), -1e3f);
+	TEST_F(bw_minf(-1e3f, -1.f), -1e3f);
+	TEST_F(bw_minf(-1e3f, -1e3f), -1e3f);
+	TEST_F(bw_minf(-1e3f, -INFINITY), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, INFINITY), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, 1e3f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, 1.f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, 1e-3f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, 0.f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, -1e-3f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, -1.f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, -1e3f), -INFINITY);
+	TEST_F(bw_minf(-INFINITY, -INFINITY), -INFINITY);
+	
+	TEST_F(bw_maxf(INFINITY, INFINITY), INFINITY);
+	TEST_F(bw_maxf(INFINITY, 1e3f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, 1.f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, 1e-3f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, 0.f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, -1e-3f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, -1.f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, -1e3f), INFINITY);
+	TEST_F(bw_maxf(INFINITY, -INFINITY), INFINITY);
+	TEST_F(bw_maxf(1e3f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(1e3f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(1e3f, 1.f), 1e3f);
+	TEST_F(bw_maxf(1e3f, 1e-3f), 1e3f);
+	TEST_F(bw_maxf(1e3f, 0.f), 1e3f);
+	TEST_F(bw_maxf(1e3f, -1e-3f), 1e3f);
+	TEST_F(bw_maxf(1e3f, -1.f), 1e3f);
+	TEST_F(bw_maxf(1e3f, -1e3f), 1e3f);
+	TEST_F(bw_maxf(1e3f, -INFINITY), 1e3f);
+	TEST_F(bw_maxf(1.f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(1.f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(1.f, 1.f), 1.f);
+	TEST_F(bw_maxf(1.f, 1e-3f), 1.f);
+	TEST_F(bw_maxf(1.f, 0.f), 1.f);
+	TEST_F(bw_maxf(1.f, -1e-3f), 1.f);
+	TEST_F(bw_maxf(1.f, -1.f), 1.f);
+	TEST_F(bw_maxf(1.f, -1e3f), 1.f);
+	TEST_F(bw_maxf(1.f, -INFINITY), 1.f);
+	TEST_F(bw_maxf(1e-3f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(1e-3f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(1e-3f, 1.f), 1.f);
+	TEST_F(bw_maxf(1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_maxf(1e-3f, 0.f), 1e-3f);
+	TEST_F(bw_maxf(1e-3f, -1e-3f), 1e-3f);
+	TEST_F(bw_maxf(1e-3f, -1.f), 1e-3f);
+	TEST_F(bw_maxf(1e-3f, -1e3f), 1e-3f);
+	TEST_F(bw_maxf(1e-3f, -INFINITY), 1e-3f);
+	TEST_F(bw_maxf(0.f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(0.f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(0.f, 1.f), 1.f);
+	TEST_F(bw_maxf(0.f, 1e-3f), 1e-3f);
+	TEST_F(bw_maxf(0.f, 0.f), 0.f);
+	TEST_F(bw_maxf(0.f, -1e-3f), 0.f);
+	TEST_F(bw_maxf(0.f, -1.f), 0.f);
+	TEST_F(bw_maxf(0.f, -1e3f), 0.f);
+	TEST_F(bw_maxf(0.f, -INFINITY), 0.f);
+	TEST_F(bw_maxf(-1e-3f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(-1e-3f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(-1e-3f, 1.f), 1.f);
+	TEST_F(bw_maxf(-1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_maxf(-1e-3f, 0.f), 0.f);
+	TEST_F(bw_maxf(-1e-3f, -1e-3f), -1e-3f);
+	TEST_F(bw_maxf(-1e-3f, -1.f), -1e-3f);
+	TEST_F(bw_maxf(-1e-3f, -1e3f), -1e-3f);
+	TEST_F(bw_maxf(-1e-3f, -INFINITY), -1e-3f);
+	TEST_F(bw_maxf(-1.f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(-1.f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(-1.f, 1.f), 1.f);
+	TEST_F(bw_maxf(-1.f, 1e-3f), 1e-3f);
+	TEST_F(bw_maxf(-1.f, 0.f), 0.f);
+	TEST_F(bw_maxf(-1.f, -1e-3f), -1e-3f);
+	TEST_F(bw_maxf(-1.f, -1.f), -1.f);
+	TEST_F(bw_maxf(-1.f, -1e3f), -1.f);
+	TEST_F(bw_maxf(-1.f, -INFINITY), -1.f);
+	TEST_F(bw_maxf(-1e3f, INFINITY), INFINITY);
+	TEST_F(bw_maxf(-1e3f, 1e3f), 1e3f);
+	TEST_F(bw_maxf(-1e3f, 1.f), 1.f);
+	TEST_F(bw_maxf(-1e3f, 1e-3f), 1e-3f);
+	TEST_F(bw_maxf(-1e3f, 0.f), 0.f);
+	TEST_F(bw_maxf(-1e3f, -1e-3f), -1e-3f);
+	TEST_F(bw_maxf(-1e3f, -1.f), -1.f);
+	TEST_F(bw_maxf(-1e3f, -1e3f), -1e3f);
+	TEST_F(bw_maxf(-1e3f, -INFINITY), -1e3f);
+	TEST_F(bw_maxf(-INFINITY, INFINITY), INFINITY);
+	TEST_F(bw_maxf(-INFINITY, 1e3f), 1e3f);
+	TEST_F(bw_maxf(-INFINITY, 1.f), 1.f);
+	TEST_F(bw_maxf(-INFINITY, 1e-3f), 1e-3f);
+	TEST_F(bw_maxf(-INFINITY, 0.f), 0.f);
+	TEST_F(bw_maxf(-INFINITY, -1e-3f), -1e-3f);
+	TEST_F(bw_maxf(-INFINITY, -1.f), -1.f);
+	TEST_F(bw_maxf(-INFINITY, -1e3f), -1e3f);
+	TEST_F(bw_maxf(-INFINITY, -INFINITY), -INFINITY);
+	
+	TEST_F(bw_clipf(INFINITY, -INFINITY, INFINITY), INFINITY);
+	TEST_F(bw_clipf(INFINITY, -1e3f, 1e3f), 1e3f);
+	TEST_F(bw_clipf(INFINITY, -1.f, 1.f), 1.f);
+	TEST_F(bw_clipf(INFINITY, -1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_clipf(INFINITY, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(1e3f, -INFINITY, INFINITY), 1e3f);
+	TEST_F(bw_clipf(1e3f, -1e3f, 1e3f), 1e3f);
+	TEST_F(bw_clipf(1e3f, -1.f, 1.f), 1.f);
+	TEST_F(bw_clipf(1e3f, -1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_clipf(1e3f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(1.f, -INFINITY, INFINITY), 1.f);
+	TEST_F(bw_clipf(1.f, -1e3f, 1e3f), 1.f);
+	TEST_F(bw_clipf(1.f, -1.f, 1.f), 1.f);
+	TEST_F(bw_clipf(1.f, -1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_clipf(1.f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(1e-3f, -INFINITY, INFINITY), 1e-3f);
+	TEST_F(bw_clipf(1e-3f, -1e3f, 1e3f), 1e-3f);
+	TEST_F(bw_clipf(1e-3f, -1.f, 1.f), 1e-3f);
+	TEST_F(bw_clipf(1e-3f, -1e-3f, 1e-3f), 1e-3f);
+	TEST_F(bw_clipf(1e-3f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(0.f, -INFINITY, INFINITY), 0.f);
+	TEST_F(bw_clipf(0.f, -1e3f, 1e3f), 0.f);
+	TEST_F(bw_clipf(0.f, -1.f, 1.f), 0.f);
+	TEST_F(bw_clipf(0.f, -1e-3f, 1e-3f), 0.f);
+	TEST_F(bw_clipf(0.f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(-1e-3f, -INFINITY, INFINITY), -1e-3f);
+	TEST_F(bw_clipf(-1e-3f, -1e3f, 1e3f), -1e-3f);
+	TEST_F(bw_clipf(-1e-3f, -1.f, 1.f), -1e-3f);
+	TEST_F(bw_clipf(-1e-3f, -1e-3f, 1e-3f), -1e-3f);
+	TEST_F(bw_clipf(-1e-3f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(-1.f, -INFINITY, INFINITY), -1.f);
+	TEST_F(bw_clipf(-1.f, -1e3f, 1e3f), -1.f);
+	TEST_F(bw_clipf(-1.f, -1.f, 1.f), -1.f);
+	TEST_F(bw_clipf(-1.f, -1e-3f, 1e-3f), -1e-3f);
+	TEST_F(bw_clipf(-1.f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(-1e3f, -INFINITY, INFINITY), -1e3f);
+	TEST_F(bw_clipf(-1e3f, -1e3f, 1e3f), -1e3f);
+	TEST_F(bw_clipf(-1e3f, -1.f, 1.f), -1.f);
+	TEST_F(bw_clipf(-1e3f, -1e-3f, 1e-3f), -1e-3f);
+	TEST_F(bw_clipf(-1e3f, 0.f, 0.f), 0.f);
+	TEST_F(bw_clipf(-INFINITY, -INFINITY, INFINITY), -INFINITY);
+	TEST_F(bw_clipf(-INFINITY, -1e3f, 1e3f), -1e3f);
+	TEST_F(bw_clipf(-INFINITY, -1.f, 1.f), -1.f);
+	TEST_F(bw_clipf(-INFINITY, -1e-3f, 1e-3f), -1e-3f);
+	TEST_F(bw_clipf(-INFINITY, 0.f, 0.f), 0.f);
+	
+	TEST_F(bw_truncf(1.234e38f), 1.234e38f);
+	TEST_F(bw_truncf(1001.f), 1001.f);
+	TEST_F(bw_truncf(1000.9f), 1000.f);
+	TEST_F(bw_truncf(1000.5f), 1000.f);
+	TEST_F(bw_truncf(1000.1f), 1000.f);
+	TEST_F(bw_truncf(1000.0f), 1000.f);
+	TEST_F(bw_truncf(999.9f), 999.f);
+	TEST_F(bw_truncf(999.5f), 999.f);
+	TEST_F(bw_truncf(999.1f), 999.f);
+	TEST_F(bw_truncf(999.f), 999.f);
+	TEST_F(bw_truncf(1.5f), 1.f);
+	TEST_F(bw_truncf(1.f), 1.f);
+	TEST_F(bw_truncf(0.9f), 0.f);
+	TEST_F(bw_truncf(0.5f), 0.f);
+	TEST_F(bw_truncf(0.1f), 0.f);
+	TEST_F(bw_truncf(0.0f), 0.f);
+	TEST_F(bw_truncf(-0.0f), 0.f);
+	TEST_F(bw_truncf(-0.1f), 0.f);
+	TEST_F(bw_truncf(-0.5f), 0.f);
+	TEST_F(bw_truncf(-0.9f), 0.f);
+	TEST_F(bw_truncf(-1.f), -1.f);
+	TEST_F(bw_truncf(-1.5f), -1.f);
+	TEST_F(bw_truncf(-999.f), -999.f);
+	TEST_F(bw_truncf(-999.1f), -999.f);
+	TEST_F(bw_truncf(-999.5f), -999.f);
+	TEST_F(bw_truncf(-999.9f), -999.f);
+	TEST_F(bw_truncf(-1000.0f), -1000.f);
+	TEST_F(bw_truncf(-1000.1f), -1000.f);
+	TEST_F(bw_truncf(-1000.5f), -1000.f);
+	TEST_F(bw_truncf(-1000.9f), -1000.f);
+	TEST_F(bw_truncf(-1001.f), -1001.f);
+	TEST_F(bw_truncf(-1.234e38f), -1.234e38f);
+	
+	TEST_F(bw_roundf(1.234e38f), 1.234e38f);
+	TEST_F(bw_roundf(1001.f), 1001.f);
+	TEST_F(bw_roundf(1000.9f), 1001.f);
+	TEST_F(bw_roundf(1000.5f), 1001.f);
+	TEST_F(bw_roundf(1000.1f), 1000.f);
+	TEST_F(bw_roundf(1000.0f), 1000.f);
+	TEST_F(bw_roundf(999.9f), 1000.f);
+	TEST_F(bw_roundf(999.5f), 1000.f);
+	TEST_F(bw_roundf(999.1f), 999.f);
+	TEST_F(bw_roundf(999.f), 999.f);
+	TEST_F(bw_roundf(1.5f), 2.f);
+	TEST_F(bw_roundf(1.f), 1.f);
+	TEST_F(bw_roundf(0.9f), 1.f);
+	TEST_F(bw_roundf(0.5f), 1.f);
+	TEST_F(bw_roundf(0.1f), 0.f);
+	TEST_F(bw_roundf(0.0f), 0.f);
+	TEST_F(bw_roundf(-0.0f), 0.f);
+	TEST_F(bw_roundf(-0.1f), 0.f);
+	TEST_F(bw_roundf(-0.5f), -1.f);
+	TEST_F(bw_roundf(-0.9f), -1.f);
+	TEST_F(bw_roundf(-1.f), -1.f);
+	TEST_F(bw_roundf(-1.5f), -2.f);
+	TEST_F(bw_roundf(-999.f), -999.f);
+	TEST_F(bw_roundf(-999.1f), -999.f);
+	TEST_F(bw_roundf(-999.5f), -1000.f);
+	TEST_F(bw_roundf(-999.9f), -1000.f);
+	TEST_F(bw_roundf(-1000.0f), -1000.f);
+	TEST_F(bw_roundf(-1000.1f), -1000.f);
+	TEST_F(bw_roundf(-1000.5f), -1001.f);
+	TEST_F(bw_roundf(-1000.9f), -1001.f);
+	TEST_F(bw_roundf(-1001.f), -1001.f);
+	TEST_F(bw_roundf(-1.234e38f), -1.234e38f);
+	
+	TEST_F(bw_floorf(1.234e38f), 1.234e38f);
+	TEST_F(bw_floorf(1001.f), 1001.f);
+	TEST_F(bw_floorf(1000.9f), 1000.f);
+	TEST_F(bw_floorf(1000.5f), 1000.f);
+	TEST_F(bw_floorf(1000.1f), 1000.f);
+	TEST_F(bw_floorf(1000.0f), 1000.f);
+	TEST_F(bw_floorf(999.9f), 999.f);
+	TEST_F(bw_floorf(999.5f), 999.f);
+	TEST_F(bw_floorf(999.1f), 999.f);
+	TEST_F(bw_floorf(999.f), 999.f);
+	TEST_F(bw_floorf(1.5f), 1.f);
+	TEST_F(bw_floorf(1.f), 1.f);
+	TEST_F(bw_floorf(0.9f), 0.f);
+	TEST_F(bw_floorf(0.5f), 0.f);
+	TEST_F(bw_floorf(0.1f), 0.f);
+	TEST_F(bw_floorf(0.0f), 0.f);
+	TEST_F(bw_floorf(-0.0f), 0.f);
+	TEST_F(bw_floorf(-0.1f), -1.f);
+	TEST_F(bw_floorf(-0.5f), -1.f);
+	TEST_F(bw_floorf(-0.9f), -1.f);
+	TEST_F(bw_floorf(-1.f), -1.f);
+	TEST_F(bw_floorf(-1.5f), -2.f);
+	TEST_F(bw_floorf(-999.f), -999.f);
+	TEST_F(bw_floorf(-999.1f), -1000.f);
+	TEST_F(bw_floorf(-999.5f), -1000.f);
+	TEST_F(bw_floorf(-999.9f), -1000.f);
+	TEST_F(bw_floorf(-1000.0f), -1000.f);
+	TEST_F(bw_floorf(-1000.1f), -1001.f);
+	TEST_F(bw_floorf(-1000.5f), -1001.f);
+	TEST_F(bw_floorf(-1000.9f), -1001.f);
+	TEST_F(bw_floorf(-1001.f), -1001.f);
+	TEST_F(bw_floorf(-1.234e38f), -1.234e38f);
+	
+	TEST_F(bw_ceilf(1.234e38f), 1.234e38f);
+	TEST_F(bw_ceilf(1001.f), 1001.f);
+	TEST_F(bw_ceilf(1000.9f), 1001.f);
+	TEST_F(bw_ceilf(1000.5f), 1001.f);
+	TEST_F(bw_ceilf(1000.1f), 1001.f);
+	TEST_F(bw_ceilf(1000.0f), 1000.f);
+	TEST_F(bw_ceilf(999.9f), 1000.f);
+	TEST_F(bw_ceilf(999.5f), 1000.f);
+	TEST_F(bw_ceilf(999.1f), 1000.f);
+	TEST_F(bw_ceilf(999.f), 999.f);
+	TEST_F(bw_ceilf(1.5f), 2.f);
+	TEST_F(bw_ceilf(1.f), 1.f);
+	TEST_F(bw_ceilf(0.9f), 1.f);
+	TEST_F(bw_ceilf(0.5f), 1.f);
+	TEST_F(bw_ceilf(0.1f), 1.f);
+	TEST_F(bw_ceilf(0.0f), 0.f);
+	TEST_F(bw_ceilf(-0.0f), 0.f);
+	TEST_F(bw_ceilf(-0.1f), 0.f);
+	TEST_F(bw_ceilf(-0.5f), 0.f);
+	TEST_F(bw_ceilf(-0.9f), 0.f);
+	TEST_F(bw_ceilf(-1.f), -1.f);
+	TEST_F(bw_ceilf(-1.5f), -1.f);
+	TEST_F(bw_ceilf(-999.f), -999.f);
+	TEST_F(bw_ceilf(-999.1f), -999.f);
+	TEST_F(bw_ceilf(-999.5f), -999.f);
+	TEST_F(bw_ceilf(-999.9f), -999.f);
+	TEST_F(bw_ceilf(-1000.0f), -1000.f);
+	TEST_F(bw_ceilf(-1000.1f), -1000.f);
+	TEST_F(bw_ceilf(-1000.5f), -1000.f);
+	TEST_F(bw_ceilf(-1000.9f), -1000.f);
+	TEST_F(bw_ceilf(-1001.f), -1001.f);
+	TEST_F(bw_ceilf(-1.234e38f), -1.234e38f);
+	
+	TEST_BW_INTFRAC(1.f, 1.f, 0.f);
+	TEST_BW_INTFRAC(1.123f, 1.f, (1.123f - 1.f));
+	TEST_BW_INTFRAC(1.999f, 1.f, (1.999f - 1.f));
+
+	printf("\nsuceeded: %d, failed: %d\n\n", n_ok, n_ko);
+	
+	return n_ko ? EXIT_FAILURE : EXIT_SUCCESS;
+}

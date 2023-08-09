@@ -20,17 +20,20 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    A collection of mathematical routines that strive to be better suited to
  *    DSP than, e.g., those supplied by your C standard library.
  * 
  *    Such a goal is hopefully accomplished by:
+ *
  *    * being as branchless as reasonable/convenient;
- *    * not handling uninteresting corner cases, such as invalid,
- *      infinity, and NaN input values;
- *    * returning approximated results (indicated in this documentation).
+ *    * not handling uninteresting corner cases, such as out-of-range,
+ *      NaN, and sometimes infinity input values (out-of-range and NaN inputs
+ *      are always considered invalid and lead to undefined behavior);
+ *    * returning approximated results (indicated in this documentation);
+ *    * making no distinction between `0.f` and `-0.f`.
  * 
  *    In practice they should guarantee fast and consistent performance, but
  *    always do your own benchmarking.
@@ -41,6 +44,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>WRITEME: document changes!!!</li>
+ *          <li>Avoided using reserved identifiers.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Added debugging code.</li>
@@ -82,8 +91,8 @@
  *  }}}
  */
 
-#ifndef _BW_MATH_H
-#define _BW_MATH_H
+#ifndef BW_MATH_H
+#define BW_MATH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -154,21 +163,17 @@ static inline float bw_absf(float x);
 /*! <<<```
  *    Returns the absolute value of `x`.
  *
- *    #### bw_min0xf()
+ *    #### bw_min0f()
  *  ```>>> */
-static inline float bw_min0xf(float x);
+static inline float bw_min0f(float x);
 /*! <<<```
  *    Returns the minimum of `0.f` and `x`.
  *
- *    `x` must be finite.
- *
- *    #### bw_max0xf()
+ *    #### bw_max0f()
  *  ```>>> */
-static inline float bw_max0xf(float x);
+static inline float bw_max0f(float x);
 /*! <<<```
  *    Returns the maximum of `0.f` and `x`.
- *
- *    `x` must be finite.
  *
  *    #### bw_minf()
  *  ```>>> */
@@ -193,7 +198,7 @@ static inline float bw_clipf(float x, float m, float M);
  *    Returns `x` unless it is smaller than `m`, in which case it returns `m`,
  *    or bigger than `M`, in which case it returns `M`.
  *
- *    `x`, `m`, and `M` must be finite.
+ *    `M` must be greater than or equal to `m`.
  *
  *    #### bw_truncf()
  *  ```>>> */
@@ -201,6 +206,8 @@ static inline float bw_truncf(float x);
 /*! <<<```
  *    Returns `x` with its fractional part set to zero (i.e., rounded towards
  *    zero).
+ *
+ *    `x` must be finite.
  *
  *    #### bw_roundf()
  *  ```>>> */
@@ -211,6 +218,8 @@ static inline float bw_roundf(float x);
  *    Halfway cases are rounded away from zero. E.g., `bw_roundf(0.5f)` gives
  *    `1.f` and `bw_roundf(-0.5f)` gives `-1.f`.
  *
+ *    `x` must be finite.
+ *
  *    #### bw_floorf()
  *  ```>>> */
 static inline float bw_floorf(float x);
@@ -218,12 +227,16 @@ static inline float bw_floorf(float x);
  *    Returns the biggest integer less or equal than `x` (i.e., `x` is rounded
  *    down).
  *
+ *    `x` must be finite.
+ *
  *    #### bw_ceilf()
  *  ```>>> */
 static inline float bw_ceilf(float x);
 /*! <<<```
  *    Returns the smallest integer greater or equal than `x` (i.e., `x` is
  *    rounded up).
+ *
+ *    `x` must be finite.
  *
  *    #### bw_intfracf()
  *  ```>>> */
@@ -427,12 +440,6 @@ static inline float bw_acoshf_3(float x);
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-typedef union {
-	float f;
-	int32_t i;
-	uint32_t u;
-} _bw_floatint;
-
 // I hope the target architecture and compiler will use conditional ops here
 
 static inline int32_t bw_signfilli32(int32_t x) {
@@ -467,87 +474,105 @@ static inline uint32_t bw_clipu32(uint32_t x, uint32_t m, uint32_t M) {
 // floating point numbers
 
 static inline float bw_copysignf(float x, float y) {
-	_bw_floatint v = {.f = x};
-	_bw_floatint s = {.f = y};
-	v.i = (v.i & 0x7fffffff) | (s.i & 0x80000000);
+	BW_ASSERT(!bw_is_nan(x));
+	BW_ASSERT(!bw_is_nan(y));
+	union { float f; uint32_t u; } v, s;
+	v.f = x;
+	s.f = y;
+	v.u = (v.u & 0x7fffffffu) | (s.u & 0x80000000u);
+	BW_ASSERT(!bw_is_nan(v.f));
 	return v.f;
 }
 
 static inline float bw_signf(float x) {
+	BW_ASSERT(!bw_is_nan(x));
 	static const float y[4] = { 0.f, 1.f, 0.f, -1.f };
-	_bw_floatint v = {.f = x};
-	return y[bw_minu32(v.u & 0x7fffffff, 1) | ((v.u >> 30) & 0x2)];
+	union { float f; uint32_t u; } v;
+	v.f = x;
+	const float r = y[bw_minu32(v.u & 0x7fffffffu, 1) | ((v.u >> 30) & 0x2)];
+	BW_ASSERT(!bw_is_nan(r));
+	return r;
 }
 
 static inline float bw_absf(float x) {
-	_bw_floatint v = {.f = x};
-	v.i = v.i & 0x7fffffff;
+	BW_ASSERT(!bw_is_nan(x));
+	union { float f; uint32_t u; } v;
+	v.f = x;
+	v.u = v.u & 0x7fffffffu;
+	BW_ASSERT(!bw_is_nan(v.f));
 	return v.f;
 }
 
-static inline float bw_min0xf(float x) {
-	BW_ASSERT(bw_is_finite(x));
-	const float y = 0.5f * (x - bw_absf(x));
-	BW_ASSERT(bw_is_finite(y));
-	return y;
+static inline float bw_min0f(float x) {
+	BW_ASSERT(!bw_is_nan(x));
+	union { float f; int32_t i; } v;
+	v.f = x;
+	v.i = bw_mini32(0, v.i);
+	BW_ASSERT(!bw_is_nan(v.f));
+	return v.f;
 }
 
-static inline float bw_max0xf(float x) {
-	BW_ASSERT(bw_is_finite(x));
-	const float y = 0.5f * (x + bw_absf(x));
-	BW_ASSERT(bw_is_finite(y));
-	return y;
+static inline float bw_max0f(float x) {
+	BW_ASSERT(!bw_is_nan(x));
+	union { float f; int32_t i; } v;
+	v.f = x;
+	v.i = bw_maxi32(0, v.i);
+	BW_ASSERT(!bw_is_nan(v.f));
+	return v.f;
 }
 
 static inline float bw_minf(float a, float b) {
-	BW_ASSERT(bw_is_finite(a));
-	BW_ASSERT(bw_is_finite(b));
-	const float y = a + bw_min0xf(b - a);
-	BW_ASSERT(bw_is_finite(y));
+	BW_ASSERT(!bw_is_nan(a));
+	BW_ASSERT(!bw_is_nan(b));
+	const float y = a < b ? a : b;
+	BW_ASSERT(!bw_is_nan(y));
 	return y;
 }
 
 static inline float bw_maxf(float a, float b) {
-	BW_ASSERT(bw_is_finite(a));
-	BW_ASSERT(bw_is_finite(b));
-	const float y = a + bw_max0xf(b - a);
-	BW_ASSERT(bw_is_finite(y));
+	BW_ASSERT(!bw_is_nan(a));
+	BW_ASSERT(!bw_is_nan(b));
+	const float y = a > b ? a : b;
+	BW_ASSERT(!bw_is_nan(y));
 	return y;
 }
 
 static inline float bw_clipf(float x, float m, float M) {
-	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(bw_is_finite(m));
-	BW_ASSERT(bw_is_finite(M));
+	BW_ASSERT(!bw_is_nan(x));
+	BW_ASSERT(!bw_is_nan(m));
+	BW_ASSERT(!bw_is_nan(M));
+	BW_ASSERT(M >= m);
 	const float y = bw_minf(bw_maxf(x, m), M);
-	BW_ASSERT(bw_is_finite(y));
+	BW_ASSERT(!bw_is_nan(y));
 	return y;
 }
 
 static inline float bw_truncf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	_bw_floatint v = {.f = x};
-	int32_t ex = (v.i & 0x7f800000) >> 23;
+	union { float f; uint32_t u; } v;
+	v.f = x;
+	const int32_t ex = (v.u & 0x7f800000u) >> 23;
 	int32_t m = (~0u) << bw_clipi32(150 - ex, 0, 23);
 	m &= bw_signfilli32(126 - ex) | 0x80000000;
-	v.i &= m;
+	v.u &= m;
 	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }
 
 static inline float bw_roundf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	_bw_floatint v = {.f = x};
-	int32_t ex = (v.i & 0x7f800000) >> 23;
-	int32_t sh = bw_clipi32(150 - ex, 0, 23);
+	union { float f; uint32_t u; } v, s;
+	v.f = x;
+	const int32_t ex = (v.u & 0x7f800000u) >> 23;
+	const int32_t sh = bw_clipi32(150 - ex, 0, 24);
 	int32_t mt = (~0u) << sh;
 	mt &= bw_signfilli32(126 - ex) | 0x80000000;
 	int32_t mr = (1 << sh) >> 1;
 	mr &= bw_signfilli32(125 - ex);
-	_bw_floatint s = {.f = bw_copysignf(1.f, x)};
-	int32_t ms = bw_signfilli32((v.i & mr) << (32 - sh));
-	v.i &= mt;
-	s.i &= ms;
+	s.f = bw_copysignf(1.f, x);
+	int32_t ms = bw_signfilli32(((v.u | 0x00800000u) & mr) << (32 - sh));
+	v.u &= mt;
+	s.u &= ms;
 	const float y = v.f + s.f;
 	BW_ASSERT(bw_is_finite(y));
 	return y;
@@ -555,9 +580,10 @@ static inline float bw_roundf(float x) {
 
 static inline float bw_floorf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
-	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
-	_bw_floatint s = {.f = 1.f};
+	union { float f; int32_t i; } t, y, s;
+	t.f = bw_truncf(x); // first bit set when t < 0
+	y.f = x - t.f; // first bit set when t > x
+	s.f = 1.f;
 	s.i &= bw_signfilli32(t.i & y.i);
 	const float r = t.f - s.f;
 	BW_ASSERT(bw_is_finite(r));
@@ -566,9 +592,10 @@ static inline float bw_floorf(float x) {
 
 static inline float bw_ceilf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	_bw_floatint t = {.f = bw_truncf(x)}; // first bit set when t < 0
-	_bw_floatint y = {.f = x - t.f}; // first bit set when t > x
-	_bw_floatint s = {.f = 1.f};
+	union { float f; int32_t i; } t, y, s;
+	t.f = bw_truncf(x); // first bit set when t < 0
+	y.f = t.f - x; // first bit set when t < x
+	s.f = 1.f;
 	s.i &= bw_signfilli32(~t.i & y.i);
 	const float r = t.f + s.f;
 	BW_ASSERT(bw_is_finite(r));
@@ -584,7 +611,8 @@ static inline void bw_intfracf(float x, float *i, float *f) {
 }
 
 static inline float bw_rcpf_2(float x) {
-	_bw_floatint v = {.f = x};
+	union { float f; int32_t i; } v;
+	v.f = x;
 	v.i = 0x7ef0e840 - v.i;
 	v.f = v.f + v.f - x * v.f * v.f;
 	v.f = v.f + v.f - x * v.f * v.f;
@@ -645,7 +673,8 @@ static inline float bw_tanf_3(float x) {
 static inline float bw_log2f_3(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
-	_bw_floatint v = {.f = x};
+	union { float f; int32_t i; } v;
+	v.f = x;
 	int e = v.i >> 23;
 	v.i = (v.i & 0x007fffff) | 0x3f800000;
 	const float y = (float)e - 129.213475204444817f + v.f * (3.148297929334117f + v.f * (-1.098865286222744f + v.f * 0.1640425613334452f));
@@ -674,7 +703,8 @@ static inline float bw_pow2f_3(float x) {
 	BW_ASSERT(x <= 127.999f);
 	if (x < -126.f)
 		return 0.f;
-	_bw_floatint v = {.f = x};
+	union { float f; int32_t i; } v;
+	v.f = x;
 	int xi = (int)x;
 	int l = xi - ((v.i >> 31) & 1);
 	float f = x - (float)l;
@@ -724,7 +754,8 @@ static inline float bw_sqrtf_2(float x) {
 		BW_ASSERT(bw_is_finite(y));
 		return y;
 	}
-	_bw_floatint v = {.f = x};
+	union { float f; uint32_t u; } v;
+	v.f = x;
 	v.u = (((v.u - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
 	float r = bw_rcpf_2(x);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);

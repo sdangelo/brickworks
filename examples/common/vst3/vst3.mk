@@ -17,7 +17,7 @@ CXXFLAGS := \
 	-Wall \
 	-Wextra \
 	-Wpedantic \
-	-std=c++20
+	-std=c++11
 LDFLAGS := \
 	-shared
 

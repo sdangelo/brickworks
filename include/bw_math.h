@@ -265,6 +265,8 @@ static inline float bw_sin2pif_3(float x);
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
  *
+ *    `x` must be finite.
+ *
  *    #### bw_sinf_3()
  *  ```>>> */
 static inline float bw_sinf_3(float x);
@@ -273,6 +275,8 @@ static inline float bw_sinf_3(float x);
  *    radians.
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
+ *
+ *    `x` must be finite.
  *
  *    #### bw_cos2pif_3()
  *  ```>>> */
@@ -283,6 +287,8 @@ static inline float bw_cos2pif_3(float x);
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
  *
+ *    `x` must be finite.
+ *
  *    #### bw_cosf_3()
  *  ```>>> */
 static inline float bw_cosf_3(float x);
@@ -291,6 +297,8 @@ static inline float bw_cosf_3(float x);
  *    radians.
  * 
  *    Absolute error < 0.011, relative error < 1.7%.
+ *
+ *    `x` must be finite.
  *
  *    #### bw_tan2pif_3()
  *  ```>>> */
@@ -305,6 +313,8 @@ static inline float bw_tan2pif_3(float x);
  *
  *    Absolute error < 0.06, relative error < 0.8%.
  *
+ *    `x` must be finite.
+ *
  *    #### bw_tanf_3()
  *  ```>>> */
 static inline float bw_tanf_3(float x);
@@ -317,6 +327,8 @@ static inline float bw_tanf_3(float x);
  *    integer number.
  *
  *    Absolute error < 0.06, relative error < 0.8%.
+ *
+ *    `x` must be finite.
  *
  *    #### bw_log2f_3()
  *  ```>>> */
@@ -611,11 +623,14 @@ static inline void bw_intfracf(float x, float *i, float *f) {
 }
 
 static inline float bw_rcpf_2(float x) {
+	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT((x >= 8.077935669e-28f && x <= 1.237940039e27f) || (x <= -8.077935669e-28f && x >= -1.237940039e27f));
 	union { float f; int32_t i; } v;
 	v.f = x;
 	v.i = 0x7ef0e840 - v.i;
 	v.f = v.f + v.f - x * v.f * v.f;
 	v.f = v.f + v.f - x * v.f * v.f;
+	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }
 

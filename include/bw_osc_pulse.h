@@ -230,7 +230,7 @@ static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *B
 	float v = bw_copysignf(1.f, pw_m_phase); // pw = phase case should be properly compensated by the AA
 	if (x_phase_inc != 0.f) {
 		const float phase_inc_2 = x_phase_inc + x_phase_inc;
-		const float phase_inc_rcp = bw_rcpf_2(x_phase_inc);
+		const float phase_inc_rcp = bw_rcpf(x_phase_inc);
 		const float phase_2 = 0.5f * v + 0.5f - pw_m_phase;
 		const float s_1_m_phase = 1.f - x;
 		const float s_1_m_phase_2 = 1.f - phase_2;

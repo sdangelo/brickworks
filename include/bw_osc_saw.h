@@ -169,7 +169,7 @@ static inline float bw_osc_saw_process1_antialias(const bw_osc_saw_coeffs *BW_RE
 	float v = x - s_1_m_phase;
 	if (x_phase_inc != 0.f) {
 		const float phase_inc_2 = x_phase_inc + x_phase_inc;
-		const float phase_inc_rcp = bw_rcpf_2(x_phase_inc);
+		const float phase_inc_rcp = bw_rcpf(x_phase_inc);
 		if (s_1_m_phase < phase_inc_2)
 			v += _bw_osc_saw_blep_diff(s_1_m_phase * phase_inc_rcp);
 		if (x < phase_inc_2)

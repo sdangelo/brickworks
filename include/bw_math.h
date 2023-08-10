@@ -48,6 +48,7 @@
  *        <ul>
  *          <li>Renamed <code>bw_min0xf()</code> as <code>bw_min0f()</code> and
  *              <code>bw_max0xf()</code> as <code>bw_max0f()</code>.</li>
+ *          <li>Removed precision suffixes from function names.</li>
  *          <li>New implementations for <code>bw_min0f()</code>,
  *              <code>bw_max0f()</code>, <code>bw_minf()</code>,
  *              <code>bw_maxf()</code>, and <code>bw_clipf()</code>.</li>
@@ -256,9 +257,9 @@ static inline void bw_intfracf(float x, float *i, float *f);
  *    Puts the integer part (floor) of `x` in `i` and the fractional part in
  *    `f`.
  *
- *    #### bw_rcpf_2()
+ *    #### bw_rcpf()
  *  ```>>> */
-static inline float bw_rcpf_2(float x);
+static inline float bw_rcpf(float x);
 /*! <<<```
  *    Returns the reciprocal of `x` (i.e., `1.f / x`).
  *
@@ -267,9 +268,9 @@ static inline float bw_rcpf_2(float x);
  *
  *    Relative error < 0.0013%.
  *
- *    #### bw_sin2pif_3()
+ *    #### bw_sin2pif()
  *  ```>>> */
-static inline float bw_sin2pif_3(float x);
+static inline float bw_sin2pif(float x);
 /*! <<<```
  *    Returns an approximation of the sine of 2 * pi * `x`, where `x` is given
  *    in radians.
@@ -278,9 +279,9 @@ static inline float bw_sin2pif_3(float x);
  *
  *    `x` must be finite.
  *
- *    #### bw_sinf_3()
+ *    #### bw_sinf()
  *  ```>>> */
-static inline float bw_sinf_3(float x);
+static inline float bw_sinf(float x);
 /*! <<<```
  *    Returns an approximation of the sine of `x`, where `x` is given in
  *    radians.
@@ -289,9 +290,9 @@ static inline float bw_sinf_3(float x);
  *
  *    `x` must be finite.
  *
- *    #### bw_cos2pif_3()
+ *    #### bw_cos2pif()
  *  ```>>> */
-static inline float bw_cos2pif_3(float x); 
+static inline float bw_cos2pif(float x); 
 /*! <<<```
  *    Returns an approximation of the cosine of 2 * pi * `x`, where `x` is given
  *    in radians.
@@ -300,9 +301,9 @@ static inline float bw_cos2pif_3(float x);
  *
  *    `x` must be finite.
  *
- *    #### bw_cosf_3()
+ *    #### bw_cosf()
  *  ```>>> */
-static inline float bw_cosf_3(float x);
+static inline float bw_cosf(float x);
 /*! <<<```
  *    Returns an approximation of the cosine of `x`, where `x` is given in
  *    radians.
@@ -311,9 +312,9 @@ static inline float bw_cosf_3(float x);
  *
  *    `x` must be finite.
  *
- *    #### bw_tan2pif_3()
+ *    #### bw_tan2pif()
  *  ```>>> */
-static inline float bw_tan2pif_3(float x);
+static inline float bw_tan2pif(float x);
 /*! <<<```
  *    Returns an approximation of the tangent of 2 * pi * `x`, where `x` is
  *    given in radians.
@@ -326,9 +327,9 @@ static inline float bw_tan2pif_3(float x);
  *
  *    `x` must be finite.
  *
- *    #### bw_tanf_3()
+ *    #### bw_tanf()
  *  ```>>> */
-static inline float bw_tanf_3(float x);
+static inline float bw_tanf(float x);
 /*! <<<```
  *    Returns an approximation of the tangent of `x`, where `x` is given in
  *    radians.
@@ -341,75 +342,75 @@ static inline float bw_tanf_3(float x);
  *
  *    `x` must be finite.
  *
- *    #### bw_log2f_3()
+ *    #### bw_log2f()
  *  ```>>> */
-static inline float bw_log2f_3(float x);
+static inline float bw_log2f(float x);
 /*! <<<```
  *    Returns an approximation of the base-2 logarithm of `x`.
  * 
  *    Absolute error < 0.0055, relative error < 1.5%.
  *
- *    #### bw_logf_3()
+ *    #### bw_logf()
  *  ```>>> */
-static inline float bw_logf_3(float x);
+static inline float bw_logf(float x);
 /*! <<<```
  *    Returns an approximation of the natural logarithm of `x`.
  * 
  *    Absolute error < 0.0039, relative error < 1.5%.
  *
- *    #### bw_log10f_3()
+ *    #### bw_log10f()
  *  ```>>> */
-static inline float bw_log10f_3(float x);
+static inline float bw_log10f(float x);
 /*! <<<```
  *    Returns an approximation of the base-10 logarithm of `x`.
  * 
  *    Absolute error < 0.0017, relative error < 1.5%.
  *
- *    #### bw_pow2f_3()
+ *    #### bw_pow2f()
  *  ```>>> */
-static inline float bw_pow2f_3(float x);
+static inline float bw_pow2f(float x);
 /*! <<<```
  *    Returns an approximation of 2 raised to the power of `x`.
  * 
  *    Relative error < 0.062%.
  *
- *    #### bw_expf_3()
+ *    #### bw_expf()
  *  ```>>> */
-static inline float bw_expf_3(float x);
+static inline float bw_expf(float x);
 /*! <<<```
  *    Returns an approximation of e (Euler's number) raised to the power of `x`.
  * 
  *    Relative error < 0.062%.
  *
- *    #### bw_pow10f_3() 
+ *    #### bw_pow10f() 
  *  ```>>> */
-static inline float bw_pow10f_3(float x);
+static inline float bw_pow10f(float x);
 /*! <<<```
  *    Returns an approximation of 10 raised to the power of `x`.
  * 
  *    Relative error < 0.062%.
  *
- *    #### bw_dB2linf_3()
+ *    #### bw_dB2linf()
  *  ```>>> */
-static inline float bw_dB2linf_3(float x);
+static inline float bw_dB2linf(float x);
 /*! <<<```
  *    Returns an approximation of 10 raised to the power of `x` / 20 (dB to
  *    linear ratio conversion).
  *
  *    Relative error < 0.062%.
  *
- *    #### bw_lin2dBf_3()
+ *    #### bw_lin2dBf()
  *  ```>>> */
-static inline float bw_lin2dBf_3(float x);
+static inline float bw_lin2dBf(float x);
 /*! <<<```
  *    Returns an approximation of 20 times the base-10 logarithm of `x` (linear
  *    ratio to dB conversion).
  *
  *    Absolute error < 0.032, relative error < 1.5%.
  * 
- *    #### bw_sqrtf_2()
+ *    #### bw_sqrtf()
  *  ```>>> */
-static inline float bw_sqrtf_2(float x);
+static inline float bw_sqrtf(float x);
 /*! <<<```
  *    Returns an approximation of the square root of `x`.
  *
@@ -417,41 +418,41 @@ static inline float bw_sqrtf_2(float x);
  * 
  *    Relative error < 0.0007%.
  *
- *    #### bw_tanhf_3()
+ *    #### bw_tanhf()
  *  ```>>> */
-static inline float bw_tanhf_3(float x);
+static inline float bw_tanhf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic tangent of `x`.
  *
  *    Absolute error < 0.035, relative error < 6.5%.
  *
- *    #### bw_sinhf_3()
+ *    #### bw_sinhf()
  *  ```>>> */
-static inline float bw_sinhf_3(float x);
+static inline float bw_sinhf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic sine of `x`.
  *
  *    Relative error < 0.07%.
  *
- *    #### bw_coshf_3()
+ *    #### bw_coshf()
  *  ```>>> */
-static inline float bw_coshf_3(float x);
+static inline float bw_coshf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic cosine of `x`.
  *
  *    Relative error < 0.07%.
  *
- *    #### bw_asinhf_3()
+ *    #### bw_asinhf()
  *  ```>>> */
-static inline float bw_asinhf_3(float x);
+static inline float bw_asinhf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic arcsine of `x`.
  *
  *    Absolute error < 0.004, relative error < 1.2%.
  *
- *    #### bw_acoshf_3()
+ *    #### bw_acoshf()
  *  ```>>> */
-static inline float bw_acoshf_3(float x);
+static inline float bw_acoshf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic arccosine of `x`.
  *
@@ -633,7 +634,7 @@ static inline void bw_intfracf(float x, float *i, float *f) {
 	BW_ASSERT(bw_is_finite(*f));
 }
 
-static inline float bw_rcpf_2(float x) {
+static inline float bw_rcpf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x >= 8.077935669e-28f && x <= 1.237940039e27f) || (x <= -8.077935669e-28f && x >= -1.237940039e27f));
 	union { float f; int32_t i; } v;
@@ -645,7 +646,7 @@ static inline float bw_rcpf_2(float x) {
 	return v.f;
 }
 
-static inline float bw_sin2pif_3(float x) {
+static inline float bw_sin2pif(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	x = x - bw_floorf(x);
 	float xp1 = x + x - 1.f;
@@ -656,47 +657,47 @@ static inline float bw_sin2pif_3(float x) {
 	return y;
 }
 
-static inline float bw_sinf_3(float x) {
+static inline float bw_sinf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	const float y = bw_sin2pif_3(0.1591549430918953f * x);
+	const float y = bw_sin2pif(0.1591549430918953f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_cos2pif_3(float x) {
+static inline float bw_cos2pif(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	const float y = bw_sin2pif_3(x + 0.25f);
+	const float y = bw_sin2pif(x + 0.25f);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_cosf_3(float x) {
+static inline float bw_cosf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	const float y = bw_cos2pif_3(0.1591549430918953f * x);
+	const float y = bw_cos2pif(0.1591549430918953f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_tan2pif_3(float x) {
+static inline float bw_tan2pif(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x - 0.5f * bw_floorf(x + x) <= 0.249840845056908f)
 			|| (x - 0.5f * bw_floorf(x + x) >= 0.250159154943092f));
-	const float y = bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
+	const float y = bw_sin2pif(x) * bw_rcpf(bw_cos2pif(x));
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_tanf_3(float x) {
+static inline float bw_tanf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) <= 1.569796326794897f)
 			|| (x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) >= 1.571796326794896f));
 	x = 0.1591549430918953f * x;
-	const float y = bw_sin2pif_3(x) * bw_rcpf_2(bw_cos2pif_3(x));
+	const float y = bw_sin2pif(x) * bw_rcpf(bw_cos2pif(x));
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_log2f_3(float x) {
+static inline float bw_log2f(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	union { float f; int32_t i; } v;
@@ -708,23 +709,23 @@ static inline float bw_log2f_3(float x) {
 	return y;
 }
 
-static inline float bw_logf_3(float x) {
+static inline float bw_logf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
-	const float y = 0.693147180559945f * bw_log2f_3(x);
+	const float y = 0.693147180559945f * bw_log2f(x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_log10f_3(float x) {
+static inline float bw_log10f(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
-	const float y = 0.3010299956639811f * bw_log2f_3(x);
+	const float y = 0.3010299956639811f * bw_log2f(x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_pow2f_3(float x) {
+static inline float bw_pow2f(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 127.999f);
 	if (x < -126.f)
@@ -740,39 +741,39 @@ static inline float bw_pow2f_3(float x) {
 	return y;
 }
 
-static inline float bw_expf_3(float x) {
+static inline float bw_expf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 88.722f);
-	const float y = bw_pow2f_3(1.442695040888963f * x);
+	const float y = bw_pow2f(1.442695040888963f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_pow10f_3(float x) {
+static inline float bw_pow10f(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 38.531f);
-	const float y = bw_pow2f_3(3.321928094887363f * x);
+	const float y = bw_pow2f(3.321928094887363f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_dB2linf_3(float x) {
+static inline float bw_dB2linf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x <= 770.630f);
-	const float y = bw_pow2f_3(0.1660964047443682f * x);
+	const float y = bw_pow2f(0.1660964047443682f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_lin2dBf_3(float x) {
+static inline float bw_lin2dBf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
-	const float y = 20.f * bw_log10f_3(x);
+	const float y = 20.f * bw_log10f(x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_sqrtf_2(float x) {
+static inline float bw_sqrtf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 0.f);
 	if (x < 8.077935669463161e-28f) {
@@ -783,14 +784,14 @@ static inline float bw_sqrtf_2(float x) {
 	union { float f; uint32_t u; } v;
 	v.f = x;
 	v.u = (((v.u - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
-	float r = bw_rcpf_2(x);
+	float r = bw_rcpf(x);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }
 
-static inline float bw_tanhf_3(float x) {
+static inline float bw_tanhf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
@@ -799,35 +800,35 @@ static inline float bw_tanhf_3(float x) {
 	return y;
 }
 
-static inline float bw_sinhf_3(float x) {
+static inline float bw_sinhf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -88.722f && x <= 88.722f);
-	const float y = 0.5f * (bw_expf_3(x) - bw_expf_3(-x));
+	const float y = 0.5f * (bw_expf(x) - bw_expf(-x));
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_coshf_3(float x) {
+static inline float bw_coshf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -88.722f && x <= 88.722f);
-	const float y = 0.5f * (bw_expf_3(x) + bw_expf_3(-x));
+	const float y = 0.5f * (bw_expf(x) + bw_expf(-x));
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_asinhf_3(float x) {
+static inline float bw_asinhf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -1.7e38f && x <= 1.7e38f);
 	float a = bw_absf(x);
-	const float y = bw_copysignf(bw_logf_3((a >= 4096.f ? a : bw_sqrtf_2(a * a + 1.f)) + a), x);
+	const float y = bw_copysignf(bw_logf((a >= 4096.f ? a : bw_sqrtf(a * a + 1.f)) + a), x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_acoshf_3(float x) {
+static inline float bw_acoshf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.f);
-	const float y = bw_logf_3((x >= 8192.f ? x : bw_sqrtf_2(x * x - 1.f)) + x);
+	const float y = bw_logf((x >= 8192.f ? x : bw_sqrtf(x * x - 1.f)) + x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }

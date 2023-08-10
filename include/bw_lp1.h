@@ -235,9 +235,9 @@ static inline void _bw_lp1_do_update_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs, c
 		}
 		if (cutoff_changed) {
 			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
-			coeffs->y_X = bw_rcpf_2(cutoff_cur);
+			coeffs->y_X = bw_rcpf(cutoff_cur);
 		}
-		const float k = cutoff_cur * bw_rcpf_2(cutoff_cur * coeffs->t + prewarp_freq_cur);
+		const float k = cutoff_cur * bw_rcpf(cutoff_cur * coeffs->t + prewarp_freq_cur);
 		coeffs->X_x = k * prewarp_freq_cur;
 		coeffs->X_X_z1 = k * coeffs->t;
 	}

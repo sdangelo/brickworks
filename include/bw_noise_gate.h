@@ -228,7 +228,7 @@ static inline void bw_noise_gate_set_sample_rate(bw_noise_gate_coeffs *BW_RESTRI
 static inline void bw_noise_gate_reset_coeffs(bw_noise_gate_coeffs *BW_RESTRICT coeffs) {
 	bw_env_follow_reset_coeffs(&coeffs->env_follow_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
-	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio > 1e12f ? 0.f : bw_rcpf_2(coeffs->ratio));
+	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio > 1e12f ? 0.f : bw_rcpf(coeffs->ratio));
 }
 
 static inline void bw_noise_gate_reset_state(const bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT state) {
@@ -242,14 +242,14 @@ static inline void bw_noise_gate_update_coeffs_ctrl(bw_noise_gate_coeffs *BW_RES
 static inline void bw_noise_gate_update_coeffs_audio(bw_noise_gate_coeffs *BW_RESTRICT coeffs) {
 	bw_env_follow_update_coeffs_audio(&coeffs->env_follow_coeffs);
 	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
-	const float rev_ratio = bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio > 1e12f ? 0.f : bw_rcpf_2(coeffs->ratio));
-	coeffs->kc = rev_ratio < 1e-12f ? -INFINITY : 1.f - bw_rcpf_2(rev_ratio);
+	const float rev_ratio = bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio > 1e12f ? 0.f : bw_rcpf(coeffs->ratio));
+	coeffs->kc = rev_ratio < 1e-12f ? -INFINITY : 1.f - bw_rcpf(rev_ratio);
 }
 
 static inline float bw_noise_gate_process1(const bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT state, float x, float x_sc) {
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
 	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
-	return env < thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(thresh * bw_rcpf_2(env))) * x : x;
+	return env < thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(thresh * bw_rcpf(env))) * x : x;
 }
 
 static inline void bw_noise_gate_process(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, int n_samples) {

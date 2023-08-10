@@ -315,11 +315,11 @@ static inline void bw_env_gen_update_coeffs_ctrl(bw_env_gen_coeffs *BW_RESTRICT 
 	if (coeffs->param_changed) {
 		// 1 ns considered instantaneous
 		if (coeffs->param_changed & _BW_ENV_GEN_PARAM_ATTACK)
-			coeffs->attack_inc = coeffs->attack > 1e-9f ? coeffs->T * bw_rcpf_2(coeffs->attack) : INFINITY;
+			coeffs->attack_inc = coeffs->attack > 1e-9f ? coeffs->T * bw_rcpf(coeffs->attack) : INFINITY;
 		if (coeffs->param_changed & (_BW_ENV_GEN_PARAM_DECAY | _BW_ENV_GEN_PARAM_SUSTAIN))
-			coeffs->decay_inc = coeffs->decay > 1e-9f ? (coeffs->sustain - 1.f) * coeffs->T * bw_rcpf_2(coeffs->decay) : -INFINITY;
+			coeffs->decay_inc = coeffs->decay > 1e-9f ? (coeffs->sustain - 1.f) * coeffs->T * bw_rcpf(coeffs->decay) : -INFINITY;
 		if (coeffs->param_changed & (_BW_ENV_GEN_PARAM_SUSTAIN | _BW_ENV_GEN_PARAM_RELEASE))
-			coeffs->release_inc = coeffs->release > 1e-9f ? -coeffs->sustain * coeffs->T * bw_rcpf_2(coeffs->release) : -INFINITY;
+			coeffs->release_inc = coeffs->release > 1e-9f ? -coeffs->sustain * coeffs->T * bw_rcpf(coeffs->release) : -INFINITY;
 	}
 }
 

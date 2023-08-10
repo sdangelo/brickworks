@@ -864,7 +864,7 @@ static inline void bw_one_pole_set_tau_up(bw_one_pole_coeffs *BW_RESTRICT coeffs
 	BW_ASSERT(!bw_is_nan(value));
 	BW_ASSERT(value >= 0.f);
 	
-	bw_one_pole_set_cutoff_up(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
+	bw_one_pole_set_cutoff_up(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf(value));
 	// tau < 1 ns is instantaneous for any practical purpose
 	
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
@@ -878,7 +878,7 @@ static inline void bw_one_pole_set_tau_down(bw_one_pole_coeffs *BW_RESTRICT coef
 	BW_ASSERT(!bw_is_nan(value));
 	BW_ASSERT(value >= 0.f);
 	
-	bw_one_pole_set_cutoff_down(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf_2(value));
+	bw_one_pole_set_cutoff_down(coeffs, value < 1e-9f ? INFINITY : 0.1591549430918953f * bw_rcpf(value));
 	// as before
 	
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));

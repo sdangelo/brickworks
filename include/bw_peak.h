@@ -254,15 +254,15 @@ static inline void _bw_peak_update_mm2_params(bw_peak_coeffs *BW_RESTRICT coeffs
 			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_BANDWIDTH)) {
 				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH)
 					coeffs->bw_k = bw_pow2f_3(coeffs->bandwidth);
-				const float Q = bw_sqrtf_2(coeffs->bw_k * coeffs->peak_gain) * bw_rcpf_2(coeffs->bw_k - 1.f);
+				const float Q = bw_sqrtf_2(coeffs->bw_k * coeffs->peak_gain) * bw_rcpf(coeffs->bw_k - 1.f);
 				bw_mm2_set_Q(&coeffs->mm2_coeffs, Q);
-				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf_2(Q));
+				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf(Q));
 			}
 		} else {
 			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_Q)) {
 				if (coeffs->param_changed & _BW_PEAK_PARAM_Q)
 					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->Q);
-				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf_2(coeffs->Q));
+				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf(coeffs->Q));
 			}
 		}
 		coeffs->param_changed = 0;

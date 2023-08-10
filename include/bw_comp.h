@@ -275,7 +275,7 @@ static inline void bw_comp_update_coeffs_audio(bw_comp_coeffs *BW_RESTRICT coeff
 static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x, float x_sc) {
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
 	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
-	const float y = env > thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(thresh * bw_rcpf_2(env))) * x : x;
+	const float y = env > thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(thresh * bw_rcpf(env))) * x : x;
 	return bw_gain_process1(&coeffs->gain_coeffs, y);
 }
 

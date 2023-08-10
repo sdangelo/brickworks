@@ -217,7 +217,7 @@ static inline void bw_osc_tri_update_coeffs_audio(bw_osc_tri_coeffs *BW_RESTRICT
 static inline float bw_osc_tri_process1(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x) {
 	const float slope = bw_one_pole_get_y_z1(&coeffs->smooth_state);
 	const float phase_d = x + x;
-	return x < slope ? (phase_d - slope) * bw_rcpf_2(slope) : (1.f + slope - phase_d) * bw_rcpf_2(1.f - slope);
+	return x < slope ? (phase_d - slope) * bw_rcpf(slope) : (1.f + slope - phase_d) * bw_rcpf(1.f - slope);
 }
 
 // PolyBLAMP residual based on Parzen window (4th-order B-spline), one-sided (x in [0, 2])
@@ -232,10 +232,10 @@ static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RE
 	const float s_1_p_pw = 1.f + slope;
 	const float s_1_m_pw = 1.f - slope;
 	const float phase_d = x + x;
-	float v = x < slope ? (phase_d - slope) * bw_rcpf_2(slope) : (s_1_p_pw - phase_d) * bw_rcpf_2(s_1_m_pw);
+	float v = x < slope ? (phase_d - slope) * bw_rcpf(slope) : (s_1_p_pw - phase_d) * bw_rcpf(s_1_m_pw);
 	if (x_phase_inc != 0.f) {
 		const float phase_inc_2 = x_phase_inc + x_phase_inc;
-		const float phase_inc_rcp = bw_rcpf_2(x_phase_inc);
+		const float phase_inc_rcp = bw_rcpf(x_phase_inc);
 		const float pw_m_phase = slope - x;
 		const float phase_2 = bw_copysignf(0.5f, pw_m_phase) + 0.5f - pw_m_phase;
 		const float s_1_m_phase = 1.f - x;
@@ -249,7 +249,7 @@ static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RE
 			blamp -= _bw_osc_tri_blamp_diff(x * phase_inc_rcp);
 		if (phase_2 < phase_inc_2)
 			blamp += _bw_osc_tri_blamp_diff(phase_2 * phase_inc_rcp);
-		v -= bw_rcpf_2(slope * s_1_m_pw) * bw_absf(x_phase_inc) * blamp;
+		v -= bw_rcpf(slope * s_1_m_pw) * bw_absf(x_phase_inc) * blamp;
 	}
 	return v;
 }

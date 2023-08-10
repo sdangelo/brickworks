@@ -244,7 +244,7 @@ static inline void _bw_satur_do_update_coeffs(bw_satur_coeffs *BW_RESTRICT coeff
 	float gain_cur = bw_one_pole_get_y_z1(&coeffs->smooth_gain_state);
 	if (force || coeffs->gain != gain_cur) {
 		gain_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_gain_state, coeffs->gain);
-		coeffs->inv_gain = bw_rcpf_2(gain_cur);
+		coeffs->inv_gain = bw_rcpf(gain_cur);
 	}
 }
 
@@ -273,7 +273,7 @@ static inline float bw_satur_process1(const bw_satur_coeffs *BW_RESTRICT coeffs,
 	const float ax = bw_absf(x);
 	const float F = ax >= 2.115287308554551f ? ax - 0.6847736211329452f : ax * ax * ((0.00304518315009429f * ax - 0.09167437770414569f) * ax + 0.5f);
 	const float d = x - state->x_z1;
-	const float y = d * d < 1e-6f ? _bw_satur_tanhf_3(0.5f * (x + state->x_z1)) : (F - state->F_z1) * bw_rcpf_2(d);
+	const float y = d * d < 1e-6f ? _bw_satur_tanhf_3(0.5f * (x + state->x_z1)) : (F - state->F_z1) * bw_rcpf(d);
 	state->x_z1 = x;
 	state->F_z1 = F;
 	return y - coeffs->bias_dc;

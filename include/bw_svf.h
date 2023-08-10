@@ -278,16 +278,16 @@ static inline void _bw_svf_do_update_coeffs(bw_svf_coeffs *BW_RESTRICT coeffs, c
 			if (prewarp_freq_changed) {
 				prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
 				coeffs->t = bw_tanf_3(coeffs->t_k * prewarp_freq_cur);
-				coeffs->kf = coeffs->t * bw_rcpf_2(prewarp_freq_cur);
+				coeffs->kf = coeffs->t * bw_rcpf(prewarp_freq_cur);
 			}
 			coeffs->kbl = coeffs->kf * cutoff_cur;
 		}
 		if (Q_changed) {
 			Q_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_Q_state, coeffs->Q);
-			coeffs->k = bw_rcpf_2(Q_cur);
+			coeffs->k = bw_rcpf(Q_cur);
 		}
 		coeffs->hp_hb = coeffs->k + coeffs->kbl;
-		coeffs->hp_x = bw_rcpf_2(1.f + coeffs->kbl * coeffs->hp_hb);
+		coeffs->hp_x = bw_rcpf(1.f + coeffs->kbl * coeffs->hp_hb);
 	}
 }
 

@@ -164,7 +164,7 @@ static inline void bw_bd_reduce_reset_coeffs(bw_bd_reduce_coeffs *BW_RESTRICT co
 static inline void bw_bd_reduce_update_coeffs_ctrl(bw_bd_reduce_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->bit_depth_prev != coeffs->bit_depth) {
 		coeffs->k = bw_pow2f_3(coeffs->bit_depth - 1);
-		coeffs->ki = bw_rcpf_2(coeffs->k);
+		coeffs->ki = bw_rcpf(coeffs->k);
 		coeffs->max = 1.f - 0.5f * coeffs->ki;
 		coeffs->bit_depth_prev = coeffs->bit_depth;
 	}

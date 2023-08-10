@@ -225,7 +225,7 @@ static inline void _bw_clip_do_update_coeffs(bw_clip_coeffs *BW_RESTRICT coeffs,
 	float gain_cur = bw_one_pole_get_y_z1(&coeffs->smooth_gain_state);
 	if (force || coeffs->gain != gain_cur) {
 		gain_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_gain_state, coeffs->gain);
-		coeffs->inv_gain = bw_rcpf_2(gain_cur);
+		coeffs->inv_gain = bw_rcpf(gain_cur);
 	}
 }
 

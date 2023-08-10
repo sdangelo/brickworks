@@ -263,8 +263,7 @@ static inline float bw_rcpf(float x);
 /*! <<<```
  *    Returns the reciprocal of `x` (i.e., `1.f / x`).
  *
- *    Not guaranteed to work for `x` having exponent too big or too small. Safe
- *    range: |`x`| in [2^-90, 2^90].
+ *    |`x`| must be in [2^-90, 2^90].
  *
  *    Relative error < 0.0013%.
  *
@@ -274,10 +273,10 @@ static inline float bw_sin2pif(float x);
 /*! <<<```
  *    Returns an approximation of the sine of 2 * pi * `x`, where `x` is given
  *    in radians.
- * 
- *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
+ *
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    #### bw_sinf()
  *  ```>>> */
@@ -285,10 +284,10 @@ static inline float bw_sinf(float x);
 /*! <<<```
  *    Returns an approximation of the sine of `x`, where `x` is given in
  *    radians.
- * 
- *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
+ *
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    #### bw_cos2pif()
  *  ```>>> */
@@ -296,10 +295,10 @@ static inline float bw_cos2pif(float x);
 /*! <<<```
  *    Returns an approximation of the cosine of 2 * pi * `x`, where `x` is given
  *    in radians.
- * 
- *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
+ * 
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    #### bw_cosf()
  *  ```>>> */
@@ -307,10 +306,10 @@ static inline float bw_cosf(float x);
 /*! <<<```
  *    Returns an approximation of the cosine of `x`, where `x` is given in
  *    radians.
- * 
- *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
+ *
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    #### bw_tan2pif()
  *  ```>>> */
@@ -319,13 +318,10 @@ static inline float bw_tan2pif(float x);
  *    Returns an approximation of the tangent of 2 * pi * `x`, where `x` is
  *    given in radians.
  * 
- *    Not guaranteed to work for `x` too close to singularities. Safe
- *    range: `x` in [-1/4 + 5e-4f / pi, 1/4 - 5e-4f / pi] + k / 2, where k is
- *    any integer number.
- *
+ *    `x` must be finite and in [-1/4 + 5e-4f / pi, 1/4 - 5e-4f / pi] + k / 2,
+ *    where k is any integer number.
+*
  *    Absolute error < 0.06 or relative error < 0.8%, whatever is worse.
- *
- *    `x` must be finite.
  *
  *    #### bw_tanf()
  *  ```>>> */
@@ -333,22 +329,21 @@ static inline float bw_tanf(float x);
 /*! <<<```
  *    Returns an approximation of the tangent of `x`, where `x` is given in
  *    radians.
- * 
- *    Not guaranteed to work for `x` too close to singularities. Safe
- *    range: `x` in [-pi/2 + 1e-3f, pi/2 - 1e-3f] + k * pi, where k is any
- *    integer number.
+ *
+ *    `x` must be finite and in [-pi/2 + 1e-3f, pi/2 - 1e-3f] + k * pi, where k
+ *    is any integer number.
  *
  *    Absolute error < 0.06 or relative error < 0.8%, whatever is worse.
- *
- *    `x` must be finite.
  *
  *    #### bw_log2f()
  *  ```>>> */
 static inline float bw_log2f(float x);
 /*! <<<```
  *    Returns an approximation of the base-2 logarithm of `x`.
+ *
+*    `x` must be finite and greater than or equal to `1.175494350822287e-38f`.
  * 
- *    Absolute error < 0.0055, relative error < 1.5%.
+ *    Absolute error < 0.0055 or relative error < 1.2%, whatever is worse.
  *
  *    #### bw_logf()
  *  ```>>> */
@@ -356,15 +351,19 @@ static inline float bw_logf(float x);
 /*! <<<```
  *    Returns an approximation of the natural logarithm of `x`.
  * 
- *    Absolute error < 0.0039, relative error < 1.5%.
+ *    `x` must be finite and greater than or equal to `1.175494350822287e-38f`.
+ * 
+ *    Absolute error < 0.0038 or relative error < 1.2%, whatever is worse.
  *
  *    #### bw_log10f()
  *  ```>>> */
 static inline float bw_log10f(float x);
 /*! <<<```
  *    Returns an approximation of the base-10 logarithm of `x`.
- * 
- *    Absolute error < 0.0017, relative error < 1.5%.
+ *
+ *    `x` must be finite and greater than or equal to `1.175494350822287e-38f`.
+ *
+ *    Absolute error < 0.0017 or relative error < 1.2%, whatever is worse.
  *
  *    #### bw_pow2f()
  *  ```>>> */
@@ -406,7 +405,7 @@ static inline float bw_lin2dBf(float x);
  *    Returns an approximation of 20 times the base-10 logarithm of `x` (linear
  *    ratio to dB conversion).
  *
- *    Absolute error < 0.032, relative error < 1.5%.
+ *    Absolute error < 0.032, relative error < 1.2%.
  * 
  *    #### bw_sqrtf()
  *  ```>>> */

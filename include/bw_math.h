@@ -46,8 +46,19 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>WRITEME: document changes!!!</li>
- *          <li>Avoided using reserved identifiers.</li>
+ *          <li>Renamed <code>bw_min0xf()</code> as <code>bw_min0f()</code> and
+ *              <code>bw_max0xf()</code> as <code>bw_max0f()</code>.</li>
+ *          <li>New implementations for <code>bw_min0f()</code>,
+ *              <code>bw_max0f()</code>, <code>bw_minf()</code>,
+ *              <code>bw_maxf()</code>, and <code>bw_clipf()</code>.</li>
+ *          <li>Fixed rounding bug in <code>bw_roundf()</code> when absolute
+ *              value of input was in [<code>0.5f</code>,
+ *              <code>1.f</code>].</li>
+ *          <li>Fixed <code>bw_ceilf()</code> for negative input values.</li>
+ *          <li>Removed usage of reserved identifiers and designated
+ *              initializers.</li>
+ *          <li>Improved documentation w.r.t. validity of input values and
+ *              approximation errors.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -263,7 +274,7 @@ static inline float bw_sin2pif_3(float x);
  *    Returns an approximation of the sine of 2 * pi * `x`, where `x` is given
  *    in radians.
  * 
- *    Absolute error < 0.011, relative error < 1.7%.
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
  *
@@ -274,7 +285,7 @@ static inline float bw_sinf_3(float x);
  *    Returns an approximation of the sine of `x`, where `x` is given in
  *    radians.
  * 
- *    Absolute error < 0.011, relative error < 1.7%.
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
  *
@@ -285,7 +296,7 @@ static inline float bw_cos2pif_3(float x);
  *    Returns an approximation of the cosine of 2 * pi * `x`, where `x` is given
  *    in radians.
  * 
- *    Absolute error < 0.011, relative error < 1.7%.
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
  *
@@ -296,7 +307,7 @@ static inline float bw_cosf_3(float x);
  *    Returns an approximation of the cosine of `x`, where `x` is given in
  *    radians.
  * 
- *    Absolute error < 0.011, relative error < 1.7%.
+ *    Absolute error < 0.011 or relative error < 1.7%, whatever is worse.
  *
  *    `x` must be finite.
  *
@@ -311,7 +322,7 @@ static inline float bw_tan2pif_3(float x);
  *    range: `x` in [-1/4 + 5e-4f / pi, 1/4 - 5e-4f / pi] + k / 2, where k is
  *    any integer number.
  *
- *    Absolute error < 0.06, relative error < 0.8%.
+ *    Absolute error < 0.06 or relative error < 0.8%, whatever is worse.
  *
  *    `x` must be finite.
  *
@@ -326,7 +337,7 @@ static inline float bw_tanf_3(float x);
  *    range: `x` in [-pi/2 + 1e-3f, pi/2 - 1e-3f] + k * pi, where k is any
  *    integer number.
  *
- *    Absolute error < 0.06, relative error < 0.8%.
+ *    Absolute error < 0.06 or relative error < 0.8%, whatever is worse.
  *
  *    `x` must be finite.
  *

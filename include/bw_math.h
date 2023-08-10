@@ -369,8 +369,11 @@ static inline float bw_log10f(float x);
  *  ```>>> */
 static inline float bw_pow2f(float x);
 /*! <<<```
- *    Returns an approximation of 2 raised to the power of `x`.
- * 
+ *    Returns an approximation of 2 raised to the power of `x`. For `x < -126.f`
+ *    it just returns `0.f`.
+ *
+ *    `x` must be less than or equal to `127.999f`.
+ *
  *    Relative error < 0.062%.
  *
  *    #### bw_expf()
@@ -378,15 +381,21 @@ static inline float bw_pow2f(float x);
 static inline float bw_expf(float x);
 /*! <<<```
  *    Returns an approximation of e (Euler's number) raised to the power of `x`.
- * 
+ *    For `x < -87.3365447505531f` it just returns `0`.
+ *
+ *    `x` must be less than or equal to `88.722f`.
+ *
  *    Relative error < 0.062%.
  *
  *    #### bw_pow10f() 
  *  ```>>> */
 static inline float bw_pow10f(float x);
 /*! <<<```
- *    Returns an approximation of 10 raised to the power of `x`.
- * 
+ *    Returns an approximation of 10 raised to the power of `x`. For
+ *    `x < -37.92977945366162f` it just returns `0`.
+ *
+ *    `x` must be less than or equal to `38.531f`.
+ *
  *    Relative error < 0.062%.
  *
  *    #### bw_dB2linf()
@@ -725,7 +734,7 @@ static inline float bw_log10f(float x) {
 }
 
 static inline float bw_pow2f(float x) {
-	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 127.999f);
 	if (x < -126.f)
 		return 0.f;
@@ -741,7 +750,7 @@ static inline float bw_pow2f(float x) {
 }
 
 static inline float bw_expf(float x) {
-	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 88.722f);
 	const float y = bw_pow2f(1.442695040888963f * x);
 	BW_ASSERT(bw_is_finite(y));
@@ -749,7 +758,7 @@ static inline float bw_expf(float x) {
 }
 
 static inline float bw_pow10f(float x) {
-	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 38.531f);
 	const float y = bw_pow2f(3.321928094887363f * x);
 	BW_ASSERT(bw_is_finite(y));

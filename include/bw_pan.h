@@ -168,8 +168,8 @@ static inline void bw_pan_set_sample_rate(bw_pan_coeffs *BW_RESTRICT coeffs, flo
 static inline void _bw_pan_do_update_coeffs(bw_pan_coeffs *BW_RESTRICT coeffs, char force) {
 	if (force || coeffs->pan != coeffs->pan_prev) {
 		const float k = 0.125f * coeffs->pan + 0.125f;
-		bw_gain_set_gain_lin(&coeffs->l_coeffs, bw_cos2pif_3(k));
-		bw_gain_set_gain_lin(&coeffs->r_coeffs, bw_sin2pif_3(k));
+		bw_gain_set_gain_lin(&coeffs->l_coeffs, bw_cos2pif(k));
+		bw_gain_set_gain_lin(&coeffs->r_coeffs, bw_sin2pif(k));
 		coeffs->pan_prev = coeffs->pan;
 	}
 }

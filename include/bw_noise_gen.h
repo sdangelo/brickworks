@@ -160,7 +160,7 @@ static inline void bw_noise_gen_init(bw_noise_gen_coeffs *BW_RESTRICT coeffs, ui
 }
 
 static inline void bw_noise_gen_set_sample_rate(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	coeffs->scaling_k = 0.004761904761904762f * bw_sqrtf_2(sample_rate);
+	coeffs->scaling_k = 0.004761904761904762f * bw_sqrtf(sample_rate);
 }
 
 static inline float bw_noise_gen_process1(const bw_noise_gen_coeffs *BW_RESTRICT coeffs) {

@@ -249,7 +249,7 @@ static inline void bw_noise_gate_update_coeffs_audio(bw_noise_gate_coeffs *BW_RE
 static inline float bw_noise_gate_process1(const bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT state, float x, float x_sc) {
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
 	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
-	return env < thresh ? bw_pow2f_3(coeffs->kc * bw_log2f_3(thresh * bw_rcpf(env))) * x : x;
+	return env < thresh ? bw_pow2f(coeffs->kc * bw_log2f(thresh * bw_rcpf(env))) * x : x;
 }
 
 static inline void bw_noise_gate_process(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, int n_samples) {
@@ -274,7 +274,7 @@ static inline void bw_noise_gate_set_thresh_lin(bw_noise_gate_coeffs *BW_RESTRIC
 }
 
 static inline void bw_noise_gate_set_thresh_dBFS(bw_noise_gate_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->thresh = bw_dB2linf_3(value);
+	coeffs->thresh = bw_dB2linf(value);
 }
 
 static inline void bw_noise_gate_set_ratio(bw_noise_gate_coeffs *BW_RESTRICT coeffs, float value) {

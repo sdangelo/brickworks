@@ -222,8 +222,8 @@ static inline void bw_hs2_set_sample_rate(bw_hs2_coeffs *BW_RESTRICT coeffs, flo
 static inline void _bw_hs2_update_mm2_params(bw_hs2_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_HS2_PARAM_HIGH_GAIN) {
-			coeffs->sg = bw_sqrtf_2(coeffs->high_gain);
-			coeffs->ssg = bw_sqrtf_2(coeffs->sg);
+			coeffs->sg = bw_sqrtf(coeffs->high_gain);
+			coeffs->ssg = bw_sqrtf(coeffs->sg);
 			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
 			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
 			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, coeffs->high_gain - coeffs->sg);
@@ -294,7 +294,7 @@ static inline void bw_hs2_set_high_gain_lin(bw_hs2_coeffs *BW_RESTRICT coeffs, f
 }
 
 static inline void bw_hs2_set_high_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_hs2_set_high_gain_lin(coeffs, bw_dB2linf_3(value));
+	bw_hs2_set_high_gain_lin(coeffs, bw_dB2linf(value));
 }
 
 #undef _BW_HS2_PARAM_HIGH_GAIN

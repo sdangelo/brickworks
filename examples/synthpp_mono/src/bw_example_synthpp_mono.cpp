@@ -105,15 +105,15 @@ void bw_example_synthpp_mono_process(bw_example_synthpp_mono *instance, const fl
 
 	int n = instance->params[p_vco3_kbd] >= 0.5f ? instance->note : 0;
 	instance->vco1PhaseGen.setFrequency(440.f *
-		bw_pow2f_3(6.f * instance->params[p_vco1_coarse] - 3.f
+		bw_pow2f(6.f * instance->params[p_vco1_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
 			+ 8.333333333333333e-2f * ((instance->note - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco1_fine]) - 2.f)));
 	instance->vco2PhaseGen.setFrequency(440.f *
-		bw_pow2f_3(6.f * instance->params[p_vco2_coarse] - 3.f
+		bw_pow2f(6.f * instance->params[p_vco2_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
 			+ 8.333333333333333e-2f * ((instance->note - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco2_fine]) - 2.f)));
 	instance->vco3PhaseGen.setFrequency(440.f *
-		bw_pow2f_3(6.f * instance->params[p_vco3_coarse] - 3.f
+		bw_pow2f(6.f * instance->params[p_vco3_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
 			+ 8.333333333333333e-2f * ((n - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco3_fine]) - 2.f)));
 
@@ -192,11 +192,11 @@ void bw_example_synthpp_mono_process(bw_example_synthpp_mono *instance, const fl
 		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * instance->vcfEnvGen.getYZ1(0) + vcf_mod;
 		float cutoff = 20.f + (20e3f - 20.f) * v * v * v;
 		if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
-			cutoff *= bw_pow2f_3(8.333333333333333e-2f * (instance->note - 60));
+			cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->note - 60));
 		else if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 1.f / 3.f))
-			cutoff *= bw_pow2f_3((0.793700525984100f * 8.333333333333333e-2f) * (instance->note - 60));
+			cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->note - 60));
 		else if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
-			cutoff *= bw_pow2f_3((0.629960524947437f * 8.333333333333333e-2f) * (instance->note - 60));
+			cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->note - 60));
 		// otherwise no kbd control
 		instance->vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 		instance->vcf.process({out}, {out}, {nullptr}, {nullptr}, n);

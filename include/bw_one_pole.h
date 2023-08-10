@@ -408,10 +408,10 @@ static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT c
 static inline void _bw_one_pole_do_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_CUTOFF_UP)
-			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_up);
+			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : bw_expf(coeffs->Ttm2pi * coeffs->cutoff_up);
 			// tau < 1 ns is instantaneous for any practical purpose
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_CUTOFF_DOWN)
-			coeffs->mA1d = coeffs->cutoff_down > 1.591549430918953e8f ? 0.f : bw_expf_3(coeffs->Ttm2pi * coeffs->cutoff_down);
+			coeffs->mA1d = coeffs->cutoff_down > 1.591549430918953e8f ? 0.f : bw_expf(coeffs->Ttm2pi * coeffs->cutoff_down);
 			// as before
 		if (coeffs->param_changed & _BW_ONE_POLE_PARAM_STICKY_THRESH)
 			coeffs->st2 = coeffs->sticky_thresh * coeffs->sticky_thresh;

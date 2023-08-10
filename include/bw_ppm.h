@@ -208,7 +208,7 @@ static inline void bw_ppm_update_coeffs_audio(bw_ppm_coeffs *BW_RESTRICT coeffs)
 
 static inline float bw_ppm_process1(const bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state *BW_RESTRICT state, float x) {
 	const float yl = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x);
-	const float y = yl >= 1e-30f ? bw_lin2dBf_3(yl) : -INFINITY; // -600 dB is quiet enough
+	const float y = yl >= 1e-30f ? bw_lin2dBf(yl) : -INFINITY; // -600 dB is quiet enough
 	state->y_z1 = y;
 	return y;
 }

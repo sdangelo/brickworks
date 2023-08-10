@@ -250,19 +250,19 @@ static inline uint32_t bw_hash_sdbm(const char *string);
  * change at any time in future versions. Please, do not use it directly. */
 
 static inline char bw_is_inf(float x) {
-	union {uint32_t u; float f;} v;
+	union { uint32_t u; float f; } v;
 	v.f = x;
 	return (v.u & 0x7fffffff) == 0x7f800000;
 }
 
 static inline char bw_is_nan(float x) {
-	union {uint32_t u; float f;} v;
+	union { uint32_t u; float f; } v;
 	v.f = x;
 	return ((v.u & 0x7f800000) == 0x7f800000) && (v.u & 0x7fffff);
 }
 
 static inline char bw_is_finite(float x) {
-	union {uint32_t u; float f;} v;
+	union { uint32_t u; float f; } v;
 	v.f = x;
 	return (v.u & 0x7f800000) != 0x7f800000;
 }

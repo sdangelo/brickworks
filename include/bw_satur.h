@@ -215,7 +215,7 @@ struct _bw_satur_state {
 	float	F_z1;
 };
 
-static inline float _bw_satur_tanhf_3(float x) {
+static inline float _bw_satur_tanhf(float x) {
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
 	return xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
@@ -239,7 +239,7 @@ static inline void _bw_satur_do_update_coeffs(bw_satur_coeffs *BW_RESTRICT coeff
 	float bias_cur = bw_one_pole_get_y_z1(&coeffs->smooth_bias_state);
 	if (force || coeffs->bias != bias_cur) {
 		bias_cur = bw_one_pole_process1_sticky_abs(&coeffs->smooth_coeffs, &coeffs->smooth_bias_state, coeffs->bias);
-		coeffs->bias_dc = _bw_satur_tanhf_3(bias_cur);
+		coeffs->bias_dc = _bw_satur_tanhf(bias_cur);
 	}
 	float gain_cur = bw_one_pole_get_y_z1(&coeffs->smooth_gain_state);
 	if (force || coeffs->gain != gain_cur) {
@@ -273,7 +273,7 @@ static inline float bw_satur_process1(const bw_satur_coeffs *BW_RESTRICT coeffs,
 	const float ax = bw_absf(x);
 	const float F = ax >= 2.115287308554551f ? ax - 0.6847736211329452f : ax * ax * ((0.00304518315009429f * ax - 0.09167437770414569f) * ax + 0.5f);
 	const float d = x - state->x_z1;
-	const float y = d * d < 1e-6f ? _bw_satur_tanhf_3(0.5f * (x + state->x_z1)) : (F - state->F_z1) * bw_rcpf(d);
+	const float y = d * d < 1e-6f ? _bw_satur_tanhf(0.5f * (x + state->x_z1)) : (F - state->F_z1) * bw_rcpf(d);
 	state->x_z1 = x;
 	state->F_z1 = F;
 	return y - coeffs->bias_dc;

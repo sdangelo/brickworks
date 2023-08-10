@@ -205,7 +205,7 @@ static inline void bw_ls1_set_sample_rate(bw_ls1_coeffs *BW_RESTRICT coeffs, flo
 
 static inline void _bw_ls1_update_mm1_params(bw_ls1_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->update) {
-		bw_mm1_set_cutoff(&coeffs->mm1_coeffs, coeffs->cutoff * bw_rcpf(bw_sqrtf_2(coeffs->dc_gain)));
+		bw_mm1_set_cutoff(&coeffs->mm1_coeffs, coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)));
 		bw_mm1_set_coeff_lp(&coeffs->mm1_coeffs, coeffs->dc_gain - 1.f);
 		bw_mm1_set_prewarp_freq(&coeffs->mm1_coeffs, coeffs->cutoff);
 		coeffs->update = 0;
@@ -267,7 +267,7 @@ static inline void bw_ls1_set_dc_gain_lin(bw_ls1_coeffs *BW_RESTRICT coeffs, flo
 }
 
 static inline void bw_ls1_set_dc_gain_dB(bw_ls1_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_ls1_set_dc_gain_lin(coeffs, bw_dB2linf_3(value));
+	bw_ls1_set_dc_gain_lin(coeffs, bw_dB2linf(value));
 }
 
 #ifdef __cplusplus

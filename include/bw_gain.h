@@ -245,7 +245,7 @@ static inline void bw_gain_set_gain_lin(bw_gain_coeffs *BW_RESTRICT coeffs, floa
 }
 
 static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
-	coeffs->gain = bw_dB2linf_3(value);
+	coeffs->gain = bw_dB2linf(value);
 }
 
 static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {

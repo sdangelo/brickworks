@@ -264,7 +264,7 @@ static inline void bw_phase_gen_process1(const bw_phase_gen_coeffs *BW_RESTRICT 
 }
 
 static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, float x_mod, float *BW_RESTRICT y, float *BW_RESTRICT y_phase_inc) {
-	*y_phase_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state) * bw_pow2f_3(x_mod);
+	*y_phase_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state) * bw_pow2f(x_mod);
 	*y = _bw_phase_gen_update_phase(state, *y_phase_inc);
 }
 

@@ -62,7 +62,7 @@ void bw_example_synth_simple_process(bw_example_synth_simple *instance, const fl
 
 	if (instance->note >= 0)
 		bw_phase_gen_set_frequency(&instance->phase_gen_coeffs,
-			440.f * bw_pow2f_3(8.333333333333333e-2f * ((instance->note - 69) + 2.f * instance->params[p_master_tune] - 1.f)));
+			440.f * bw_pow2f(8.333333333333333e-2f * ((instance->note - 69) + 2.f * instance->params[p_master_tune] - 1.f)));
 	
 	for (int i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = y[0] + i;

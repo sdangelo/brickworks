@@ -133,15 +133,15 @@ void bw_example_synth_mono_process(bw_example_synth_mono *instance, const float*
 	
 	int n = instance->params[p_vco3_kbd] >= 0.5f ? instance->note : 0;
 	bw_phase_gen_set_frequency(&instance->vco1_phase_gen_coeffs, 440.f *
-		bw_pow2f_3(6.f * instance->params[p_vco1_coarse] - 3.f
+		bw_pow2f(6.f * instance->params[p_vco1_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
 			+ 8.333333333333333e-2f * ((instance->note - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco1_fine]) - 2.f)));
 	bw_phase_gen_set_frequency(&instance->vco2_phase_gen_coeffs, 440.f *
-		bw_pow2f_3(6.f * instance->params[p_vco2_coarse] - 3.f
+		bw_pow2f(6.f * instance->params[p_vco2_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
 			+ 8.333333333333333e-2f * ((instance->note - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco2_fine]) - 2.f)));
 	bw_phase_gen_set_frequency(&instance->vco3_phase_gen_coeffs, 440.f *
-		bw_pow2f_3(6.f * instance->params[p_vco3_coarse] - 3.f
+		bw_pow2f(6.f * instance->params[p_vco3_coarse] - 3.f
 			+ 2.f * instance->pitch_bend - 1.f
 			+ 8.333333333333333e-2f * ((n - 69) + 2.f * (instance->params[p_master_tune] + instance->params[p_vco3_fine]) - 2.f)));
 	
@@ -220,11 +220,11 @@ void bw_example_synth_mono_process(bw_example_synth_mono *instance, const float*
 		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * bw_env_gen_get_y_z1(&instance->vcf_env_gen_state) + vcf_mod;
 		float cutoff = 20.f + (20e3f - 20.f) * v * v * v;
 		if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
-			cutoff *= bw_pow2f_3(8.333333333333333e-2f * (instance->note - 60));
+			cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->note - 60));
 		else if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 1.f / 3.f))
-			cutoff *= bw_pow2f_3((0.793700525984100f * 8.333333333333333e-2f) * (instance->note - 60));
+			cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->note - 60));
 		else if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
-			cutoff *= bw_pow2f_3((0.629960524947437f * 8.333333333333333e-2f) * (instance->note - 60));
+			cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->note - 60));
 		// otherwise no kbd control
 		bw_svf_set_cutoff(&instance->vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 		bw_svf_process(&instance->vcf_coeffs, &instance->vcf_state, out, out, NULL, NULL, n);

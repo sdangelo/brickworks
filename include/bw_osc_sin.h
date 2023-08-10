@@ -104,7 +104,7 @@ static inline void bw_osc_sin_process_multi(const float **x, float **y, int n_ch
 #include <bw_math.h>
 
 static inline float bw_osc_sin_process1(float x) {
-	return bw_sin2pif_3(x);
+	return bw_sin2pif(x);
 }
 
 static inline void bw_osc_sin_process(const float *x, float *y, int n_samples) {

@@ -253,7 +253,7 @@ static inline void _bw_peak_update_mm2_params(bw_peak_coeffs *BW_RESTRICT coeffs
 		if (coeffs->use_bandwidth) {
 			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_BANDWIDTH)) {
 				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH)
-					coeffs->bw_k = bw_pow2f_3(coeffs->bandwidth);
+					coeffs->bw_k = bw_pow2f(coeffs->bandwidth);
 				const float Q = bw_sqrtf_2(coeffs->bw_k * coeffs->peak_gain) * bw_rcpf(coeffs->bw_k - 1.f);
 				bw_mm2_set_Q(&coeffs->mm2_coeffs, Q);
 				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf(Q));
@@ -328,7 +328,7 @@ static inline void bw_peak_set_peak_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs,
 }
 
 static inline void bw_peak_set_peak_gain_dB(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_peak_set_peak_gain_lin(coeffs, bw_dB2linf_3(value));
+	bw_peak_set_peak_gain_lin(coeffs, bw_dB2linf(value));
 }
 
 static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {

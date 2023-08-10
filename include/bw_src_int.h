@@ -160,7 +160,7 @@ static inline void bw_src_int_init(bw_src_int_coeffs *BW_RESTRICT coeffs, int ra
 	coeffs->ratio = ratio;
 	// 4th-degree Butterworth with cutoff at ratio * Nyquist, using bilinear transform w/ prewarping
 	const float fc = (float)(ratio >= 0 ? ratio : -ratio);
-	const float T = bw_tanf_3(1.570796326794896f / fc);
+	const float T = bw_tanf(1.570796326794896f / fc);
 	const float T2 = T * T;
 	const float k = 1.f / (T * (T * (T * (T + 2.613125929752753f) + 3.414213562373095f) + 2.613125929752753f) + 1.f);
 	coeffs->b0 = k * T2 * T2;

@@ -231,7 +231,7 @@ static inline void _bw_lp1_do_update_coeffs(bw_lp1_coeffs *BW_RESTRICT coeffs, c
 	if (prewarp_freq_changed || cutoff_changed) {
 		if (prewarp_freq_changed) {
 			prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
-			coeffs->t = bw_tanf_3(coeffs->t_k * prewarp_freq_cur);
+			coeffs->t = bw_tanf(coeffs->t_k * prewarp_freq_cur);
 		}
 		if (cutoff_changed) {
 			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);

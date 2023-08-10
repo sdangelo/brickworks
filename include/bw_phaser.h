@@ -228,7 +228,7 @@ static inline void bw_phaser_update_coeffs_audio(bw_phaser_coeffs *BW_RESTRICT c
 	float p, pi;
 	bw_phase_gen_process1(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, &p, &pi);
 	const float m = coeffs->amount * bw_osc_sin_process1(p);
-	bw_ap1_set_cutoff(&coeffs->ap1_coeffs, bw_clipf(coeffs->center * bw_pow2f_3(m), 1.f, coeffs->cutoff_max));
+	bw_ap1_set_cutoff(&coeffs->ap1_coeffs, bw_clipf(coeffs->center * bw_pow2f(m), 1.f, coeffs->cutoff_max));
 	bw_ap1_update_coeffs_ctrl(&coeffs->ap1_coeffs);
 	bw_ap1_update_coeffs_audio(&coeffs->ap1_coeffs);
 }

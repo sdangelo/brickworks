@@ -221,8 +221,8 @@ static inline void bw_ls2_set_sample_rate(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 static inline void _bw_ls2_update_mm2_params(bw_ls2_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & _BW_LS2_PARAM_DC_GAIN) {
-			coeffs->sg = bw_sqrtf_2(coeffs->dc_gain);
-			coeffs->issg = bw_sqrtf_2(bw_rcpf(coeffs->sg));
+			coeffs->sg = bw_sqrtf(coeffs->dc_gain);
+			coeffs->issg = bw_sqrtf(bw_rcpf(coeffs->sg));
 			bw_mm2_set_coeff_x(&coeffs->mm2_coeffs, coeffs->sg);
 			bw_mm2_set_coeff_lp(&coeffs->mm2_coeffs, coeffs->dc_gain - coeffs->sg);
 			bw_mm2_set_coeff_hp(&coeffs->mm2_coeffs, 1.f - coeffs->sg);
@@ -293,7 +293,7 @@ static inline void bw_ls2_set_dc_gain_lin(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 }
 
 static inline void bw_ls2_set_dc_gain_dB(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_ls2_set_dc_gain_lin(coeffs, bw_dB2linf_3(value));
+	bw_ls2_set_dc_gain_lin(coeffs, bw_dB2linf(value));
 }
 
 #undef _BW_LS2_PARAM_DC_GAIN

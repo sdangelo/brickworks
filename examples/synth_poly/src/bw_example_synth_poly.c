@@ -188,9 +188,9 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 		+ 8.333333333333333e-2f * (2.f * (instance->params[p_master_tune] + instance->params[p_vco3_fine]) - 71.f);
 	for (int i = 0; i < N_VOICES; i++) {
 		int n3 = instance->params[p_vco3_kbd] >= 0.5f ? instance->voices[i].note : 0;
-		bw_phase_gen_set_frequency(&instance->voices[i].vco1_phase_gen_coeffs, 440.f * bw_pow2f_3(df1 + 8.333333333333333e-2f * instance->voices[i].note));
-		bw_phase_gen_set_frequency(&instance->voices[i].vco2_phase_gen_coeffs, 440.f * bw_pow2f_3(df2 + 8.333333333333333e-2f * instance->voices[i].note));
-		bw_phase_gen_set_frequency(&instance->voices[i].vco3_phase_gen_coeffs, 440.f * bw_pow2f_3(df3 + 8.333333333333333e-2f * n3));
+		bw_phase_gen_set_frequency(&instance->voices[i].vco1_phase_gen_coeffs, 440.f * bw_pow2f(df1 + 8.333333333333333e-2f * instance->voices[i].note));
+		bw_phase_gen_set_frequency(&instance->voices[i].vco2_phase_gen_coeffs, 440.f * bw_pow2f(df2 + 8.333333333333333e-2f * instance->voices[i].note));
+		bw_phase_gen_set_frequency(&instance->voices[i].vco3_phase_gen_coeffs, 440.f * bw_pow2f(df3 + 8.333333333333333e-2f * n3));
 	}
 	
 	const float vcf_mod_k = 0.3f * instance->params[p_vcf_mod];
@@ -298,11 +298,11 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 			float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * bw_env_gen_get_y_z1(vcf_env_gen_states[j]) + vcf_mod[j];
 			float cutoff = 20.f + (20e3f - 20.f) * v * v * v;
 			if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
-				cutoff *= bw_pow2f_3(8.333333333333333e-2f * (instance->voices[j].note - 60));
+				cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->voices[j].note - 60));
 			else if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 1.f / 3.f))
-				cutoff *= bw_pow2f_3((0.793700525984100f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
+				cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
 			else if (instance->params[p_vcf_kbd_ctrl] >= (1.f / 6.f + 2.f / 3.f))
-				cutoff *= bw_pow2f_3((0.629960524947437f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
+				cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
 			// otherwise no kbd control
 			bw_svf_set_cutoff(&instance->voices[j].vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 			bw_svf_process(&instance->voices[j].vcf_coeffs, &instance->voices[j].vcf_state, b0[j], b0[j], NULL, NULL, n);

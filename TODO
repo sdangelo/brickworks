@@ -28,7 +28,6 @@ code:
 * bw_math: review types
 * src inside distortions? w/ control from outside?
 * bw_fuzz gain compensation?
-* remove union value = {.f = v};? (std c++ latest) - C++ compound literals...
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
 * revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
@@ -50,6 +49,7 @@ code:
 * voice alloc mode -> voice alloc priority
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * modulation vs process (multi) no update (post 1.0.0)???
+* check assumptions w.r.t. usage of math functions
 
 build system:
 * single header generation (vs modules in bwp... to think about)

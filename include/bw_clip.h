@@ -254,7 +254,7 @@ static inline float bw_clip_process1(const bw_clip_coeffs *BW_RESTRICT coeffs, b
 	const float a = bw_absf(x);
 	const float F = a > 1.f ? a - 0.5f : 0.5f * a * a;
 	const float d = x - state->x_z1;
-	const float y = d * d < 1e-6f ? bw_clipf(0.5f * (x + state->x_z1), -1.f, 1.f) : (F - state->F_z1) * bw_rcpf_2(d);
+	const float y = d * d < 1e-6f ? bw_clipf(0.5f * (x + state->x_z1), -1.f, 1.f) : (F - state->F_z1) * bw_rcpf(d);
 	state->x_z1 = x;
 	state->F_z1 = F;
 	return y - coeffs->bias_dc;

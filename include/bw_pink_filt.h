@@ -195,7 +195,7 @@ static inline void bw_pink_filt_init(bw_pink_filt_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_pink_filt_set_sample_rate(bw_pink_filt_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	coeffs->scaling_k = 210.f / bw_sqrtf_2(sample_rate);
+	coeffs->scaling_k = 210.f / bw_sqrtf(sample_rate);
 }
 
 static inline void bw_pink_filt_reset_state(const bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT state) {

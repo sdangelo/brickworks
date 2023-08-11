@@ -31,6 +31,10 @@
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
+ *          <li>Added <code>const</code> where needed to callback types in
+ *              <code>bw_voice_alloc_opts</code> and to
+ *              <code>bw_voice_alloc()</code>.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -50,8 +54,8 @@
  *  }}}
  */
 
-#ifndef _BW_VOICE_ALLOC_H
-#define _BW_VOICE_ALLOC_H
+#ifndef BW_VOICE_ALLOC_H
+#define BW_VOICE_ALLOC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,8 +83,8 @@ typedef struct {
 
 	void (*note_on)(void *BW_RESTRICT voice, unsigned char note, float velocity);
 	void (*note_off)(void *BW_RESTRICT voice, float velocity);
-	unsigned char (*get_note)(void *BW_RESTRICT voice);
-	char (*is_free)(void *BW_RESTRICT voice);
+	unsigned char (*get_note)(const void *BW_RESTRICT voice);
+	char (*is_free)(const void *BW_RESTRICT voice);
 } bw_voice_alloc_opts;
 /*! <<<```
  *    Voice allocation options:
@@ -97,7 +101,7 @@ typedef struct {
  *
  *    #### bw_voice_alloc()
  *  ```>>> */
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, size_t n_voices);
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void * const *BW_RESTRICT voices, size_t n_voices);
 /*! <<<```
  *    It performs voice allocation according to `opts` and using the events in
  *    `queue`.
@@ -111,7 +115,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void **BW_RESTRICT voices, size_t n_voices) {
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void * const *BW_RESTRICT voices, size_t n_voices) {
 	BW_ASSERT(opts != NULL);
 	BW_ASSERT(opts->priority == bw_voice_alloc_priority_low || opts->priority == bw_voice_alloc_priority_high);
 	BW_ASSERT(n_voices == 0 || opts->note_on != NULL);
@@ -124,45 +128,43 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 
 	for (unsigned char i = 0; i < queue->n_events; i++) {
 		bw_note_queue_event *ev = queue->events + i;
+		bw_note_queue_status *st = queue->status + ev->note;
+
 		for (size_t j = 0; j < n_voices; j++)
 			if (!opts->is_free(voices[j]) && opts->get_note(voices[j]) == ev->note) {
-				if (!ev->status.pressed || ev->went_off)
-					opts->note_off(voices[j], ev->status.velocity);
-				if (ev->status.pressed)
-					opts->note_on(voices[j], ev->note, ev->status.velocity);
+				if (!st->pressed || ev->went_off)
+					opts->note_off(voices[j], st->velocity);
+				if (st->pressed)
+					opts->note_on(voices[j], ev->note, st->velocity);
 				goto next_event;
 			}
 
-		if (ev->status.pressed) {
+		if (st->pressed) {
 			for (size_t j = 0; j < n_voices; j++)
 				if (opts->is_free(voices[j])) { 
-					opts->note_on(voices[j], ev->note, ev->status.velocity);
+					opts->note_on(voices[j], ev->note, st->velocity);
 					goto next_event;
 				}
 
 			size_t k = n_voices;
-			int v = ev->note;
+			unsigned char v = ev->note;
 			for (size_t j = 0; j < n_voices; j++) {
-				int n = opts->get_note(voices[j]);
+				unsigned char n = opts->get_note(voices[j]);
 				if (!queue->status[n].pressed && (k == n_voices || (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v))) {
 					v = n;
 					k = j;
 				}
 			}
-			if (k != n_voices) {
-				opts->note_on(voices[k], ev->note, ev->status.velocity);
-				continue;
-			}
-
-			for (size_t j = 0; j < n_voices; j++) {
-				int n = opts->get_note(voices[j]);
-				if (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v) {
-					v = n;
-					k = j;
+			if (k == n_voices)
+				for (size_t j = 0; j < n_voices; j++) {
+					unsigned char n = opts->get_note(voices[j]);
+					if (opts->priority == bw_voice_alloc_priority_low ? n > v : n < v) {
+						v = n;
+						k = j;
+					}
 				}
-			}
 			if (k != n_voices)
-				opts->note_on(voices[k], ev->note, ev->status.velocity);
+				opts->note_on(voices[k], ev->note, st->velocity);
 		}
 
 		next_event:;

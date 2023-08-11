@@ -21,7 +21,7 @@
 #include "bw_example_synthpp_poly.h"
 
 #include <bw_math.h>
-#include <bwpp_buf.h>
+#include <bw_buf.h>
 #include <bw_voice_alloc.h>
 
 void bw_example_synthpp_poly_init(bw_example_synthpp_poly *instance) {
@@ -121,12 +121,12 @@ static void note_off(void *BW_RESTRICT voice, float velocity) {
 	v->gate = 0;
 }
 
-static unsigned char get_note(void *BW_RESTRICT voice) {
+static unsigned char get_note(const void *BW_RESTRICT voice) {
 	bw_example_synthpp_poly_voice *v = (bw_example_synthpp_poly_voice *)voice;
 	return v->note;
 }
 
-static char is_free(void *BW_RESTRICT voice) {
+static char is_free(const void *BW_RESTRICT voice) {
 	bw_example_synthpp_poly_voice *v = (bw_example_synthpp_poly_voice *)voice;
 	bw_env_gen_phase phase = v->instance->vcaEnvGen.getPhase(v->index);
 	return !v->gate && phase == bw_env_gen_phase_off;

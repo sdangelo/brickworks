@@ -62,6 +62,7 @@
  *              <code>bw_acoshf()</code>.</li>
  *          <li>Removed usage of reserved identifiers and designated
  *              initializers.</li>
+ *          <li>Added <code>extern "C"</code> to functions.</li>
  *          <li>Improved documentation w.r.t. validity of input values and
  *              approximation errors.</li>
  *        </ul>
@@ -110,11 +111,11 @@
 #ifndef BW_MATH_H
 #define BW_MATH_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_signfilli32()
@@ -482,10 +483,18 @@ static inline float bw_acoshf(float x);
  *    Absolute error < 0.004 or relative error < 0.8%, whatever is worse.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // I hope the target architecture and compiler will use conditional ops here
 

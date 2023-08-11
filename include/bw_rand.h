@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Pseudo-random number generators.
@@ -34,6 +34,12 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Added one more assertion in <code>bw_randf()</code>.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Added debugging code.</li>
@@ -55,8 +61,8 @@
  *  }}}
  */
 
-#ifndef _BW_RAND_H
-#define _BW_RAND_H
+#ifndef BW_RAND_H
+#define BW_RAND_H
 
 #include <bw_common.h>
 
@@ -86,7 +92,15 @@ static inline float bw_randf(uint64_t *BW_RESTRICT state);
  *    between calls and which gets updated by this function.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
@@ -101,7 +115,9 @@ static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
 
 static inline float bw_randf(uint64_t *BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
-	return  (2.f / (float)UINT32_MAX) * (float)bw_randu32(state) - 1.f;
+	const float y = (2.f / (float)UINT32_MAX) * (float)bw_randu32(state) - 1.f;
+	BW_ASSERT(bw_is_finite(y));
+	return y;
 }
 
 #ifdef __cplusplus

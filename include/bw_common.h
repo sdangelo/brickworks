@@ -38,7 +38,8 @@
  *          <li>Introduced <code>BW_NO_DEBUG</code> to replace
  *              <code>NDEBUG</code> and prevented useless inclusion of
  *              <code>assert.h</code>.</li>
- *          <li>Avoided using reserved identifiers.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Added <code>extern "C"</code> to functions.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -194,6 +195,11 @@
 #  define BW_ASSERT_DEEP(ignore) ((void)0)
 # endif
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! ...
  *
  *    #### bw_is_inf()
@@ -244,10 +250,18 @@ static inline uint32_t bw_hash_sdbm(const char *string);
  *    Returns the sdbm hash of the given `string`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static inline char bw_is_inf(float x) {
 	union { uint32_t u; float f; } v;
@@ -294,5 +308,9 @@ static inline uint32_t bw_hash_sdbm(const char *string) {
 		hash = *string + (hash << 6) + (hash << 16) - hash;
 	return hash;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

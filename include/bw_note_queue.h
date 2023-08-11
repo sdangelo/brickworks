@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 0.6.0 }}}
+ *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Simple data structure that helps keeping track of note on/off events and
@@ -30,6 +30,19 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.0</strong>:
+ *        <ul>
+ *          <li>Removed redundant <code>status</code> member from
+ *              <code>bw_note_queue_event</code>.</li>
+ *          <li>Possibly improved memeory layout of
+ *              <code>bw_note_queue</code>.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Removed usage of reserved identifiers and designated
+ *              initializers.</li>
+ *          <li>Clarified ambiguity in the documentation of
+ *              <code>bw_note_queue_status</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>0.6.0</strong>:
  *        <ul>
  *          <li>Added debugging code.</li>
@@ -45,38 +58,37 @@
  *  }}}
  */
 
-#ifndef _BW_NOTE_QUEUE_H
-#define _BW_NOTE_QUEUE_H
+#ifndef BW_NOTE_QUEUE_H
+#define BW_NOTE_QUEUE_H
+
+#include <bw_common.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_note_queue_status
  *  ```>>> */
 typedef struct {
 	char		pressed;
-	float		velocity;	// negative = unknown / not available
+	float		velocity;
 } bw_note_queue_status;
 /*! <<<```
  *    Note status:
  *     * `pressed`: whether the note is pressed (non-`0`) or not (`0`);
- *     * `velocity`: velocity in [`0.f`, `1.f`].
+ *     * `velocity`: velocity in [`0.f`, `1.f`], otherwise negative to indicate
+ *       unknown / not available.
  *
  *    #### bw_note_queue_event
  *  ```>>> */
 typedef struct {
 	unsigned char		note;
-	bw_note_queue_status	status;
 	char			went_off;
 } bw_note_queue_event;
 /*! <<<```
  *    Note on/off event:
  *     * `note`: note number in [`0`, `127`];
- *     * `status`: note status;
  *     * `went_off`: whether a note off event fired on the same note (non-`0`)
  *       or not (`0`) -- see `bw_note_queue`.
  *
@@ -84,8 +96,8 @@ typedef struct {
  *  ```>>> */
 typedef struct {
 	bw_note_queue_event	events[128];
-	unsigned char		n_events;
 	bw_note_queue_status	status[128];
+	unsigned char		n_events;
 	unsigned char		n_pressed;
 } bw_note_queue;
 /*! <<<```
@@ -95,8 +107,8 @@ typedef struct {
  *       event added for a given note overwrites the previous if it exists;
  *       `went_off` is set to non-`0` in case of a note off event or when
  *       overwriting an event whose `went_off` was already non-`0`;
- *     * `n_events`: number of elements in `events`;
  *     * `status`: current status of all notes;
+ *     * `n_events`: number of elements in `events`;
  *     * `n_pressed`: number of currently pressed keys.
  *
  *    #### bw_note_queue_reset()
@@ -135,17 +147,46 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
  *    than or equal to that of `bw_note_queue`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+
+namespace Brickworks {
+
+/*! api_cpp {{{
+ *    ##### Brickworks::NoteQueue
+ *  ```>>> */
+class NoteQueue {
+public:
+	NoteQueue();
+	
+	void clear();
+	void add(unsigned char note, bool pressed, float velocity, bool force_went_off);
+	
+	bw_note_queue	queue;
+};
+/*! <<<```
+ *  }}} */
+
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue) {
 	BW_ASSERT(queue != NULL);
-	for (int i = 0; i < 128; i++)
-		queue->status[i] = (bw_note_queue_status){ .pressed = 0, .velocity = 0.f };
-	queue->n_pressed = 0;
+	for (int i = 0; i < 128; i++) {
+		queue->status[i].pressed = 0;
+		queue->status[i].velocity = 0.f;
+	}
 	queue->n_events = 0;
+	queue->n_pressed = 0;
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 }
 
@@ -172,14 +213,16 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
 	if (i == queue->n_events)
 		queue->n_events++;
 	else
-		went_off = queue->events[i].went_off || !queue->events[i].status.pressed;
+		went_off = queue->events[i].went_off || !queue->status[note].pressed;
 
-	queue->events[i] = (bw_note_queue_event){ .note = note, .status = { pressed, velocity }, .went_off = went_off || force_went_off };
+	queue->events[i].note = note;
+	queue->events[i].went_off = went_off || force_went_off;
 	if (pressed && !queue->status[note].pressed)
 		queue->n_pressed++;
 	else if (!pressed && queue->status[note].pressed)
 		queue->n_pressed--;
-	queue->status[note] = (bw_note_queue_status){ .pressed = pressed, .velocity = velocity };
+	queue->status[note].pressed = pressed;
+	queue->status[note].velocity = velocity;
 
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 }
@@ -190,19 +233,19 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
 	if (queue->n_events >= 128 || queue->n_pressed >= 128)
 		return 0;
 
-	for (int i = 0; i < (int)queue->n_events; i++) {
+	for (unsigned char i = 0; i < queue->n_events; i++) {
 		const bw_note_queue_event *ev = queue->events + i;
-		if (ev->note >= 128 || !bw_is_finite(ev->status.velocity) || ev->status.velocity > 1.f)
+		if (ev->note >= 128)
 			return 0;
-		for (int j = 0; j < i; j++) {
+		for (unsigned char j = 0; j < i; j++) {
 			const bw_note_queue_event *ev2 = queue->events + j;
 			if (ev2->note == ev->note)
 				return 0;
 		}
 	}
 
-	int cnt = 0;
-	for (int i = 0; i < 128; i++) {
+	unsigned char cnt = 0;
+	for (unsigned char i = 0; i < 128; i++) {
 		const bw_note_queue_status *st = queue->status + i;
 		if (st->pressed)
 			cnt++;
@@ -214,6 +257,22 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
 }
 
 #ifdef __cplusplus
+}
+
+namespace Brickworks {
+
+inline NoteQueue::NoteQueue() {
+	bw_note_queue_reset(&queue);
+}
+
+inline void NoteQueue::clear() {
+	bw_note_queue_clear(&queue);
+}
+
+inline void NoteQueue::add(unsigned char note, bool pressed, float velocity, bool force_went_off) {
+	bw_note_queue_add(&queue, note, pressed, velocity, force_went_off);
+}
+
 }
 #endif
 

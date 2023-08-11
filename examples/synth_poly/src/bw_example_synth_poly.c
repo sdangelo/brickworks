@@ -149,12 +149,12 @@ static void note_off(void *BW_RESTRICT voice, float velocity) {
 	v->gate = 0;
 }
 
-static unsigned char get_note(void *BW_RESTRICT voice) {
+static unsigned char get_note(const void *BW_RESTRICT voice) {
 	bw_example_synth_poly_voice *v = (bw_example_synth_poly_voice *)voice;
 	return v->note;
 }
 
-static char is_free(void *BW_RESTRICT voice) {
+static char is_free(const void *BW_RESTRICT voice) {
 	bw_example_synth_poly_voice *v = (bw_example_synth_poly_voice *)voice;
 	bw_env_gen_phase phase = bw_env_gen_get_phase(&v->vca_env_gen_state);
 	return !v->gate && phase == bw_env_gen_phase_off;

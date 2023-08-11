@@ -33,7 +33,7 @@ code:
 * update state ctrl -> process ctrl?
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
-* bwpp -> bwxx
+* merge c++ code into c headers
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
 * fix definitions leading to X ** -> const X ** error https://isocpp.org/wiki/faq/const-correctness#constptrptr-conversion, fix fx_balance, fx_pan, synth_poly
 * drywet -> dry_wet, ringmod -> ring_mod, etc?
@@ -43,7 +43,6 @@ code:
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * bw_buf invert src dest order?
 * check unititialized warnings
-* voice alloc mode -> voice alloc priority
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * modulation vs process (multi) no update (post 1.0.0)???
 * check assumptions w.r.t. usage of math functions

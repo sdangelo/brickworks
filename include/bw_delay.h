@@ -238,7 +238,7 @@ static inline void bw_delay_reset_coeffs(bw_delay_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state) {
-	bw_buf_fill(state->buf, 0.f, coeffs->len);
+	bw_buf_fill(0.f, state->buf, coeffs->len);
 	state->idx = 0;
 }
 

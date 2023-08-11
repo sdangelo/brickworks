@@ -47,7 +47,7 @@ typedef struct _bw_example_fx_flanger bw_example_fx_flanger;
 
 void bw_example_fx_flanger_init(bw_example_fx_flanger *instance);
 void bw_example_fx_flanger_set_sample_rate(bw_example_fx_flanger *instance, float sample_rate);
-BW_SIZE_T bw_example_fx_flanger_mem_req(bw_example_fx_flanger *instance);
+size_t bw_example_fx_flanger_mem_req(bw_example_fx_flanger *instance);
 void bw_example_fx_flanger_mem_set(bw_example_fx_flanger *instance, void *mem);
 void bw_example_fx_flanger_reset(bw_example_fx_flanger *instance);
 void bw_example_fx_flanger_process(bw_example_fx_flanger *instance, const float** x, float** y, int n_samples);

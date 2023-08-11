@@ -62,7 +62,7 @@ void bw_example_synthpp_simple_process(bw_example_synthpp_simple *instance, cons
 		instance->oscFilt.process({out}, {out}, n);
 		instance->svf.process({out}, {out}, {nullptr}, {nullptr}, n);
 		instance->envGen.process({instance->note >= 0}, {instance->buf}, n);
-		bw_buf_mul(out, out, instance->buf, n);
+		bufMul<1>({out}, {instance->buf}, {out}, n);
 		instance->gain.process({out}, {out}, n);
 		instance->ppm.process({out}, {nullptr}, n);
 	}

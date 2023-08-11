@@ -28,7 +28,7 @@ void bw_example_fx_reverb_set_sample_rate(bw_example_fx_reverb *instance, float 
 	bw_reverb_set_sample_rate(&instance->reverb_coeffs, sample_rate);
 }
 
-BW_SIZE_T bw_example_fx_reverb_mem_req(bw_example_fx_reverb *instance) {
+size_t bw_example_fx_reverb_mem_req(bw_example_fx_reverb *instance) {
 	return bw_reverb_mem_req(&instance->reverb_coeffs);
 }
 

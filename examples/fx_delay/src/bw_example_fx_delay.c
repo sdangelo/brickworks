@@ -28,7 +28,7 @@ void bw_example_fx_delay_set_sample_rate(bw_example_fx_delay *instance, float sa
 	bw_delay_set_sample_rate(&instance->delay_coeffs, sample_rate);
 }
 
-BW_SIZE_T bw_example_fx_delay_mem_req(bw_example_fx_delay *instance) {
+size_t bw_example_fx_delay_mem_req(bw_example_fx_delay *instance) {
 	return bw_delay_mem_req(&instance->delay_coeffs);
 }
 

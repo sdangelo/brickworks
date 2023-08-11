@@ -46,7 +46,7 @@ typedef struct _bw_example_fx_delay bw_example_fx_delay;
 
 void bw_example_fx_delay_init(bw_example_fx_delay *instance);
 void bw_example_fx_delay_set_sample_rate(bw_example_fx_delay *instance, float sample_rate);
-BW_SIZE_T bw_example_fx_delay_mem_req(bw_example_fx_delay *instance);
+size_t bw_example_fx_delay_mem_req(bw_example_fx_delay *instance);
 void bw_example_fx_delay_mem_set(bw_example_fx_delay *instance, void *mem);
 void bw_example_fx_delay_reset(bw_example_fx_delay *instance);
 void bw_example_fx_delay_process(bw_example_fx_delay *instance, const float** x, float** y, int n_samples);

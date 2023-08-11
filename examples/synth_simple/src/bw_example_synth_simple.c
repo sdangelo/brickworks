@@ -73,7 +73,7 @@ void bw_example_synth_simple_process(bw_example_synth_simple *instance, const fl
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 		bw_svf_process(&instance->svf_coeffs, &instance->svf_state, out, out, NULL, NULL, n);
 		bw_env_gen_process(&instance->env_gen_coeffs, &instance->env_gen_state, instance->note >= 0, instance->buf, n);
-		bw_buf_mul(out, out, instance->buf, n);
+		bw_buf_mul(out, instance->buf, out, n);
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);
 	}

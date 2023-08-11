@@ -45,7 +45,7 @@ typedef struct _bw_example_fx_vibrato bw_example_fx_vibrato;
 
 void bw_example_fx_vibrato_init(bw_example_fx_vibrato *instance);
 void bw_example_fx_vibrato_set_sample_rate(bw_example_fx_vibrato *instance, float sample_rate);
-BW_SIZE_T bw_example_fx_vibrato_mem_req(bw_example_fx_vibrato *instance);
+size_t bw_example_fx_vibrato_mem_req(bw_example_fx_vibrato *instance);
 void bw_example_fx_vibrato_mem_set(bw_example_fx_vibrato *instance, void *mem);
 void bw_example_fx_vibrato_reset(bw_example_fx_vibrato *instance);
 void bw_example_fx_vibrato_process(bw_example_fx_vibrato *instance, const float** x, float** y, int n_samples);

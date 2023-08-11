@@ -47,7 +47,7 @@ typedef struct _bw_example_fx_chorus bw_example_fx_chorus;
 
 void bw_example_fx_chorus_init(bw_example_fx_chorus *instance);
 void bw_example_fx_chorus_set_sample_rate(bw_example_fx_chorus *instance, float sample_rate);
-BW_SIZE_T bw_example_fx_chorus_mem_req(bw_example_fx_chorus *instance);
+size_t bw_example_fx_chorus_mem_req(bw_example_fx_chorus *instance);
 void bw_example_fx_chorus_mem_set(bw_example_fx_chorus *instance, void *mem);
 void bw_example_fx_chorus_reset(bw_example_fx_chorus *instance);
 void bw_example_fx_chorus_process(bw_example_fx_chorus *instance, const float** x, float** y, int n_samples);

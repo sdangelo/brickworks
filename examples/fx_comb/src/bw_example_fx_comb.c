@@ -28,7 +28,7 @@ void bw_example_fx_comb_set_sample_rate(bw_example_fx_comb *instance, float samp
 	bw_comb_set_sample_rate(&instance->comb_coeffs, sample_rate);
 }
 
-BW_SIZE_T bw_example_fx_comb_mem_req(bw_example_fx_comb *instance) {
+size_t bw_example_fx_comb_mem_req(bw_example_fx_comb *instance) {
 	return bw_comb_mem_req(&instance->comb_coeffs);
 }
 

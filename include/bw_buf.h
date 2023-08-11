@@ -31,6 +31,9 @@
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
+ *          <li>Changed order of arguments to improve consistency.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
@@ -75,55 +78,55 @@ extern "C" {
 /*! api {{{
  *    #### bw_buf_fill()
  *  ```>>> */
-static inline void bw_buf_fill(float *dest, float k, size_t n_elems);
+static inline void bw_buf_fill(float k, float *dest, size_t n_elems);
 /*! <<<```
  *    Sets the first `n_elems` in `dest` to `k`.
  *
  *    #### bw_buf_neg()
  *  ```>>> */
-static inline void bw_buf_neg(float *dest, const float *src, size_t n_elems);
+static inline void bw_buf_neg(const float *src, float *dest, size_t n_elems);
 /*! <<<```
  *    Inverts the sign of the first `n_elems` in `src` and stores the results in
  *    the first `n_elems` of `dest`.
  *
  *    #### bw_buf_add()
  *  ```>>> */
-static inline void bw_buf_add(float *dest, const float *src, float k, size_t n_elems);
+static inline void bw_buf_add(const float *src, float k, float *dest, size_t n_elems);
 /*! <<<```
  *    Adds `k` to the first `n_elems` in `src` and stores the results in the
  *    first `n_elems` of `dest`.
  *
  *    #### bw_buf_scale()
  *  ```>>> */
-static inline void bw_buf_scale(float *dest, const float *src, float k, size_t n_elems);
+static inline void bw_buf_scale(const float *src, float k, float *dest, size_t n_elems);
 /*! <<<```
  *    Multiplies the first `n_elems` in `src` by `k` and stores the results in
  *    the first `n_elems` of `dest`.
  *
  *    #### bw_buf_mix()
  *  ```>>> */
-static inline void bw_buf_mix(float *dest, const float *src1, const float *src2, size_t n_elems);
+static inline void bw_buf_mix(const float *src1, const float *src2, float *dest, size_t n_elems);
 /*! <<<```
  *    Adds the first `n_elems` of `src1` and `src2` and stores the results in
  *    the first `n_elems` of `dest`.
  *
  *    #### bw_buf_mul()
  *  ```>>> */
-static inline void bw_buf_mul(float *dest, const float *src1, const float *src2, size_t n_elems);
+static inline void bw_buf_mul(const float *src1, const float *src2, float *dest, size_t n_elems);
 /*! <<<```
  *    Multiplies the first `n_elems` of `src1` and `src2` and stores the results
  *    in the first `n_elems` of `dest`.
  *
  *    #### bw_buf_fill_multi()
  *  ```>>> */
-static inline void bw_buf_fill_multi(float **dest, float k, size_t n_channels, size_t n_elems);
+static inline void bw_buf_fill_multi(float k, float **dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Sets the first `n_elems` in each of the `n_channels` buffers `dest` to
  *    `k`.
  *
  *    #### bw_buf_neg_multi()
  *  ```>>> */
-static inline void bw_buf_neg_multi(float **dest, const float **src, size_t n_channels, size_t n_elems);
+static inline void bw_buf_neg_multi(const float * const *src, float **dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Inverts the sign of the first `n_elems` in each of the `n_channels`
  *    buffers `src` and stores the results in the first `n_elems` in each of the
@@ -131,7 +134,7 @@ static inline void bw_buf_neg_multi(float **dest, const float **src, size_t n_ch
  *
  *    #### bw_buf_add_multi()
  *  ```>>> */
-static inline void bw_buf_add_multi(float **dest, const float **src, float k, size_t n_channels, size_t n_elems);
+static inline void bw_buf_add_multi(const float * const *src, float k, float **dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Adds `k` to the first `n_elems` in each of the `n_channels` buffers `src`
  *    and stores the results in the first `n_elems` in each of the `n_channels`
@@ -139,7 +142,7 @@ static inline void bw_buf_add_multi(float **dest, const float **src, float k, si
  *
  *    #### bw_buf_scale_multi()
  *  ```>>> */
-static inline void bw_buf_scale_multi(float **dest, const float **src, float k, size_t n_channels, size_t n_elems);
+static inline void bw_buf_scale_multi(const float * const *src, float k, float **dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Multiplies the first `n_elems` in each of the `n_channels` buffers `src`
  *    by `k` and stores the results in the first `n_elems` in each of the
@@ -147,7 +150,7 @@ static inline void bw_buf_scale_multi(float **dest, const float **src, float k, 
  *
  *    #### bw_buf_mix_multi()
  *  ```>>> */
-static inline void bw_buf_mix_multi(float **dest, const float **src1, const float **src2, size_t n_channels, size_t n_elems);
+static inline void bw_buf_mix_multi(const float * const *src1, const float * const *src2, float **dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Adds the first `n_elems` in each of the `n_channels` buffers `src1` and
  *    `src2` and stores the results in the first `n_elems` in each of the
@@ -155,7 +158,7 @@ static inline void bw_buf_mix_multi(float **dest, const float **src1, const floa
  *
  *    #### bw_buf_mul_multi()
  *  ```>>> */
-static inline void bw_buf_mul_multi(float **dest, const float **src1, const float **src2, size_t n_channels, size_t n_elems);
+static inline void bw_buf_mul_multi(const float * const *src1, const float * const *src2, float **dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Multiplies the first `n_elems` in each of the `n_channels` buffers `src1`
  *    and `src2` and stores the results in the first `n_elems` in each of the
@@ -174,8 +177,8 @@ namespace Brickworks {
  *  ```>>> */
 template<size_t N_CHANNELS>
 void bufFill(
-		std::array<float *, N_CHANNELS> dest,
 		float k,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples);
 /*! <<<```
  *
@@ -183,8 +186,8 @@ void bufFill(
  *  ```>>> */
 template<size_t N_CHANNELS>
 void bufNeg(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples);
 /*! <<<```
  *
@@ -192,8 +195,8 @@ void bufNeg(
  *  ```>>> */		
 template<size_t N_CHANNELS>
 void bufAdd(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
 		float k,
 		int nSamples);
 /*! <<<```
@@ -202,8 +205,8 @@ void bufAdd(
  *  ```>>> */
 template<size_t N_CHANNELS>
 void bufScale(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
 		float k,
 		int nSamples);
 /*! <<<```
@@ -212,9 +215,9 @@ void bufScale(
  *  ```>>> */
 template<size_t N_CHANNELS>
 void bufMix(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src1,
 		std::array<const float *, N_CHANNELS> src2,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples);
 /*! <<<```
  *
@@ -222,9 +225,9 @@ void bufMix(
  *  ```>>> */
 template<size_t N_CHANNELS>
 void bufMul(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src1,
 		std::array<const float *, N_CHANNELS> src2,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples);
 /*! <<<```
  *  }}} */
@@ -241,7 +244,7 @@ void bufMul(
 extern "C" {
 #endif
 
-static inline void bw_buf_fill(float *dest, float k, size_t n_elems) {
+static inline void bw_buf_fill(float k, float *dest, size_t n_elems) {
 	BW_ASSERT(!(dest == NULL && n_elems != 0));
 	BW_ASSERT(!bw_is_nan(k));
 
@@ -251,7 +254,7 @@ static inline void bw_buf_fill(float *dest, float k, size_t n_elems) {
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_neg(float *dest, const float *src, size_t n_elems) {
+static inline void bw_buf_neg(const float *src, float *dest, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 
@@ -261,7 +264,7 @@ static inline void bw_buf_neg(float *dest, const float *src, size_t n_elems) {
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_add(float *dest, const float *src, float k, size_t n_elems) {
+static inline void bw_buf_add(const float *src, float k, float *dest, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
@@ -272,7 +275,7 @@ static inline void bw_buf_add(float *dest, const float *src, float k, size_t n_e
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_scale(float *dest, const float *src, float k, size_t n_elems) {
+static inline void bw_buf_scale(const float *src, float k, float *dest, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
@@ -283,7 +286,7 @@ static inline void bw_buf_scale(float *dest, const float *src, float k, size_t n
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_mix(float *dest, const float *src1, const float *src2, size_t n_elems) {
+static inline void bw_buf_mix(const float *src1, const float *src2, float *dest, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_elems != 0));
 	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
 	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
@@ -294,7 +297,7 @@ static inline void bw_buf_mix(float *dest, const float *src1, const float *src2,
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_mul(float *dest, const float *src1, const float *src2, size_t n_elems) {
+static inline void bw_buf_mul(const float *src1, const float *src2, float *dest, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_elems != 0));
 	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
 	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
@@ -305,46 +308,46 @@ static inline void bw_buf_mul(float *dest, const float *src1, const float *src2,
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_fill_multi(float **dest, float k, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_fill_multi(float k, float **dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!(dest == NULL && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
-		bw_buf_fill(dest[i], k, n_elems);
+		bw_buf_fill(k, dest[i], n_elems);
 }
 
-static inline void bw_buf_neg_multi(float **dest, const float **src, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_neg_multi(const float * const *src, float **dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
-		bw_buf_neg(dest[i], src[i], n_elems);
+		bw_buf_neg(src[i], dest[i], n_elems);
 }
 
-static inline void bw_buf_add_multi(float **dest, const float **src, float k, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_add_multi(const float * const *src, float k, float **dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
-		bw_buf_add(dest[i], src[i], k, n_elems);
+		bw_buf_add(src[i], k, dest[i], n_elems);
 }
 
-static inline void bw_buf_scale_multi(float **dest, const float **src, float k, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_scale_multi(const float * const *src, float k, float **dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src == NULL) && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
-		bw_buf_scale(dest[i], src[i], k, n_elems);
+		bw_buf_scale(src[i], k, dest[i], n_elems);
 }
 
-static inline void bw_buf_mix_multi(float **dest, const float **src1, const float **src2, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_mix_multi(const float * const *src1, const float * const *src2, float **dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
-		bw_buf_mix(dest[i], src1[i], src2[i], n_elems);
+		bw_buf_mix(src1[i], src2[i], dest[i], n_elems);
 }
 
-static inline void bw_buf_mul_multi(float **dest, const float **src1, const float **src2, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_mul_multi(const float * const *src1, const float * const *src2, float **dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
-		bw_buf_mul(dest[i], src1[i], src2[i], n_elems);
+		bw_buf_mul(src1[i], src2[i], dest[i], n_elems);
 }
 
 #ifdef __cplusplus
@@ -354,54 +357,54 @@ namespace Brickworks {
 
 template<size_t N_CHANNELS>
 inline void bufFill(
-		std::array<float *, N_CHANNELS> dest,
 		float k,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples) {
-	bw_buf_fill_multi(dest.data(), k, N_CHANNELS, nSamples);
+	bw_buf_fill_multi(k, dest.data(), N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufNeg(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples) {
-	bw_buf_neg_multi(dest.data(), src.data(), N_CHANNELS, nSamples);
+	bw_buf_neg_multi(src.data(), dest.data(), N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufAdd(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src,
 		float k,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples) {
-	bw_buf_add_multi(dest.data(), src.data(), k, N_CHANNELS, nSamples);
+	bw_buf_add_multi(src.data(), k, dest.data(), N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufScale(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src,
 		float k,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples) {
-	bw_buf_scale_multi(dest.data(), src.data(), k, N_CHANNELS, nSamples);
+	bw_buf_scale_multi(src.data(), k, dest.data(), N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufMix(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src1,
 		std::array<const float *, N_CHANNELS> src2,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples) {
-	bw_buf_mix_multi(dest.data(), src1.data(), src2.data(), N_CHANNELS, nSamples);
+	bw_buf_mix_multi(src1.data(), src2.data(), dest.data(), N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufMul(
-		std::array<float *, N_CHANNELS> dest,
 		std::array<const float *, N_CHANNELS> src1,
 		std::array<const float *, N_CHANNELS> src2,
+		std::array<float *, N_CHANNELS> dest,
 		int nSamples) {
-	bw_buf_mul_multi(dest.data(), src1.data(), src2.data(), N_CHANNELS, nSamples);
+	bw_buf_mul_multi(src1.data(), src2.data(), dest.data(), N_CHANNELS, nSamples);
 }
 
 }

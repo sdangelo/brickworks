@@ -48,7 +48,7 @@ typedef struct _bw_example_fx_reverb bw_example_fx_reverb;
 
 void bw_example_fx_reverb_init(bw_example_fx_reverb *instance);
 void bw_example_fx_reverb_set_sample_rate(bw_example_fx_reverb *instance, float sample_rate);
-BW_SIZE_T bw_example_fx_reverb_mem_req(bw_example_fx_reverb *instance);
+size_t bw_example_fx_reverb_mem_req(bw_example_fx_reverb *instance);
 void bw_example_fx_reverb_mem_set(bw_example_fx_reverb *instance, void *mem);
 void bw_example_fx_reverb_reset(bw_example_fx_reverb *instance);
 void bw_example_fx_reverb_process(bw_example_fx_reverb *instance, const float** x, float** y, int n_samples);

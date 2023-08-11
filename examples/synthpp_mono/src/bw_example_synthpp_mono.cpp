@@ -139,13 +139,13 @@ void bw_example_synthpp_mono_process(bw_example_synthpp_mono *instance, const fl
 			instance->pinkFilt.process({instance->buf[0]}, {instance->buf[0]}, n);
 		else
 			instance->pinkFilt.reset(); // FIXME: calling this here is sloppy coding
-		bw_buf_scale(instance->buf[0], instance->buf[0], 5.f, n);
+		bufScale<1>({instance->buf[0]}, 5.f, {instance->buf[0]}, n);
 
 		for (int j = 0; j < n; j++)
 			instance->buf[1][j] = instance->mod_wheel * (out[j] + instance->params[p_mod_mix] * (instance->buf[0][j] - out[j]));
 		const float vcf_mod = 0.3f * instance->params[p_vcf_mod] * instance->buf[1][0];
 
-		bw_buf_scale(instance->buf[2], instance->buf[1], instance->params[p_vco1_mod], n);
+		bufScale<1>({instance->buf[1]}, instance->params[p_vco1_mod], {instance->buf[2]}, n);
 		instance->vco1PhaseGen.process({instance->buf[2]}, {instance->buf[2]}, {instance->buf[3]}, n);
 		if (instance->params[p_vco1_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
 			instance->vco1OscTri.process({instance->buf[2]}, {instance->buf[3]}, {instance->buf[2]}, n);
@@ -159,7 +159,7 @@ void bw_example_synthpp_mono_process(bw_example_synthpp_mono *instance, const fl
 			instance->vco1OscTri.reset();
 		}
 
-		bw_buf_scale(instance->buf[1], instance->buf[1], instance->params[p_vco1_mod], n);
+		bufScale<1>({instance->buf[1]}, instance->params[p_vco1_mod], {instance->buf[1]}, n);
 		instance->vco2PhaseGen.process({instance->buf[1]}, {instance->buf[1]}, {instance->buf[3]}, n);
 		if (instance->params[p_vco2_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
 			instance->vco2OscTri.process({instance->buf[1]}, {instance->buf[3]}, {instance->buf[1]}, n);
@@ -177,16 +177,16 @@ void bw_example_synthpp_mono_process(bw_example_synthpp_mono *instance, const fl
 		instance->vco2Gain.process({instance->buf[1]}, {instance->buf[1]}, n);
 		instance->vco3Gain.process({out}, {out}, n);
 		instance->noiseGain.process({instance->buf[0]}, {instance->buf[0]}, n);
-		bw_buf_mix(out, out, instance->buf[1], n);
-		bw_buf_mix(out, out, instance->buf[2], n);
+		bufMix<1>({out}, {instance->buf[1]}, {out}, n);
+		bufMix<1>({out}, {instance->buf[2]}, {out}, n);
 
 		instance->oscFilt.process({out}, {out}, n);
 
 		const float k = instance->params[p_noise_color] >= 0.5f
 			? 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK()
 			: 0.1f * instance->noiseGen.getScalingK();
-		bw_buf_scale(instance->buf[0], instance->buf[0], k, n);
-		bw_buf_mix(out, out, instance->buf[0], n);
+		bufScale<1>({instance->buf[0]}, k, {instance->buf[0]}, n);
+		bufMix<1>({out}, {instance->buf[0]}, {out}, n);
 
 		instance->vcfEnvGen.process({instance->gate}, {nullptr}, n);
 		float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * instance->vcfEnvGen.getYZ1(0) + vcf_mod;
@@ -202,12 +202,12 @@ void bw_example_synthpp_mono_process(bw_example_synthpp_mono *instance, const fl
 		instance->vcf.process({out}, {out}, {nullptr}, {nullptr}, n);
 
 		instance->vcaEnvGen.process({instance->gate}, {instance->buf[0]}, n);
-		bw_buf_mul(out, out, instance->buf[0], n);
+		bufMul<1>({out}, {instance->buf[0]}, {out}, n);
 
 		instance->a440PhaseGen.process({nullptr}, {instance->buf[0]}, {nullptr}, n);
 		oscSinProcess<1>({instance->buf[0]}, {instance->buf[0]}, n);
 		if (instance->params[p_a440] >= 0.5f)
-			bw_buf_mix(out, out, instance->buf[0], n);
+			bufMix<1>({out}, {instance->buf[0]}, {out}, n);
 
 		instance->gain.process({out}, {out}, n);
 		instance->ppm.process({out}, {nullptr}, n);

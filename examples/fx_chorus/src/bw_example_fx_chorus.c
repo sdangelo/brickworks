@@ -32,7 +32,7 @@ void bw_example_fx_chorus_set_sample_rate(bw_example_fx_chorus *instance, float 
 	bw_chorus_set_sample_rate(&instance->chorus_coeffs, sample_rate);
 }
 
-BW_SIZE_T bw_example_fx_chorus_mem_req(bw_example_fx_chorus *instance) {
+size_t bw_example_fx_chorus_mem_req(bw_example_fx_chorus *instance) {
 	return bw_chorus_mem_req(&instance->chorus_coeffs);
 }
 

@@ -50,7 +50,7 @@ typedef struct _bw_example_fx_comb bw_example_fx_comb;
 
 void bw_example_fx_comb_init(bw_example_fx_comb *instance);
 void bw_example_fx_comb_set_sample_rate(bw_example_fx_comb *instance, float sample_rate);
-BW_SIZE_T bw_example_fx_comb_mem_req(bw_example_fx_comb *instance);
+size_t bw_example_fx_comb_mem_req(bw_example_fx_comb *instance);
 void bw_example_fx_comb_mem_set(bw_example_fx_comb *instance, void *mem);
 void bw_example_fx_comb_reset(bw_example_fx_comb *instance);
 void bw_example_fx_comb_process(bw_example_fx_comb *instance, const float** x, float** y, int n_samples);

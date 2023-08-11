@@ -14,10 +14,8 @@ code:
 * should clip slope in triangle?
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * svf bandpass out polarity too confusing (inverted in mm2)?
-* better common config.h (less stuff maybe, or more stuff - decide)
 * pan process with no out: should just reset coeffs?
 * get_y_z1, common strategy?
-* sqrt(0) and corner cases, common strategy?
 * bw_satur gain compensation to divide by actual gain (derivative) rather than gain parameter?
 * cite papers, thank authors
 * add initial state (x0) to reset state of lp1, ap1, mm1, hs1, ls1, others? all?
@@ -25,7 +23,6 @@ code:
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
 * prewarp control in all derived filtering modules
-* bw_math: review types
 * src inside distortions? w/ control from outside?
 * bw_fuzz gain compensation?
 * make gain of distortions homogeneous?
@@ -78,6 +75,7 @@ code:
 * dump data structures (see note queue) and indicate error precisely
 * process (multi) no update
 * examples cpu usage
+* bw_math: review types in implementation
 
 build system:
 * make makefiles handle paths with spaces etc

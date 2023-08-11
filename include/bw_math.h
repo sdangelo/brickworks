@@ -197,15 +197,11 @@ static inline float bw_minf(float a, float b);
 /*! <<<```
  *    Returns the minimum of `a` and `b`.
  *
- *    `a` and `b` must be finite.
- *
  *    #### bw_maxf()
  *  ```>>> */
 static inline float bw_maxf(float a, float b);
 /*! <<<```
  *    Returns the maximum of `a` and `b`.
- *
- *    `a` and `b` must be finite.
  *
  *    #### bw_clipf()
  *  ```>>> */
@@ -260,6 +256,8 @@ static inline void bw_intfracf(float x, float *i, float *f);
 /*! <<<```
  *    Puts the integer part (floor) of `x` in `i` and the fractional part in
  *    `f`.
+ *
+ *    `x` must be finite.
  *
  *    #### bw_rcpf()
  *  ```>>> */

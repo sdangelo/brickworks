@@ -56,6 +56,10 @@
  *              value of input was in [<code>0.5f</code>,
  *              <code>1.f</code>].</li>
  *          <li>Fixed <code>bw_ceilf()</code> for negative input values.</li>
+ *          <li>Fixed <code>bw_sqrtf()</code> for very large input values and
+ *              improved implementation.</li>
+ *          <li>Fixed input validity ranges in <code>bw_asinhf()</code> and
+ *              <code>bw_acoshf()</code>.</li>
  *          <li>Removed usage of reserved identifiers and designated
  *              initializers.</li>
  *          <li>Improved documentation w.r.t. validity of input values and
@@ -403,7 +407,10 @@ static inline float bw_pow10f(float x);
 static inline float bw_dB2linf(float x);
 /*! <<<```
  *    Returns an approximation of 10 raised to the power of `x` / 20 (dB to
- *    linear ratio conversion).
+ *    linear ratio conversion). For `x < -758.5955890732315f` it just returns
+ *    `0.f`.
+ *
+ *    `x` must be less than or equal to `770.630f`.
  *
  *    Relative error < 0.062%.
  *
@@ -414,7 +421,9 @@ static inline float bw_lin2dBf(float x);
  *    Returns an approximation of 20 times the base-10 logarithm of `x` (linear
  *    ratio to dB conversion).
  *
- *    Absolute error < 0.032, relative error < 1.2%.
+ *    `x` must be finite and greater than or equal to `1.175494350822287e-38f`.
+ *
+ *    Absolute error < 0.032 or relative error < 1.2%, whatever is worse.
  * 
  *    #### bw_sqrtf()
  *  ```>>> */
@@ -422,9 +431,9 @@ static inline float bw_sqrtf(float x);
 /*! <<<```
  *    Returns an approximation of the square root of `x`.
  *
- *    Do not feed `0.f`.
- * 
- *    Relative error < 0.0007%.
+ *    `x` must be finite and greater than or equal to `0.f`.
+ *
+ *    Absolute error < 1.09e-19 or relative error < 0.0007%, whatever is worse.
  *
  *    #### bw_tanhf()
  *  ```>>> */
@@ -432,7 +441,7 @@ static inline float bw_tanhf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic tangent of `x`.
  *
- *    Absolute error < 0.035, relative error < 6.5%.
+ *    Absolute error < 0.035 or relative error < 6.5%, whatever is worse.
  *
  *    #### bw_sinhf()
  *  ```>>> */
@@ -440,13 +449,17 @@ static inline float bw_sinhf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic sine of `x`.
  *
- *    Relative error < 0.07%.
+ *    |`x`| must less than or equal to `88.722f`.
+ *
+ *    Absolute error < 1e-7 or relative error < 0.07%, whatever is worse.
  *
  *    #### bw_coshf()
  *  ```>>> */
 static inline float bw_coshf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic cosine of `x`.
+ *
+ *    |`x`| must less than or equal to `88.722f`.
  *
  *    Relative error < 0.07%.
  *
@@ -456,7 +469,9 @@ static inline float bw_asinhf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic arcsine of `x`.
  *
- *    Absolute error < 0.004, relative error < 1.2%.
+ *    |`x`| must less than or equal to `8.507059173023462e+37f`.
+ *
+ *    Absolute error < 0.004 or relative error < 1.2%, whatever is worse.
  *
  *    #### bw_acoshf()
  *  ```>>> */
@@ -464,7 +479,9 @@ static inline float bw_acoshf(float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic arccosine of `x`.
  *
- *    Absolute error < 0.004, relative error < 0.8%.
+ *    `x` must be in [1.f, 8.507059173023462e+37f].
+ *
+ *    Absolute error < 0.004 or relative error < 0.8%, whatever is worse.
  *  }}} */
 
 /*** Implementation ***/
@@ -766,7 +783,7 @@ static inline float bw_pow10f(float x) {
 }
 
 static inline float bw_dB2linf(float x) {
-	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 770.630f);
 	const float y = bw_pow2f(0.1660964047443682f * x);
 	BW_ASSERT(bw_is_finite(y));
@@ -784,27 +801,27 @@ static inline float bw_lin2dBf(float x) {
 static inline float bw_sqrtf(float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 0.f);
-	if (x < 8.077935669463161e-28f) {
-		const float y = 3.518437208883201e13f * x;
-		BW_ASSERT(bw_is_finite(y));
-		return y;
-	}
-	union { float f; uint32_t u; } v;
+	if (x < 1.1754943508222875e-38f)
+		return 0.f;
+	union { float f; int32_t i; } v;
 	v.f = x;
-	v.u = (((v.u - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
-	float r = bw_rcpf(x);
+	int i = (v.i >> 26) & 0x38;
+	v.i += (0x200000e0 << i) & 0xff000000;
+	const float r = bw_rcpf(v.f);
+	v.i = (((v.i - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
+	v.i -= (0x100000f0 << i) & 0xff000000;
 	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }
 
 static inline float bw_tanhf(float x) {
-	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(!bw_is_nan(x));
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
 	const float y = xm * axm * (0.01218073260037716f * axm - 0.2750231331124371f) + xm;
-	BW_ASSERT(bw_is_finite(y));
+	BW_ASSERT(!bw_is_nan(y));
 	return y;
 }
 
@@ -826,7 +843,7 @@ static inline float bw_coshf(float x) {
 
 static inline float bw_asinhf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(x >= -1.7e38f && x <= 1.7e38f);
+	BW_ASSERT(x >= -8.507059173023462e+37f && x <= 8.507059173023462e+37f);
 	float a = bw_absf(x);
 	const float y = bw_copysignf(bw_logf((a >= 4096.f ? a : bw_sqrtf(a * a + 1.f)) + a), x);
 	BW_ASSERT(bw_is_finite(y));
@@ -835,7 +852,7 @@ static inline float bw_asinhf(float x) {
 
 static inline float bw_acoshf(float x) {
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(x >= 1.f);
+	BW_ASSERT(x >= 1.f && x <= 8.507059173023462e+37f);
 	const float y = bw_logf((x >= 8192.f ? x : bw_sqrtf(x * x - 1.f)) + x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;

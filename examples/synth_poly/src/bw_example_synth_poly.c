@@ -237,7 +237,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 		else
 			for (int j = 0; j < N_VOICES; j++)
 				bw_pink_filt_reset_state(&instance->pink_filt_coeffs, pink_filt_states[j]); // FIXME: calling this here is sloppy coding
-		bw_buf_scale_multi((const float **)b1, 5.f, b1, N_VOICES, n);
+		bw_buf_scale_multi((const float * const *)b1, 5.f, b1, N_VOICES, n);
 		
 		float vcf_mod[N_VOICES];
 		for (int j = 0; j < N_VOICES; j++) {
@@ -282,16 +282,16 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 		bw_gain_process_multi(&instance->vco2_gain_coeffs, (const float **)b2, b2, N_VOICES, n);
 		bw_gain_process_multi(&instance->vco3_gain_coeffs, (const float **)b0, b0, N_VOICES, n);
 		bw_gain_process_multi(&instance->noise_gain_coeffs, (const float **)b1, b1, N_VOICES, n);
-		bw_buf_mix_multi((const float **)b0, (const float **)b2, b0, N_VOICES, n);
-		bw_buf_mix_multi((const float **)b0, (const float **)b3, b0, N_VOICES, n);
+		bw_buf_mix_multi((const float * const *)b0, (const float * const *)b2, b0, N_VOICES, n);
+		bw_buf_mix_multi((const float * const *)b0, (const float * const *)b3, b0, N_VOICES, n);
 		
 		bw_osc_filt_process_multi(osc_filt_states, (const float **)b0, b0, N_VOICES, n);
 		
 		const float k = instance->params[p_noise_color] >= 0.5f
 			? 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
 			: 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
-		bw_buf_scale_multi((const float **)b1, k, b1, N_VOICES, n);
-		bw_buf_mix_multi((const float **)b0, (const float **)b1, b0, N_VOICES, n);
+		bw_buf_scale_multi((const float * const *)b1, k, b1, N_VOICES, n);
+		bw_buf_mix_multi((const float * const *)b0, (const float * const *)b1, b0, N_VOICES, n);
 		
 		bw_env_gen_process_multi(&instance->vcf_env_gen_coeffs, vcf_env_gen_states, gates, NULL, N_VOICES, n);
 		for (int j = 0; j < N_VOICES; j++) {
@@ -309,7 +309,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 		}
 		
 		bw_env_gen_process_multi(&instance->vca_env_gen_coeffs, vca_env_gen_states, gates, b1, N_VOICES, n);
-		bw_buf_mul_multi((const float **)b0, (const float **)b1, b0, N_VOICES, n);
+		bw_buf_mul_multi((const float * const *)b0, (const float * const *)b1, b0, N_VOICES, n);
 		
 		bw_buf_fill(0.f, out, n);
 		for (int j = 0; j < N_VOICES; j++)

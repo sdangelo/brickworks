@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_delay.h>
+#include <bw_delay.h>
 
 using namespace Brickworks;
 

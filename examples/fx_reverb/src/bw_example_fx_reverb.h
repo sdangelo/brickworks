@@ -21,6 +21,8 @@
 #ifndef _BW_EXAMPLE_FX_REVERB_H
 #define _BW_EXAMPLE_FX_REVERB_H
 
+#include "platform.h"
+
 #include <bw_reverb.h>
 
 #ifdef __cplusplus

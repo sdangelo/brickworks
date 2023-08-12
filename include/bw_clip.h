@@ -327,7 +327,9 @@ static inline void bw_clip_set_gain_compensation(bw_clip_coeffs *BW_RESTRICT coe
 
 namespace Brickworks {
 
-/*! api {{{
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
  *    ##### Brickworks::Clip
  *  ```>>> */
 template<size_t N_CHANNELS>

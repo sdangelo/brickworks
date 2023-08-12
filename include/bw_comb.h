@@ -397,7 +397,9 @@ static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
 
 namespace Brickworks {
 
-/*! api {{{
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
  *    ##### Brickworks::Comb
  *  ```>>> */
 template<size_t N_CHANNELS>

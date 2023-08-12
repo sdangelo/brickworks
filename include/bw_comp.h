@@ -31,8 +31,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li><code>bw_comb_process()</code> and
- *              <code>bw_comb_process_multi()</code> now use <code>size_t</code>
+ *          <li><code>bw_comp_process()</code> and
+ *              <code>bw_comp_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
  *          <li>Added more <code>const</code> specifiers to input
  *              arguments.</li>
@@ -346,7 +346,9 @@ static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float
 
 namespace Brickworks {
 
-/*! api {{{
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
  *    ##### Brickworks::Comp
  *  ```>>> */
 template<size_t N_CHANNELS>

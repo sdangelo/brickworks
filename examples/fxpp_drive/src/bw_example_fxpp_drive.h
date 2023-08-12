@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_drive.h>
+#include <bw_drive.h>
 #include <bwpp_src_int.h>
 
 using namespace Brickworks;

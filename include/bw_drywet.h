@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_drywet_process()</code> and
+ *              <code>bw_drywet_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -47,8 +54,8 @@
  *  }}}
  */
 
-#ifndef _BW_DRYWET_H
-#define _BW_DRYWET_H
+#ifndef BW_DRYWET_H
+#define BW_DRYWET_H
 
 #include <bw_common.h>
 
@@ -59,7 +66,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_drywet_coeffs
  *  ```>>> */
-typedef struct _bw_drywet_coeffs bw_drywet_coeffs;
+typedef struct bw_drywet_coeffs bw_drywet_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -102,7 +109,7 @@ static inline float bw_drywet_process1(const bw_drywet_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_drywet_process()
  *  ```>>> */
-static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const float *x_dry, const float *x_wet, float *y, int n_samples);
+static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const float *x_dry, const float *x_wet, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the dry input buffer `x_dry` and of the
  *    wet input buffer `x_wet` and fills the first `n_samples` of the output
@@ -110,7 +117,7 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
  *
  *    #### bw_drywet_process_multi()
  *  ```>>> */
-static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float **x_dry, const float **x_wet, float **y, int n_channels, int n_samples);
+static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float * const *x_dry, const float * const *x_wet, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` dry input buffers
  *    `x_dry` and of the `n_channels` wet input buffers `x_wet`, and fills the
@@ -149,7 +156,7 @@ static inline void bw_drywet_set_smooth_tau(bw_drywet_coeffs *BW_RESTRICT coeffs
 extern "C" {
 #endif
 
-struct _bw_drywet_coeffs {
+struct bw_drywet_coeffs {
 	// Sub-components
 	bw_gain_coeffs	gain_coeffs;
 };
@@ -178,19 +185,19 @@ static inline float bw_drywet_process1(const bw_drywet_coeffs *BW_RESTRICT coeff
 	return bw_gain_get_gain(&coeffs->gain_coeffs) * (x_wet - x_dry) + x_dry;
 }
 
-static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const float *x_dry, const float *x_wet, float *y, int n_samples) {
+static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const float *x_dry, const float *x_wet, float *y, size_t n_samples) {
 	bw_drywet_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_drywet_update_coeffs_audio(coeffs);
 		y[i] = bw_drywet_process1(coeffs, x_dry[i], x_wet[i]);
 	}
 }
 
-static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float **x_dry, const float **x_wet, float **y, int n_channels, int n_samples) {
+static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float * const *x_dry, const float * const *x_wet, float **y, size_t n_channels, size_t n_samples) {
 	bw_drywet_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_drywet_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_drywet_process1(coeffs, x_dry[j][i], x_wet[j][i]);
 	}
 }
@@ -204,6 +211,94 @@ static inline void bw_drywet_set_smooth_tau(bw_drywet_coeffs *BW_RESTRICT coeffs
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::DryWet
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class DryWet {
+public:
+	DryWet();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x_dry,
+		const float * const *x_wet,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x_dry,
+		std::array<const float *, N_CHANNELS> x_wet,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setWet(float value);
+	void setSmoothTau(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_drywet_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline DryWet<N_CHANNELS>::DryWet() {
+	bw_drywet_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void DryWet<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_drywet_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void DryWet<N_CHANNELS>::reset() {
+	bw_drywet_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void DryWet<N_CHANNELS>::process(
+		const float * const *x_dry,
+		const float * const *x_wet,
+		float **y,
+		size_t nSamples) {
+	bw_drywet_process_multi(&coeffs, x_dry, x_wet, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void DryWet<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x_dry,
+		std::array<const float *, N_CHANNELS> x_wet,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x_dry.data(), x_wet.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void DryWet<N_CHANNELS>::setWet(float value) {
+	bw_drywet_set_wet(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void DryWet<N_CHANNELS>::setSmoothTau(float value) {
+	bw_drywet_set_smooth_tau(&coeffs, value);
+}
+
 }
 #endif
 

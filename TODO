@@ -1,6 +1,11 @@
 1.0.0
 -----
 
+in progress:
+* merge c++ code into c headers
+* revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
+* var names xy -> x_y
+* don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
 code:
 * debugging
 * check all examples again
@@ -27,13 +32,9 @@ code:
 * bw_fuzz gain compensation?
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
-* revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
-* var names xy -> x_y
-* don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
 * update state ctrl -> process ctrl?
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
-* merge c++ code into c headers
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
 * drywet -> dry_wet, ringmod -> ring_mod, etc?
 * allow nullptr in C++ wrappers where process_multi arg can be NULL

@@ -21,11 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_TREM_H
 #define _BW_EXAMPLE_FX_TREM_H
 
+#include "platform.h"
+
+#include <bw_trem.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_trem.h>
 
 enum {
 	p_rate,

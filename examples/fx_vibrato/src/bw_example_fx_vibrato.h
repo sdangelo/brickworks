@@ -21,11 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_VIBRATO_H
 #define _BW_EXAMPLE_FX_VIBRATO_H
 
+#include "platform.h"
+
+#include <bw_chorus.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_chorus.h>
 
 enum {
 	p_rate,

@@ -21,15 +21,15 @@
 #ifndef _BW_EXAMPLE_FX_EQ_3BAND_H
 #define _BW_EXAMPLE_FX_EQ_3BAND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_ls2.h>
 #include <bw_hs2.h>
 #include <bw_peak.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_ls_cutoff,

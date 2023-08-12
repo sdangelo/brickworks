@@ -21,11 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_SLEW_LIM_H
 #define _BW_EXAMPLE_FX_SLEW_LIM_H
 
+#include "platform.h"
+
+#include <bw_slew_lim.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_slew_lim.h>
 
 enum {
 	p_max_rate,

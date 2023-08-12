@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_ap1.h>
+#include <bw_ap1.h>
 
 using namespace Brickworks;
 

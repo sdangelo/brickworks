@@ -21,11 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_WAH_H
 #define _BW_EXAMPLE_FX_WAH_H
 
+#include "platform.h"
+
+#include <bw_wah.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_wah.h>
 
 enum {
 	p_wah,

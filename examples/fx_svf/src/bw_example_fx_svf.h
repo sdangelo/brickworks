@@ -21,11 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_SVF_H
 #define _BW_EXAMPLE_FX_SVF_H
 
+#include "platform.h"
+
+#include <bw_svf.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_svf.h>
 
 enum {
 	p_cutoff,

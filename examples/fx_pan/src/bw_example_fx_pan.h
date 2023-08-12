@@ -21,15 +21,15 @@
 #ifndef _BW_EXAMPLE_FX_PAN_H
 #define _BW_EXAMPLE_FX_PAN_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_pan.h>
 #include <bw_ppm.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_pan,

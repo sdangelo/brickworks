@@ -21,14 +21,14 @@
 #ifndef _BW_EXAMPLE_FX_CLIP_H
 #define _BW_EXAMPLE_FX_CLIP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_clip.h>
 #include <bw_src_int.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_bias,

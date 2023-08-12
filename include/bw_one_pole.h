@@ -196,7 +196,7 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_one_pole_process_multi()
  *  ```>>> */
-static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -706,7 +706,7 @@ static inline void bw_one_pole_process(bw_one_pole_coeffs *BW_RESTRICT coeffs, b
 	BW_ASSERT_DEEP(!bw_has_nan(y, n_samples));
 }
 
-static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state **BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_one_pole_process_multi(bw_one_pole_coeffs *BW_RESTRICT coeffs, bw_one_pole_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
@@ -985,11 +985,11 @@ public:
 	void process(
 		const float * const *x,
 		float **y,
-		int nSamples);
+		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
-		int nSamples);
+		size_t nSamples);
 
 	void setCutoff(float value);
 	void setCutoffUp(float value);
@@ -1040,7 +1040,7 @@ template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::process(
 		const float * const *x,
 		float **y,
-		int nSamples) {
+		size_t nSamples) {
 	bw_one_pole_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }
 
@@ -1048,7 +1048,7 @@ template<size_t N_CHANNELS>
 inline void OnePole<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
-		int nSamples) {
+		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
 

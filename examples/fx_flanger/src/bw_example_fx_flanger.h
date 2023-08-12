@@ -21,13 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_FLANGER_H
 #define _BW_EXAMPLE_FX_FLANGER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_chorus.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_rate,

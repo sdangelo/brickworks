@@ -21,13 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_PHASER_H
 #define _BW_EXAMPLE_FX_PHASER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_phaser.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_rate,

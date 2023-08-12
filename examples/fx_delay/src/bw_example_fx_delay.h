@@ -21,13 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_DELAY_H
 #define _BW_EXAMPLE_FX_DELAY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_delay.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_delay,

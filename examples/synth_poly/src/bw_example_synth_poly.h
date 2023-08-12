@@ -21,10 +21,6 @@
 #ifndef _BW_EXAMPLE_SYNTH_POLY_H
 #define _BW_EXAMPLE_SYNTH_POLY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_note_queue.h>
@@ -40,6 +36,10 @@ extern "C" {
 #include <bw_env_gen.h>
 #include <bw_gain.h>
 #include <bw_ppm.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_volume,

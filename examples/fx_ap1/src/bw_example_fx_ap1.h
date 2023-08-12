@@ -21,13 +21,13 @@
 #ifndef _BW_EXAMPLE_FX_AP1_H
 #define _BW_EXAMPLE_FX_AP1_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_ap1.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_cutoff,

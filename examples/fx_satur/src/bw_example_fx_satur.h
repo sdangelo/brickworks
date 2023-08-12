@@ -21,12 +21,14 @@
 #ifndef _BW_EXAMPLE_FX_SATUR_H
 #define _BW_EXAMPLE_FX_SATUR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "platform.h"
 
 #include <bw_satur.h>
 #include <bw_src_int.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_bias,

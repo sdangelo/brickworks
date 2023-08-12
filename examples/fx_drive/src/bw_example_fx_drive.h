@@ -21,14 +21,14 @@
 #ifndef _BW_EXAMPLE_FX_DRIVE_H
 #define _BW_EXAMPLE_FX_DRIVE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_drive.h>
 #include <bw_src_int.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_drive,

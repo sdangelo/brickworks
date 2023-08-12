@@ -21,11 +21,11 @@
 #ifndef _BW_EXAMPLE_FX_REVERB_H
 #define _BW_EXAMPLE_FX_REVERB_H
 
+#include <bw_reverb.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_reverb.h>
 
 enum {
 	p_predelay,

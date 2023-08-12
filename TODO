@@ -28,7 +28,7 @@ code:
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
 * revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
-* x_y vs xy var names
+* var names xy -> x_y
 * don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
 * update state ctrl -> process ctrl?
 * mem req -> return value of set sample rate?
@@ -44,6 +44,7 @@ code:
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * modulation vs process (multi) no update (post 1.0.0)???
 * check assumptions w.r.t. usage of math functions
+* extern "C" in a macro to be individually applied (easier #include)
 
 build system:
 * single header generation (vs modules in bwp... to think about)

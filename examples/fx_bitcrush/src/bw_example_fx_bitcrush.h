@@ -21,12 +21,14 @@
 #ifndef _BW_EXAMPLE_FX_BITCRUSH_H
 #define _BW_EXAMPLE_FX_BITCRUSH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "platform.h"
 
 #include <bw_sr_reduce.h>
 #include <bw_bd_reduce.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_sr_ratio,

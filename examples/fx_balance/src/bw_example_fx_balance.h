@@ -21,15 +21,15 @@
 #ifndef _BW_EXAMPLE_FX_BALANCE_H
 #define _BW_EXAMPLE_FX_BALANCE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "platform.h"
 
 #include <bw_balance.h>
 #include <bw_ppm.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	p_balance,

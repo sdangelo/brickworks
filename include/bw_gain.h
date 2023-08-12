@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_gain_process()</code> and
+ *              <code>bw_gain_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -67,8 +74,8 @@
  *  }}}
  */
 
-#ifndef _BW_GAIN_H
-#define _BW_GAIN_H
+#ifndef BW_GAIN_H
+#define BW_GAIN_H
 
 #include <bw_common.h>
 
@@ -79,7 +86,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_gain_coeffs
  *  ```>>> */
-typedef struct _bw_gain_coeffs bw_gain_coeffs;
+typedef struct bw_gain_coeffs bw_gain_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -122,7 +129,7 @@ static inline float bw_gain_process1(const bw_gain_coeffs *BW_RESTRICT coeffs, f
  *
  *    #### bw_gain_process()
  *  ```>>> */
-static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples);
+static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
@@ -130,7 +137,7 @@ static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const flo
  *
  *    #### bw_gain_process_multi()
  *  ```>>> */
-static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -183,7 +190,7 @@ static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs);
 extern "C" {
 #endif
 
-struct _bw_gain_coeffs {
+struct bw_gain_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_state;
@@ -206,7 +213,7 @@ static inline void bw_gain_set_sample_rate(bw_gain_coeffs *BW_RESTRICT coeffs, f
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 }
 
-static inline void _bw_gain_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void bw_gain_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs, char force) {
 	if (force || coeffs->smooth_tau != coeffs->smooth_tau_prev) {
 		bw_one_pole_set_tau(&coeffs->smooth_coeffs, coeffs->smooth_tau);
 		bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
@@ -215,12 +222,12 @@ static inline void _bw_gain_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs,
 }
 
 static inline void bw_gain_reset_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs) {
-	_bw_gain_do_update_coeffs(coeffs, 1);
+	bw_gain_do_update_coeffs(coeffs, 1);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->gain);
 }
 
 static inline void bw_gain_update_coeffs_ctrl(bw_gain_coeffs *BW_RESTRICT coeffs) {
-	_bw_gain_do_update_coeffs(coeffs, 0);
+	bw_gain_do_update_coeffs(coeffs, 0);
 }
 
 static inline void bw_gain_update_coeffs_audio(bw_gain_coeffs *BW_RESTRICT coeffs) {
@@ -231,19 +238,19 @@ static inline float bw_gain_process1(const bw_gain_coeffs *BW_RESTRICT coeffs, f
 	return bw_one_pole_get_y_z1(&coeffs->smooth_state) * x;
 }
 
-static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples) {
+static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples) {
 	bw_gain_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_gain_update_coeffs_audio(coeffs);
 		y[i] = bw_gain_process1(coeffs, x[i]);
 	}
 }
 
-static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_gain_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_gain_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_gain_process1(coeffs, x[j][i]);
 	}
 }
@@ -265,6 +272,103 @@ static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs) {
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Gain
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Gain {
+public:
+	Gain();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setGainLin(float value);
+	void setGainDB(float value);
+	void setSmoothTau(float value);
+	
+	float getGain();
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_gain_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline Gain<N_CHANNELS>::Gain() {
+	bw_gain_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_gain_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::reset() {
+	bw_gain_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_gain_process_multi(&coeffs, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::setGainLin(float value) {
+	bw_gain_set_gain_lin(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::setGainDB(float value) {
+	bw_gain_set_gain_dB(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Gain<N_CHANNELS>::setSmoothTau(float value) {
+	bw_gain_set_smooth_tau(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline float Gain<N_CHANNELS>::getGain() {
+	return bw_gain_get_gain(&coeffs);
+}
+
 }
 #endif
 

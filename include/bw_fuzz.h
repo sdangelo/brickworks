@@ -34,8 +34,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_fuzz_process()</code> and
+ *              <code>bw_fuzz_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -52,8 +59,8 @@
  *  }}}
  */
 
-#ifndef _BW_FUZZ_H
-#define _BW_FUZZ_H
+#ifndef BW_FUZZ_H
+#define BW_FUZZ_H
 
 #include <bw_common.h>
 
@@ -64,13 +71,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_fuzz_coeffs
  *  ```>>> */
-typedef struct _bw_fuzz_coeffs bw_fuzz_coeffs;
+typedef struct bw_fuzz_coeffs bw_fuzz_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_fuzz_state
  *  ```>>> */
-typedef struct _bw_fuzz_state bw_fuzz_state;
+typedef struct bw_fuzz_state bw_fuzz_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -119,7 +126,7 @@ static inline float bw_fuzz_process1(const bw_fuzz_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_fuzz_process()
  *  ```>>> */
-static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -127,7 +134,7 @@ static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_s
  *
  *    #### bw_fuzz_process_multi()
  *  ```>>> */
-static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
   *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -172,7 +179,7 @@ static inline void bw_fuzz_set_volume(bw_fuzz_coeffs *BW_RESTRICT coeffs, float 
 extern "C" {
 #endif
 
-struct _bw_fuzz_coeffs {
+struct bw_fuzz_coeffs {
 	// Sub-components
 	bw_svf_coeffs	svf_coeffs;
 	bw_hs1_coeffs	hs1_coeffs;
@@ -181,7 +188,7 @@ struct _bw_fuzz_coeffs {
 	bw_gain_coeffs	gain_coeffs;
 };
 
-struct _bw_fuzz_state {
+struct bw_fuzz_state {
 	// Sub-components
 	bw_svf_state	svf_state;
 	bw_hs1_state	hs1_state;
@@ -245,19 +252,19 @@ static inline float bw_fuzz_process1(const bw_fuzz_coeffs *BW_RESTRICT coeffs, b
 	return bw_gain_process1(&coeffs->gain_coeffs, y);
 }
 
-static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_fuzz_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_fuzz_update_coeffs_audio(coeffs);
 		y[i] = bw_fuzz_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_fuzz_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_fuzz_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_fuzz_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -271,6 +278,96 @@ static inline void bw_fuzz_set_volume(bw_fuzz_coeffs *BW_RESTRICT coeffs, float 
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Fuzz
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Fuzz {
+public:
+	Fuzz();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setFuzz(float value);
+	void setVolume(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_fuzz_coeffs	 coeffs;
+	bw_fuzz_state	 states[N_CHANNELS];
+	bw_fuzz_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline Fuzz<N_CHANNELS>::Fuzz() {
+	bw_fuzz_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void Fuzz<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_fuzz_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Fuzz<N_CHANNELS>::reset() {
+	bw_fuzz_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_fuzz_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void Fuzz<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_fuzz_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Fuzz<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Fuzz<N_CHANNELS>::setFuzz(float value) {
+	bw_fuzz_set_fuzz(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Fuzz<N_CHANNELS>::setVolume(float value) {
+	bw_fuzz_set_volume(&coeffs, value);
+}
+
 }
 #endif
 

@@ -42,8 +42,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_env_gen_process()</code> and
+ *              <code>bw_env_gen_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -86,8 +93,8 @@
  *  }}}
  */
 
-#ifndef _BW_ENV_GEN_H
-#define _BW_ENV_GEN_H
+#ifndef BW_ENV_GEN_H
+#define BW_ENV_GEN_H
 
 #include <bw_common.h>
 
@@ -98,13 +105,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_env_gen_coeffs
  *  ```>>> */
-typedef struct _bw_env_gen_coeffs bw_env_gen_coeffs;
+typedef struct bw_env_gen_coeffs bw_env_gen_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_env_gen_state
  *  ```>>> */
-typedef struct _bw_env_gen_state bw_env_gen_state;
+typedef struct bw_env_gen_state bw_env_gen_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -177,7 +184,7 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
  *
  *    #### bw_env_gen_process()
  *  ```>>> */
-static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, int n_samples);
+static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y` using
  *    the given `gate` value (`0` for off, non-`0` for on), while using and
@@ -187,7 +194,7 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
  *
  *    #### bw_env_gen_process_multi()
  *  ```>>> */
-static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state **BW_RESTRICT state, char *gate, float **y, int n_channels, int n_samples);
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y` using the given `n_channels` `gate` values (`0` for off,
@@ -263,7 +270,7 @@ static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state);
 extern "C" {
 #endif
 
-struct _bw_env_gen_coeffs {
+struct bw_env_gen_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	
@@ -282,16 +289,16 @@ struct _bw_env_gen_coeffs {
 	int			param_changed;
 };
 
-struct _bw_env_gen_state {
+struct bw_env_gen_state {
 	bw_env_gen_phase	phase;
 	float			y_z1;
 	bw_one_pole_state	smooth_state;
 };
 
-#define _BW_ENV_GEN_PARAM_ATTACK	1
-#define _BW_ENV_GEN_PARAM_DECAY		(1<<1)
-#define _BW_ENV_GEN_PARAM_SUSTAIN	(1<<2)
-#define _BW_ENV_GEN_PARAM_RELEASE	(1<<3)
+#define BW_ENV_GEN_PARAM_ATTACK		1
+#define BW_ENV_GEN_PARAM_DECAY		(1<<1)
+#define BW_ENV_GEN_PARAM_SUSTAIN	(1<<2)
+#define BW_ENV_GEN_PARAM_RELEASE	(1<<3)
 
 static inline void bw_env_gen_init(bw_env_gen_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_init(&coeffs->smooth_coeffs);
@@ -322,11 +329,11 @@ static inline void bw_env_gen_reset_state(const bw_env_gen_coeffs *BW_RESTRICT c
 static inline void bw_env_gen_update_coeffs_ctrl(bw_env_gen_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		// 1 ns considered instantaneous
-		if (coeffs->param_changed & _BW_ENV_GEN_PARAM_ATTACK)
+		if (coeffs->param_changed & BW_ENV_GEN_PARAM_ATTACK)
 			coeffs->attack_inc = coeffs->attack > 1e-9f ? coeffs->T * bw_rcpf(coeffs->attack) : INFINITY;
-		if (coeffs->param_changed & (_BW_ENV_GEN_PARAM_DECAY | _BW_ENV_GEN_PARAM_SUSTAIN))
+		if (coeffs->param_changed & (BW_ENV_GEN_PARAM_DECAY | BW_ENV_GEN_PARAM_SUSTAIN))
 			coeffs->decay_inc = coeffs->decay > 1e-9f ? (coeffs->sustain - 1.f) * coeffs->T * bw_rcpf(coeffs->decay) : -INFINITY;
-		if (coeffs->param_changed & (_BW_ENV_GEN_PARAM_SUSTAIN | _BW_ENV_GEN_PARAM_RELEASE))
+		if (coeffs->param_changed & (BW_ENV_GEN_PARAM_SUSTAIN | BW_ENV_GEN_PARAM_RELEASE))
 			coeffs->release_inc = coeffs->release > 1e-9f ? -coeffs->sustain * coeffs->T * bw_rcpf(coeffs->release) : -INFINITY;
 	}
 }
@@ -382,59 +389,59 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
 	return v;
 }
 
-static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, int n_samples) {
+static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	bw_env_gen_update_state_ctrl(coeffs, state, gate);
 	if (y != NULL)
-		for (int i = 0; i < n_samples; i++)
+		for (size_t i = 0; i < n_samples; i++)
 			y[i] = bw_env_gen_process1(coeffs, state);
 	else
-		for (int i = 0; i < n_samples; i++)
+		for (size_t i = 0; i < n_samples; i++)
 			bw_env_gen_process1(coeffs, state);
 }
 
-static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state **BW_RESTRICT state, char *gate, float **y, int n_channels, int n_samples) {
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float **y, size_t n_channels, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
-	for (int j = 0; j < n_channels; j++)
+	for (size_t j = 0; j < n_channels; j++)
 		bw_env_gen_update_state_ctrl(coeffs, state[j], gate[j]);
 	if (y != NULL)
-		for (int i = 0; i < n_samples; i++)
-			for (int j = 0; j < n_channels; j++) {
+		for (size_t i = 0; i < n_samples; i++)
+			for (size_t j = 0; j < n_channels; j++) {
 				const float v = bw_env_gen_process1(coeffs, state[j]);
 				if (y[j] != NULL)
 					y[j][i] = v;
 			}
 	else
-		for (int i = 0; i < n_samples; i++)
-			for (int j = 0; j < n_channels; j++)
+		for (size_t i = 0; i < n_samples; i++)
+			for (size_t j = 0; j < n_channels; j++)
 				bw_env_gen_process1(coeffs, state[j]);
 }
 
 static inline void bw_env_gen_set_attack(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->attack != value) {
 		coeffs->attack = value;
-		coeffs->param_changed |= _BW_ENV_GEN_PARAM_ATTACK;
+		coeffs->param_changed |= BW_ENV_GEN_PARAM_ATTACK;
 	}
 }
 
 static inline void bw_env_gen_set_decay(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->decay != value) {
 		coeffs->decay = value;
-		coeffs->param_changed |= _BW_ENV_GEN_PARAM_DECAY;
+		coeffs->param_changed |= BW_ENV_GEN_PARAM_DECAY;
 	}
 }
 
 static inline void bw_env_gen_set_sustain(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->sustain != value) {
 		coeffs->sustain = value;
-		coeffs->param_changed |= _BW_ENV_GEN_PARAM_SUSTAIN;
+		coeffs->param_changed |= BW_ENV_GEN_PARAM_SUSTAIN;
 	}
 }
 
 static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->release != value) {
 		coeffs->release = value;
-		coeffs->param_changed |= _BW_ENV_GEN_PARAM_RELEASE;
+		coeffs->param_changed |= BW_ENV_GEN_PARAM_RELEASE;
 	}
 }
 
@@ -446,12 +453,127 @@ static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state) {
 	return state->y_z1;
 }
 
-#undef _BW_ENV_GEN_PARAM_ATTACK
-#undef _BW_ENV_GEN_PARAM_DECAY
-#undef _BW_ENV_GEN_PARAM_SUSTAIN
-#undef _BW_ENV_GEN_PARAM_RELEASE
+#undef BW_ENV_GEN_PARAM_ATTACK
+#undef BW_ENV_GEN_PARAM_DECAY
+#undef BW_ENV_GEN_PARAM_SUSTAIN
+#undef BW_ENV_GEN_PARAM_RELEASE
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::EnvGen
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class EnvGen {
+public:
+	EnvGen();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const char *gate,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<char, N_CHANNELS> gate,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setAttack(float value);
+	void setDecay(float value);
+	void setSustain(float value);
+	void setRelease(float value);
+	
+	bw_env_gen_phase getPhase(size_t channel);
+	float getYZ1(size_t channel);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_env_gen_coeffs	 coeffs;
+	bw_env_gen_state	 states[N_CHANNELS];
+	bw_env_gen_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline EnvGen<N_CHANNELS>::EnvGen() {
+	bw_env_gen_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_env_gen_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::reset() {
+	bw_env_gen_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_env_gen_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::process(
+		const char *gate,
+		float **y,
+		size_t nSamples) {
+	bw_env_gen_process_multi(&coeffs, statesP, gate, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::process(
+		std::array<char, N_CHANNELS> gate,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(gate.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setAttack(float value) {
+	bw_env_gen_set_attack(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setDecay(float value) {
+	bw_env_gen_set_decay(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setSustain(float value) {
+	bw_env_gen_set_sustain(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setRelease(float value) {
+	bw_env_gen_set_release(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline bw_env_gen_phase EnvGen<N_CHANNELS>::getPhase(size_t channel) {
+	return bw_env_gen_get_phase(states + channel);
+}
+
+template<size_t N_CHANNELS>
+inline float EnvGen<N_CHANNELS>::getYZ1(size_t channel) {
+	return bw_env_gen_get_y_z1(states + channel);
+}
+
 }
 #endif
 

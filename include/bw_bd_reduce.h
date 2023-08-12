@@ -219,7 +219,7 @@ namespace Brickworks {
 
 /*** Public C++ API ***/
 
-/*! api {{{
+/*! api_cpp {{{
  *    ##### Brickworks::BDReduce
  *  ```>>> */
 template<size_t N_CHANNELS>

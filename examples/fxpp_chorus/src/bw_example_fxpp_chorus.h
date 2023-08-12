@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_chorus.h>
+#include <bw_chorus.h>
 
 using namespace Brickworks;
 

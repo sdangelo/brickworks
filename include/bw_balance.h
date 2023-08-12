@@ -242,7 +242,7 @@ namespace Brickworks {
 
 /*** Public C++ API ***/
 
-/*! api {{{
+/*! api_cpp {{{
  *    ##### Brickworks::Balance
  *  ```>>> */
 template<size_t N_CHANNELS>

@@ -40,6 +40,15 @@
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_chorus_process()</code> and
+ *              <code>bw_chorus_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -64,8 +73,8 @@
  *  }}}
  */
 
-#ifndef _BW_CHORUS_H
-#define _BW_CHORUS_H
+#ifndef BW_CHORUS_H
+#define BW_CHORUS_H
 
 #include <bw_common.h>
 
@@ -76,13 +85,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_chorus_coeffs
  *  ```>>> */
-typedef struct _bw_chorus_coeffs bw_chorus_coeffs;
+typedef struct bw_chorus_coeffs bw_chorus_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_chorus_state
  *  ```>>> */
-typedef struct _bw_chorus_state bw_chorus_state;
+typedef struct bw_chorus_state bw_chorus_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -145,7 +154,7 @@ static inline float bw_chorus_process1(const bw_chorus_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_chorus_process()
  *  ```>>> */
-static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -153,7 +162,7 @@ static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_ch
  *
  *    #### bw_chorus_process_multi()
  *  ```>>> */
-static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -226,7 +235,7 @@ static inline void bw_chorus_set_coeff_fb(bw_chorus_coeffs *BW_RESTRICT coeffs, 
 extern "C" {
 #endif
 
-struct _bw_chorus_coeffs {
+struct bw_chorus_coeffs {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
@@ -237,7 +246,7 @@ struct _bw_chorus_coeffs {
 	float			amount;
 };
 
-struct _bw_chorus_state {
+struct bw_chorus_state {
 	// Sub-components
 	bw_comb_state		comb_state;
 };
@@ -293,19 +302,19 @@ static inline float bw_chorus_process1(const bw_chorus_coeffs *BW_RESTRICT coeff
 	return bw_comb_process1(&coeffs->comb_coeffs, &state->comb_state, x);
 }
 
-static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_chorus_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_chorus_update_coeffs_audio(coeffs);
 		y[i] = bw_chorus_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_chorus_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_chorus_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_chorus_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -336,6 +345,136 @@ static inline void bw_chorus_set_coeff_fb(bw_chorus_coeffs *BW_RESTRICT coeffs, 
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Chorus
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Chorus {
+public:
+	Chorus(float maxDelay = 0.01f);
+	~Chorus();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setRate(float value);
+	void setDelay(float value);
+	void setAmount(float value);
+	void setCoeffX(float value);
+	void setCoeffMod(float value);
+	void setCoeffFB(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_chorus_coeffs	 coeffs;
+	bw_chorus_state		 states[N_CHANNELS];
+	bw_chorus_state		*statesP[N_CHANNELS];
+	void			*mem;
+};
+
+template<size_t N_CHANNELS>
+inline Chorus<N_CHANNELS>::Chorus(float maxDelay) {
+	bw_chorus_init(&coeffs, maxDelay);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+	mem = nullptr;
+}
+
+template<size_t N_CHANNELS>
+inline Chorus<N_CHANNELS>::~Chorus() {
+	if (mem != nullptr)
+		operator delete(mem);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_chorus_set_sample_rate(&coeffs, sampleRate);
+	size_t req = bw_chorus_mem_req(&coeffs);
+	if (mem != nullptr)
+		operator delete(mem);
+	mem = operator new(req * N_CHANNELS);
+	void *m = mem;
+	for (size_t i = 0; i < N_CHANNELS; i++, m = static_cast<char *>(m) + req)
+		bw_chorus_mem_set(&coeffs, states + i, m);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::reset() {
+	bw_chorus_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_chorus_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_chorus_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setRate(float value) {
+	bw_chorus_set_rate(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setDelay(float value) {
+	bw_chorus_set_delay(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setAmount(float value) {
+	bw_chorus_set_amount(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setCoeffX(float value) {
+	bw_chorus_set_coeff_x(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setCoeffMod(float value) {
+	bw_chorus_set_coeff_mod(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::setCoeffFB(float value) {
+	bw_chorus_set_coeff_fb(&coeffs, value);
+}
+
 }
 #endif
 

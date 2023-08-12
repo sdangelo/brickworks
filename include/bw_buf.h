@@ -77,6 +77,8 @@
 extern "C" {
 #endif
 
+/*** Public API ***/
+
 /*! api {{{
  *    #### bw_buf_fill()
  *  ```>>> */
@@ -168,112 +170,6 @@ static inline void bw_buf_mul_multi(const float * const *src1, const float * con
  *  }}} */
 
 #ifdef __cplusplus
-}
-
-#include <array>
-
-namespace Brickworks {
-
-/*! api_cpp {{{
- *    ##### Brickworks::bufFill
- *  ```>>> */
-template<size_t N_CHANNELS>
-inline void bufFill(
-		float k,
-		float ** dest,
-		int nSamples);
-
-template<size_t N_CHANNELS>
-inline void bufFill(
-		float k,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
-/*! <<<```
- *
- *    ##### Brickworks::bufNeg
- *  ```>>> */
-template<size_t N_CHANNELS>
-inline void bufNeg(
-		const float * const *src,
-		float **dest,
-		int nSamples);
-
-template<size_t N_CHANNELS>
-inline void bufNeg(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
-/*! <<<```
- *
- *    ##### Brickworks::bufAdd
- *  ```>>> */		
-template<size_t N_CHANNELS>
-inline void bufAdd(
-		const float * const *src,
-		float **dest,
-		float k,
-		int nSamples);
-
-template<size_t N_CHANNELS>
-inline void bufAdd(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
-		float k,
-		int nSamples);
-/*! <<<```
- *
- *    ##### Brickworks::bufScale
- *  ```>>> */
-template<size_t N_CHANNELS>
-inline void bufScale(
-		const float * const *src,
-		float k,
-		float **dest,
-		int nSamples);
-
-template<size_t N_CHANNELS>
-inline void bufScale(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
-		float k,
-		int nSamples);
-/*! <<<```
- *
- *    ##### Brickworks::bufMix
- *  ```>>> */
-template<size_t N_CHANNELS>
-inline void bufMix(
-		const float * const *src1,
-		const float * const *src2,
-		float **dest,
-		int nSamples);
-
-template<size_t N_CHANNELS>
-inline void bufMix(
-		std::array<const float *, N_CHANNELS> src1,
-		std::array<const float *, N_CHANNELS> src2,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
-/*! <<<```
- *
- *    ##### Brickworks::bufMul
- *  ```>>> */
-template<size_t N_CHANNELS>
-inline void bufMul(
-		const float * const *src1,
-		const float * const *src2,
-		float **dest,
-		int nSamples);
-
-template<size_t N_CHANNELS>
-inline void bufMul(
-		std::array<const float *, N_CHANNELS> src1,
-		std::array<const float *, N_CHANNELS> src2,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
-/*! <<<```
- *  }}} */
-
 }
 #endif
 
@@ -395,7 +291,116 @@ static inline void bw_buf_mul_multi(const float * const *src1, const float * con
 #ifdef __cplusplus
 }
 
+#include <array>
+
 namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::bufFill
+ *  ```>>> */
+template<size_t N_CHANNELS>
+inline void bufFill(
+		float k,
+		float ** dest,
+		int nSamples);
+
+template<size_t N_CHANNELS>
+inline void bufFill(
+		float k,
+		std::array<float *, N_CHANNELS> dest,
+		int nSamples);
+/*! <<<```
+ *
+ *    ##### Brickworks::bufNeg
+ *  ```>>> */
+template<size_t N_CHANNELS>
+inline void bufNeg(
+		const float * const *src,
+		float **dest,
+		int nSamples);
+
+template<size_t N_CHANNELS>
+inline void bufNeg(
+		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
+		int nSamples);
+/*! <<<```
+ *
+ *    ##### Brickworks::bufAdd
+ *  ```>>> */		
+template<size_t N_CHANNELS>
+inline void bufAdd(
+		const float * const *src,
+		float **dest,
+		float k,
+		int nSamples);
+
+template<size_t N_CHANNELS>
+inline void bufAdd(
+		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
+		float k,
+		int nSamples);
+/*! <<<```
+ *
+ *    ##### Brickworks::bufScale
+ *  ```>>> */
+template<size_t N_CHANNELS>
+inline void bufScale(
+		const float * const *src,
+		float k,
+		float **dest,
+		int nSamples);
+
+template<size_t N_CHANNELS>
+inline void bufScale(
+		std::array<const float *, N_CHANNELS> src,
+		std::array<float *, N_CHANNELS> dest,
+		float k,
+		int nSamples);
+/*! <<<```
+ *
+ *    ##### Brickworks::bufMix
+ *  ```>>> */
+template<size_t N_CHANNELS>
+inline void bufMix(
+		const float * const *src1,
+		const float * const *src2,
+		float **dest,
+		int nSamples);
+
+template<size_t N_CHANNELS>
+inline void bufMix(
+		std::array<const float *, N_CHANNELS> src1,
+		std::array<const float *, N_CHANNELS> src2,
+		std::array<float *, N_CHANNELS> dest,
+		int nSamples);
+/*! <<<```
+ *
+ *    ##### Brickworks::bufMul
+ *  ```>>> */
+template<size_t N_CHANNELS>
+inline void bufMul(
+		const float * const *src1,
+		const float * const *src2,
+		float **dest,
+		int nSamples);
+
+template<size_t N_CHANNELS>
+inline void bufMul(
+		std::array<const float *, N_CHANNELS> src1,
+		std::array<const float *, N_CHANNELS> src2,
+		std::array<float *, N_CHANNELS> dest,
+		int nSamples);
+/*! <<<```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
 
 template<size_t N_CHANNELS>
 inline void bufFill(

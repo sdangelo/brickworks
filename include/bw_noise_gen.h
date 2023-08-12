@@ -137,6 +137,10 @@ static inline float bw_noise_gen_get_scaling_k(const bw_noise_gen_coeffs *BW_RES
  *    if sample rate scaling were enabled, as stored in `coeffs`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -144,7 +148,11 @@ static inline float bw_noise_gen_get_scaling_k(const bw_noise_gen_coeffs *BW_RES
 
 #include <bw_math.h>
 #include <bw_rand.h>
- 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _bw_noise_gen_coeffs {
 	// Coefficients
 	float		 scaling_k;

@@ -58,11 +58,11 @@
 #ifndef _BW_REVERB_H
 #define _BW_REVERB_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_reverb_coeffs
@@ -198,6 +198,10 @@ static inline void bw_reverb_set_wet(bw_reverb_coeffs *BW_RESTRICT coeffs, float
  *    Default value: `0.5f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -211,6 +215,10 @@ static inline void bw_reverb_set_wet(bw_reverb_coeffs *BW_RESTRICT coeffs, float
 #include <bw_drywet.h>
 #include <bw_one_pole.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_reverb_coeffs {
 	// Sub-components

@@ -60,11 +60,11 @@
 #ifndef _BW_PHASER_H
 #define _BW_PHASER_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_phaser_coeffs
@@ -164,6 +164,10 @@ static inline void bw_phaser_set_amount(bw_phaser_coeffs *BW_RESTRICT coeffs, fl
  *    Default value: `1.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -173,6 +177,10 @@ static inline void bw_phaser_set_amount(bw_phaser_coeffs *BW_RESTRICT coeffs, fl
 #include <bw_osc_sin.h>
 #include <bw_ap1.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_phaser_coeffs {
 	// Sub-components

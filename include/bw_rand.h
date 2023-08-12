@@ -70,6 +70,8 @@
 extern "C" {
 #endif
 
+/*** Public API ***/
+
 /*! api {{{
  *    #### bw_randu32()
  *  ```>>> */

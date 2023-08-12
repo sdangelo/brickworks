@@ -72,11 +72,11 @@
 #ifndef _BW_PEAK_H
 #define _BW_PEAK_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_peak_coeffs
@@ -205,6 +205,10 @@ static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs,
  *    Default value: non-`0` (use bandwidth parameter).
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -212,6 +216,10 @@ static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs,
 
 #include <bw_mm2.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_peak_coeffs {
 	// Sub-components

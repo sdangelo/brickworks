@@ -65,11 +65,11 @@
 #ifndef _BW_SR_REDUCE_H
 #define _BW_SR_REDUCE_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_sr_reduce_coeffs
@@ -131,12 +131,20 @@ static inline void bw_sr_reduce_set_ratio(bw_sr_reduce_coeffs *BW_RESTRICT coeff
  *    Default value: `1.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_sr_reduce_coeffs {
 	// Parameters

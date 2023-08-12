@@ -57,12 +57,14 @@
 #ifndef BW_VOICE_ALLOC_H
 #define BW_VOICE_ALLOC_H
 
+#include <bw_common.h>
+#include <bw_note_queue.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <bw_common.h>
-#include <bw_note_queue.h>
+/*** Public API ***/
 
 /*! api {{{
  *    #### bw_voice_alloc_priority
@@ -110,10 +112,18 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
  *    the number of elements in `voices`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void * const *BW_RESTRICT voices, size_t n_voices) {
 	BW_ASSERT(opts != NULL);

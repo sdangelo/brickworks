@@ -74,11 +74,11 @@
 #ifndef _BW_PHASE_GEN_H
 #define _BW_PHASE_GEN_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_phase_gen_coeffs
@@ -188,6 +188,10 @@ static inline void bw_phase_gen_set_portamento_tau(bw_phase_gen_coeffs *BW_RESTR
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -195,6 +199,10 @@ static inline void bw_phase_gen_set_portamento_tau(bw_phase_gen_coeffs *BW_RESTR
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_phase_gen_coeffs {
 	// Sub-components

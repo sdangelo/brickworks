@@ -62,11 +62,11 @@
 #ifndef _BW_MM1_H
 #define _BW_MM1_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_mm1_coeffs
@@ -186,6 +186,10 @@ static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float 
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -193,6 +197,10 @@ static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float 
 
 #include <bw_lp1.h>
 #include <bw_gain.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_mm1_coeffs {
 	// Sub-components

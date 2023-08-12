@@ -61,11 +61,11 @@
 #ifndef _BW_CLIP_H
 #define _BW_CLIP_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_clip_coeffs
@@ -173,6 +173,10 @@ static inline void bw_clip_set_gain_compensation(bw_clip_coeffs *BW_RESTRICT coe
  *    Default value: `1` (on).
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -180,6 +184,10 @@ static inline void bw_clip_set_gain_compensation(bw_clip_coeffs *BW_RESTRICT coe
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_clip_coeffs {
 	// Sub-components

@@ -72,11 +72,11 @@
 #ifndef _BW_OSC_TRI_H
 #define _BW_OSC_TRI_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_osc_tri_coeffs
@@ -172,6 +172,10 @@ static inline void bw_osc_tri_set_slope(bw_osc_tri_coeffs *BW_RESTRICT coeffs, f
  *    Default value: `0.5f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -179,6 +183,10 @@ static inline void bw_osc_tri_set_slope(bw_osc_tri_coeffs *BW_RESTRICT coeffs, f
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_osc_tri_coeffs {
 	// Sub-components

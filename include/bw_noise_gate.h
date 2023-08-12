@@ -56,11 +56,11 @@
 #ifndef _BW_NOISE_GATE_H
 #define _BW_NOISE_GATE_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_noise_gate_coeffs
@@ -184,6 +184,10 @@ static inline void bw_noise_gate_set_release_tau(bw_noise_gate_coeffs *BW_RESTRI
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -192,6 +196,10 @@ static inline void bw_noise_gate_set_release_tau(bw_noise_gate_coeffs *BW_RESTRI
 #include <bw_math.h>
 #include <bw_env_follow.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_noise_gate_coeffs {
 	// Sub-noise_gateonents

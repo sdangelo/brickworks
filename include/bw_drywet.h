@@ -50,11 +50,11 @@
 #ifndef _BW_DRYWET_H
 #define _BW_DRYWET_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_drywet_coeffs
@@ -134,12 +134,20 @@ static inline void bw_drywet_set_smooth_tau(bw_drywet_coeffs *BW_RESTRICT coeffs
  *    Default value: `0.05f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_gain.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_drywet_coeffs {
 	// Sub-components

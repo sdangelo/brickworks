@@ -67,11 +67,11 @@
 #ifndef _BW_ENV_FOLLOW_H
 #define _BW_ENV_FOLLOW_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_env_follow_coeffs
@@ -174,6 +174,10 @@ static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRIC
 /*! <<<```
  *    Returns the last output sample as stored in `state`.
  *  }}} */
+ 
+#ifdef __cplusplus
+}
+#endif
 
 /*** Implementation ***/
 
@@ -182,6 +186,10 @@ static inline float bw_env_follow_get_y_z1(const bw_env_follow_state *BW_RESTRIC
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_env_follow_coeffs {
 	// Sub-components

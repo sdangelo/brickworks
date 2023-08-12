@@ -62,11 +62,11 @@
 #ifndef _BW_HS1_H
 #define _BW_HS1_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_hs1_coeffs
@@ -170,6 +170,10 @@ static inline void bw_hs1_set_high_gain_dB(bw_hs1_coeffs *BW_RESTRICT coeffs, fl
  *
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -177,6 +181,10 @@ static inline void bw_hs1_set_high_gain_dB(bw_hs1_coeffs *BW_RESTRICT coeffs, fl
 
 #include <bw_mm1.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_hs1_coeffs {
 	// Sub-components

@@ -82,11 +82,11 @@
 #ifndef _BW_SVF_H
 #define _BW_SVF_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_svf_coeffs
@@ -208,6 +208,10 @@ static inline void bw_svf_set_prewarp_freq(bw_svf_coeffs *BW_RESTRICT coeffs, fl
  *    Default value: `1e3f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -215,6 +219,10 @@ static inline void bw_svf_set_prewarp_freq(bw_svf_coeffs *BW_RESTRICT coeffs, fl
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_svf_coeffs {
 	// Sub-components

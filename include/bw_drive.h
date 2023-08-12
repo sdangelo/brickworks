@@ -54,11 +54,11 @@
 #ifndef _BW_DRIVE_H
 #define _BW_DRIVE_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_drive_coeffs
@@ -160,6 +160,10 @@ static inline void bw_drive_set_volume(bw_drive_coeffs *BW_RESTRICT coeffs, floa
  *    Default value: `1.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -169,6 +173,10 @@ static inline void bw_drive_set_volume(bw_drive_coeffs *BW_RESTRICT coeffs, floa
 #include <bw_peak.h>
 #include <bw_satur.h>
 #include <bw_gain.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_drive_coeffs {
 	// Sub-components

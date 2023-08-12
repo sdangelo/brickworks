@@ -70,11 +70,11 @@
 #ifndef _BW_OSC_PULSE_H
 #define _BW_OSC_PULSE_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_osc_pulse_coeffs
@@ -170,6 +170,10 @@ static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT
  *    Default value: `0.5f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -177,6 +181,10 @@ static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_osc_pulse_coeffs {
 	// Sub-components

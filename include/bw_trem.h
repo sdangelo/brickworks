@@ -58,11 +58,11 @@
 #ifndef _BW_TREM_H
 #define _BW_TREM_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_trem_coeffs
@@ -155,6 +155,10 @@ static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float 
  *    Default value: `1.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -163,6 +167,10 @@ static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float 
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
 #include <bw_ringmod.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_trem_coeffs {
 	// Sub-components

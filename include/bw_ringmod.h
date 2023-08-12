@@ -58,11 +58,11 @@
 #ifndef _BW_RINGMOD_H
 #define _BW_RINGMOD_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_ringmod_coeffs
@@ -137,6 +137,10 @@ static inline void bw_ringmod_set_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, 
  *    Default value: `1.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -144,6 +148,10 @@ static inline void bw_ringmod_set_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, 
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_ringmod_coeffs {
 	// Sub-components

@@ -74,11 +74,11 @@
 #ifndef _BW_SATUR_H
 #define _BW_SATUR_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_satur_coeffs
@@ -186,6 +186,10 @@ static inline void bw_satur_set_gain_compensation(bw_satur_coeffs *BW_RESTRICT c
  *    Default value: `1` (on).
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -193,6 +197,10 @@ static inline void bw_satur_set_gain_compensation(bw_satur_coeffs *BW_RESTRICT c
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_satur_coeffs {
 	// Sub-components

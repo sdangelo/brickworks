@@ -55,11 +55,11 @@
 #ifndef _BW_FUZZ_H
 #define _BW_FUZZ_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_fuzz_coeffs
@@ -153,6 +153,10 @@ static inline void bw_fuzz_set_volume(bw_fuzz_coeffs *BW_RESTRICT coeffs, float 
  *    Default value: `1.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -163,6 +167,10 @@ static inline void bw_fuzz_set_volume(bw_fuzz_coeffs *BW_RESTRICT coeffs, float 
 #include <bw_satur.h>
 #include <bw_hp1.h>
 #include <bw_gain.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_fuzz_coeffs {
 	// Sub-components

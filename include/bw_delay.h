@@ -61,11 +61,11 @@
 #ifndef _BW_DELAY_H
 #define _BW_DELAY_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_delay_coeffs
@@ -186,6 +186,10 @@ static inline size_t bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coef
  *    Returns the length of the delay line in samples.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -193,6 +197,10 @@ static inline size_t bw_delay_get_length(const bw_delay_coeffs *BW_RESTRICT coef
 
 #include <bw_buf.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_delay_coeffs {
 	// Coefficients

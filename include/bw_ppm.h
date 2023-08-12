@@ -61,11 +61,11 @@
 #ifndef _BW_PPM_H
 #define _BW_PPM_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_ppm_coeffs
@@ -163,12 +163,20 @@ static inline float bw_ppm_get_y_z1(const bw_ppm_state *BW_RESTRICT state);
  *    Returns the last output sample as stored in `state`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_env_follow.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_ppm_coeffs {
 	// Sub-components

@@ -81,6 +81,8 @@
 #ifndef BW_COMMON_H
 #define BW_COMMON_H
 
+/*** Public API ***/
+
 /*! api {{{
  *
  *    #### Basic definitions

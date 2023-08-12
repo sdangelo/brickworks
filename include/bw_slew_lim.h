@@ -63,11 +63,11 @@
 #ifndef _BW_SLEW_LIM_H
 #define _BW_SLEW_LIM_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_slew_lim_coeffs
@@ -205,12 +205,20 @@ static inline void bw_slew_lim_set_max_rate_down(bw_slew_lim_coeffs *BW_RESTRICT
 
 static inline float bw_slew_lim_get_y_z1(const bw_slew_lim_state *BW_RESTRICT state);
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_slew_lim_coeffs {
 	// Coefficients

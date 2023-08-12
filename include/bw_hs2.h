@@ -62,11 +62,11 @@
 #ifndef _BW_HS2_H
 #define _BW_HS2_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_hs2_coeffs
@@ -179,6 +179,10 @@ static inline void bw_hs2_set_high_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, fl
  *    Default value: `-INFINITY`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -186,6 +190,10 @@ static inline void bw_hs2_set_high_gain_dB(bw_hs2_coeffs *BW_RESTRICT coeffs, fl
 
 #include <bw_mm2.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_hs2_coeffs {
 	// Sub-components

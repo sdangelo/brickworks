@@ -67,11 +67,11 @@
 #ifndef _BW_CHORUS_H
 #define _BW_CHORUS_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_chorus_coeffs
@@ -209,6 +209,10 @@ static inline void bw_chorus_set_coeff_fb(bw_chorus_coeffs *BW_RESTRICT coeffs, 
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -217,6 +221,10 @@ static inline void bw_chorus_set_coeff_fb(bw_chorus_coeffs *BW_RESTRICT coeffs, 
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
 #include <bw_comb.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_chorus_coeffs {
 	// Sub-components

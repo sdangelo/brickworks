@@ -67,6 +67,8 @@
 extern "C" {
 #endif
 
+/*** Public API ***/
+
 /*! api {{{
  *    #### bw_note_queue_status
  *  ```>>> */
@@ -148,25 +150,6 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
  *  }}} */
 
 #ifdef __cplusplus
-}
-
-namespace Brickworks {
-
-/*! api_cpp {{{
- *    ##### Brickworks::NoteQueue
- *  ```>>> */
-class NoteQueue {
-public:
-	NoteQueue();
-	
-	void clear();
-	void add(unsigned char note, bool pressed, float velocity, bool force_went_off);
-	
-	bw_note_queue	queue;
-};
-/*! <<<```
- *  }}} */
-
 }
 #endif
 
@@ -259,7 +242,29 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
 #ifdef __cplusplus
 }
 
+/*** Public C++ API ***/
+
 namespace Brickworks {
+
+/*! api_cpp {{{
+ *    ##### Brickworks::NoteQueue
+ *  ```>>> */
+class NoteQueue {
+public:
+	NoteQueue();
+	
+	void clear();
+	void add(unsigned char note, bool pressed, float velocity, bool force_went_off);
+	
+	bw_note_queue	queue;
+};
+/*! <<<```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
 
 inline NoteQueue::NoteQueue() {
 	bw_note_queue_reset(&queue);

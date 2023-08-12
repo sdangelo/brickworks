@@ -58,11 +58,11 @@
 #ifndef _BW_PAN_H
 #define _BW_PAN_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_pan_coeffs
@@ -136,6 +136,10 @@ static inline void bw_pan_set_pan(bw_pan_coeffs *BW_RESTRICT coeffs, float value
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -143,6 +147,10 @@ static inline void bw_pan_set_pan(bw_pan_coeffs *BW_RESTRICT coeffs, float value
 
 #include <bw_math.h>
 #include <bw_gain.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_pan_coeffs {
 	// Sub-components

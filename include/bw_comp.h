@@ -60,11 +60,11 @@
 #ifndef _BW_COMP_H
 #define _BW_COMP_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_comp_coeffs
@@ -204,6 +204,10 @@ static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -213,6 +217,10 @@ static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float
 #include <bw_env_follow.h>
 #include <bw_gain.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_comp_coeffs {
 	// Sub-components

@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_one_pole.h>
+#include <bw_one_pole.h>
 
 using namespace Brickworks;
 

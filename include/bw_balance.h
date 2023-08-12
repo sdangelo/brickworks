@@ -59,11 +59,11 @@
 #ifndef _BW_BALANCE_H
 #define _BW_BALANCE_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_balance_coeffs
@@ -138,6 +138,10 @@ static inline void bw_balance_set_balance(bw_balance_coeffs *BW_RESTRICT coeffs,
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -145,6 +149,10 @@ static inline void bw_balance_set_balance(bw_balance_coeffs *BW_RESTRICT coeffs,
 
 #include <bw_math.h>
 #include <bw_gain.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_balance_coeffs {
 	// Sub-components

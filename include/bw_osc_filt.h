@@ -67,11 +67,11 @@
 #ifndef _BW_OSC_FILT_H
 #define _BW_OSC_FILT_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_osc_filt_state
@@ -110,10 +110,18 @@ static inline void bw_osc_filt_process_multi(bw_osc_filt_state **BW_RESTRICT sta
  *    using and updating each of the `n_channels` `state`s.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_osc_filt_state {
 	float	x_z1;

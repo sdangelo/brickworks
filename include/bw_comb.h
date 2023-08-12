@@ -68,11 +68,11 @@
 #ifndef _BW_COMB_H
 #define _BW_COMB_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_comb_coeffs
@@ -202,6 +202,10 @@ static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
  *    Default value: `0.f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -211,6 +215,10 @@ static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
 #include <bw_gain.h>
 #include <bw_one_pole.h>
 #include <bw_math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_comb_coeffs {
 	// Sub-components

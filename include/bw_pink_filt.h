@@ -81,11 +81,11 @@
 #ifndef _BW_PINK_FILT_H
 #define _BW_PINK_FILT_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_pink_filt_coeffs
@@ -170,10 +170,18 @@ static inline float bw_pink_filt_get_scaling_k(const bw_pink_filt_coeffs *BW_RES
  *    if sample rate scaling were enabled, as stored in `coeffs`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_pink_filt_coeffs {
 	// Coefficients

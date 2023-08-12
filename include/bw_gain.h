@@ -70,11 +70,11 @@
 #ifndef _BW_GAIN_H
 #define _BW_GAIN_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_gain_coeffs
@@ -167,6 +167,10 @@ static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs);
  *    Returns the actual current gain coefficient (linear gain) in `coeffs`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -174,6 +178,10 @@ static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs);
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_gain_coeffs {
 	// Sub-components

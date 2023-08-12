@@ -63,11 +63,11 @@
 #ifndef _BW_AP2_H
 #define _BW_AP2_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_ap2_coeffs
@@ -162,12 +162,20 @@ static inline void bw_ap2_set_Q(bw_ap2_coeffs *BW_RESTRICT coeffs, float value);
  *    Default value: `0.5f`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_svf.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_ap2_coeffs {
 	// Sub-components

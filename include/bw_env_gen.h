@@ -89,11 +89,11 @@
 #ifndef _BW_ENV_GEN_H
 #define _BW_ENV_GEN_H
 
+#include <bw_common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <bw_common.h>
 
 /*! api {{{
  *    #### bw_env_gen_coeffs
@@ -247,6 +247,10 @@ static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state);
  *    Returns the last output sample as stored in `state`.
  *  }}} */
 
+#ifdef __cplusplus
+}
+#endif
+
 /*** Implementation ***/
 
 /* WARNING: This part of the file is not part of the public API. Its content may
@@ -254,6 +258,10 @@ static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state);
 
 #include <bw_math.h>
 #include <bw_one_pole.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _bw_env_gen_coeffs {
 	// Sub-components

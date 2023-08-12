@@ -41,6 +41,15 @@
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_comb_process()</code> and
+ *              <code>bw_comb_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -65,8 +74,8 @@
  *  }}}
  */
 
-#ifndef _BW_COMB_H
-#define _BW_COMB_H
+#ifndef BW_COMB_H
+#define BW_COMB_H
 
 #include <bw_common.h>
 
@@ -77,13 +86,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_comb_coeffs
  *  ```>>> */
-typedef struct _bw_comb_coeffs bw_comb_coeffs;
+typedef struct bw_comb_coeffs bw_comb_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_comb_state
  *  ```>>> */
-typedef struct _bw_comb_state bw_comb_state;
+typedef struct bw_comb_state bw_comb_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -146,7 +155,7 @@ static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_comb_process()
  *  ```>>> */
-static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -154,7 +163,7 @@ static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_s
  *
  *    #### bw_comb_process_multi()
  *  ```>>> */
-static inline void bw_comb_process_multi(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_comb_process_multi(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -220,7 +229,7 @@ static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
 extern "C" {
 #endif
 
-struct _bw_comb_coeffs {
+struct bw_comb_coeffs {
 	// Sub-components
 	bw_delay_coeffs		delay_coeffs;
 	bw_gain_coeffs		blend_coeffs;
@@ -233,9 +242,9 @@ struct _bw_comb_coeffs {
 	// Coefficients
 	float			fs;
 
-	size_t		dffi;
+	size_t			dffi;
 	float			dfff;
-	size_t		dfbi;
+	size_t			dfbi;
 	float			dfbf;
 
 	// Parameters
@@ -243,7 +252,7 @@ struct _bw_comb_coeffs {
 	float			delay_fb;
 };
 
-struct _bw_comb_state {
+struct bw_comb_state {
 	// Sub-components
 	bw_delay_state		delay_state;
 };
@@ -277,11 +286,10 @@ static inline size_t bw_comb_mem_req(const bw_comb_coeffs *BW_RESTRICT coeffs) {
 }
 
 static inline void bw_comb_mem_set(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, void *mem) {
-	(void)coeffs;
 	bw_delay_mem_set(&coeffs->delay_coeffs, &state->delay_state, mem);
 }
 
-static inline void _bw_comb_do_update_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void bw_comb_do_update_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs, char force) {
 	float delay_ff_cur = bw_one_pole_get_y_z1(&coeffs->smooth_delay_ff_state);
 	float delay_fb_cur = bw_one_pole_get_y_z1(&coeffs->smooth_delay_fb_state);
 	if (force || delay_ff_cur != coeffs->delay_ff) {
@@ -317,7 +325,7 @@ static inline void bw_comb_reset_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs) {
 	bw_gain_reset_coeffs(&coeffs->fb_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_ff_state, coeffs->delay_ff);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_delay_fb_state, coeffs->delay_fb);
-	_bw_comb_do_update_coeffs(coeffs, 1);
+	bw_comb_do_update_coeffs(coeffs, 1);
 }
 
 static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state) {
@@ -334,7 +342,7 @@ static inline void bw_comb_update_coeffs_audio(bw_comb_coeffs *BW_RESTRICT coeff
 	bw_gain_update_coeffs_audio(&coeffs->blend_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->ff_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->fb_coeffs);
-	_bw_comb_do_update_coeffs(coeffs, 0);
+	bw_comb_do_update_coeffs(coeffs, 0);
 }
 
 static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x) {
@@ -345,19 +353,19 @@ static inline float bw_comb_process1(const bw_comb_coeffs *BW_RESTRICT coeffs, b
 	return bw_gain_process1(&coeffs->blend_coeffs, v) + bw_gain_process1(&coeffs->ff_coeffs, ff);
 }
 
-static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_comb_process(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_comb_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_comb_update_coeffs_audio(coeffs);
 		y[i] = bw_comb_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_comb_process_multi(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_comb_process_multi(bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_comb_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_comb_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_comb_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -383,6 +391,128 @@ static inline void bw_comb_set_coeff_fb(bw_comb_coeffs *BW_RESTRICT coeffs, floa
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*! api {{{
+ *    ##### Brickworks::Comb
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Comb {
+public:
+	Comb(float maxDelay = 1.f);
+	~Comb();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setDelayFF(float value);
+	void setDelayFB(float value);
+	void setCoeffBlend(float value);
+	void setCoeffFF(float value);
+	void setCoeffFB(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_comb_coeffs	 coeffs;
+	bw_comb_state	 states[N_CHANNELS];
+	bw_comb_state	*statesP[N_CHANNELS];
+	void		*mem;
+};
+
+template<size_t N_CHANNELS>
+inline Comb<N_CHANNELS>::Comb(float maxDelay) {
+	bw_comb_init(&coeffs, maxDelay);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+	mem = nullptr;
+}
+
+template<size_t N_CHANNELS>
+inline Comb<N_CHANNELS>::~Comb() {
+	if (mem != nullptr)
+		operator delete(mem);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_comb_set_sample_rate(&coeffs, sampleRate);
+	size_t req = bw_comb_mem_req(&coeffs);
+	if (mem != nullptr)
+		operator delete(mem);
+	mem = operator new(req * N_CHANNELS);
+	void *m = mem;
+	for (size_t i = 0; i < N_CHANNELS; i++, m = static_cast<char *>(m) + req)
+		bw_comb_mem_set(&coeffs, states + i, m);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::reset() {
+	bw_comb_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_comb_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_comb_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::setDelayFF(float value) {
+	bw_comb_set_delay_ff(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::setDelayFB(float value) {
+	bw_comb_set_delay_fb(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::setCoeffBlend(float value) {
+	bw_comb_set_coeff_blend(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::setCoeffFF(float value) {
+	bw_comb_set_coeff_ff(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::setCoeffFB(float value) {
+	bw_comb_set_coeff_fb(&coeffs, value);
+}
+
 }
 #endif
 

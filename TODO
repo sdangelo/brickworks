@@ -40,7 +40,7 @@ code:
 * better src filter
 * bw_env_gen process_multi gate const?
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
-* check unititialized warnings
+* check unititialized warnings (check fxpp_comp in particular)
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * modulation vs process (multi) no update (post 1.0.0)???
 * check assumptions w.r.t. usage of math functions

@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_balance_process()</code> and
+ *              <code>bw_balance_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -56,8 +63,8 @@
  *  }}}
  */
 
-#ifndef _BW_BALANCE_H
-#define _BW_BALANCE_H
+#ifndef BW_BALANCE_H
+#define BW_BALANCE_H
 
 #include <bw_common.h>
 
@@ -68,7 +75,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_balance_coeffs
  *  ```>>> */
-typedef struct _bw_balance_coeffs bw_balance_coeffs;
+typedef struct bw_balance_coeffs bw_balance_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -112,7 +119,7 @@ static inline void bw_balance_process1(const bw_balance_coeffs *BW_RESTRICT coef
  *
  *    #### bw_balance_process()
  *  ```>>> */
-static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, const float *x_l, const float *x_r, float *y_l, float *y_r, int n_samples);
+static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, const float *x_l, const float *x_r, float *y_l, float *y_r, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffers `x_l` (left) and
  *    `x_r` (right) and fills the first `n_samples` of the output buffers `y_l`
@@ -121,7 +128,7 @@ static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_balance_process_multi()
  *  ```>>> */
-static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float **x_l, const float **x_r, float **y_l, float **y_r, int n_channels, int n_samples);
+static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float * const *x_l, const float * const *x_r, float **y_l, float **y_r, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x_l`
  *    (left) and `x_r` (right) and fills the first `n_samples` of the
@@ -154,7 +161,7 @@ static inline void bw_balance_set_balance(bw_balance_coeffs *BW_RESTRICT coeffs,
 extern "C" {
 #endif
 
-struct _bw_balance_coeffs {
+struct bw_balance_coeffs {
 	// Sub-components
 	bw_gain_coeffs	l_coeffs;
 	bw_gain_coeffs	r_coeffs;
@@ -175,7 +182,7 @@ static inline void bw_balance_set_sample_rate(bw_balance_coeffs *BW_RESTRICT coe
 	bw_gain_set_sample_rate(&coeffs->r_coeffs, sample_rate);
 }
 
-static inline void _bw_balance_do_update_coeffs(bw_balance_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void bw_balance_do_update_coeffs(bw_balance_coeffs *BW_RESTRICT coeffs, char force) {
 	if (force || coeffs->balance != coeffs->balance_prev) {
 		bw_gain_set_gain_lin(&coeffs->l_coeffs, bw_minf(1.f - coeffs->balance, 1.f));
 		bw_gain_set_gain_lin(&coeffs->r_coeffs, bw_minf(1.f + coeffs->balance, 1.f));
@@ -184,13 +191,13 @@ static inline void _bw_balance_do_update_coeffs(bw_balance_coeffs *BW_RESTRICT c
 }
 
 static inline void bw_balance_reset_coeffs(bw_balance_coeffs *BW_RESTRICT coeffs) {
-	_bw_balance_do_update_coeffs(coeffs, 1);
+	bw_balance_do_update_coeffs(coeffs, 1);
 	bw_gain_reset_coeffs(&coeffs->l_coeffs);
 	bw_gain_reset_coeffs(&coeffs->r_coeffs);
 }
 
 static inline void bw_balance_update_coeffs_ctrl(bw_balance_coeffs *BW_RESTRICT coeffs) {
-	_bw_balance_do_update_coeffs(coeffs, 0);
+	bw_balance_do_update_coeffs(coeffs, 0);
 	bw_gain_update_coeffs_ctrl(&coeffs->l_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->r_coeffs);
 }
@@ -205,19 +212,19 @@ static inline void bw_balance_process1(const bw_balance_coeffs *BW_RESTRICT coef
 	*y_r = bw_gain_process1(&coeffs->r_coeffs, x_r);
 }
 
-static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, const float *x_l, const float *x_r, float *y_l, float *y_r, int n_samples){
+static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, const float *x_l, const float *x_r, float *y_l, float *y_r, size_t n_samples){
 	bw_balance_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_balance_update_coeffs_audio(coeffs);
 		bw_balance_process1(coeffs, x_l[i], x_r[i], y_l + i, y_r + i);
 	}
 }
 
-static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float **x_l, const float **x_r, float **y_l, float **y_r, int n_channels, int n_samples) {
+static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float * const *x_l, const float * const *x_r, float **y_l, float **y_r, size_t n_channels, size_t n_samples) {
 	bw_balance_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_balance_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			bw_balance_process1(coeffs, x_l[j][i], x_r[j][i], y_l[j] + i, y_r[j] + i);
 	}
 }
@@ -227,6 +234,92 @@ static inline void bw_balance_set_balance(bw_balance_coeffs *BW_RESTRICT coeffs,
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api {{{
+ *    ##### Brickworks::Balance
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Balance {
+public:
+	Balance();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x_l,
+		const float * const *x_r,
+		float **y_l,
+		float **y_r,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x_l,
+		std::array<const float *, N_CHANNELS> x_r,
+		std::array<float *, N_CHANNELS> y_l,
+		std::array<float *, N_CHANNELS> y_r,
+		size_t nSamples);
+
+	void setBalance(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_balance_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline Balance<N_CHANNELS>::Balance() {
+	bw_balance_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void Balance<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_balance_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Balance<N_CHANNELS>::reset() {
+	bw_balance_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void Balance<N_CHANNELS>::process(
+		const float * const *x_l,
+		const float * const *x_r,
+		float **y_l,
+		float **y_r,
+		size_t nSamples) {
+	bw_balance_process_multi(&coeffs, x_l, x_r, y_l, y_r, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Balance<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x_l,
+		std::array<const float *, N_CHANNELS> x_r,
+		std::array<float *, N_CHANNELS> y_l,
+		std::array<float *, N_CHANNELS> y_r,
+		size_t nSamples) {
+	process(x_l.data(), x_r.data(), y_l.data(), y_r.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Balance<N_CHANNELS>::setBalance(float value) {
+	bw_balance_set_balance(&coeffs, value);
+}
+
 }
 #endif
 

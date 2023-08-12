@@ -421,7 +421,7 @@ static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT c
 	BW_ASSERT_DEEP(coeffs->state == bw_one_pole_coeffs_state_set_sample_rate);
 }
 
-static inline void _bw_one_pole_do_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_one_pole_do_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & BW_ONE_POLE_PARAM_CUTOFF_UP)
 			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : bw_expf(coeffs->Ttm2pi * coeffs->cutoff_up);
@@ -441,7 +441,7 @@ static inline void bw_one_pole_reset_coeffs(bw_one_pole_coeffs *BW_RESTRICT coef
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_set_sample_rate);
 
 	coeffs->param_changed = ~0;
-	_bw_one_pole_do_update_coeffs_ctrl(coeffs);
+	bw_one_pole_do_update_coeffs_ctrl(coeffs);
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->state = _bw_one_pole_coeffs_state_reset_coeffs;
@@ -476,7 +476,7 @@ static inline void bw_one_pole_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRIC
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	
-	_bw_one_pole_do_update_coeffs_ctrl(coeffs);
+	bw_one_pole_do_update_coeffs_ctrl(coeffs);
 	
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);

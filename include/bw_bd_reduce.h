@@ -33,8 +33,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_bd_reduce_process()</code> and
+ *              <code>bw_bd_reduce_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -62,8 +69,8 @@
  *  }}}
  */
 
-#ifndef _BW_BD_REDUCE_H
-#define _BW_BD_REDUCE_H
+#ifndef BW_BD_REDUCE_H
+#define BW_BD_REDUCE_H
 
 #include <bw_common.h>
 
@@ -74,7 +81,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_bd_reduce_coeffs
  *  ```>>> */
-typedef struct _bw_bd_reduce_coeffs bw_bd_reduce_coeffs;
+typedef struct bw_bd_reduce_coeffs bw_bd_reduce_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -111,7 +118,7 @@ static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT
  *
  *    #### bw_bd_reduce_process()
  *  ```>>> */
-static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples);
+static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
@@ -119,7 +126,7 @@ static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_bd_reduce_process_multi()
  *  ```>>> */
-static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -149,7 +156,7 @@ static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT c
 extern "C" {
 #endif
 
-struct _bw_bd_reduce_coeffs {
+struct bw_bd_reduce_coeffs {
 	// Coefficients
 	float	ki;
 	float	k;
@@ -186,16 +193,16 @@ static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT
 	return coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + 0.5f);
 }
 
-static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, int n_samples) {
+static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples) {
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++)
+	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_bd_reduce_process1(coeffs, x[i]);
 }
 
-static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++)
-		for (int j = 0; j < n_channels; j++)
+	for (size_t i = 0; i < n_samples; i++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_bd_reduce_process1(coeffs, x[j][i]);
 }
 
@@ -204,6 +211,78 @@ static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT c
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api {{{
+ *    ##### Brickworks::BDReduce
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class BDReduce {
+public:
+	BDReduce();
+	
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setBitDepth(char value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_bd_reduce_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline BDReduce<N_CHANNELS>::BDReduce() {
+	bw_bd_reduce_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::reset() {
+	bw_bd_reduce_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_bd_reduce_process_multi(&coeffs, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::setBitDepth(char value) {
+	bw_bd_reduce_set_bit_depth(&coeffs, value);
+}
+
 }
 #endif
 

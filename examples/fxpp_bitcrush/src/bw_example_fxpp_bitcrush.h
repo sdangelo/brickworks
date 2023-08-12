@@ -24,7 +24,7 @@
 #include "platform.h"
 
 #include <bwpp_sr_reduce.h>
-#include <bwpp_bd_reduce.h>
+#include <bw_bd_reduce.h>
 
 using namespace Brickworks;
 

@@ -128,7 +128,7 @@ static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_balance_process_multi()
  *  ```>>> */
-static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float * const *x_l, const float * const *x_r, float **y_l, float **y_r, size_t n_channels, size_t n_samples);
+static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float * const *x_l, const float * const *x_r, float * const *y_l, float * const *y_r, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x_l`
  *    (left) and `x_r` (right) and fills the first `n_samples` of the
@@ -220,7 +220,7 @@ static inline void bw_balance_process(bw_balance_coeffs *BW_RESTRICT coeffs, con
 	}
 }
 
-static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float * const *x_l, const float * const *x_r, float **y_l, float **y_r, size_t n_channels, size_t n_samples) {
+static inline void bw_balance_process_multi(bw_balance_coeffs *BW_RESTRICT coeffs, const float * const *x_l, const float * const *x_r, float * const *y_l, float * const *y_r, size_t n_channels, size_t n_samples) {
 	bw_balance_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_balance_update_coeffs_audio(coeffs);
@@ -255,8 +255,8 @@ public:
 	void process(
 		const float * const *x_l,
 		const float * const *x_r,
-		float **y_l,
-		float **y_r,
+		float * const *y_l,
+		float * const *y_r,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x_l,
@@ -299,8 +299,8 @@ template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::process(
 		const float * const *x_l,
 		const float * const *x_r,
-		float **y_l,
-		float **y_r,
+		float * const *y_l,
+		float * const *y_r,
 		size_t nSamples) {
 	bw_balance_process_multi(&coeffs, x_l, x_r, y_l, y_r, N_CHANNELS, nSamples);
 }

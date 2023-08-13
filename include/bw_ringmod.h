@@ -126,7 +126,7 @@ static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_ringmod_process_multi()
  *  ```>>> */
-static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float * const *x_mod, const float * const *x_car, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float * const *x_mod, const float * const *x_car, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` modulation input
  *    buffers `x_mod` and of the `n_channels` carrier input buffers `x_car`, and
@@ -204,7 +204,7 @@ static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, con
 	}
 }
 
-static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float * const *x_mod, const float * const *x_car, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float * const *x_mod, const float * const *x_car, float * const *y, size_t n_channels, size_t n_samples) {
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_ringmod_update_coeffs_audio(coeffs);
 		for (size_t j = 0; j < n_channels; j++)
@@ -238,7 +238,7 @@ public:
 	void process(
 		const float * const *x_mod,
 		const float * const *x_car,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x_mod,
@@ -280,7 +280,7 @@ template<size_t N_CHANNELS>
 inline void RingMod<N_CHANNELS>::process(
 		const float * const *x_mod,
 		const float * const *x_car,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_ringmod_process_multi(&coeffs, x_mod, x_car, y, N_CHANNELS, nSamples);
 }

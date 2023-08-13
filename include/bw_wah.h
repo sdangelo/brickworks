@@ -151,7 +151,7 @@ static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_stat
  *
  *    #### bw_wah_process_multi()
  *  ```>>> */
-static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -233,7 +233,7 @@ static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_stat
 	}
 }
 
-static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_wah_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_wah_update_coeffs_audio(coeffs);
@@ -267,7 +267,7 @@ public:
 	void reset();
 	void process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -313,7 +313,7 @@ inline void Wah<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void Wah<N_CHANNELS>::process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_wah_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }

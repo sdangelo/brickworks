@@ -141,7 +141,7 @@ static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_s
  *
  *    #### bw_comp_process_multi()
  *  ```>>> */
-static inline void bw_comp_process_multi(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state * const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_comp_process_multi(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state * const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    the first `n_samples` of the `n_channels` sidechain input buffers `x_sc`,
@@ -302,7 +302,7 @@ static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_s
 	}
 }
 
-static inline void bw_comp_process_multi(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state * const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_comp_process_multi(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state * const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_comp_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_comp_update_coeffs_audio(coeffs);
@@ -361,7 +361,7 @@ public:
 	void process(
 		const float * const *x,
 		const float * const *xSC,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -415,7 +415,7 @@ template<size_t N_CHANNELS>
 inline void Comp<N_CHANNELS>::process(
 		const float * const *x,
 		const float * const *xSC,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_comp_process_multi(&coeffs, statesP, x, xSC, y, N_CHANNELS, nSamples);
 }

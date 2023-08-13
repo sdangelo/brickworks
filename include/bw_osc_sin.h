@@ -96,7 +96,7 @@ static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples
  *
  *    #### bw_osc_sin_process_multi()
  *  ```>>> */
-static inline void bw_osc_sin_process_multi(const float * const *x, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_osc_sin_process_multi(const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -127,7 +127,7 @@ static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples
 		y[i] = bw_osc_sin_process1(x[i]);
 }
 
-static inline void bw_osc_sin_process_multi(const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_osc_sin_process_multi(const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	for (size_t i = 0; i < n_channels; i++)
 		bw_osc_sin_process(x[i], y[i], n_samples);
 }
@@ -147,7 +147,7 @@ namespace Brickworks {
 template<size_t N_CHANNELS>
 void oscSinProcess(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 
 template<size_t N_CHANNELS>
@@ -166,7 +166,7 @@ void oscSinProcess(
 template<size_t N_CHANNELS>
 inline void oscSinProcess(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_osc_sin_process_multi(x, y, N_CHANNELS, nSamples);
 }

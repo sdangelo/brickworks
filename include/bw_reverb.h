@@ -147,20 +147,20 @@ static inline void bw_reverb_process1(const bw_reverb_coeffs *BW_RESTRICT coeffs
  *  ```>>> */
 static inline void bw_reverb_process(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, const float *x_l, const float *x_r, float *y_l, float *y_r, size_t n_samples);
 /*! <<<```
- *    Processes the first `n_samples` of the input buffers `xl` (left) and `xr`
- *    (right) and fills the first `n_samples` of the output buffers `yl` (left)
- *    and `yr` (right), while using and updating both `coeffs` and `state`
- *    (control and audio rate).
+ *    Processes the first `n_samples` of the input buffers `x_l` (left) and
+ *    `x_r` (right) and fills the first `n_samples` of the output buffers `y_l`
+ *    (left) and `y_r` (right), while using and updating both `coeffs` and
+ *    `state` (control and audio rate).
  * 
  *    #### bw_reverb_process_multi()
  *  ```>>> */
-static inline void bw_reverb_process_multi(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state * const *BW_RESTRICT state, const float * const *x_l, const float * const *x_r, float **yl, float **yr, size_t n_channels, size_t n_samples);
+static inline void bw_reverb_process_multi(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state * const *BW_RESTRICT state, const float * const *x_l, const float * const *x_r, float * const *y_l, float * const *y_r, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x_l`
  *    (left) and `x_r` (right) and fills the first `n_samples` of the
- *    `n_channels` output buffers `y_l` (left) and `y_r` (right), while using and
- *    updating both the common `coeffs` and each of the `n_channels` `state`s
- *    (control and audio rate).
+ *    `n_channels` output buffers `y_l` (left) and `y_r` (right), while using
+ *    and updating both the common `coeffs` and each of the `n_channels`
+ *    `state`s (control and audio rate).
  *
  *    #### bw_reverb_set_predelay()
  *  ```>>> */
@@ -591,7 +591,7 @@ static inline void bw_reverb_process(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_re
 	}
 }
 
-static inline void bw_reverb_process_multi(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state * const *BW_RESTRICT state, const float * const *x_l, const float * const *x_r, float **y_l, float **y_r, size_t n_channels, size_t n_samples) {
+static inline void bw_reverb_process_multi(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state * const *BW_RESTRICT state, const float * const *x_l, const float * const *x_r, float * const *y_l, float * const *y_r, size_t n_channels, size_t n_samples) {
 	bw_reverb_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_reverb_update_coeffs_audio(coeffs);
@@ -643,8 +643,8 @@ public:
 	void process(
 		const float * const *x_l,
 		const float * const *x_r,
-		float **y_l,
-		float **y_r,
+		float * const *y_l,
+		float * const *y_r,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x_l,
@@ -712,8 +712,8 @@ template<size_t N_CHANNELS>
 inline void Reverb<N_CHANNELS>::process(
 		const float * const *x_l,
 		const float * const *x_r,
-		float **y_l,
-		float **y_r,
+		float * const *y_l,
+		float * const *y_r,
 		size_t nSamples) {
 	bw_reverb_process_multi(&coeffs, statesP, x_l, x_r, y_l, y_r, N_CHANNELS, nSamples);
 }

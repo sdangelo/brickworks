@@ -117,7 +117,7 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
  *
  *    #### bw_drywet_process_multi()
  *  ```>>> */
-static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float * const *x_dry, const float * const *x_wet, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float * const *x_dry, const float * const *x_wet, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` dry input buffers
  *    `x_dry` and of the `n_channels` wet input buffers `x_wet`, and fills the
@@ -193,7 +193,7 @@ static inline void bw_drywet_process(bw_drywet_coeffs *BW_RESTRICT coeffs, const
 	}
 }
 
-static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float * const *x_dry, const float * const *x_wet, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_drywet_process_multi(bw_drywet_coeffs *BW_RESTRICT coeffs, const float * const *x_dry, const float * const *x_wet, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_drywet_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_drywet_update_coeffs_audio(coeffs);
@@ -232,7 +232,7 @@ public:
 	void process(
 		const float * const *x_dry,
 		const float * const *x_wet,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x_dry,
@@ -275,7 +275,7 @@ template<size_t N_CHANNELS>
 inline void DryWet<N_CHANNELS>::process(
 		const float * const *x_dry,
 		const float * const *x_wet,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_drywet_process_multi(&coeffs, x_dry, x_wet, y, N_CHANNELS, nSamples);
 }

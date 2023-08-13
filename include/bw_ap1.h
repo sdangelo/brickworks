@@ -145,7 +145,7 @@ static inline void bw_ap1_process(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_stat
  *
  *    #### bw_ap1_process_multi()
  *  ```>>> */
-static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -222,7 +222,7 @@ static inline void bw_ap1_process(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_stat
 	}
 }
 
-static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_ap1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_ap1_update_coeffs_audio(coeffs);
@@ -256,7 +256,7 @@ public:
 	void reset(float x_0 = 0.f);
 	void process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -302,7 +302,7 @@ inline void AP1<N_CHANNELS>::reset(float x_0) {
 template<size_t N_CHANNELS>
 inline void AP1<N_CHANNELS>::process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_ap1_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }

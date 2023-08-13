@@ -127,7 +127,7 @@ static inline void bw_pan_process(bw_pan_coeffs *BW_RESTRICT coeffs, const float
  *
  *    #### bw_pan_process_multi()
  *  ```>>> */
-static inline void bw_pan_process_multi(bw_pan_coeffs *BW_RESTRICT coeffs, const float * const *x, float **y_l, float **y_r, size_t n_channels, size_t n_samples);
+static inline void bw_pan_process_multi(bw_pan_coeffs *BW_RESTRICT coeffs, const float * const *x, float * const *y_l, float * const *y_r, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y_l`
@@ -220,7 +220,7 @@ static inline void bw_pan_process(bw_pan_coeffs *BW_RESTRICT coeffs, const float
 	}
 }
 
-static inline void bw_pan_process_multi(bw_pan_coeffs *BW_RESTRICT coeffs, const float * const *x, float **y_l, float **y_r, size_t n_channels, size_t n_samples) {
+static inline void bw_pan_process_multi(bw_pan_coeffs *BW_RESTRICT coeffs, const float * const *x, float * const *y_l, float * const *y_r, size_t n_channels, size_t n_samples) {
 	bw_pan_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_pan_update_coeffs_audio(coeffs);
@@ -254,8 +254,8 @@ public:
 	void reset();
 	void process(
 		const float * const *x,
-		float **y_l,
-		float **y_r,
+		float * const *y_l,
+		float * const *y_r,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -296,8 +296,8 @@ inline void Pan<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void Pan<N_CHANNELS>::process(
 		const float * const *x,
-		float **y_l,
-		float **y_r,
+		float * const *y_l,
+		float * const *y_r,
 		size_t nSamples) {
 	bw_pan_process_multi(&coeffs, x, y_l, y_r, N_CHANNELS, nSamples);
 }

@@ -147,7 +147,7 @@ static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_osc_pulse_process_multi()
  *  ```>>> */
-static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -274,7 +274,7 @@ static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs,
 		}
 }
 
-static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float * const *y, size_t n_channels, size_t n_samples) {
 	if (coeffs->antialiasing)
 		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
@@ -319,7 +319,7 @@ public:
 	void process(
 		const float * const *x,
 		const float * const *x_phase_inc,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -362,7 +362,7 @@ template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::process(
 		const float * const *x,
 		const float * const *x_phase_inc,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_osc_pulse_process_multi(&coeffs, x, x_phase_inc, y, N_CHANNELS, nSamples);
 }

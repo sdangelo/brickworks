@@ -165,7 +165,7 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_phase_gen_process_multi()
  *  ```>>> */
-static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float **y, float **y_phase_inc, size_t n_channels, size_t n_samples);
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float * const *y, float * const *y_phase_inc, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y`, while using and updating both the common `coeffs` and each of
@@ -342,7 +342,7 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
 	}
 }
 
-static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float **y, float **y_phase_inc, size_t n_channels, size_t n_samples) {
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float * const *y, float * const *y_phase_inc, size_t n_channels, size_t n_samples) {
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (x_mod != NULL) {
@@ -476,8 +476,8 @@ public:
 	void reset(float phase_0 = 0.f);
 	void process(
 		const float * const *x_mod,
-		float **y,
-		float **y_phase_inc,
+		float * const *y,
+		float * const *y_phase_inc,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x_mod,
@@ -525,8 +525,8 @@ inline void PhaseGen<N_CHANNELS>::reset(float phase_0) {
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::process(
 		const float * const *x_mod,
-		float **y,
-		float **y_phase_inc,
+		float * const *y,
+		float * const *y_phase_inc,
 		size_t nSamples) {
 	bw_phase_gen_process_multi(&coeffs, statesP, x_mod, y, y_phase_inc, N_CHANNELS, nSamples);
 }

@@ -122,7 +122,7 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
  *
  *    #### bw_src_int_process_multi()
  *  ```>>> */
-static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t *n, size_t n_channels, size_t n_in_samples);
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *n, size_t n_channels, size_t n_in_samples);
 /*! <<<```
  *    Processes the first `n_in_samples` of the `n_channels` input buffers `x`
  *    and fills the `n_channels` output buffers `y` using `coeffs`, while using
@@ -240,7 +240,7 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
 	return n;
 }
 
-static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t *n, size_t n_channels, size_t n_in_samples) {
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *n, size_t n_channels, size_t n_in_samples) {
 	if (n != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			n[i] = bw_src_int_process(coeffs, state[i], x[i], y[i], n_in_samples);
@@ -266,10 +266,10 @@ class SRCInt {
 public:
 	SRCInt(int ratio);
 	
-	void reset(float x0 = 0.f);
+	void reset(float x_0 = 0.f);
 	std::array<size_t, N_CHANNELS> process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nInSamples);
 	std::array<size_t, N_CHANNELS> process(
 		std::array<const float *, N_CHANNELS> x,
@@ -299,15 +299,15 @@ inline SRCInt<N_CHANNELS>::SRCInt(int ratio) {
 }
 
 template<size_t N_CHANNELS>
-inline void SRCInt<N_CHANNELS>::reset(float x0) {
+inline void SRCInt<N_CHANNELS>::reset(float x_0) {
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_src_int_reset_state(&coeffs, states + i, x0);
+		bw_src_int_reset_state(&coeffs, states + i, x_0);
 }
 
 template<size_t N_CHANNELS>
 inline std::array<size_t, N_CHANNELS> SRCInt<N_CHANNELS>::process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nInSamples) {
 	std::array<size_t, N_CHANNELS> ret;
 	bw_src_int_process_multi(&coeffs, statesP, x, y, ret.data(), N_CHANNELS, nInSamples);

@@ -167,28 +167,16 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 
 	const float vcf_mod_k = 0.3f * instance->params[p_vcf_mod];
 
-	float *xb0[N_VOICES], *xb1[N_VOICES], *xb2[N_VOICES], *xb3[N_VOICES], *xb4[N_VOICES];
-	std::array<float *, N_VOICES> b0, b1, b2, b3, b4, na;
-	std::array<const float *, N_VOICES> cb0, cb1, cb2, cb3, cb4;
-	std::array<char, N_VOICES> gates;
+	float *b0[N_VOICES], *b1[N_VOICES], *b2[N_VOICES], *b3[N_VOICES], *b4[N_VOICES], *na[N_VOICES];
+	char xgates[N_VOICES];
 	for (int j = 0; j < N_VOICES; j++) {
-		xb0[j] = instance->voices[j].buf[0];
-		xb1[j] = instance->voices[j].buf[1];
-		xb2[j] = instance->voices[j].buf[2];
-		xb3[j] = instance->voices[j].buf[3];
-		xb4[j] = instance->voices[j].buf[4];
-		b0.data()[j] = instance->voices[j].buf[0];
-		b1.data()[j] = instance->voices[j].buf[1];
-		b2.data()[j] = instance->voices[j].buf[2];
-		b3.data()[j] = instance->voices[j].buf[3];
-		b4.data()[j] = instance->voices[j].buf[4];
-		na.data()[j] = nullptr;
-		cb0.data()[j] = instance->voices[j].buf[0];
-		cb1.data()[j] = instance->voices[j].buf[1];
-		cb2.data()[j] = instance->voices[j].buf[2];
-		cb3.data()[j] = instance->voices[j].buf[3];
-		cb4.data()[j] = instance->voices[j].buf[4];
-		gates.data()[j] = instance->voices[j].gate;
+		b0[j] = instance->voices[j].buf[0];
+		b1[j] = instance->voices[j].buf[1];
+		b2[j] = instance->voices[j].buf[2];
+		b3[j] = instance->voices[j].buf[3];
+		b4[j] = instance->voices[j].buf[4];
+		na[j] = nullptr;
+		xgates[j] = instance->voices[j].gate;
 	}
 
 	for (int i = 0; i < n_samples; i += BUFFER_SIZE) {
@@ -196,81 +184,81 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 		int n = bw_minf(n_samples - i, BUFFER_SIZE);
 
 		for (int j = 0; j < N_VOICES; j++)
-			instance->voices[j].vco3PhaseGen.process({nullptr}, {b0.data()[j]}, {b1.data()[j]}, n);
+			instance->voices[j].vco3PhaseGen.process({nullptr}, {b0[j]}, {b1[j]}, n);
 		if (instance->params[p_vco3_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
-			instance->vco3OscTri.process(cb0, cb1, b0, n);
+			instance->vco3OscTri.process(b0, b1, b0, n);
 			instance->vco3OscPulse.reset();
 		} else if (instance->params[p_vco3_waveform] >= (1.f / 4.f)) {
-			instance->vco3OscPulse.process(cb0, cb1, b0, n);
+			instance->vco3OscPulse.process(b0, b1, b0, n);
 			instance->vco3OscTri.reset();
 		} else {
-			instance->vco3OscSaw.process(cb0, cb1, b0, n);
+			instance->vco3OscSaw.process(b0, b1, b0, n);
 			instance->vco3OscPulse.reset();
 			instance->vco3OscTri.reset();
 		}
 		
 		instance->noiseGen.process(b1, n);
 		if (instance->params[p_noise_color] >= 0.5f)
-			instance->pinkFilt.process(cb1, b1, n);
+			instance->pinkFilt.process(b1, b1, n);
 		else
 			instance->pinkFilt.reset(); // FIXME: calling this here is sloppy coding
-		bufScale<N_VOICES>(xb1, 5.f, xb1, n);
+		bufScale<N_VOICES>(b1, 5.f, b1, n);
 
 		float vcf_mod[N_VOICES];
 		for (int j = 0; j < N_VOICES; j++) {
 			for (int k = 0; k < n; k++)
-				b2.data()[j][k] = instance->mod_wheel * (b0.data()[j][k] + instance->params[p_mod_mix] * (b1.data()[j][k] - b0.data()[j][k]));
-			vcf_mod[j] = vcf_mod_k * b2.data()[j][0];
+				b2[j][k] = instance->mod_wheel * (b0[j][k] + instance->params[p_mod_mix] * (b1[j][k] - b0[j][k]));
+			vcf_mod[j] = vcf_mod_k * b2[j][0];
 		}
 		
 		for (int j = 0; j < N_VOICES; j++) {
-			bufScale<1>({xb2[j]}, instance->params[p_vco1_mod], {xb3[j]}, n);
-			instance->voices[j].vco1PhaseGen.process({b3.data()[j]}, {b4.data()[j]}, {b3.data()[j]}, n);
+			bufScale<1>({b2[j]}, instance->params[p_vco1_mod], {b3[j]}, n);
+			instance->voices[j].vco1PhaseGen.process({b3[j]}, {b4[j]}, {b3[j]}, n);
 		}
 		if (instance->params[p_vco1_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
-			instance->vco1OscTri.process(cb3, cb4, b3, n);
+			instance->vco1OscTri.process(b3, b4, b3, n);
 			instance->vco1OscPulse.reset();
 		} else if (instance->params[p_vco1_waveform] >= (1.f / 4.f)) {
-			instance->vco1OscPulse.process(cb3, cb4, b3, n);
+			instance->vco1OscPulse.process(b3, b4, b3, n);
 			instance->vco1OscTri.reset();
 		} else {
-			instance->vco1OscSaw.process(cb3, cb4, b3, n);
+			instance->vco1OscSaw.process(b3, b4, b3, n);
 			instance->vco1OscPulse.reset();
 			instance->vco1OscTri.reset();
 		}
 
 		for (int j = 0; j < N_VOICES; j++) {
-			bufScale<1>({xb2[j]}, instance->params[p_vco2_mod], {xb2[j]}, n);
-			instance->voices[j].vco2PhaseGen.process({b2.data()[j]}, {b2.data()[j]}, {b4.data()[j]}, n);
+			bufScale<1>({b2[j]}, instance->params[p_vco2_mod], {b2[j]}, n);
+			instance->voices[j].vco2PhaseGen.process({b2[j]}, {b2[j]}, {b4[j]}, n);
 		}
 		if (instance->params[p_vco2_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
-			instance->vco2OscTri.process(cb2, cb4, b2, n);
+			instance->vco2OscTri.process(b2, b4, b2, n);
 			instance->vco2OscPulse.reset();
 		} else if (instance->params[p_vco2_waveform] >= (1.f / 4.f)) {
-			instance->vco2OscPulse.process(cb2, cb4, b2, n);
+			instance->vco2OscPulse.process(b2, b4, b2, n);
 			instance->vco2OscTri.reset();
 		} else {
-			instance->vco2OscSaw.process(cb2, cb4, b2, n);
+			instance->vco2OscSaw.process(b2, b4, b2, n);
 			instance->vco2OscPulse.reset();
 			instance->vco2OscTri.reset();
 		}
 
-		instance->vco1Gain.process(cb3, b3, n);
-		instance->vco2Gain.process(cb2, b2, n);
-		instance->vco3Gain.process(cb0, b0, n);
-		instance->noiseGain.process(cb1, b1, n);
-		bufMix<N_VOICES>(xb0, xb2, xb0, n);
-		bufMix<N_VOICES>(xb0, xb3, xb0, n);
+		instance->vco1Gain.process(b3, b3, n);
+		instance->vco2Gain.process(b2, b2, n);
+		instance->vco3Gain.process(b0, b0, n);
+		instance->noiseGain.process(b1, b1, n);
+		bufMix<N_VOICES>(b0, b2, b0, n);
+		bufMix<N_VOICES>(b0, b3, b0, n);
 
-		instance->oscFilt.process(cb0, b0, n);
+		instance->oscFilt.process(b0, b0, n);
 
 		const float k = instance->params[p_noise_color] >= 0.5f
 			? 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK()
 			: 0.1f * instance->noiseGen.getScalingK();
-		bufScale<N_VOICES>(xb1, k, xb1, n);
-		bufMix<N_VOICES>(xb0, xb1, xb0, n);
+		bufScale<N_VOICES>(b1, k, b1, n);
+		bufMix<N_VOICES>(b0, b1, b0, n);
 
-		instance->vcfEnvGen.process(gates, na, n);
+		instance->vcfEnvGen.process(xgates, na, n);
 		for (int j = 0; j < N_VOICES; j++) {
 			float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * instance->vcfEnvGen.getYZ1(j) + vcf_mod[j];
 			float cutoff = 20.f + (20e3f - 20.f) * v * v * v;
@@ -282,15 +270,15 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 				cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
 			// otherwise no kbd control
 			instance->voices[j].vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
-			instance->voices[j].vcf.process({b0.data()[j]}, {b0.data()[j]}, {nullptr}, {nullptr}, n);
+			instance->voices[j].vcf.process({b0[j]}, {b0[j]}, {nullptr}, {nullptr}, n);
 		}
 
-		instance->vcaEnvGen.process(gates, b1, n);
-		bufMul<N_VOICES>(xb0, xb1, xb0, n);
+		instance->vcaEnvGen.process(xgates, b1, n);
+		bufMul<N_VOICES>(b0, b1, b0, n);
 
 		bufFill<1>(0.f, {out}, n);
 		for (int j = 0; j < N_VOICES; j++)
-			bufMix<1>({out}, {xb0[j]}, {out}, n);
+			bufMix<1>({out}, {b0[j]}, {out}, n);
 
 		instance->a440PhaseGen.process({nullptr}, {instance->buf}, {nullptr}, n);
 		oscSinProcess<1>({instance->buf}, {instance->buf}, n);

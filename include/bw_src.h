@@ -34,10 +34,11 @@
  *              to count samples and channels.</li>
  *          <li>Added more <code>const</code> specifiers to input
  *              arguments.</li>
- *          <li>Moved C++ code to C header.</li>
+ *          <li>Moved C++ code to C header and fixed C++ API.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Removed useless computation when upsampling.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -113,7 +114,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
  *
  *    #### bw_src_process_multi()
  *  ```>>> */
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t **n_in_samples, size_t **n_out_samples);
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *n_in_samples, size_t *n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples[i]` of each input buffer `x[i]`
  *    and fills the corresponding output buffer `y[i]` with at most
@@ -245,7 +246,6 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 				// TDF-II
 				const float v0 = coeffs->b0 * o;
 				const float v1 = coeffs->b1 * o;
-				const float v2 = coeffs->b2 * o;
 				y[j] = v0 + state->z1;
 				state->z1 = v1 - coeffs->a1 * y[j] + state->z2;
 				state->z2 = coeffs->b2 * o - coeffs->a2 * y[j] + state->z3;
@@ -267,9 +267,9 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 	*n_out_samples = j;
 }
 
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t **n_in_samples, size_t **n_out_samples) {
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *n_in_samples, size_t *n_out_samples) {
 	for (size_t i = 0; i < n_channels; i++)
-		bw_src_process(coeffs, state[i], x[i], y[i], n_in_samples[i], n_out_samples[i]);
+		bw_src_process(coeffs, state[i], x[i], y[i], n_in_samples + i, n_out_samples + i);
 }
 
 #ifdef __cplusplus
@@ -292,14 +292,14 @@ public:
 	void reset(float x_0 = 0.f);
 	void process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t *nInSamples,
 		size_t *nOutSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
-		std::array<size_t *, N_CHANNELS> nInSamples,
-		std::array<size_t *, N_CHANNELS> nOutSamples);
+		std::array<size_t, N_CHANNELS> &nInSamples,
+		std::array<size_t, N_CHANNELS> &nOutSamples);
 /*! <<<...
  *  }
  *  ```
@@ -332,7 +332,7 @@ inline void SRC<N_CHANNELS>::reset(float x_0) {
 template<size_t N_CHANNELS>
 inline void SRC<N_CHANNELS>::process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t *nInSamples,
 		size_t *nOutSamples) {
 	bw_src_process_multi(coeffs, statesP, x, y, N_CHANNELS, nInSamples, nOutSamples);
@@ -342,8 +342,8 @@ template<size_t N_CHANNELS>
 inline void SRC<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
-		std::array<size_t *, N_CHANNELS> nInSamples,
-		std::array<size_t *, N_CHANNELS> nOutSamples) {
+		std::array<size_t, N_CHANNELS> &nInSamples,
+		std::array<size_t, N_CHANNELS> &nOutSamples) {
 	process(x.data(), y.data(), nInSamples.data(), nOutSamples.data());
 }
 

@@ -122,7 +122,7 @@ static inline void bw_osc_saw_process(bw_osc_saw_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_osc_saw_process_multi()
  *  ```>>> */
-static inline void bw_osc_saw_process_multi(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_osc_saw_process_multi(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -202,7 +202,7 @@ static inline void bw_osc_saw_process(bw_osc_saw_coeffs *BW_RESTRICT coeffs, con
 			y[i] = bw_osc_saw_process1(coeffs, x[i]);
 }
 
-static inline void bw_osc_saw_process_multi(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_osc_saw_process_multi(bw_osc_saw_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float * const *y, size_t n_channels, size_t n_samples) {
 	if (x_phase_inc != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			bw_osc_saw_process(coeffs, x[i], x_phase_inc[i], y[i], n_samples);
@@ -235,7 +235,7 @@ public:
 	void process(
 		const float * const *x,
 		const float * const *x_phase_inc,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -267,7 +267,7 @@ template<size_t N_CHANNELS>
 inline void OscSaw<N_CHANNELS>::process(
 		const float * const *x,
 		const float * const *x_phase_inc,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_osc_saw_process_multi(&coeffs, x, x_phase_inc, y, N_CHANNELS, nSamples);
 }

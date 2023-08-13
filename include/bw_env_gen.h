@@ -194,7 +194,7 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
  *
  *    #### bw_env_gen_process_multi()
  *  ```>>> */
-static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y` using the given `n_channels` `gate` values (`0` for off,
@@ -400,7 +400,7 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
 			bw_env_gen_process1(coeffs, state);
 }
 
-static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	for (size_t j = 0; j < n_channels; j++)
 		bw_env_gen_update_state_ctrl(coeffs, state[j], gate[j]);
@@ -479,7 +479,7 @@ public:
 	void reset();
 	void process(
 		const char *gate,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<char, N_CHANNELS> gate,
@@ -531,7 +531,7 @@ inline void EnvGen<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::process(
 		const char *gate,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_env_gen_process_multi(&coeffs, statesP, gate, y, N_CHANNELS, nSamples);
 }

@@ -158,7 +158,7 @@ static inline void bw_satur_process(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satu
  *
  *    #### bw_satur_process_multi()
  *  ```>>> */
-static inline void bw_satur_process_multi(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
+static inline void bw_satur_process_multi(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -312,7 +312,7 @@ static inline void bw_satur_process(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satu
 		}
 }
 
-static inline void bw_satur_process_multi(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+static inline void bw_satur_process_multi(bw_satur_coeffs *BW_RESTRICT coeffs, bw_satur_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_satur_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_satur_update_coeffs_audio(coeffs);
@@ -354,7 +354,7 @@ public:
 	void reset();
 	void process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
@@ -402,7 +402,7 @@ inline void Satur<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void Satur<N_CHANNELS>::process(
 		const float * const *x,
-		float **y,
+		float * const *y,
 		size_t nSamples) {
 	bw_satur_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }

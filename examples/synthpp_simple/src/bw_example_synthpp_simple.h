@@ -29,7 +29,7 @@
 #include <bwpp_svf.h>
 #include <bw_env_gen.h>
 #include <bw_gain.h>
-#include <bwpp_ppm.h>
+#include <bw_ppm.h>
 
 using namespace Brickworks;
 

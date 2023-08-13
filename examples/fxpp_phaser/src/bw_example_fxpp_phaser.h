@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_phaser.h>
+#include <bw_phaser.h>
 
 using namespace Brickworks;
 

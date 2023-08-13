@@ -23,8 +23,8 @@
 
 #include "platform.h"
 
-#include <bwpp_balance.h>
-#include <bwpp_ppm.h>
+#include <bw_balance.h>
+#include <bw_ppm.h>
 
 using namespace Brickworks;
 

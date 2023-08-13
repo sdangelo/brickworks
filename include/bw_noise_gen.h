@@ -33,8 +33,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_noise_gen_process()</code> and
+ *              <code>bw_noise_gen_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -62,8 +69,8 @@
  *  }}}
  */
 
-#ifndef _BW_NOISE_GEN_H
-#define _BW_NOISE_GEN_H
+#ifndef BW_NOISE_GEN_H
+#define BW_NOISE_GEN_H
 
 #include <bw_common.h>
 
@@ -74,7 +81,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_noise_gen_coeffs
  *  ```>>> */
-typedef struct _bw_noise_gen_coeffs bw_noise_gen_coeffs;
+typedef struct bw_noise_gen_coeffs bw_noise_gen_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -103,14 +110,14 @@ static inline float bw_noise_gen_process1_scaling(const bw_noise_gen_coeffs *BW_
  *
  *    #### bw_noise_gen_process()
  *  ```>>> */
-static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, int n_samples);
+static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y` using
  *    `coeffs`.
  *
  *    #### bw_noise_gen_process_multi()
  *  ```>>> */
-static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float **y, int n_channels, int n_samples);
+static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y` using `coeffs`.
@@ -153,7 +160,7 @@ static inline float bw_noise_gen_get_scaling_k(const bw_noise_gen_coeffs *BW_RES
 extern "C" {
 #endif
 
-struct _bw_noise_gen_coeffs {
+struct bw_noise_gen_coeffs {
 	// Coefficients
 	float		 scaling_k;
 
@@ -179,17 +186,17 @@ static inline float bw_noise_gen_process1_scaling(const bw_noise_gen_coeffs *BW_
 	return coeffs->scaling_k * bw_randf(coeffs->state);
 }
 
-static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, int n_samples) {
+static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT y, size_t n_samples) {
 	if (coeffs->sample_rate_scaling)
-		for (int i = 0; i < n_samples; i++)
+		for (size_t i = 0; i < n_samples; i++)
 			y[i] = bw_noise_gen_process1(coeffs);
 	else
-		for (int i = 0; i < n_samples; i++)
+		for (size_t i = 0; i < n_samples; i++)
 			y[i] = bw_noise_gen_process1_scaling(coeffs);
 }
 
-static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float **y, int n_channels, int n_samples) {
-	for (int i = 0; i < n_channels; i++)
+static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float **y, size_t n_channels, size_t n_samples) {
+	for (size_t i = 0; i < n_channels; i++)
 		bw_noise_gen_process(coeffs, y[i], n_samples);
 }
 
@@ -202,6 +209,81 @@ static inline float bw_noise_gen_get_scaling_k(const bw_noise_gen_coeffs *BW_RES
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::NoiseGen
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class NoiseGen {
+public:
+	NoiseGen(uint64_t *BW_RESTRICT state);
+
+	void setSampleRate(float sampleRate);
+	void process(
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setSampleRateScaling(bool value);
+	
+	float getScalingK();
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_noise_gen_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline NoiseGen<N_CHANNELS>::NoiseGen(uint64_t *BW_RESTRICT state) {
+	bw_noise_gen_init(&coeffs, state);
+}
+
+template<size_t N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_noise_gen_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::process(
+		float **y,
+		size_t nSamples) {
+	bw_noise_gen_process_multi(&coeffs, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::process(
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void NoiseGen<N_CHANNELS>::setSampleRateScaling(bool value) {
+	bw_noise_gen_set_sample_rate_scaling(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline float NoiseGen<N_CHANNELS>::getScalingK() {
+	return bw_noise_gen_get_scaling_k(&coeffs);
+}
+
 }
 #endif
 

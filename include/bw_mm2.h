@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_mm2_process()</code> and
+ *              <code>bw_mm2_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -59,8 +66,8 @@
  *  }}}
  */
 
-#ifndef _BW_MM2_H
-#define _BW_MM2_H
+#ifndef BW_MM2_H
+#define BW_MM2_H
 
 #include <bw_common.h>
 
@@ -71,13 +78,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_mm2_coeffs
  *  ```>>> */
-typedef struct _bw_mm2_coeffs bw_mm2_coeffs;
+typedef struct bw_mm2_coeffs bw_mm2_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_mm2_state
  *  ```>>> */
-typedef struct _bw_mm2_state bw_mm2_state;
+typedef struct bw_mm2_state bw_mm2_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -101,10 +108,10 @@ static inline void bw_mm2_reset_coeffs(bw_mm2_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_mm2_reset_state()
  *  ```>>> */
-static inline void bw_mm2_reset_state(const bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, float x0);
+static inline void bw_mm2_reset_state(const bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, float x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x0`.
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_mm2_update_coeffs_ctrl()
  *  ```>>> */
@@ -127,7 +134,7 @@ static inline float bw_mm2_process1(const bw_mm2_coeffs *BW_RESTRICT coeffs, bw_
  *
  *    #### bw_mm2_process()
  *  ```>>> */
-static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -135,7 +142,7 @@ static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_stat
  *
  *    #### bw_mm2_process_multi()
  *  ```>>> */
-static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -228,7 +235,7 @@ static inline void bw_mm2_set_coeff_hp(bw_mm2_coeffs *BW_RESTRICT coeffs, float 
 extern "C" {
 #endif
 
-struct _bw_mm2_coeffs {
+struct bw_mm2_coeffs {
 	// Sub-components
 	bw_svf_coeffs	svf_coeffs;
 	bw_gain_coeffs	gain_x_coeffs;
@@ -237,7 +244,7 @@ struct _bw_mm2_coeffs {
 	bw_gain_coeffs	gain_hp_coeffs;
 };
 
-struct _bw_mm2_state {
+struct bw_mm2_state {
 	bw_svf_state	svf_state;
 };
 
@@ -273,8 +280,8 @@ static inline void bw_mm2_reset_coeffs(bw_mm2_coeffs *BW_RESTRICT coeffs) {
 	bw_gain_reset_coeffs(&coeffs->gain_hp_coeffs);
 }
 
-static inline void bw_mm2_reset_state(const bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, float x0) {
-	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, x0);
+static inline void bw_mm2_reset_state(const bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, float x_0) {
+	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, x_0);
 }
 
 static inline void bw_mm2_update_coeffs_ctrl(bw_mm2_coeffs *BW_RESTRICT coeffs) {
@@ -303,19 +310,19 @@ static inline float bw_mm2_process1(const bw_mm2_coeffs *BW_RESTRICT coeffs, bw_
 	return vx + vlp + vbp + vhp;
 }
 
-static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_mm2_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm2_update_coeffs_audio(coeffs);
 		y[i] = bw_mm2_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_mm2_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm2_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_mm2_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -353,6 +360,132 @@ static inline void bw_mm2_set_coeff_hp(bw_mm2_coeffs *BW_RESTRICT coeffs, float 
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::MM2
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class MM2 {
+public:
+	MM2();
+
+	void setSampleRate(float sampleRate);
+	void reset(float x_0 = 0.f);
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setCutoff(float value);
+	void setQ(float value);
+	void setPrewarpAtCutoff(bool value);
+	void setPrewarpFreq(float value);
+	void setCoeffX(float value);
+	void setCoeffLp(float value);
+	void setCoeffBp(float value);
+	void setCoeffHp(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_mm2_coeffs	 coeffs;
+	bw_mm2_state	 states[N_CHANNELS];
+	bw_mm2_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline MM2<N_CHANNELS>::MM2() {
+	bw_mm2_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_mm2_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::reset(float x_0) {
+	bw_mm2_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_mm2_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_mm2_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCutoff(float value) {
+	bw_mm2_set_cutoff(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setQ(float value) {
+	bw_mm2_set_Q(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
+	bw_mm2_set_prewarp_at_cutoff(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setPrewarpFreq(float value) {
+	bw_mm2_set_prewarp_freq(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffX(float value) {
+	bw_mm2_set_coeff_x(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffLp(float value) {
+	bw_mm2_set_coeff_lp(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffBp(float value) {
+	bw_mm2_set_coeff_bp(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void MM2<N_CHANNELS>::setCoeffHp(float value) {
+	bw_mm2_set_coeff_hp(&coeffs, value);
+}
+
 }
 #endif
 

@@ -30,7 +30,7 @@
 #include <bwpp_osc_tri.h>
 #include <bwpp_osc_sin.h>
 #include <bwpp_osc_filt.h>
-#include <bwpp_noise_gen.h>
+#include <bw_noise_gen.h>
 #include <bwpp_pink_filt.h>
 #include <bwpp_svf.h>
 #include <bw_env_gen.h>

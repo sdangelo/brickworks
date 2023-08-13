@@ -30,8 +30,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_notch_process()</code> and
+ *              <code>bw_notch_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -60,8 +67,8 @@
  *  }}}
  */
 
-#ifndef _BW_NOTCH_H
-#define _BW_NOTCH_H
+#ifndef BW_NOTCH_H
+#define BW_NOTCH_H
 
 #include <bw_common.h>
 
@@ -72,13 +79,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_notch_coeffs
  *  ```>>> */
-typedef struct _bw_notch_coeffs bw_notch_coeffs;
+typedef struct bw_notch_coeffs bw_notch_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_notch_state
  *  ```>>> */
-typedef struct _bw_notch_state bw_notch_state;
+typedef struct bw_notch_state bw_notch_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -102,10 +109,10 @@ static inline void bw_notch_reset_coeffs(bw_notch_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_notch_reset_state()
  *  ```>>> */
-static inline void bw_notch_reset_state(const bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, float x0);
+static inline void bw_notch_reset_state(const bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, float x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x0`.
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_notch_update_coeffs_ctrl()
  *  ```>>> */
@@ -128,7 +135,7 @@ static inline float bw_notch_process1(const bw_notch_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_notch_process()
  *  ```>>> */
-static inline void bw_notch_process(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_notch_process(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -136,7 +143,7 @@ static inline void bw_notch_process(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notc
  *
  *    #### bw_notch_process_multi()
  *  ```>>> */
-static inline void bw_notch_process_multi(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_notch_process_multi(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -177,12 +184,12 @@ static inline void bw_notch_set_Q(bw_notch_coeffs *BW_RESTRICT coeffs, float val
 extern "C" {
 #endif
 
-struct _bw_notch_coeffs {
+struct bw_notch_coeffs {
 	// Sub-components
 	bw_svf_coeffs	svf_coeffs;
 };
 
-struct _bw_notch_state {
+struct bw_notch_state {
 	bw_svf_state	svf_state;
 };
 
@@ -198,8 +205,8 @@ static inline void bw_notch_reset_coeffs(bw_notch_coeffs *BW_RESTRICT coeffs) {
 	bw_svf_reset_coeffs(&coeffs->svf_coeffs);
 }
 
-static inline void bw_notch_reset_state(const bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, float x0) {
-	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, x0);
+static inline void bw_notch_reset_state(const bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, float x_0) {
+	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, x_0);
 }
 
 static inline void bw_notch_update_coeffs_ctrl(bw_notch_coeffs *BW_RESTRICT coeffs) {
@@ -216,19 +223,19 @@ static inline float bw_notch_process1(const bw_notch_coeffs *BW_RESTRICT coeffs,
 	return lp + hp;
 }
 
-static inline void bw_notch_process(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_notch_process(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_notch_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_notch_update_coeffs_audio(coeffs);
 		y[i] = bw_notch_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_notch_process_multi(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_notch_process_multi(bw_notch_coeffs *BW_RESTRICT coeffs, bw_notch_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_notch_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_notch_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_notch_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -242,6 +249,96 @@ static inline void bw_notch_set_Q(bw_notch_coeffs *BW_RESTRICT coeffs, float val
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Notch
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Notch {
+public:
+	Notch();
+
+	void setSampleRate(float sampleRate);
+	void reset(float x_0 = 0.f);
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setCutoff(float value);
+	void setQ(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_notch_coeffs	 coeffs;
+	bw_notch_state	 states[N_CHANNELS];
+	bw_notch_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline Notch<N_CHANNELS>::Notch() {
+	bw_notch_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void Notch<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_notch_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Notch<N_CHANNELS>::reset(float x0) {
+	bw_notch_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_notch_reset_state(&coeffs, states + i, x0);
+}
+
+template<size_t N_CHANNELS>
+inline void Notch<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_notch_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Notch<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Notch<N_CHANNELS>::setCutoff(float value) {
+	bw_notch_set_cutoff(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Notch<N_CHANNELS>::setQ(float value) {
+	bw_notch_set_Q(&coeffs, value);
+}
+
 }
 #endif
 

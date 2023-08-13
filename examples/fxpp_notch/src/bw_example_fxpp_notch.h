@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_notch.h>
+#include <bw_notch.h>
 
 using namespace Brickworks;
 

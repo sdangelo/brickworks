@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_noise_gate.h>
+#include <bw_noise_gate.h>
 
 using namespace Brickworks;
 

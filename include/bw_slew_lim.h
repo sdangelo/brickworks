@@ -109,10 +109,10 @@ static inline void bw_slew_lim_reset_coeffs(bw_slew_lim_coeffs *BW_RESTRICT coef
  *
  *    #### bw_slew_lim_reset_state()
  *  ```>>> */
-static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float y_z1);
+static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/equilibrium value `y_z1`.
+ *    and the quiescent/equilibrium value `x_0`.
  *
  *    #### bw_slew_lim_update_coeffs_ctrl()
  *  ```>>> */
@@ -256,9 +256,9 @@ static inline void bw_slew_lim_reset_coeffs(bw_slew_lim_coeffs *BW_RESTRICT coef
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
 }
 
-static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float y_z1) {
+static inline void bw_slew_lim_reset_state(const bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, float x_0) {
 	(void)coeffs;
-	state->y_z1 = y_z1;
+	state->y_z1 = x_0;
 }
 
 static inline void bw_slew_lim_update_coeffs_ctrl(bw_slew_lim_coeffs *BW_RESTRICT coeffs) {
@@ -464,10 +464,10 @@ inline void SlewLim<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void SlewLim<N_CHANNELS>::reset(float y_z1) {
+inline void SlewLim<N_CHANNELS>::reset(float x_0) {
 	bw_slew_lim_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_slew_lim_reset_state(&coeffs, states + i, y_z1);
+		bw_slew_lim_reset_state(&coeffs, states + i, x_0);
 }
 
 template<size_t N_CHANNELS>

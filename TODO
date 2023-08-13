@@ -34,15 +34,11 @@ code:
 * drywet -> dry_wet, ringmod -> ring_mod, etc?
 * allow nullptr in C++ wrappers where process_multi arg can be NULL
 * better src filter
-* bw_env_gen process_multi gate const?
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * check unititialized warnings (check fxpp_comp in particular vs fxpp_satur)
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * modulation vs process (multi) no update (post 1.0.0)???
 * check assumptions w.r.t. usage of math functions
-* extern "C" in a macro to be individually applied (easier #include)
-* x_0 vs y_z1 (eg svf vs one_pole/slew_lim)
-* float **y -> float * const *y
 
 build system:
 * single header generation (vs modules in bwp... to think about)

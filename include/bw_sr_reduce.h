@@ -33,8 +33,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_sr_reduce_lim_process()</code> and
+ *              <code>bw_sr_reduce_lim_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -62,8 +69,8 @@
  *  }}}
  */
 
-#ifndef _BW_SR_REDUCE_H
-#define _BW_SR_REDUCE_H
+#ifndef BW_SR_REDUCE_H
+#define BW_SR_REDUCE_H
 
 #include <bw_common.h>
 
@@ -74,13 +81,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_sr_reduce_coeffs
  *  ```>>> */
-typedef struct _bw_sr_reduce_coeffs bw_sr_reduce_coeffs;
+typedef struct bw_sr_reduce_coeffs bw_sr_reduce_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_sr_reduce_state
  *  ```>>> */
-typedef struct _bw_sr_reduce_state bw_sr_reduce_state;
+typedef struct bw_sr_reduce_state bw_sr_reduce_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -105,7 +112,7 @@ static inline float bw_sr_reduce_process1(const bw_sr_reduce_coeffs *BW_RESTRICT
  *
  *    #### bw_sr_reduce_process()
  *  ```>>> */
-static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using `coeffs` and
@@ -113,7 +120,7 @@ static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_sr_reduce_process_multi()
  *  ```>>> */
-static inline void bw_sr_reduce_process_multi(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_sr_reduce_process_multi(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -146,12 +153,12 @@ static inline void bw_sr_reduce_set_ratio(bw_sr_reduce_coeffs *BW_RESTRICT coeff
 extern "C" {
 #endif
 
-struct _bw_sr_reduce_coeffs {
+struct bw_sr_reduce_coeffs {
 	// Parameters
 	float	ratio;
 };
 
-struct _bw_sr_reduce_state {
+struct bw_sr_reduce_state {
 	float	phase;
 	float	y_z1;
 };
@@ -174,13 +181,13 @@ static inline float bw_sr_reduce_process1(const bw_sr_reduce_coeffs *BW_RESTRICT
 	return state->y_z1;
 }
 
-static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
-	for (int i = 0; i < n_samples; i++)
+static inline void bw_sr_reduce_process(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
+	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_sr_reduce_process1(coeffs, state, x[i]);
 }
 
-static inline void bw_sr_reduce_process_multi(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
-	for (int i = 0; i < n_channels; i++)
+static inline void bw_sr_reduce_process_multi(bw_sr_reduce_coeffs *BW_RESTRICT coeffs, bw_sr_reduce_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+	for (size_t i = 0; i < n_channels; i++)
 		bw_sr_reduce_process(coeffs, state[i], x[i], y[i], n_samples);
 }
 
@@ -189,6 +196,83 @@ static inline void bw_sr_reduce_set_ratio(bw_sr_reduce_coeffs *BW_RESTRICT coeff
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::SRReduce
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class SRReduce {
+public:
+	SRReduce();
+	
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setRatio(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_sr_reduce_coeffs	 coeffs;
+	bw_sr_reduce_state	 states[N_CHANNELS];
+	bw_sr_reduce_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline SRReduce<N_CHANNELS>::SRReduce() {
+	bw_sr_reduce_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void SRReduce<N_CHANNELS>::reset() {
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_sr_reduce_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void SRReduce<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_sr_reduce_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void SRReduce<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void SRReduce<N_CHANNELS>::setRatio(float value) {
+	bw_sr_reduce_set_ratio(&coeffs, value);
+}
+
 }
 #endif
 

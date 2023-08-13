@@ -46,6 +46,7 @@ code:
 * modulation vs process (multi) no update (post 1.0.0)???
 * check assumptions w.r.t. usage of math functions
 * extern "C" in a macro to be individually applied (easier #include)
+* x_0 vs y_z1 (eg svf vs one_pole/slew_lim)
 
 build system:
 * single header generation (vs modules in bwp... to think about)

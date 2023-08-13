@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_trem.h>
+#include <bw_trem.h>
 
 using namespace Brickworks;
 

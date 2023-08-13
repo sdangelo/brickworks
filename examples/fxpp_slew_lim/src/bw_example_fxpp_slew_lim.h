@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_slew_lim.h>
+#include <bw_slew_lim.h>
 
 using namespace Brickworks;
 

@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_ringmod_process()</code> and
+ *              <code>bw_ringmod_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -55,8 +62,8 @@
  *  }}}
  */
 
-#ifndef _BW_RINGMOD_H
-#define _BW_RINGMOD_H
+#ifndef BW_RINGMOD_H
+#define BW_RINGMOD_H
 
 #include <bw_common.h>
 
@@ -67,7 +74,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_ringmod_coeffs
  *  ```>>> */
-typedef struct _bw_ringmod_coeffs bw_ringmod_coeffs;
+typedef struct bw_ringmod_coeffs bw_ringmod_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -110,7 +117,7 @@ static inline float bw_ringmod_process1(const bw_ringmod_coeffs *BW_RESTRICT coe
  *
  *    #### bw_ringmod_process()
  *  ```>>> */
-static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float *x_mod, const float *x_car, float *y, int n_samples);
+static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float *x_mod, const float *x_car, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the modulation input buffer `x_mod` and
  *    of the carrier input buffer `x_car` and fills the first `n_samples` of the
@@ -119,7 +126,7 @@ static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_ringmod_process_multi()
  *  ```>>> */
-static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float **x_mod, const float **x_car, float **y, int n_channels, int n_samples);
+static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float * const *x_mod, const float * const *x_car, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` modulation input
  *    buffers `x_mod` and of the `n_channels` carrier input buffers `x_car`, and
@@ -153,7 +160,7 @@ static inline void bw_ringmod_set_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, 
 extern "C" {
 #endif
 
-struct _bw_ringmod_coeffs {
+struct bw_ringmod_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_state;
@@ -190,17 +197,17 @@ static inline float bw_ringmod_process1(const bw_ringmod_coeffs *BW_RESTRICT coe
 	return k * x_car * x_mod + bw_absf(1.f - k) * x_mod;
 }
 
-static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float *x_mod, const float *x_car, float *y, int n_samples) {
-	for (int i = 0; i < n_samples; i++) {
+static inline void bw_ringmod_process(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float *x_mod, const float *x_car, float *y, size_t n_samples) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_ringmod_update_coeffs_audio(coeffs);
 		y[i] = bw_ringmod_process1(coeffs, x_mod[i], x_car[i]);
 	}
 }
 
-static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float **x_mod, const float **x_car, float **y, int n_channels, int n_samples) {
-	for (int i = 0; i < n_samples; i++) {
+static inline void bw_ringmod_process_multi(bw_ringmod_coeffs *BW_RESTRICT coeffs, const float * const *x_mod, const float * const *x_car, float **y, size_t n_channels, size_t n_samples) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_ringmod_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_ringmod_process1(coeffs, x_mod[j][i], x_car[j][i]);
 	}
 }
@@ -210,6 +217,88 @@ static inline void bw_ringmod_set_amount(bw_ringmod_coeffs *BW_RESTRICT coeffs, 
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::RingMod
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class RingMod {
+public:
+	RingMod();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x_mod,
+		const float * const *x_car,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x_mod,
+		std::array<const float *, N_CHANNELS> x_car,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setAmount(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_ringmod_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline RingMod<N_CHANNELS>::RingMod() {
+	bw_ringmod_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void RingMod<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_ringmod_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void RingMod<N_CHANNELS>::reset() {
+	bw_ringmod_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void RingMod<N_CHANNELS>::process(
+		const float * const *x_mod,
+		const float * const *x_car,
+		float **y,
+		size_t nSamples) {
+	bw_ringmod_process_multi(&coeffs, x_mod, x_car, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void RingMod<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x_mod,
+		std::array<const float *, N_CHANNELS> x_car,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x_mod.data(), x_car.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void RingMod<N_CHANNELS>::setAmount(float value) {
+	bw_ringmod_set_amount(&coeffs, value);
+}
+
 }
 #endif
 

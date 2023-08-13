@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_slew_lim_process()</code> and
+ *              <code>bw_slew_lim_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -60,8 +67,8 @@
  *  }}}
  */
 
-#ifndef _BW_SLEW_LIM_H
-#define _BW_SLEW_LIM_H
+#ifndef BW_SLEW_LIM_H
+#define BW_SLEW_LIM_H
 
 #include <bw_common.h>
 
@@ -72,13 +79,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_slew_lim_coeffs
  *  ```>>> */
-typedef struct _bw_slew_lim_coeffs bw_slew_lim_coeffs;
+typedef struct bw_slew_lim_coeffs bw_slew_lim_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_slew_lim_state
  *  ```>>> */
-typedef struct _bw_slew_lim_state bw_slew_lim_state;
+typedef struct bw_slew_lim_state bw_slew_lim_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -140,7 +147,7 @@ static inline float bw_slew_lim_process1_down(const bw_slew_lim_coeffs *BW_RESTR
  *
  *    #### bw_slew_lim_process()
  *  ```>>> */
-static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -150,7 +157,7 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
  * 
  *    #### bw_slew_lim_process_multi()
  *  ```>>> */
-static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -220,7 +227,7 @@ static inline float bw_slew_lim_get_y_z1(const bw_slew_lim_state *BW_RESTRICT st
 extern "C" {
 #endif
 
-struct _bw_slew_lim_coeffs {
+struct bw_slew_lim_coeffs {
 	// Coefficients
 	float	T;
 
@@ -232,7 +239,7 @@ struct _bw_slew_lim_coeffs {
 	float	max_rate_down;
 };
 
-struct _bw_slew_lim_state {
+struct bw_slew_lim_state {
 	float	y_z1;
 };
 
@@ -282,22 +289,22 @@ static inline float bw_slew_lim_process1_down(const bw_slew_lim_coeffs *BW_RESTR
 	return y;
 }
 
-static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					y[i] = bw_slew_lim_process1(coeffs, state, x[i]);
 			else
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					y[i] = bw_slew_lim_process1_up(coeffs, state, x[i]);
 		} else {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					y[i] = bw_slew_lim_process1_down(coeffs, state, x[i]);
 			else {
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					y[i] = x[i];
 				state->y_z1 = x[n_samples - 1];
 			}
@@ -305,14 +312,14 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
 	} else {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					bw_slew_lim_process1(coeffs, state, x[i]);
 			else
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					bw_slew_lim_process1_up(coeffs, state, x[i]);
 		} else {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int i = 0; i < n_samples; i++)
+				for (size_t i = 0; i < n_samples; i++)
 					bw_slew_lim_process1_down(coeffs, state, x[i]);
 			else
 				state->y_z1 = x[n_samples - 1];
@@ -320,38 +327,38 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
 	}
 }
 
-static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int j = 0; j < n_channels; j++)
+				for (size_t j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
-						for (int i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = bw_slew_lim_process1(coeffs, state[j], x[j][i]);
 					else
-						for (int i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							bw_slew_lim_process1(coeffs, state[j], x[j][i]);
 			else
-				for (int j = 0; j < n_channels; j++)
-					for (int i = 0; i < n_samples; i++)
+				for (size_t j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
 						if (y[j] != NULL)
 							y[j][i] = bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
 						else
 							bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
 		} else {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int j = 0; j < n_channels; j++)
+				for (size_t j = 0; j < n_channels; j++)
 					if (y[j] != NULL)
-						for (int i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 					else
-						for (int i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
-				for (int j = 0; j < n_channels; j++) {
+				for (size_t j = 0; j < n_channels; j++) {
 					if (y[j] != NULL)
-						for (int i = 0; i < n_samples; i++)
+						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = x[j][i];
 					state[j]->y_z1 = x[j][n_samples - 1];
 				}
@@ -359,20 +366,20 @@ static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coe
 	} else {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int j = 0; j < n_channels; j++)
-					for (int i = 0; i < n_samples; i++)
+				for (size_t j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_slew_lim_process1(coeffs, state[j], x[j][i]);
 			else
-				for (int j = 0; j < n_channels; j++)
-					for (int i = 0; i < n_samples; i++)
+				for (size_t j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
 		} else {
 			if (coeffs->max_rate_down != INFINITY)
-				for (int j = 0; j < n_channels; j++)
-					for (int i = 0; i < n_samples; i++)
+				for (size_t j = 0; j < n_channels; j++)
+					for (size_t i = 0; i < n_samples; i++)
 						bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
-				for (int j = 0; j < n_channels; j++)
+				for (size_t j = 0; j < n_channels; j++)
 					state[j]->y_z1 = x[j][n_samples - 1];
 		}
 	}
@@ -396,6 +403,109 @@ static inline float bw_slew_lim_get_y_z1(const bw_slew_lim_state *BW_RESTRICT st
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::SlewLim
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class SlewLim {
+public:
+	SlewLim();
+
+	void setSampleRate(float sampleRate);
+	void reset(float y_z1 = 0.f);
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setMaxRate(float value);
+	void setMaxRateUp(float value);
+	void setMaxRateDown(float value);
+	
+	float getYZ1(size_t channel);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_slew_lim_coeffs	 coeffs;
+	bw_slew_lim_state	 states[N_CHANNELS];
+	bw_slew_lim_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline SlewLim<N_CHANNELS>::SlewLim() {
+	bw_slew_lim_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_slew_lim_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::reset(float y_z1) {
+	bw_slew_lim_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_slew_lim_reset_state(&coeffs, states + i, y_z1);
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_slew_lim_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::setMaxRate(float value) {
+	bw_slew_lim_set_max_rate(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::setMaxRateUp(float value) {
+	bw_slew_lim_set_max_rate_up(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void SlewLim<N_CHANNELS>::setMaxRateDown(float value) {
+	bw_slew_lim_set_max_rate_down(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline float SlewLim<N_CHANNELS>::getYZ1(size_t channel) {
+	return bw_slew_lim_get_y_z1(states + channel);
+}
+
 }
 #endif
 

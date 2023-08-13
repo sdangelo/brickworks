@@ -31,8 +31,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_trem_process()</code> and
+ *              <code>bw_trem_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -55,8 +62,8 @@
  *  }}}
  */
 
-#ifndef _BW_TREM_H
-#define _BW_TREM_H
+#ifndef BW_TREM_H
+#define BW_TREM_H
 
 #include <bw_common.h>
 
@@ -67,13 +74,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_trem_coeffs
  *  ```>>> */
-typedef struct _bw_trem_coeffs bw_trem_coeffs;
+typedef struct bw_trem_coeffs bw_trem_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_trem_state
  *  ```>>> */
-typedef struct _bw_trem_state bw_trem_state;
+typedef struct bw_trem_state bw_trem_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -122,7 +129,7 @@ static inline float bw_trem_process1(const bw_trem_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_trem_process()
  *  ```>>> */
-static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -130,7 +137,7 @@ static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_s
  *
  *    #### bw_trem_process_multi()
  *  ```>>> */
-static inline void bw_trem_process_multi(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_trem_process_multi(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -172,13 +179,13 @@ static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float 
 extern "C" {
 #endif
 
-struct _bw_trem_coeffs {
+struct bw_trem_coeffs {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_ringmod_coeffs	ringmod_coeffs;
 };
 
-struct _bw_trem_state {
+struct bw_trem_state {
 	bw_phase_gen_state	phase_gen_state;
 };
 
@@ -218,19 +225,19 @@ static inline float bw_trem_process1(const bw_trem_coeffs *BW_RESTRICT coeffs, b
 	return bw_ringmod_process1(&coeffs->ringmod_coeffs, x, 1.f + c);
 }
 
-static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_trem_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_trem_update_coeffs_audio(coeffs);
 		y[i] = bw_trem_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_trem_process_multi(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_trem_process_multi(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_trem_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_trem_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_trem_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -244,6 +251,96 @@ static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float 
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Trem
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Trem {
+public:
+	Trem();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setRate(float value);
+	void setAmount(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_trem_coeffs	 coeffs;
+	bw_trem_state		 states[N_CHANNELS];
+	bw_trem_state		*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline Trem<N_CHANNELS>::Trem() {
+	bw_trem_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void Trem<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_trem_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Trem<N_CHANNELS>::reset() {
+	bw_trem_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_trem_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void Trem<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_trem_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Trem<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Trem<N_CHANNELS>::setRate(float value) {
+	bw_trem_set_rate(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Trem<N_CHANNELS>::setAmount(float value) {
+	bw_trem_set_amount(&coeffs, value);
+}
+
 }
 #endif
 

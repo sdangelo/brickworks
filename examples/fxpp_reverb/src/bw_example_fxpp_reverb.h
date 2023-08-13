@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_reverb.h>
+#include <bw_reverb.h>
 
 using namespace Brickworks;
 

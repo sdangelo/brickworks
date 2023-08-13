@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_satur.h>
+#include <bw_satur.h>
 #include <bwpp_src_int.h>
 
 using namespace Brickworks;

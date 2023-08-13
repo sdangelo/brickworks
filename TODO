@@ -47,6 +47,7 @@ code:
 * check assumptions w.r.t. usage of math functions
 * extern "C" in a macro to be individually applied (easier #include)
 * x_0 vs y_z1 (eg svf vs one_pole/slew_lim)
+* float **y -> float * const *y
 
 build system:
 * single header generation (vs modules in bwp... to think about)

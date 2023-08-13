@@ -29,8 +29,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_src_process()</code> and
+ *              <code>bw_src_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -53,8 +60,8 @@
  *  }}}
  */
 
-#ifndef _BW_SRC_H
-#define _BW_SRC_H
+#ifndef BW_SRC_H
+#define BW_SRC_H
 
 #include <bw_common.h>
 
@@ -65,13 +72,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_src_coeffs
  *  ```>>> */
-typedef struct _bw_src_coeffs bw_src_coeffs;
+typedef struct bw_src_coeffs bw_src_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_src_state
  *  ```>>> */
-typedef struct _bw_src_state bw_src_state;
+typedef struct bw_src_state bw_src_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -87,14 +94,14 @@ static inline void bw_src_init(bw_src_coeffs *BW_RESTRICT coeffs, float ratio);
  *
  *    #### bw_src_reset_state()
  *  ```>>> */
-static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, float x0);
+static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, float x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x0`.
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_src_process()
  *  ```>>> */
-static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, int *n_in_samples, int *n_out_samples);
+static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *n_in_samples, size_t *n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples` of the input buffer `x` and
  *    fills the output buffer `y` with at most `n_out_samples` using `coeffs`,
@@ -106,7 +113,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
  *
  *    #### bw_src_process_multi()
  *  ```>>> */
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int **n_in_samples, int **n_out_samples);
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t **n_in_samples, size_t **n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples[i]` of each input buffer `x[i]`
  *    and fills the corresponding output buffer `y[i]` with at most
@@ -134,7 +141,7 @@ static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs,
 extern "C" {
 #endif
 
-struct _bw_src_coeffs {
+struct bw_src_coeffs {
 	float	k;
 	float	a1;
 	float	a2;
@@ -145,7 +152,7 @@ struct _bw_src_coeffs {
 	float	b2;
 };
 
-struct _bw_src_state {
+struct bw_src_state {
 	float	i;
 	float	z1;
 	float	z2;
@@ -172,29 +179,29 @@ static inline void bw_src_init(bw_src_coeffs *BW_RESTRICT coeffs, float ratio) {
 	coeffs->a4 = k * (T * (T * (T * (T - 2.613125929752753f) + 3.414213562373095f) - 2.613125929752753f) + 1.f);
 }
 
-static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, float x0) {
+static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, float x_0) {
 	if (coeffs->k < 0) {
 		// DF-II
-		state->z1 = x0 / (1.f + coeffs->a1 + coeffs->a2 + coeffs->a3 + coeffs->a4);
+		state->z1 = x_0 / (1.f + coeffs->a1 + coeffs->a2 + coeffs->a3 + coeffs->a4);
 		state->z2 = state->z1;
 		state->z3 = state->z2;
 		state->z4 = state->z3;
 	} else {
 		// TDF-II
-		state->z4 = (coeffs->b0 - coeffs->a4) * x0;
-		state->z3 = (coeffs->b1 - coeffs->a3) * x0 + state->z4;
-		state->z2 = (coeffs->b2 - coeffs->a2) * x0 + state->z3;
-		state->z1 = (coeffs->b1 - coeffs->a1) * x0 + state->z2;
+		state->z4 = (coeffs->b0 - coeffs->a4) * x_0;
+		state->z3 = (coeffs->b1 - coeffs->a3) * x_0 + state->z4;
+		state->z2 = (coeffs->b2 - coeffs->a2) * x_0 + state->z3;
+		state->z1 = (coeffs->b1 - coeffs->a1) * x_0 + state->z2;
 	}
 	state->i = 0.f;
-	state->xz1 = x0;
-	state->xz2 = x0;
-	state->xz3 = x0;
+	state->xz1 = x_0;
+	state->xz2 = x_0;
+	state->xz3 = x_0;
 }
 
-static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, int *n_in_samples, int *n_out_samples) {
-	int i = 0;
-	int j = 0;
+static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *n_in_samples, size_t *n_out_samples) {
+	size_t i = 0;
+	size_t j = 0;
 	if (coeffs->k < 0) {
 		while (i < *n_in_samples && j < *n_out_samples) {
 			// DF-II
@@ -260,12 +267,86 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 	*n_out_samples = j;
 }
 
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int **n_in_samples, int **n_out_samples) {
-	for (int i = 0; i < n_channels; i++)
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t **n_in_samples, size_t **n_out_samples) {
+	for (size_t i = 0; i < n_channels; i++)
 		bw_src_process(coeffs, state[i], x[i], y[i], n_in_samples[i], n_out_samples[i]);
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::SRC
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class SRC {
+public:
+	SRC(float ratio);
+	
+	void reset(float x_0 = 0.f);
+	void process(
+		const float * const *x,
+		float **y,
+		size_t *nInSamples,
+		size_t *nOutSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		std::array<size_t *, N_CHANNELS> nInSamples,
+		std::array<size_t *, N_CHANNELS> nOutSamples);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_src_coeffs	 coeffs;
+	bw_src_state	 states[N_CHANNELS];
+	bw_src_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline SRC<N_CHANNELS>::SRC(float ratio) {
+	bw_src_init(&coeffs, ratio);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void SRC<N_CHANNELS>::reset(float x_0) {
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_src_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void SRC<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t *nInSamples,
+		size_t *nOutSamples) {
+	bw_src_process_multi(coeffs, statesP, x, y, N_CHANNELS, nInSamples, nOutSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void SRC<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		std::array<size_t *, N_CHANNELS> nInSamples,
+		std::array<size_t *, N_CHANNELS> nOutSamples) {
+	process(x.data(), y.data(), nInSamples.data(), nOutSamples.data());
+}
+
 }
 #endif
 

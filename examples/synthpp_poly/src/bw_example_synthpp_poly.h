@@ -24,7 +24,7 @@
 #include "platform.h"
 
 #include <bw_note_queue.h>
-#include <bwpp_phase_gen.h>
+#include <bw_phase_gen.h>
 #include <bw_osc_saw.h>
 #include <bw_osc_pulse.h>
 #include <bw_osc_tri.h>

@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_phase_gen.h>
+#include <bw_phase_gen.h>
 #include <bw_osc_pulse.h>
 #include <bw_osc_filt.h>
 #include <bwpp_svf.h>

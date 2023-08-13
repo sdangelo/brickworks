@@ -37,8 +37,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_peak_process()</code> and
+ *              <code>bw_peak_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -69,8 +76,8 @@
  *  }}}
  */
 
-#ifndef _BW_PEAK_H
-#define _BW_PEAK_H
+#ifndef BW_PEAK_H
+#define BW_PEAK_H
 
 #include <bw_common.h>
 
@@ -81,13 +88,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_peak_coeffs
  *  ```>>> */
-typedef struct _bw_peak_coeffs bw_peak_coeffs;
+typedef struct bw_peak_coeffs bw_peak_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_peak_state
  *  ```>>> */
-typedef struct _bw_peak_state bw_peak_state;
+typedef struct bw_peak_state bw_peak_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -111,10 +118,10 @@ static inline void bw_peak_reset_coeffs(bw_peak_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_peak_reset_state()
  *  ```>>> */
-static inline void bw_peak_reset_state(const bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, float x0);
+static inline void bw_peak_reset_state(const bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, float x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x0`.
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_peak_update_coeffs_ctrl()
  *  ```>>> */
@@ -137,7 +144,7 @@ static inline float bw_peak_process1(const bw_peak_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_peak_process()
  *  ```>>> */
-static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -145,7 +152,7 @@ static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_s
  *
  *    #### bw_peak_process_multi()
  *  ```>>> */
-static inline void bw_peak_process_multi(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_peak_process_multi(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -221,7 +228,7 @@ static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs,
 extern "C" {
 #endif
 
-struct _bw_peak_coeffs {
+struct bw_peak_coeffs {
 	// Sub-components
 	bw_mm2_coeffs	mm2_coeffs;
 
@@ -236,13 +243,13 @@ struct _bw_peak_coeffs {
 	int		param_changed;
 };
 
-struct _bw_peak_state {
+struct bw_peak_state {
 	bw_mm2_state	mm2_state;
 };
 
-#define _BW_PEAK_PARAM_PEAK_GAIN	1
-#define _BW_PEAK_PARAM_Q		(1<<1)
-#define _BW_PEAK_PARAM_BANDWIDTH	(1<<2)
+#define BW_PEAK_PARAM_PEAK_GAIN	1
+#define BW_PEAK_PARAM_Q		(1<<1)
+#define BW_PEAK_PARAM_BANDWIDTH	(1<<2)
 
 static inline void bw_peak_init(bw_peak_coeffs *BW_RESTRICT coeffs) {
 	bw_mm2_init(&coeffs->mm2_coeffs);
@@ -256,19 +263,19 @@ static inline void bw_peak_set_sample_rate(bw_peak_coeffs *BW_RESTRICT coeffs, f
 	bw_mm2_set_sample_rate(&coeffs->mm2_coeffs, sample_rate);
 }
 
-static inline void _bw_peak_update_mm2_params(bw_peak_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_peak_update_mm2_params(bw_peak_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->use_bandwidth) {
-			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_BANDWIDTH)) {
-				if (coeffs->param_changed & _BW_PEAK_PARAM_BANDWIDTH)
+			if (coeffs->param_changed & (BW_PEAK_PARAM_PEAK_GAIN | BW_PEAK_PARAM_BANDWIDTH)) {
+				if (coeffs->param_changed & BW_PEAK_PARAM_BANDWIDTH)
 					coeffs->bw_k = bw_pow2f(coeffs->bandwidth);
 				const float Q = bw_sqrtf(coeffs->bw_k * coeffs->peak_gain) * bw_rcpf(coeffs->bw_k - 1.f);
 				bw_mm2_set_Q(&coeffs->mm2_coeffs, Q);
 				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf(Q));
 			}
 		} else {
-			if (coeffs->param_changed & (_BW_PEAK_PARAM_PEAK_GAIN | _BW_PEAK_PARAM_Q)) {
-				if (coeffs->param_changed & _BW_PEAK_PARAM_Q)
+			if (coeffs->param_changed & (BW_PEAK_PARAM_PEAK_GAIN | BW_PEAK_PARAM_Q)) {
+				if (coeffs->param_changed & BW_PEAK_PARAM_Q)
 					bw_mm2_set_Q(&coeffs->mm2_coeffs, coeffs->Q);
 				bw_mm2_set_coeff_bp(&coeffs->mm2_coeffs, (coeffs->peak_gain - 1.f) * bw_rcpf(coeffs->Q));
 			}
@@ -279,16 +286,16 @@ static inline void _bw_peak_update_mm2_params(bw_peak_coeffs *BW_RESTRICT coeffs
 
 static inline void bw_peak_reset_coeffs(bw_peak_coeffs *BW_RESTRICT coeffs) {
 	coeffs->param_changed = ~0;
-	_bw_peak_update_mm2_params(coeffs);
+	bw_peak_update_mm2_params(coeffs);
 	bw_mm2_reset_coeffs(&coeffs->mm2_coeffs);
 }
 
-static inline void bw_peak_reset_state(const bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, float x0) {
-	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state, x0);
+static inline void bw_peak_reset_state(const bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, float x_0) {
+	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state, x_0);
 }
 
 static inline void bw_peak_update_coeffs_ctrl(bw_peak_coeffs *BW_RESTRICT coeffs) {
-	_bw_peak_update_mm2_params(coeffs);
+	bw_peak_update_mm2_params(coeffs);
 	bw_mm2_update_coeffs_ctrl(&coeffs->mm2_coeffs);
 }
 
@@ -300,19 +307,19 @@ static inline float bw_peak_process1(const bw_peak_coeffs *BW_RESTRICT coeffs, b
 	return bw_mm2_process1(&coeffs->mm2_coeffs, &state->mm2_state, x);
 }
 
-static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_peak_process(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_peak_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_peak_update_coeffs_audio(coeffs);
 		y[i] = bw_peak_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_peak_process_multi(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_peak_process_multi(bw_peak_coeffs *BW_RESTRICT coeffs, bw_peak_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_peak_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_peak_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_peak_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -324,14 +331,14 @@ static inline void bw_peak_set_cutoff(bw_peak_coeffs *BW_RESTRICT coeffs, float 
 static inline void bw_peak_set_Q(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->Q != value) {
 		coeffs->Q = value;
-		coeffs->param_changed |= _BW_PEAK_PARAM_Q;
+		coeffs->param_changed |= BW_PEAK_PARAM_Q;
 	}
 }
 
 static inline void bw_peak_set_peak_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->peak_gain != value) {
 		coeffs->peak_gain = value;
-		coeffs->param_changed |= _BW_PEAK_PARAM_PEAK_GAIN;
+		coeffs->param_changed |= BW_PEAK_PARAM_PEAK_GAIN;
 	}
 }
 
@@ -342,22 +349,136 @@ static inline void bw_peak_set_peak_gain_dB(bw_peak_coeffs *BW_RESTRICT coeffs, 
 static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->bandwidth != value) {
 		coeffs->bandwidth = value;
-		coeffs->param_changed |= _BW_PEAK_PARAM_BANDWIDTH;
+		coeffs->param_changed |= BW_PEAK_PARAM_BANDWIDTH;
 	}
 }
 
 static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, char value) {
 	if ((coeffs->use_bandwidth && !value) || (!coeffs->use_bandwidth && value)) {
 		coeffs->use_bandwidth = value;
-		coeffs->param_changed |= _BW_PEAK_PARAM_Q | _BW_PEAK_PARAM_BANDWIDTH;
+		coeffs->param_changed |= BW_PEAK_PARAM_Q | BW_PEAK_PARAM_BANDWIDTH;
 	}
 }
 
-#undef _BW_PEAK_PARAM_PEAK_GAIN
-#undef _BW_PEAK_PARAM_Q
-#undef _BW_PEAK_PARAM_BANDWIDTH
+#undef BW_PEAK_PARAM_PEAK_GAIN
+#undef BW_PEAK_PARAM_Q
+#undef BW_PEAK_PARAM_BANDWIDTH
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Peak
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Peak {
+public:
+	Peak();
+
+	void setSampleRate(float sampleRate);
+	void reset(float x_0 = 0.f);
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setCutoff(float value);
+	void setQ(float value);
+	void setPeakGainLin(float value);
+	void setPeakGainDB(float value);
+	void setBandwidth(float value);
+	void setUseBandwidth(bool value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_peak_coeffs	 coeffs;
+	bw_peak_state	 states[N_CHANNELS];
+	bw_peak_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline Peak<N_CHANNELS>::Peak() {
+	bw_peak_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_peak_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::reset(float x_0) {
+	bw_peak_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_peak_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_peak_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setCutoff(float value) {
+	bw_peak_set_cutoff(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setQ(float value) {
+	bw_peak_set_Q(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setPeakGainLin(float value) {
+	bw_peak_set_peak_gain_lin(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setPeakGainDB(float value) {
+	bw_peak_set_peak_gain_dB(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setBandwidth(float value) {
+	bw_peak_set_bandwidth(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void Peak<N_CHANNELS>::setUseBandwidth(bool value) {
+	bw_peak_set_use_bandwidth(&coeffs, value);
+}
+
 }
 #endif
 

@@ -25,7 +25,7 @@
 
 #include <bw_ls2.h>
 #include <bw_hs2.h>
-#include <bwpp_peak.h>
+#include <bw_peak.h>
 
 using namespace Brickworks;
 

@@ -307,10 +307,10 @@ inline void Notch<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void Notch<N_CHANNELS>::reset(float x0) {
+inline void Notch<N_CHANNELS>::reset(float x_0) {
 	bw_notch_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_notch_reset_state(&coeffs, states + i, x0);
+		bw_notch_reset_state(&coeffs, states + i, x_0);
 }
 
 template<size_t N_CHANNELS>

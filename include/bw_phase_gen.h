@@ -31,8 +31,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_phase_gen_process()</code> and
+ *              <code>bw_phase_gen_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -71,8 +78,8 @@
  *  }}}
  */
 
-#ifndef _BW_PHASE_GEN_H
-#define _BW_PHASE_GEN_H
+#ifndef BW_PHASE_GEN_H
+#define BW_PHASE_GEN_H
 
 #include <bw_common.h>
 
@@ -83,13 +90,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_phase_gen_coeffs
  *  ```>>> */
-typedef struct _bw_phase_gen_coeffs bw_phase_gen_coeffs;
+typedef struct bw_phase_gen_coeffs bw_phase_gen_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_phase_gen_state
  *  ```>>> */
-typedef struct _bw_phase_gen_state bw_phase_gen_state;
+typedef struct bw_phase_gen_state bw_phase_gen_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -146,7 +153,7 @@ static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTR
  *
  *    #### bw_phase_gen_process()
  *  ```>>> */
-static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float *y, float *y_phase_inc, int n_samples);
+static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float *y, float *y_phase_inc, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y`, while
  *    using and updating both `coeffs` and `state` (control and audio rate).
@@ -158,7 +165,7 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_phase_gen_process_multi()
  *  ```>>> */
-static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state **BW_RESTRICT state, const float **x_mod, float **y, float **y_phase_inc, int n_channels, int n_samples);
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float **y, float **y_phase_inc, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y`, while using and updating both the common `coeffs` and each of
@@ -204,7 +211,7 @@ static inline void bw_phase_gen_set_portamento_tau(bw_phase_gen_coeffs *BW_RESTR
 extern "C" {
 #endif
 
-struct _bw_phase_gen_coeffs {
+struct bw_phase_gen_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	portamento_coeffs;
 	bw_one_pole_state	portamento_state;
@@ -219,7 +226,7 @@ struct _bw_phase_gen_coeffs {
 	float			frequency_prev;
 };
 
-struct _bw_phase_gen_state {
+struct bw_phase_gen_state {
 	float	phase;
 };
 
@@ -233,7 +240,7 @@ static inline void bw_phase_gen_set_sample_rate(bw_phase_gen_coeffs *BW_RESTRICT
 	coeffs->T = 1.f / sample_rate;
 }
 
-static inline void _bw_phase_gen_do_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_RESTRICT coeffs, char force) {
+static inline void bw_phase_gen_do_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_RESTRICT coeffs, char force) {
 	bw_one_pole_update_coeffs_ctrl(&coeffs->portamento_coeffs);
 	if (force || coeffs->frequency != coeffs->frequency_prev) {
 		coeffs->portamento_target = coeffs->T * coeffs->frequency;
@@ -242,7 +249,7 @@ static inline void _bw_phase_gen_do_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_R
 }
 
 static inline void bw_phase_gen_reset_coeffs(bw_phase_gen_coeffs *BW_RESTRICT coeffs) {
-	_bw_phase_gen_do_update_coeffs_ctrl(coeffs, 1);
+	bw_phase_gen_do_update_coeffs_ctrl(coeffs, 1);
 	bw_one_pole_reset_coeffs(&coeffs->portamento_coeffs);
 	bw_one_pole_reset_state(&coeffs->portamento_coeffs, &coeffs->portamento_state, coeffs->portamento_target);
 }
@@ -253,7 +260,7 @@ static inline void bw_phase_gen_reset_state(const bw_phase_gen_coeffs *BW_RESTRI
 }
 
 static inline void bw_phase_gen_update_coeffs_ctrl(bw_phase_gen_coeffs *BW_RESTRICT coeffs) {
-	_bw_phase_gen_do_update_coeffs_ctrl(coeffs, 0);
+	bw_phase_gen_do_update_coeffs_ctrl(coeffs, 0);
 }
 
 static inline void bw_phase_gen_update_coeffs_audio(bw_phase_gen_coeffs *BW_RESTRICT coeffs) {
@@ -276,29 +283,29 @@ static inline void bw_phase_gen_process1_mod(const bw_phase_gen_coeffs *BW_RESTR
 	*y = _bw_phase_gen_update_phase(state, *y_phase_inc);
 }
 
-static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float* y, float *y_phase_inc, int n_samples) {
+static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT state, const float *x_mod, float* y, float *y_phase_inc, size_t n_samples) {
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (x_mod != NULL) {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, y_phase_inc + i);
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v_phase_inc;
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, &v_phase_inc);
 				}
 		} else {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					bw_phase_gen_process1(coeffs, state, y + i, y_phase_inc + i);
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v_phase_inc;
 					bw_phase_gen_process1(coeffs, state, y + i, &v_phase_inc);
@@ -307,26 +314,26 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
 	} else {
 		if (x_mod != NULL) {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v;
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], &v, y_phase_inc + i);
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v, v_phase_inc;
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], &v, &v_phase_inc);
 				}
 		} else {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v;
 					bw_phase_gen_process1(coeffs, state, &v, y_phase_inc + i);
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v, v_phase_inc;
 					bw_phase_gen_process1(coeffs, state, &v, &v_phase_inc);
@@ -335,14 +342,14 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
 	}
 }
 
-static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state **BW_RESTRICT state, const float **x_mod, float **y, float **y_phase_inc, int n_channels, int n_samples) {
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float **y, float **y_phase_inc, size_t n_channels, size_t n_samples) {
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (x_mod != NULL) {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						if (x_mod[j])
 							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
@@ -355,9 +362,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 					}
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						if (x_mod[j])
 							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
@@ -369,9 +376,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 				}
 		} else {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
 						if (y[j])
@@ -381,9 +388,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 					}
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
 						if (y[j])
@@ -394,9 +401,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 	} else {
 		if (x_mod != NULL) {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						if (x_mod[j])
 							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
@@ -407,9 +414,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 					}
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						if (x_mod[j])
 							bw_phase_gen_process1_mod(coeffs, state[j], x_mod[j][i], &v, &v_phase_inc);
@@ -419,9 +426,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 				}
 		} else {
 			if (y_phase_inc != NULL)
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
 						if (y_phase_inc[j])
@@ -429,9 +436,9 @@ static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT c
 					}
 				}
 			else
-				for (int i = 0; i < n_samples; i++) {
+				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
-					for (int j = 0; j < n_channels; j++) {
+					for (size_t j = 0; j < n_channels; j++) {
 						float v, v_phase_inc;
 						bw_phase_gen_process1(coeffs, state[j], &v, &v_phase_inc);
 					}
@@ -449,6 +456,100 @@ static inline void bw_phase_gen_set_portamento_tau(bw_phase_gen_coeffs *BW_RESTR
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::PhaseGen
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class PhaseGen {
+public:
+	PhaseGen();
+
+	void setSampleRate(float sampleRate);
+	void reset(float phase_0 = 0.f);
+	void process(
+		const float * const *x_mod,
+		float **y,
+		float **y_phase_inc,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x_mod,
+		std::array<float *, N_CHANNELS> y,
+		std::array<float *, N_CHANNELS> y_phase_inc,
+		size_t nSamples);
+
+	void setFrequency(float value);
+	void setPortamentoTau(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_phase_gen_coeffs	 coeffs;
+	bw_phase_gen_state	 states[N_CHANNELS];
+	bw_phase_gen_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline PhaseGen<N_CHANNELS>::PhaseGen() {
+	bw_phase_gen_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void PhaseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_phase_gen_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void PhaseGen<N_CHANNELS>::reset(float phase_0) {
+	bw_phase_gen_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_phase_gen_reset_state(&coeffs, states + i, phase_0);
+}
+
+template<size_t N_CHANNELS>
+inline void PhaseGen<N_CHANNELS>::process(
+		const float * const *x_mod,
+		float **y,
+		float **y_phase_inc,
+		size_t nSamples) {
+	bw_phase_gen_process_multi(&coeffs, statesP, x_mod, y, y_phase_inc, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void PhaseGen<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x_mod,
+		std::array<float *, N_CHANNELS> y,
+		std::array<float *, N_CHANNELS> y_phase_inc,
+		size_t nSamples) {
+	process(x_mod.data(), y.data(), y_phase_inc.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void PhaseGen<N_CHANNELS>::setFrequency(float value) {
+	bw_phase_gen_set_frequency(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void PhaseGen<N_CHANNELS>::setPortamentoTau(float value) {
+	bw_phase_gen_set_portamento_tau(&coeffs, value);
+}
+
 }
 #endif
 

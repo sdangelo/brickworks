@@ -33,8 +33,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_osc_pulse_process()</code> and
+ *              <code>bw_osc_pulse_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -67,8 +74,8 @@
  *  }}}
  */
 
-#ifndef _BW_OSC_PULSE_H
-#define _BW_OSC_PULSE_H
+#ifndef BW_OSC_PULSE_H
+#define BW_OSC_PULSE_H
 
 #include <bw_common.h>
 
@@ -79,7 +86,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_pulse_coeffs
  *  ```>>> */
-typedef struct _bw_osc_pulse_coeffs bw_osc_pulse_coeffs;
+typedef struct bw_osc_pulse_coeffs bw_osc_pulse_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -129,7 +136,7 @@ static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *B
  *
  *    #### bw_osc_pulse_process()
  *  ```>>> */
-static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples);
+static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
@@ -140,7 +147,7 @@ static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_osc_pulse_process_multi()
  *  ```>>> */
-static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples);
+static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -186,7 +193,7 @@ static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT
 extern "C" {
 #endif
 
-struct _bw_osc_pulse_coeffs {
+struct bw_osc_pulse_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_state;
@@ -226,7 +233,7 @@ static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT
 }
 
 // PolyBLEP residual based on Parzen window (4th-order B-spline), one-sided (x in [0, 2])
-static inline float _bw_osc_pulse_blep_diff(float x) {
+static inline float bw_osc_pulse_blep_diff(float x) {
 	return x < 1.f
 		? x * ((0.25f * x - 0.6666666666666666f) * x * x + 1.333333333333333f) - 1.f
 		: x * (x * ((0.6666666666666666f - 0.08333333333333333f * x) * x - 2.f) + 2.666666666666667f) - 1.333333333333333f;
@@ -243,41 +250,41 @@ static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *B
 		const float s_1_m_phase = 1.f - x;
 		const float s_1_m_phase_2 = 1.f - phase_2;
 		if (s_1_m_phase < phase_inc_2)
-			v -= _bw_osc_pulse_blep_diff(s_1_m_phase * phase_inc_rcp);
+			v -= bw_osc_pulse_blep_diff(s_1_m_phase * phase_inc_rcp);
 		if (s_1_m_phase_2 < phase_inc_2)
-			v += _bw_osc_pulse_blep_diff(s_1_m_phase_2 * phase_inc_rcp);
+			v += bw_osc_pulse_blep_diff(s_1_m_phase_2 * phase_inc_rcp);
 		if (x < phase_inc_2)
-			v += _bw_osc_pulse_blep_diff(x * phase_inc_rcp);
+			v += bw_osc_pulse_blep_diff(x * phase_inc_rcp);
 		if (phase_2 < phase_inc_2)
-			v -= _bw_osc_pulse_blep_diff(phase_2 * phase_inc_rcp);
+			v -= bw_osc_pulse_blep_diff(phase_2 * phase_inc_rcp);
 	}
 	return v;
 }
 
-static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples) {
+static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, size_t n_samples) {
 	if (coeffs->antialiasing)
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
 			y[i] = bw_osc_pulse_process1_antialias(coeffs, x[i], x_phase_inc[i]);
 		}
 	else
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
 			y[i] = bw_osc_pulse_process1(coeffs, x[i]);
 		}
 }
 
-static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples) {
+static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples) {
 	if (coeffs->antialiasing)
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
-			for (int j = 0; j < n_channels; j++)
+			for (size_t j = 0; j < n_channels; j++)
 				y[j][i] = bw_osc_pulse_process1_antialias(coeffs, x[j][i], x_phase_inc[j][i]);
 		}
 	else
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
-			for (int j = 0; j < n_channels; j++)
+			for (size_t j = 0; j < n_channels; j++)
 				y[j][i] = bw_osc_pulse_process1(coeffs, x[j][i]);
 		}
 }
@@ -291,6 +298,94 @@ static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::OscPulse
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class OscPulse {
+public:
+	OscPulse();
+	
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		const float * const *x_phase_inc,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<const float *, N_CHANNELS> x_phase_inc,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+	
+	void setAntialiasing(bool value);
+	void setPulseWidth(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_osc_pulse_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline OscPulse<N_CHANNELS>::OscPulse() {
+	bw_osc_pulse_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void OscPulse<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_osc_pulse_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void OscPulse<N_CHANNELS>::reset() {
+	bw_osc_pulse_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void OscPulse<N_CHANNELS>::process(
+		const float * const *x,
+		const float * const *x_phase_inc,
+		float **y,
+		size_t nSamples) {
+	bw_osc_pulse_process_multi(&coeffs, x, x_phase_inc, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void OscPulse<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<const float *, N_CHANNELS> x_phase_inc,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), x_phase_inc.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void OscPulse<N_CHANNELS>::setAntialiasing(bool value) {
+	bw_osc_pulse_set_antialiasing(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void OscPulse<N_CHANNELS>::setPulseWidth(float value) {
+	bw_osc_pulse_set_pulse_width(&coeffs, value);
+}
+
 }
 #endif
 

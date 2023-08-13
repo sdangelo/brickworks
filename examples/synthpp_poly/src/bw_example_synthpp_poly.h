@@ -25,11 +25,11 @@
 
 #include <bw_note_queue.h>
 #include <bwpp_phase_gen.h>
-#include <bwpp_osc_saw.h>
-#include <bwpp_osc_pulse.h>
-#include <bwpp_osc_tri.h>
-#include <bwpp_osc_sin.h>
-#include <bwpp_osc_filt.h>
+#include <bw_osc_saw.h>
+#include <bw_osc_pulse.h>
+#include <bw_osc_tri.h>
+#include <bw_osc_sin.h>
+#include <bw_osc_filt.h>
 #include <bw_noise_gen.h>
 #include <bwpp_pink_filt.h>
 #include <bwpp_svf.h>

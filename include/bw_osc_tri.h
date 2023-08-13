@@ -33,8 +33,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_osc_tri_process()</code> and
+ *              <code>bw_osc_tri_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -69,8 +76,8 @@
  *  }}}
  */
 
-#ifndef _BW_OSC_TRI_H
-#define _BW_OSC_TRI_H
+#ifndef BW_OSC_TRI_H
+#define BW_OSC_TRI_H
 
 #include <bw_common.h>
 
@@ -81,7 +88,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_tri_coeffs
  *  ```>>> */
-typedef struct _bw_osc_tri_coeffs bw_osc_tri_coeffs;
+typedef struct bw_osc_tri_coeffs bw_osc_tri_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
@@ -131,7 +138,7 @@ static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RE
  *
  *    #### bw_osc_tri_process()
  *  ```>>> */
-static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples);
+static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
@@ -142,7 +149,7 @@ static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_osc_tri_process_multi()
  *  ```>>> */
-static inline void bw_osc_tri_process_multi(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples);
+static inline void bw_osc_tri_process_multi(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -188,7 +195,7 @@ static inline void bw_osc_tri_set_slope(bw_osc_tri_coeffs *BW_RESTRICT coeffs, f
 extern "C" {
 #endif
 
-struct _bw_osc_tri_coeffs {
+struct bw_osc_tri_coeffs {
 	// Sub-components
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_state;
@@ -229,7 +236,7 @@ static inline float bw_osc_tri_process1(const bw_osc_tri_coeffs *BW_RESTRICT coe
 }
 
 // PolyBLAMP residual based on Parzen window (4th-order B-spline), one-sided (x in [0, 2])
-static inline float _bw_osc_tri_blamp_diff(float x) {
+static inline float bw_osc_tri_blamp_diff(float x) {
 	return x < 1.f
 		? x * (x * ((0.05f * x - 0.1666666666666667f) * x * x + 0.6666666666666666f) - 1.0f) + 0.4666666666666667f
 		: x * (x * (x * ((0.1666666666666667f - 0.01666666666666667f * x) * x - 0.6666666666666666f) + 1.333333333333333f) - 1.333333333333333f) + 0.5333333333333333f;
@@ -250,42 +257,42 @@ static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RE
 		const float s_1_m_phase_2 = 1.f - phase_2;
 		float blamp = 0.f;
 		if (s_1_m_phase_2 < phase_inc_2)
-			blamp += _bw_osc_tri_blamp_diff(s_1_m_phase_2 * phase_inc_rcp);
+			blamp += bw_osc_tri_blamp_diff(s_1_m_phase_2 * phase_inc_rcp);
 		if (s_1_m_phase < phase_inc_2)
-			blamp -= _bw_osc_tri_blamp_diff(s_1_m_phase * phase_inc_rcp);
+			blamp -= bw_osc_tri_blamp_diff(s_1_m_phase * phase_inc_rcp);
 		if (x < phase_inc_2)
-			blamp -= _bw_osc_tri_blamp_diff(x * phase_inc_rcp);
+			blamp -= bw_osc_tri_blamp_diff(x * phase_inc_rcp);
 		if (phase_2 < phase_inc_2)
-			blamp += _bw_osc_tri_blamp_diff(phase_2 * phase_inc_rcp);
+			blamp += bw_osc_tri_blamp_diff(phase_2 * phase_inc_rcp);
 		v -= bw_rcpf(slope * s_1_m_pw) * bw_absf(x_phase_inc) * blamp;
 	}
 	return v;
 }
 
-static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, int n_samples) {
+static inline void bw_osc_tri_process(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, size_t n_samples) {
 	if (coeffs->antialiasing)
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_tri_update_coeffs_audio(coeffs);
 			y[i] = bw_osc_tri_process1_antialias(coeffs, x[i], x_phase_inc[i]);
 		}
 	else
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_tri_update_coeffs_audio(coeffs);
 			y[i] = bw_osc_tri_process1(coeffs, x[i]);
 		}
 }
 
-static inline void bw_osc_tri_process_multi(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float **x, const float **x_phase_inc, float **y, int n_channels, int n_samples) {
+static inline void bw_osc_tri_process_multi(bw_osc_tri_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float **y, size_t n_channels, size_t n_samples) {
 	if (coeffs->antialiasing)
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_tri_update_coeffs_audio(coeffs);
-			for (int j = 0; j < n_channels; j++)
+			for (size_t j = 0; j < n_channels; j++)
 				y[j][i] = bw_osc_tri_process1_antialias(coeffs, x[j][i], x_phase_inc[j][i]);
 		}
 	else
-		for (int i = 0; i < n_samples; i++) {
+		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_tri_update_coeffs_audio(coeffs);
-			for (int j = 0; j < n_channels; j++)
+			for (size_t j = 0; j < n_channels; j++)
 				y[j][i] = bw_osc_tri_process1(coeffs, x[j][i]);
 		}
 }
@@ -299,6 +306,94 @@ static inline void bw_osc_tri_set_slope(bw_osc_tri_coeffs *BW_RESTRICT coeffs, f
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::OscTri
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class OscTri {
+public:
+	OscTri();
+	
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		const float * const *x_phase_inc,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<const float *, N_CHANNELS> x_phase_inc,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+	
+	void setAntialiasing(bool value);
+	void setSlope(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_osc_tri_coeffs	 coeffs;
+};
+
+template<size_t N_CHANNELS>
+inline OscTri<N_CHANNELS>::OscTri() {
+	bw_osc_tri_init(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void OscTri<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_osc_tri_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void OscTri<N_CHANNELS>::reset() {
+	bw_osc_tri_reset_coeffs(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline void OscTri<N_CHANNELS>::process(
+		const float * const *x,
+		const float * const *x_phase_inc,
+		float **y,
+		size_t nSamples) {
+	bw_osc_tri_process_multi(&coeffs, x, x_phase_inc, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void OscTri<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<const float *, N_CHANNELS> x_phase_inc,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), x_phase_inc.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void OscTri<N_CHANNELS>::setAntialiasing(bool value) {
+	bw_osc_tri_set_antialiasing(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void OscTri<N_CHANNELS>::setSlope(float value) {
+	bw_osc_tri_set_slope(&coeffs, value);
+}
+
 }
 #endif
 

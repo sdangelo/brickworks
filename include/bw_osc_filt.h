@@ -35,8 +35,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_osc_filt_process()</code> and
+ *              <code>bw_osc_filt_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -64,8 +71,8 @@
  *  }}}
  */
 
-#ifndef _BW_OSC_FILT_H
-#define _BW_OSC_FILT_H
+#ifndef BW_OSC_FILT_H
+#define BW_OSC_FILT_H
 
 #include <bw_common.h>
 
@@ -76,7 +83,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_filt_state
  *  ```>>> */
-typedef struct _bw_osc_filt_state bw_osc_filt_state;
+typedef struct bw_osc_filt_state bw_osc_filt_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -95,7 +102,7 @@ static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, f
  *
  *    #### bw_osc_filt_process()
  *  ```>>> */
-static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
@@ -103,7 +110,7 @@ static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, con
  *
  *    #### bw_osc_filt_process_multi()
  *  ```>>> */
-static inline void bw_osc_filt_process_multi(bw_osc_filt_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_osc_filt_process_multi(bw_osc_filt_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -123,7 +130,7 @@ static inline void bw_osc_filt_process_multi(bw_osc_filt_state **BW_RESTRICT sta
 extern "C" {
 #endif
 
-struct _bw_osc_filt_state {
+struct bw_osc_filt_state {
 	float	x_z1;
 	float	y_z1;
 };
@@ -140,17 +147,85 @@ static inline float bw_osc_filt_process1(bw_osc_filt_state *BW_RESTRICT state, f
 	return y;
 }
 
-static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
-	for (int i = 0; i < n_samples; i++)
+static inline void bw_osc_filt_process(bw_osc_filt_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
+	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_osc_filt_process1(state, x[i]);
 }
 
-static inline void bw_osc_filt_process_multi(bw_osc_filt_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
-	for (int i = 0; i < n_channels; i++)
+static inline void bw_osc_filt_process_multi(bw_osc_filt_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+	for (size_t i = 0; i < n_channels; i++)
 		bw_osc_filt_process(state[i], x[i], y[i], n_samples);
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::OscFilt
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class OscFilt {
+public:
+	OscFilt();
+	
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_osc_filt_state	 states[N_CHANNELS];
+	bw_osc_filt_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline OscFilt<N_CHANNELS>::OscFilt() {
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void OscFilt<N_CHANNELS>::reset() {
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_osc_filt_reset_state(states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void OscFilt<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_osc_filt_process_multi(statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void OscFilt<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
 }
 #endif
 

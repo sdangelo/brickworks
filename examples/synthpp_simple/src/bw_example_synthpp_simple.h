@@ -24,8 +24,8 @@
 #include "platform.h"
 
 #include <bwpp_phase_gen.h>
-#include <bwpp_osc_pulse.h>
-#include <bwpp_osc_filt.h>
+#include <bw_osc_pulse.h>
+#include <bw_osc_filt.h>
 #include <bwpp_svf.h>
 #include <bw_env_gen.h>
 #include <bw_gain.h>

@@ -32,8 +32,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_osc_sin_process()</code> and
+ *              <code>bw_osc_sin_process_multi()</code> now use
+ *              <code>size_t</code> to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>oscSinProcess()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -61,8 +68,8 @@
  *  }}}
  */
 
-#ifndef _BW_OSC_SIN_H
-#define _BW_OSC_SIN_H
+#ifndef BW_OSC_SIN_H
+#define BW_OSC_SIN_H
 
 #include <bw_common.h>
 
@@ -81,7 +88,7 @@ static inline float bw_osc_sin_process1(float x);
  *
  *    #### bw_osc_sin_process()
  *  ```>>> */
-static inline void bw_osc_sin_process(const float *x, float *y, int n_samples);
+static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
@@ -89,7 +96,7 @@ static inline void bw_osc_sin_process(const float *x, float *y, int n_samples);
  *
  *    #### bw_osc_sin_process_multi()
  *  ```>>> */
-static inline void bw_osc_sin_process_multi(const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_osc_sin_process_multi(const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -115,17 +122,63 @@ static inline float bw_osc_sin_process1(float x) {
 	return bw_sin2pif(x);
 }
 
-static inline void bw_osc_sin_process(const float *x, float *y, int n_samples) {
-	for (int i = 0; i < n_samples; i++)
+static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples) {
+	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_osc_sin_process1(x[i]);
 }
 
-static inline void bw_osc_sin_process_multi(const float **x, float **y, int n_channels, int n_samples) {
-	for (int i = 0; i < n_channels; i++)
+static inline void bw_osc_sin_process_multi(const float * const *x, float **y, size_t n_channels, size_t n_samples) {
+	for (size_t i = 0; i < n_channels; i++)
 		bw_osc_sin_process(x[i], y[i], n_samples);
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::oscSinProcess
+ *  ```>>> */
+template<size_t N_CHANNELS>
+void oscSinProcess(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+
+template<size_t N_CHANNELS>
+void oscSinProcess(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+/*! <<<```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+template<size_t N_CHANNELS>
+inline void oscSinProcess(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_osc_sin_process_multi(x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void oscSinProcess(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	oscSinProcess<N_CHANNELS>(x.data(), y.data(), nSamples);
+}
+
 }
 #endif
 

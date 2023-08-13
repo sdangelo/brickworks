@@ -26,7 +26,7 @@
 #include <bw_phase_gen.h>
 #include <bw_osc_pulse.h>
 #include <bw_osc_filt.h>
-#include <bwpp_svf.h>
+#include <bw_svf.h>
 #include <bw_env_gen.h>
 #include <bw_gain.h>
 #include <bw_ppm.h>

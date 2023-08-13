@@ -1,11 +1,6 @@
 1.0.0
 -----
 
-in progress:
-* merge c++ code into c headers
-* revise typedef style (see https://stackoverflow.com/questions/54752861/using-an-anonymous-struct-vs-a-named-struct-with-typedef)
-* var names xy -> x_y
-* don't use reserved identifiers (https://devblogs.microsoft.com/oldnewthing/20230109-00/?p=107685)
 code:
 * debugging
 * check all examples again

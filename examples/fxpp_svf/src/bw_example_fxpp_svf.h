@@ -23,7 +23,7 @@
 
 #include "platform.h"
 
-#include <bwpp_svf.h>
+#include <bw_svf.h>
 
 using namespace Brickworks;
 

@@ -31,8 +31,15 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Now using <code>size_t</code> instead of
- *              <code>BW_SIZE_T</code>.</li>
+ *          <li><code>bw_wah_process()</code> and
+ *              <code>bw_wah_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
+ *          <li>Added more <code>const</code> specifiers to input
+ *              arguments.</li>
+ *          <li>Moved C++ code to C header.</li>
+ *          <li>Added overladed C++ <code>process()</code> function taking
+ *              C-style arrays as arguments.</li>
+ *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -69,8 +76,8 @@
  *  }}}
  */
 
-#ifndef _BW_WAH_H
-#define _BW_WAH_H
+#ifndef BW_WAH_H
+#define BW_WAH_H
 
 #include <bw_common.h>
 
@@ -81,13 +88,13 @@ extern "C" {
 /*! api {{{
  *    #### bw_wah_coeffs
  *  ```>>> */
-typedef struct _bw_wah_coeffs bw_wah_coeffs;
+typedef struct bw_wah_coeffs bw_wah_coeffs;
 /*! <<<```
  *    Coefficients and related.
  *
  *    #### bw_wah_state
  *  ```>>> */
-typedef struct _bw_wah_state bw_wah_state;
+typedef struct bw_wah_state bw_wah_state;
 /*! <<<```
  *    Internal state and related.
  *
@@ -136,7 +143,7 @@ static inline float bw_wah_process1(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_
  *
  *    #### bw_wah_process()
  *  ```>>> */
-static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, int n_samples);
+static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -144,7 +151,7 @@ static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_stat
  *
  *    #### bw_wah_process_multi()
  *  ```>>> */
-static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples);
+static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -176,12 +183,12 @@ static inline void bw_wah_set_wah(bw_wah_coeffs *BW_RESTRICT coeffs, float value
 extern "C" {
 #endif
 
-struct _bw_wah_coeffs {
+struct bw_wah_coeffs {
 	// Sub-components
 	bw_svf_coeffs	svf_coeffs;
 };
 
-struct _bw_wah_state {
+struct bw_wah_state {
 	// Sub-components
 	bw_svf_state	svf_state;
 };
@@ -218,19 +225,19 @@ static inline float bw_wah_process1(const bw_wah_coeffs *BW_RESTRICT coeffs, bw_
 	return v_bp;
 }
 
-static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, int n_samples) {
+static inline void bw_wah_process(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
 	bw_wah_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_wah_update_coeffs_audio(coeffs);
 		y[i] = bw_wah_process1(coeffs, state, x[i]);
 	}
 }
 
-static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state **BW_RESTRICT state, const float **x, float **y, int n_channels, int n_samples) {
+static inline void bw_wah_process_multi(bw_wah_coeffs *BW_RESTRICT coeffs, bw_wah_state * const *BW_RESTRICT state, const float * const *x, float **y, size_t n_channels, size_t n_samples) {
 	bw_wah_update_coeffs_ctrl(coeffs);
-	for (int i = 0; i < n_samples; i++) {
+	for (size_t i = 0; i < n_samples; i++) {
 		bw_wah_update_coeffs_audio(coeffs);
-		for (int j = 0; j < n_channels; j++)
+		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_wah_process1(coeffs, state[j], x[j][i]);
 	}
 }
@@ -240,6 +247,90 @@ static inline void bw_wah_set_wah(bw_wah_coeffs *BW_RESTRICT coeffs, float value
 }
 
 #ifdef __cplusplus
+}
+
+#include <array>
+
+namespace Brickworks {
+
+/*** Public C++ API ***/
+
+/*! api_cpp {{{
+ *    ##### Brickworks::Wah
+ *  ```>>> */
+template<size_t N_CHANNELS>
+class Wah {
+public:
+	Wah();
+
+	void setSampleRate(float sampleRate);
+	void reset();
+	void process(
+		const float * const *x,
+		float **y,
+		size_t nSamples);
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples);
+
+	void setWah(float value);
+/*! <<<...
+ *  }
+ *  ```
+ *  }}} */
+
+/*** Implementation ***/
+
+/* WARNING: This part of the file is not part of the public API. Its content may
+ * change at any time in future versions. Please, do not use it directly. */
+
+private:
+	bw_wah_coeffs	 coeffs;
+	bw_wah_state	 states[N_CHANNELS];
+	bw_wah_state	*statesP[N_CHANNELS];
+};
+
+template<size_t N_CHANNELS>
+inline Wah<N_CHANNELS>::Wah() {
+	bw_wah_init(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		statesP[i] = states + i;
+}
+
+template<size_t N_CHANNELS>
+inline void Wah<N_CHANNELS>::setSampleRate(float sampleRate) {
+	bw_wah_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
+inline void Wah<N_CHANNELS>::reset() {
+	bw_wah_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_wah_reset_state(&coeffs, states + i);
+}
+
+template<size_t N_CHANNELS>
+inline void Wah<N_CHANNELS>::process(
+		const float * const *x,
+		float **y,
+		size_t nSamples) {
+	bw_wah_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Wah<N_CHANNELS>::process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS> y,
+		size_t nSamples) {
+	process(x.data(), y.data(), nSamples);
+}
+
+template<size_t N_CHANNELS>
+inline void Wah<N_CHANNELS>::setWah(float value) {
+	bw_wah_set_wah(&coeffs, value);
+}
+
 }
 #endif
 

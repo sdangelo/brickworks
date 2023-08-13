@@ -32,7 +32,7 @@
 #include <bw_osc_filt.h>
 #include <bw_noise_gen.h>
 #include <bw_pink_filt.h>
-#include <bwpp_svf.h>
+#include <bw_svf.h>
 #include <bw_env_gen.h>
 #include <bw_gain.h>
 #include <bw_ppm.h>

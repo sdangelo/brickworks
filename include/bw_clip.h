@@ -40,9 +40,9 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li><code>bw_chorus_process()</code> and
- *              <code>bw_chorus_process_multi()</code> now use
- *              <code>size_t</code> to count samples and channels.</li>
+ *          <li><code>bw_clip_process()</code> and
+ *              <code>bw_clip_process_multi()</code> now use <code>size_t</code>
+ *              to count samples and channels.</li>
  *          <li>Added more <code>const</code> specifiers to input
  *              arguments.</li>
  *          <li>Moved C++ code to C header.</li>

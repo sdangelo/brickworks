@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 1.0.0 }}}
  *  requires {{{
- *    bw_common bw_math bw_one_pole bw_osc_sin bw_phase_gen bw_ringmod
+ *    bw_common bw_math bw_one_pole bw_osc_sin bw_phase_gen bw_ring_mod
  *  }}}
  *  description {{{
  *    Tremolo with variable speed and amount.
@@ -173,7 +173,7 @@ static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float 
 
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
-#include <bw_ringmod.h>
+#include <bw_ring_mod.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,7 +182,7 @@ extern "C" {
 struct bw_trem_coeffs {
 	// Sub-components
 	bw_phase_gen_coeffs	phase_gen_coeffs;
-	bw_ringmod_coeffs	ringmod_coeffs;
+	bw_ring_mod_coeffs	ring_mod_coeffs;
 };
 
 struct bw_trem_state {
@@ -191,17 +191,17 @@ struct bw_trem_state {
 
 static inline void bw_trem_init(bw_trem_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_init(&coeffs->phase_gen_coeffs);
-	bw_ringmod_init(&coeffs->ringmod_coeffs);
+	bw_ring_mod_init(&coeffs->ring_mod_coeffs);
 }
 
 static inline void bw_trem_set_sample_rate(bw_trem_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_phase_gen_set_sample_rate(&coeffs->phase_gen_coeffs, sample_rate);
-	bw_ringmod_set_sample_rate(&coeffs->ringmod_coeffs, sample_rate);
+	bw_ring_mod_set_sample_rate(&coeffs->ring_mod_coeffs, sample_rate);
 }
 
 static inline void bw_trem_reset_coeffs(bw_trem_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_reset_coeffs(&coeffs->phase_gen_coeffs);
-	bw_ringmod_reset_coeffs(&coeffs->ringmod_coeffs);
+	bw_ring_mod_reset_coeffs(&coeffs->ring_mod_coeffs);
 }
 
 static inline void bw_trem_reset_state(const bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state) {
@@ -210,19 +210,19 @@ static inline void bw_trem_reset_state(const bw_trem_coeffs *BW_RESTRICT coeffs,
 
 static inline void bw_trem_update_coeffs_ctrl(bw_trem_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_update_coeffs_ctrl(&coeffs->phase_gen_coeffs);
-	bw_ringmod_update_coeffs_ctrl(&coeffs->ringmod_coeffs);
+	bw_ring_mod_update_coeffs_ctrl(&coeffs->ring_mod_coeffs);
 }
 
 static inline void bw_trem_update_coeffs_audio(bw_trem_coeffs *BW_RESTRICT coeffs) {
 	bw_phase_gen_update_coeffs_audio(&coeffs->phase_gen_coeffs);
-	bw_ringmod_update_coeffs_audio(&coeffs->ringmod_coeffs);
+	bw_ring_mod_update_coeffs_audio(&coeffs->ring_mod_coeffs);
 }
 
 static inline float bw_trem_process1(const bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state, float x) {
 	float p, pi;
 	bw_phase_gen_process1(&coeffs->phase_gen_coeffs, &state->phase_gen_state, &p, &pi);
 	const float c = bw_osc_sin_process1(p);
-	return bw_ringmod_process1(&coeffs->ringmod_coeffs, x, 1.f + c);
+	return bw_ring_mod_process1(&coeffs->ring_mod_coeffs, x, 1.f + c);
 }
 
 static inline void bw_trem_process(bw_trem_coeffs *BW_RESTRICT coeffs, bw_trem_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
@@ -247,7 +247,7 @@ static inline void bw_trem_set_rate(bw_trem_coeffs *BW_RESTRICT coeffs, float va
 }
 
 static inline void bw_trem_set_amount(bw_trem_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_ringmod_set_amount(&coeffs->ringmod_coeffs, value);
+	bw_ring_mod_set_amount(&coeffs->ring_mod_coeffs, value);
 }
 
 #ifdef __cplusplus

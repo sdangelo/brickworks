@@ -31,7 +31,6 @@ code:
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
-* drywet -> dry_wet, ringmod -> ring_mod, etc?
 * allow nullptr in C++ wrappers where process_multi arg can be NULL
 * better src filter
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
@@ -39,6 +38,8 @@ code:
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * modulation vs process (multi) no update (post 1.0.0)???
 * check assumptions w.r.t. usage of math functions
+* sample rate-constant coeffs? (pan case)
+* sr-dependent vs cr-dependent coeffs? see synth poly example
 
 build system:
 * single header generation (vs modules in bwp... to think about)
@@ -68,6 +69,8 @@ code:
 * process (multi) no update
 * examples cpu usage
 * bw_math: review types in implementation
+* way to detect extern "C"? perhaps hidden "trap" preprocessor definition?
+* any chance to avoid casts in C for const X * const * input arguments?
 
 build system:
 * make makefiles handle paths with spaces etc
@@ -81,9 +84,3 @@ build system:
 * cross compile (rpi etc.)
 * better use of xcodegen (see xcode warnings) and/or consider tuist (https://tuist.io/), bazel (https://bazel.build/), pants (https://www.pantsbuild.org/), buck (https://buck2.build/), please (https://please.build/index.html) for mobile apps
 * homogenize android and ios common code (e.g., same index)
-
---
-
-code:
-* sample rate-constant coeffs? (pan case)
-* sr-dependent vs cr-dependent coeffs? see synth poly example

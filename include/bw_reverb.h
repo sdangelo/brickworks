@@ -22,7 +22,7 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 1.0.0 }}}
  *  requires {{{
- *    bw_buf bw_common bw_delay bw_drywet bw_gain bw_lp1 bw_math bw_one_pole
+ *    bw_buf bw_common bw_delay bw_dry_wet bw_gain bw_lp1 bw_math bw_one_pole
  *    bw_osc_sin bw_phase_gen
  *  }}}
  *  description {{{
@@ -221,7 +221,7 @@ static inline void bw_reverb_set_wet(bw_reverb_coeffs *BW_RESTRICT coeffs, float
 #include <bw_phase_gen.h>
 #include <bw_osc_sin.h>
 #include <bw_gain.h>
-#include <bw_drywet.h>
+#include <bw_dry_wet.h>
 #include <bw_one_pole.h>
 #include <bw_math.h>
 
@@ -249,7 +249,7 @@ struct bw_reverb_coeffs {
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
 	bw_lp1_coeffs		damping_coeffs;
-	bw_drywet_coeffs	drywet_coeffs;
+	bw_dry_wet_coeffs	dry_wet_coeffs;
 	bw_one_pole_coeffs	smooth_coeffs;
 	bw_one_pole_state	smooth_predelay_state;
 
@@ -325,13 +325,13 @@ static inline void bw_reverb_init(bw_reverb_coeffs *BW_RESTRICT coeffs) {
 	bw_gain_init(&coeffs->decay_coeffs);
 	bw_phase_gen_init(&coeffs->phase_gen_coeffs);
 	bw_lp1_init(&coeffs->damping_coeffs);
-	bw_drywet_init(&coeffs->drywet_coeffs);
+	bw_dry_wet_init(&coeffs->dry_wet_coeffs);
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 
 	bw_lp1_set_cutoff(&coeffs->bandwidth_coeffs, 20e3f);
 	bw_lp1_set_cutoff(&coeffs->damping_coeffs, 20e3f);
 	bw_gain_set_gain_lin(&coeffs->decay_coeffs, 0.5f);
-	bw_drywet_set_wet(&coeffs->drywet_coeffs, 0.5f);
+	bw_dry_wet_set_wet(&coeffs->dry_wet_coeffs, 0.5f);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-6f);
 
@@ -356,7 +356,7 @@ static inline void bw_reverb_set_sample_rate(bw_reverb_coeffs *BW_RESTRICT coeff
 	bw_gain_set_sample_rate(&coeffs->decay_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&coeffs->phase_gen_coeffs, sample_rate);
 	bw_lp1_set_sample_rate(&coeffs->damping_coeffs, sample_rate);
-	bw_drywet_set_sample_rate(&coeffs->drywet_coeffs, sample_rate);
+	bw_dry_wet_set_sample_rate(&coeffs->dry_wet_coeffs, sample_rate);
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	coeffs->fs = sample_rate;
@@ -451,7 +451,7 @@ static inline void bw_reverb_reset_coeffs(bw_reverb_coeffs *BW_RESTRICT coeffs) 
 	bw_phase_gen_reset_coeffs(&coeffs->phase_gen_coeffs);
 	bw_phase_gen_reset_state(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, 0.f);
 	bw_lp1_reset_coeffs(&coeffs->damping_coeffs);
-	bw_drywet_reset_coeffs(&coeffs->drywet_coeffs);
+	bw_dry_wet_reset_coeffs(&coeffs->dry_wet_coeffs);
 	bw_reverb_set_predelay(coeffs, coeffs->predelay); // to get it rounded
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_predelay_state, coeffs->predelay);
 }
@@ -479,7 +479,7 @@ static inline void bw_reverb_update_coeffs_ctrl(bw_reverb_coeffs *BW_RESTRICT co
 	bw_lp1_update_coeffs_ctrl(&coeffs->bandwidth_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->decay_coeffs);
 	bw_phase_gen_update_coeffs_ctrl(&coeffs->phase_gen_coeffs);
-	bw_drywet_update_coeffs_ctrl(&coeffs->drywet_coeffs);
+	bw_dry_wet_update_coeffs_ctrl(&coeffs->dry_wet_coeffs);
 	bw_lp1_update_coeffs_ctrl(&coeffs->damping_coeffs);
 }
 
@@ -497,7 +497,7 @@ static inline void bw_reverb_update_coeffs_audio(bw_reverb_coeffs *BW_RESTRICT c
 	coeffs->s = (8.f / 29761.f) * bw_osc_sin_process1(p);
 	bw_lp1_update_coeffs_audio(&coeffs->damping_coeffs);
 	coeffs->diff2 = bw_clipf(bw_gain_get_gain(&coeffs->decay_coeffs) + 0.15f, 0.25f, 0.5f);
-	bw_drywet_update_coeffs_audio(&coeffs->drywet_coeffs);
+	bw_dry_wet_update_coeffs_audio(&coeffs->dry_wet_coeffs);
 }
 
 static inline void bw_reverb_process1(const bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, float x_l, float x_r, float *y_l, float *y_r) {
@@ -579,8 +579,8 @@ static inline void bw_reverb_process1(const bw_reverb_coeffs *BW_RESTRICT coeffs
 			- bw_delay_read(&coeffs->delay_dd4_coeffs, &state->delay_dd4_state, coeffs->dr6, 0.f)
 			- bw_delay_read(&coeffs->delay_d4_coeffs, &state->delay_d4_state, coeffs->dr7, 0.f)
 		);
-	*y_l = bw_drywet_process1(&coeffs->drywet_coeffs, x_l, *y_l);
-	*y_r = bw_drywet_process1(&coeffs->drywet_coeffs, x_r, *y_r);
+	*y_l = bw_dry_wet_process1(&coeffs->dry_wet_coeffs, x_l, *y_l);
+	*y_r = bw_dry_wet_process1(&coeffs->dry_wet_coeffs, x_r, *y_r);
 }
 
 static inline void bw_reverb_process(bw_reverb_coeffs *BW_RESTRICT coeffs, bw_reverb_state *BW_RESTRICT state, const float *x_l, const float *x_r, float *y_l, float *y_r, size_t n_samples) {
@@ -617,7 +617,7 @@ static inline void bw_reverb_set_decay(bw_reverb_coeffs *BW_RESTRICT coeffs, flo
 }
 
 static inline void bw_reverb_set_wet(bw_reverb_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_drywet_set_wet(&coeffs->drywet_coeffs, value);
+	bw_dry_wet_set_wet(&coeffs->dry_wet_coeffs, value);
 }
 
 #ifdef __cplusplus

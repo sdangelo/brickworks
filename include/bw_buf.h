@@ -38,6 +38,8 @@
  *          <li>Added overladed C++ functions taking C-style arrays as
  *              arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Now enforcing that buffers are never <code>NULL</code> in
+ *              debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -183,8 +185,8 @@ extern "C" {
 #endif
 
 static inline void bw_buf_fill(float k, float *BW_RESTRICT dest, size_t n_elems) {
-	BW_ASSERT(!(dest == NULL && n_elems != 0));
 	BW_ASSERT(!bw_is_nan(k));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = k;
@@ -193,8 +195,9 @@ static inline void bw_buf_fill(float k, float *BW_RESTRICT dest, size_t n_elems)
 }
 
 static inline void bw_buf_neg(const float *src, float *dest, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
+	BW_ASSERT(src != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = -src[i];
@@ -203,9 +206,10 @@ static inline void bw_buf_neg(const float *src, float *dest, size_t n_elems) {
 }
 
 static inline void bw_buf_add(const float *src, float k, float *dest, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
+	BW_ASSERT(src != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = k + src[i];
@@ -214,9 +218,10 @@ static inline void bw_buf_add(const float *src, float k, float *dest, size_t n_e
 }
 
 static inline void bw_buf_scale(const float *src, float k, float *dest, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src == NULL) && n_elems != 0));
+	BW_ASSERT(src != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = k * src[i];
@@ -225,9 +230,11 @@ static inline void bw_buf_scale(const float *src, float k, float *dest, size_t n
 }
 
 static inline void bw_buf_mix(const float *src1, const float *src2, float *dest, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_elems != 0));
+	BW_ASSERT(src1 != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
+	BW_ASSERT(src2 != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = src1[i] + src2[i];
@@ -236,9 +243,11 @@ static inline void bw_buf_mix(const float *src1, const float *src2, float *dest,
 }
 
 static inline void bw_buf_mul(const float *src1, const float *src2, float *dest, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_elems != 0));
+	BW_ASSERT(src1 != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
+	BW_ASSERT(src2 != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = src1[i] * src2[i];
@@ -247,42 +256,52 @@ static inline void bw_buf_mul(const float *src1, const float *src2, float *dest,
 }
 
 static inline void bw_buf_fill_multi(float k, float *BW_RESTRICT const *BW_RESTRICT dest, size_t n_channels, size_t n_elems) {
-	BW_ASSERT(!(dest == NULL && n_channels != 0));
+	BW_ASSERT(!bw_is_nan(k));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_fill(k, dest[i], n_elems);
 }
 
 static inline void bw_buf_neg_multi(const float * const *src, float * const *dest, size_t n_channels, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src == NULL) && n_channels != 0));
+	BW_ASSERT(src != NULL);
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_neg(src[i], dest[i], n_elems);
 }
 
 static inline void bw_buf_add_multi(const float * const *src, float k, float * const *dest, size_t n_channels, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src == NULL) && n_channels != 0));
+	BW_ASSERT(src != NULL);
+	BW_ASSERT(!bw_is_nan(k));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_add(src[i], k, dest[i], n_elems);
 }
 
 static inline void bw_buf_scale_multi(const float * const *src, float k, float * const *dest, size_t n_channels, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src == NULL) && n_channels != 0));
+	BW_ASSERT(src != NULL);
+	BW_ASSERT(!bw_is_nan(k));
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_scale(src[i], k, dest[i], n_elems);
 }
 
 static inline void bw_buf_mix_multi(const float * const *src1, const float * const *src2, float * const *dest, size_t n_channels, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_channels != 0));
+	BW_ASSERT(src1 != NULL);
+	BW_ASSERT(src2 != NULL);
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_mix(src1[i], src2[i], dest[i], n_elems);
 }
 
 static inline void bw_buf_mul_multi(const float * const *src1, const float * const *src2, float * const *dest, size_t n_channels, size_t n_elems) {
-	BW_ASSERT(!((dest == NULL || src1 == NULL || src2 == NULL) && n_channels != 0));
+	BW_ASSERT(src1 != NULL);
+	BW_ASSERT(src2 != NULL);
+	BW_ASSERT(dest != NULL);
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_mul(src1[i], src2[i], dest[i], n_elems);

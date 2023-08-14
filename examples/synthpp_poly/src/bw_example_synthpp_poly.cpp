@@ -167,7 +167,7 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 
 	const float vcf_mod_k = 0.3f * instance->params[p_vcf_mod];
 
-	float *b0[N_VOICES], *b1[N_VOICES], *b2[N_VOICES], *b3[N_VOICES], *b4[N_VOICES], *na[N_VOICES];
+	float *b0[N_VOICES], *b1[N_VOICES], *b2[N_VOICES], *b3[N_VOICES], *b4[N_VOICES];
 	char xgates[N_VOICES];
 	for (int j = 0; j < N_VOICES; j++) {
 		b0[j] = instance->voices[j].buf[0];
@@ -175,7 +175,6 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 		b2[j] = instance->voices[j].buf[2];
 		b3[j] = instance->voices[j].buf[3];
 		b4[j] = instance->voices[j].buf[4];
-		na[j] = nullptr;
 		xgates[j] = instance->voices[j].gate;
 	}
 
@@ -258,7 +257,7 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 		bufScale<N_VOICES>(b1, k, b1, n);
 		bufMix<N_VOICES>(b0, b1, b0, n);
 
-		instance->vcfEnvGen.process(xgates, na, n);
+		instance->vcfEnvGen.process(xgates, {}, n);
 		for (int j = 0; j < N_VOICES; j++) {
 			float v = instance->params[p_vcf_cutoff] + instance->params[p_vcf_contour] * instance->vcfEnvGen.getYZ1(j) + vcf_mod[j];
 			float cutoff = 20.f + (20e3f - 20.f) * v * v * v;

@@ -27,7 +27,6 @@ code:
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
-* allow nullptr in C++ wrappers where process_multi arg can be NULL
 * better src filter
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * check unititialized warnings (check fxpp_comp in particular vs fxpp_satur)

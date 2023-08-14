@@ -32,8 +32,8 @@
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li>Changed order of arguments to improve consistency.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ functions taking C-style arrays as
  *              arguments.</li>
@@ -82,7 +82,7 @@ extern "C" {
 /*! api {{{
  *    #### bw_buf_fill()
  *  ```>>> */
-static inline void bw_buf_fill(float k, float *dest, size_t n_elems);
+static inline void bw_buf_fill(float k, float *BW_RESTRICT dest, size_t n_elems);
 /*! <<<```
  *    Sets the first `n_elems` in `dest` to `k`.
  *
@@ -123,7 +123,7 @@ static inline void bw_buf_mul(const float *src1, const float *src2, float *dest,
  *
  *    #### bw_buf_fill_multi()
  *  ```>>> */
-static inline void bw_buf_fill_multi(float k, float * const *dest, size_t n_channels, size_t n_elems);
+static inline void bw_buf_fill_multi(float k, float *BW_RESTRICT const *BW_RESTRICT dest, size_t n_channels, size_t n_elems);
 /*! <<<```
  *    Sets the first `n_elems` in each of the `n_channels` buffers `dest` to
  *    `k`.
@@ -182,7 +182,7 @@ static inline void bw_buf_mul_multi(const float * const *src1, const float * con
 extern "C" {
 #endif
 
-static inline void bw_buf_fill(float k, float *dest, size_t n_elems) {
+static inline void bw_buf_fill(float k, float *BW_RESTRICT dest, size_t n_elems) {
 	BW_ASSERT(!(dest == NULL && n_elems != 0));
 	BW_ASSERT(!bw_is_nan(k));
 
@@ -246,7 +246,7 @@ static inline void bw_buf_mul(const float *src1, const float *src2, float *dest,
 	BW_ASSERT_DEEP(!bw_has_nan(dest, n_elems));
 }
 
-static inline void bw_buf_fill_multi(float k, float * const *dest, size_t n_channels, size_t n_elems) {
+static inline void bw_buf_fill_multi(float k, float *BW_RESTRICT const *BW_RESTRICT dest, size_t n_channels, size_t n_elems) {
 	BW_ASSERT(!(dest == NULL && n_channels != 0));
 
 	for (size_t i = 0; i < n_channels; i++)
@@ -303,13 +303,13 @@ namespace Brickworks {
 template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
-		float * const * dest,
+		float *BW_RESTRICT const *BW_RESTRICT dest,
 		int nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
-		std::array<float *, N_CHANNELS> dest,
+		std::array<float *BW_RESTRICT, N_CHANNELS> dest,
 		int nSamples);
 /*! <<<```
  *
@@ -405,7 +405,7 @@ inline void bufMul(
 template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
-		float * const * dest,
+		float *BW_RESTRICT const *BW_RESTRICT dest,
 		int nSamples) {
 	bw_buf_fill_multi(k, dest, N_CHANNELS, nSamples);
 }
@@ -413,7 +413,7 @@ inline void bufFill(
 template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
-		std::array<float *, N_CHANNELS> dest,
+		std::array<float *BW_RESTRICT, N_CHANNELS> dest,
 		int nSamples) {
 	bufFill<N_CHANNELS>(k, dest.data(), nSamples);
 }

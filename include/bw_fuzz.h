@@ -37,8 +37,8 @@
  *          <li><code>bw_fuzz_process()</code> and
  *              <code>bw_fuzz_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -134,7 +134,7 @@ static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_s
  *
  *    #### bw_fuzz_process_multi()
  *  ```>>> */
-static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
   *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -260,7 +260,7 @@ static inline void bw_fuzz_process(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_s
 	}
 }
 
-static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_fuzz_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_fuzz_update_coeffs_audio(coeffs);
@@ -320,7 +320,7 @@ public:
 private:
 	bw_fuzz_coeffs	 coeffs;
 	bw_fuzz_state	 states[N_CHANNELS];
-	bw_fuzz_state	*statesP[N_CHANNELS];
+	bw_fuzz_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>

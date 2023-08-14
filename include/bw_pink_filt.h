@@ -39,8 +39,8 @@
  *          <li><code>bw_pink_filt_process()</code> and
  *              <code>bw_pink_filt_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -148,7 +148,7 @@ static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs,
  * 
  *    #### bw_pink_filt_process_multi()
  *  ```>>> */
-static inline void bw_pink_filt_process_multi(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_pink_filt_process_multi(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -248,7 +248,7 @@ static inline void bw_pink_filt_process(bw_pink_filt_coeffs *BW_RESTRICT coeffs,
 			y[i] = bw_pink_filt_process1(coeffs, state, x[i]);
 }
 
-static inline void bw_pink_filt_process_multi(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_pink_filt_process_multi(bw_pink_filt_coeffs *BW_RESTRICT coeffs, bw_pink_filt_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	for (size_t i = 0; i < n_channels; i++)
 		bw_pink_filt_process(coeffs, state[i], x[i], y[i], n_samples);
 }
@@ -305,7 +305,7 @@ public:
 private:
 	bw_pink_filt_coeffs	 coeffs;
 	bw_pink_filt_state	 states[N_CHANNELS];
-	bw_pink_filt_state	*statesP[N_CHANNELS];
+	bw_pink_filt_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>

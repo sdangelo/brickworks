@@ -32,8 +32,8 @@
  *          <li><code>bw_noise_gate_process()</code> and
  *              <code>bw_noise_gate_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -137,7 +137,7 @@ static inline void bw_noise_gate_process(bw_noise_gate_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_noise_gate_process_multi()
  *  ```>>> */
-static inline void bw_noise_gate_process_multi(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state * const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_noise_gate_process_multi(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    the first `n_samples` of the `n_channels` sidechain input buffers `x_sc`,
@@ -275,7 +275,7 @@ static inline void bw_noise_gate_process(bw_noise_gate_coeffs *BW_RESTRICT coeff
 	}
 }
 
-static inline void bw_noise_gate_process_multi(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state * const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_noise_gate_process_multi(bw_noise_gate_coeffs *BW_RESTRICT coeffs, bw_noise_gate_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_noise_gate_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_noise_gate_update_coeffs_audio(coeffs);
@@ -325,12 +325,12 @@ public:
 	void reset();
 	void process(
 		const float * const *x,
-		const float * const *xSC,
+		const float * const *x_sc,
 		float * const *y,
 		size_t nSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> xSC,
+		std::array<const float *, N_CHANNELS> x_sc,
 		std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
@@ -352,7 +352,7 @@ public:
 private:
 	bw_noise_gate_coeffs	 coeffs;
 	bw_noise_gate_state	 states[N_CHANNELS];
-	bw_noise_gate_state	*statesP[N_CHANNELS];
+	bw_noise_gate_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>
@@ -377,19 +377,19 @@ inline void NoiseGate<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::process(
 		const float * const *x,
-		const float * const *xSC,
+		const float * const *x_sc,
 		float * const *y,
 		size_t nSamples) {
-	bw_noise_gate_process_multi(&coeffs, statesP, x, xSC, y, N_CHANNELS, nSamples);
+	bw_noise_gate_process_multi(&coeffs, statesP, x, x_sc, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> xSC,
+		std::array<const float *, N_CHANNELS> x_sc,
 		std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
-	process(x.data(), xSC.data(), y.data(), nSamples);
+	process(x.data(), x_sc.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>

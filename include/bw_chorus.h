@@ -43,8 +43,8 @@
  *          <li><code>bw_chorus_process()</code> and
  *              <code>bw_chorus_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implmenetation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -117,7 +117,7 @@ static inline size_t bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_chorus_mem_set()
  *  ```>>> */
-static inline void bw_chorus_mem_set(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, void *mem);
+static inline void bw_chorus_mem_set(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, void *BW_RESTRICT mem);
 /*! <<<```
  *    Associates the contiguous memory block `mem` to the given `state`.
  *
@@ -162,7 +162,7 @@ static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_ch
  *
  *    #### bw_chorus_process_multi()
  *  ```>>> */
-static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -267,8 +267,7 @@ static inline size_t bw_chorus_mem_req(const bw_chorus_coeffs *BW_RESTRICT coeff
 	return bw_comb_mem_req(&coeffs->comb_coeffs);
 }
 
-static inline void bw_chorus_mem_set(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, void *mem) {
-	(void)coeffs;
+static inline void bw_chorus_mem_set(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, void *BW_RESTRICT mem) {
 	bw_comb_mem_set(&coeffs->comb_coeffs, &state->comb_state, mem);
 }
 
@@ -310,7 +309,7 @@ static inline void bw_chorus_process(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_ch
 	}
 }
 
-static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_chorus_process_multi(bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_chorus_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_chorus_update_coeffs_audio(coeffs);
@@ -392,8 +391,8 @@ public:
 private:
 	bw_chorus_coeffs	 coeffs;
 	bw_chorus_state		 states[N_CHANNELS];
-	bw_chorus_state		*statesP[N_CHANNELS];
-	void			*mem;
+	bw_chorus_state		*BW_RESTRICT statesP[N_CHANNELS];
+	void			*BW_RESTRICT mem;
 };
 
 template<size_t N_CHANNELS>

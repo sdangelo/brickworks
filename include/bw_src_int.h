@@ -38,8 +38,8 @@
  *          <li><code>bw_src_int_lim_process()</code> and
  *              <code>bw_src_int_lim_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -122,7 +122,7 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
  *
  *    #### bw_src_int_process_multi()
  *  ```>>> */
-static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *n, size_t n_channels, size_t n_in_samples);
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *BW_RESTRICT n, size_t n_channels, size_t n_in_samples);
 /*! <<<```
  *    Processes the first `n_in_samples` of the `n_channels` input buffers `x`
  *    and fills the `n_channels` output buffers `y` using `coeffs`, while using
@@ -240,7 +240,7 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
 	return n;
 }
 
-static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *n, size_t n_channels, size_t n_in_samples) {
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *BW_RESTRICT n, size_t n_channels, size_t n_in_samples) {
 	if (n != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			n[i] = bw_src_int_process(coeffs, state[i], x[i], y[i], n_in_samples);
@@ -288,7 +288,7 @@ public:
 private:
 	bw_src_int_coeffs	 coeffs;
 	bw_src_int_state	 states[N_CHANNELS];
-	bw_src_int_state	*statesP[N_CHANNELS];
+	bw_src_int_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>

@@ -45,8 +45,8 @@
  *          <li><code>bw_env_gen_process()</code> and
  *              <code>bw_env_gen_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -184,7 +184,7 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
  *
  *    #### bw_env_gen_process()
  *  ```>>> */
-static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, size_t n_samples);
+static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *BW_RESTRICT y, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the output buffer `y` using
  *    the given `gate` value (`0` for off, non-`0` for on), while using and
@@ -194,7 +194,7 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
  *
  *    #### bw_env_gen_process_multi()
  *  ```>>> */
-static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT const *BW_RESTRICT state, const char *BW_RESTRICT gate, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y` using the given `n_channels` `gate` values (`0` for off,
@@ -243,13 +243,13 @@ static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_env_gen_get_phase()
  *  ```>>> */
-static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *state);
+static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *BW_RESTRICT state);
 /*! <<<```
  *    Returns the current envelope generator phase as stored in `state`.
  *
  *    #### bw_env_gen_get_y_z1()
  *  ```>>> */
-static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state);
+static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *BW_RESTRICT state);
 /*! <<<```
  *    Returns the last output sample as stored in `state`.
  *  }}} */
@@ -389,7 +389,7 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
 	return v;
 }
 
-static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *y, size_t n_samples) {
+static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *BW_RESTRICT y, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	bw_env_gen_update_state_ctrl(coeffs, state, gate);
 	if (y != NULL)
@@ -400,7 +400,7 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
 			bw_env_gen_process1(coeffs, state);
 }
 
-static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state * const *BW_RESTRICT state, const char *gate, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT const *BW_RESTRICT state, const char *BW_RESTRICT gate, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	for (size_t j = 0; j < n_channels; j++)
 		bw_env_gen_update_state_ctrl(coeffs, state[j], gate[j]);
@@ -445,11 +445,11 @@ static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs,
 	}
 }
 
-static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *state) {
+static inline bw_env_gen_phase bw_env_gen_get_phase(const bw_env_gen_state *BW_RESTRICT state) {
 	return state->phase;
 }
 
-static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *state) {
+static inline float bw_env_gen_get_y_z1(const bw_env_gen_state *BW_RESTRICT state) {
 	return state->y_z1;
 }
 
@@ -478,12 +478,12 @@ public:
 	void setSampleRate(float sampleRate);
 	void reset();
 	void process(
-		const char *gate,
-		float * const *y,
+		const char *BW_RESTRICT gate,
+		float *BW_RESTRICT const *BW_RESTRICT y,
 		size_t nSamples);
 	void process(
 		std::array<char, N_CHANNELS> gate,
-		std::array<float *, N_CHANNELS> y,
+		std::array<float *BW_RESTRICT, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setAttack(float value);
@@ -506,7 +506,7 @@ public:
 private:
 	bw_env_gen_coeffs	 coeffs;
 	bw_env_gen_state	 states[N_CHANNELS];
-	bw_env_gen_state	*statesP[N_CHANNELS];
+	bw_env_gen_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>
@@ -530,8 +530,8 @@ inline void EnvGen<N_CHANNELS>::reset() {
 
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::process(
-		const char *gate,
-		float * const *y,
+		const char *BW_RESTRICT gate,
+		float *BW_RESTRICT const *BW_RESTRICT y,
 		size_t nSamples) {
 	bw_env_gen_process_multi(&coeffs, statesP, gate, y, N_CHANNELS, nSamples);
 }
@@ -539,7 +539,7 @@ inline void EnvGen<N_CHANNELS>::process(
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::process(
 		std::array<char, N_CHANNELS> gate,
-		std::array<float *, N_CHANNELS> y,
+		std::array<float *BW_RESTRICT, N_CHANNELS> y,
 		size_t nSamples) {
 	process(gate.data(), y.data(), nSamples);
 }

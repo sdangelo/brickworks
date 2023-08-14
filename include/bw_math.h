@@ -60,9 +60,12 @@
  *              improved implementation.</li>
  *          <li>Fixed input validity ranges in <code>bw_asinhf()</code> and
  *              <code>bw_acoshf()</code>.</li>
+ *          <li>Added <code>BW_RESTRICT</code> specifiers to input
+ *              arguments of <code>bw_intfracf()</code>.</li>
  *          <li>Removed usage of reserved identifiers and designated
  *              initializers.</li>
  *          <li>Added <code>extern "C"</code> to functions.</li>
+ *          <li>Added more debugging checks in <code>bw_intfracf()</code>.</li>
  *          <li>Improved documentation w.r.t. validity of input values and
  *              approximation errors.</li>
  *        </ul>
@@ -255,7 +258,7 @@ static inline float bw_ceilf(float x);
  *
  *    #### bw_intfracf()
  *  ```>>> */
-static inline void bw_intfracf(float x, float *i, float *f);
+static inline void bw_intfracf(float x, float *BW_RESTRICT i, float *BW_RESTRICT f);
 /*! <<<```
  *    Puts the integer part (floor) of `x` in `i` and the fractional part in
  *    `f`.
@@ -660,8 +663,11 @@ static inline float bw_ceilf(float x) {
 	return r;
 }
 
-static inline void bw_intfracf(float x, float *i, float *f) {
+static inline void bw_intfracf(float x, float *BW_RESTRICT i, float *BW_RESTRICT f) {
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(i != NULL);
+	BW_ASSERT(f != NULL);
+	BW_ASSERT(i != f);
 	*i = bw_floorf(x);
 	*f = x - *i;
 	BW_ASSERT(bw_is_finite(*i));

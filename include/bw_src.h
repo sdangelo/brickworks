@@ -32,8 +32,8 @@
  *          <li><code>bw_src_process()</code> and
  *              <code>bw_src_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header and fixed C++ API.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -102,7 +102,7 @@ static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_src_process()
  *  ```>>> */
-static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *n_in_samples, size_t *n_out_samples);
+static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples` of the input buffer `x` and
  *    fills the output buffer `y` with at most `n_out_samples` using `coeffs`,
@@ -114,7 +114,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
  *
  *    #### bw_src_process_multi()
  *  ```>>> */
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *n_in_samples, size_t *n_out_samples);
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples[i]` of each input buffer `x[i]`
  *    and fills the corresponding output buffer `y[i]` with at most
@@ -200,7 +200,7 @@ static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, b
 	state->xz3 = x_0;
 }
 
-static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *n_in_samples, size_t *n_out_samples) {
+static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples) {
 	size_t i = 0;
 	size_t j = 0;
 	if (coeffs->k < 0) {
@@ -267,7 +267,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 	*n_out_samples = j;
 }
 
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *n_in_samples, size_t *n_out_samples) {
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples) {
 	for (size_t i = 0; i < n_channels; i++)
 		bw_src_process(coeffs, state[i], x[i], y[i], n_in_samples + i, n_out_samples + i);
 }
@@ -293,8 +293,8 @@ public:
 	void process(
 		const float * const *x,
 		float * const *y,
-		size_t *nInSamples,
-		size_t *nOutSamples);
+		size_t *BW_RESTRICT nInSamples,
+		size_t *BW_RESTRICT nOutSamples);
 	void process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS> y,
@@ -313,7 +313,7 @@ public:
 private:
 	bw_src_coeffs	 coeffs;
 	bw_src_state	 states[N_CHANNELS];
-	bw_src_state	*statesP[N_CHANNELS];
+	bw_src_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>
@@ -333,8 +333,8 @@ template<size_t N_CHANNELS>
 inline void SRC<N_CHANNELS>::process(
 		const float * const *x,
 		float * const *y,
-		size_t *nInSamples,
-		size_t *nOutSamples) {
+		size_t *BW_RESTRICT nInSamples,
+		size_t *BW_RESTRICT nOutSamples) {
 	bw_src_process_multi(coeffs, statesP, x, y, N_CHANNELS, nInSamples, nOutSamples);
 }
 

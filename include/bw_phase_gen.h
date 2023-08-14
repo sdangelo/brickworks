@@ -34,8 +34,8 @@
  *          <li><code>bw_phase_gen_process()</code> and
  *              <code>bw_phase_gen_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -165,7 +165,7 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_phase_gen_process_multi()
  *  ```>>> */
-static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float * const *y, float * const *y_phase_inc, size_t n_channels, size_t n_samples);
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x_mod, float * const *y, float * const *y_phase_inc, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y`, while using and updating both the common `coeffs` and each of
@@ -342,7 +342,7 @@ static inline void bw_phase_gen_process(bw_phase_gen_coeffs *BW_RESTRICT coeffs,
 	}
 }
 
-static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state * const *BW_RESTRICT state, const float * const *x_mod, float * const *y, float * const *y_phase_inc, size_t n_channels, size_t n_samples) {
+static inline void bw_phase_gen_process_multi(bw_phase_gen_coeffs *BW_RESTRICT coeffs, bw_phase_gen_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x_mod, float * const *y, float * const *y_phase_inc, size_t n_channels, size_t n_samples) {
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (x_mod != NULL) {
@@ -500,7 +500,7 @@ public:
 private:
 	bw_phase_gen_coeffs	 coeffs;
 	bw_phase_gen_state	 states[N_CHANNELS];
-	bw_phase_gen_state	*statesP[N_CHANNELS];
+	bw_phase_gen_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>

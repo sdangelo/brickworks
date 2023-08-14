@@ -32,8 +32,8 @@
  *          <li><code>bw_mm2_process()</code> and
  *              <code>bw_mm2_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -142,7 +142,7 @@ static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_stat
  *
  *    #### bw_mm2_process_multi()
  *  ```>>> */
-static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -318,7 +318,7 @@ static inline void bw_mm2_process(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_stat
 	}
 }
 
-static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_mm2_process_multi(bw_mm2_coeffs *BW_RESTRICT coeffs, bw_mm2_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_mm2_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm2_update_coeffs_audio(coeffs);
@@ -408,7 +408,7 @@ public:
 private:
 	bw_mm2_coeffs	 coeffs;
 	bw_mm2_state	 states[N_CHANNELS];
-	bw_mm2_state	*statesP[N_CHANNELS];
+	bw_mm2_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>

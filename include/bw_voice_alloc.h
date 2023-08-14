@@ -31,7 +31,8 @@
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
- *          <li>Added <code>const</code> where needed to callback types in
+ *          <li>Added <code>const</code> and <code>BW_RESTRICT</code> where
+ *              needed to callback types in
  *              <code>bw_voice_alloc_opts</code> and to
  *              <code>bw_voice_alloc()</code>.</li>
  *          <li>Removed usage of reserved identifiers.</li>
@@ -103,7 +104,7 @@ typedef struct {
  *
  *    #### bw_voice_alloc()
  *  ```>>> */
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void * const *BW_RESTRICT voices, size_t n_voices);
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void *BW_RESTRICT const *BW_RESTRICT voices, size_t n_voices);
 /*! <<<```
  *    It performs voice allocation according to `opts` and using the events in
  *    `queue`.
@@ -125,7 +126,7 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 extern "C" {
 #endif
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void * const *BW_RESTRICT voices, size_t n_voices) {
+void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void *BW_RESTRICT const *BW_RESTRICT voices, size_t n_voices) {
 	BW_ASSERT(opts != NULL);
 	BW_ASSERT(opts->priority == bw_voice_alloc_priority_low || opts->priority == bw_voice_alloc_priority_high);
 	BW_ASSERT(n_voices == 0 || opts->note_on != NULL);

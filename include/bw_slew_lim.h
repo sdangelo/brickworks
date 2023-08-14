@@ -32,8 +32,8 @@
  *          <li><code>bw_slew_lim_process()</code> and
  *              <code>bw_slew_lim_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -157,7 +157,7 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
  * 
  *    #### bw_slew_lim_process_multi()
  *  ```>>> */
-static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -327,7 +327,7 @@ static inline void bw_slew_lim_process(bw_slew_lim_coeffs *BW_RESTRICT coeffs, b
 	}
 }
 
-static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state * const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_slew_lim_process_multi(bw_slew_lim_coeffs *BW_RESTRICT coeffs, bw_slew_lim_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
 		if (coeffs->max_rate_up != INFINITY) {
@@ -448,7 +448,7 @@ public:
 private:
 	bw_slew_lim_coeffs	 coeffs;
 	bw_slew_lim_state	 states[N_CHANNELS];
-	bw_slew_lim_state	*statesP[N_CHANNELS];
+	bw_slew_lim_state	*BW_RESTRICT statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>

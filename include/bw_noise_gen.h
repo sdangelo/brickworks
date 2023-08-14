@@ -36,8 +36,8 @@
  *          <li><code>bw_noise_gen_process()</code> and
  *              <code>bw_noise_gen_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
- *          <li>Added more <code>const</code> specifiers to input
- *              arguments.</li>
+ *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
+ *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
@@ -117,7 +117,7 @@ static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_noise_gen_process_multi()
  *  ```>>> */
-static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t n_samples);
 /*! <<<```
  *    Generates and fills the first `n_samples` of the `n_channels` output
  *    buffers `y` using `coeffs`.
@@ -165,7 +165,7 @@ struct bw_noise_gen_coeffs {
 	float		 scaling_k;
 
 	// Parameters
-	uint64_t	*state;
+	uint64_t	*BW_RESTRICT state;
 	char		 sample_rate_scaling;
 };
 
@@ -195,7 +195,7 @@ static inline void bw_noise_gen_process(bw_noise_gen_coeffs *BW_RESTRICT coeffs,
 			y[i] = bw_noise_gen_process1_scaling(coeffs);
 }
 
-static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_noise_gen_process_multi(bw_noise_gen_coeffs *BW_RESTRICT coeffs, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t n_samples) {
 	for (size_t i = 0; i < n_channels; i++)
 		bw_noise_gen_process(coeffs, y[i], n_samples);
 }
@@ -227,10 +227,10 @@ public:
 
 	void setSampleRate(float sampleRate);
 	void process(
-		float * const *y,
+		float *BW_RESTRICT const *BW_RESTRICT y,
 		size_t nSamples);
 	void process(
-		std::array<float *, N_CHANNELS> y,
+		std::array<float *BW_RESTRICT, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setSampleRateScaling(bool value);
@@ -262,14 +262,14 @@ inline void NoiseGen<N_CHANNELS>::setSampleRate(float sampleRate) {
 
 template<size_t N_CHANNELS>
 inline void NoiseGen<N_CHANNELS>::process(
-		float * const *y,
+		float *BW_RESTRICT const *BW_RESTRICT y,
 		size_t nSamples) {
 	bw_noise_gen_process_multi(&coeffs, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void NoiseGen<N_CHANNELS>::process(
-		std::array<float *, N_CHANNELS> y,
+		std::array<float *BW_RESTRICT, N_CHANNELS> y,
 		size_t nSamples) {
 	process(y.data(), nSamples);
 }

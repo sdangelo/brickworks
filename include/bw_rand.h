@@ -31,6 +31,14 @@
  *    All functions in this module are [reentrant](api#reentrant-function),
  *    [RT-safe](api#rt-safe-function), [thread-safe](api#thread-safe-function),
  *    and have [no side effects](api#no-side-effects).
+ *
+ *    The algorithms are based on the ["simplified" Permuted Congruential
+ *    Generator (PCG)](https://nullprogram.com/blog/2017/09/21/#permuted-congruential-generator-pcg)
+ *    by Chris Wellons, which is itself taken from
+ *
+ *    M. E. O'Neill, "PCG: A Family of Simple Fast Space-Efficient Statistically
+ *    Good Algorithms for Random Number Generation", September 2014, available
+ *    at https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf.
  *  }}}
  *  changelog {{{
  *    <ul>

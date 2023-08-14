@@ -23,7 +23,7 @@
  *  version {{{ 1.0.0 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
- *    Stereo panner.
+ *    Stereo panner with -3 dB center pan law.
  *  }}}
  *  changelog {{{
  *    <ul>

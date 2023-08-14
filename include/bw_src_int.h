@@ -25,7 +25,7 @@
  *  description {{{
  *    Integer-ratio IIR sample rate converter.
  *
- *    Multi-rate filtering inspired by
+ *    The multi-rate filtering approach was inspired by
  *
  *    M. Holters and J.Parker, "A Combined Model for a Bucket Brigade Device and
  *    its Input and Output Filters", 21st Intl. Conf. Digital Audio Effects

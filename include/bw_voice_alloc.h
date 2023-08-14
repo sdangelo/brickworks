@@ -29,6 +29,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Specified that velocity can be negative in
+ *              <code>bw_voice_alloc_opts</code>.</li>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li>Added <code>const</code> and <code>BW_RESTRICT</code> where
@@ -94,9 +96,11 @@ typedef struct {
  *     * `priority`: note priority;
  *     * `note_on`: note on callback, where `voice` is an opaque pointer to the
  *       chosen voice, `note` is the note number, and `velocity` is the note
- *       velocity in [`0.f`, `1.f`];
+ *       velocity in [`0.f`, `1.f`] or otherwise negative to indicate unknown /
+ *       not available;
  *     * `note_off`: note off callback, where `voice` is an opaque pointer to
- *       the chosen voice and `velocity` is the note velocity in [`0.f`, `1.f`];
+ *       the chosen voice and `velocity` is the note velocity in [`0.f`, `1.f`]
+ *       or otherwise negative to indicate unknown / not available;
  *     * `get_note`: callback that returns the note number associated to the
  *       given `voice`;
  *     * `is_free`: callback that returns whether the given `voice` is free

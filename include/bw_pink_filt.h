@@ -31,6 +31,12 @@
  *    3 dB/oct from about 0.000046 × Nyquist frequency to about 0.9 × Nyquist
  *    frequency. It can be used to turn white noise into pink noise (hence the
  *    name).
+ *
+ *    The filter design is based on
+ *
+ *    P. P. La Pastina and S. D'Angelo, "Optimal Integer Order Approximation of
+ *    Fractional Order Filters", Proc. 24th Intl. Conf. Digital Audio Effects
+ *    (DAFx20in21), pp. 89-96, Vienna, Austria, September 2021.
  *  }}}
  *  changelog {{{
  *    <ul>

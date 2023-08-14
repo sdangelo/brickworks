@@ -79,8 +79,8 @@ typedef struct {
 /*! <<<```
  *    Note status:
  *     * `pressed`: whether the note is pressed (non-`0`) or not (`0`);
- *     * `velocity`: velocity in [`0.f`, `1.f`], otherwise negative to indicate
- *       unknown / not available.
+ *     * `velocity`: velocity in [`0.f`, `1.f`] or otherwise negative to
+ *       indicate unknown / not available.
  *
  *    #### bw_note_queue_event
  *  ```>>> */

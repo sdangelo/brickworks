@@ -25,6 +25,13 @@
  *  description {{{
  *    State variable filter (2nd order, 12 dB/oct) model with separated lowpass,
  *    bandpass, and highpass outputs.
+ *
+ *    The module implements a robust original algorithm design, which I later
+ *    found to be probably related to the one described in
+ *
+ *    A. Wishnick, "Time-Varying Filters for Musical Applications", Proc. 17th
+ *    Intl. Conf. Digital Audio Effects (DAFx-14), Erlangen, Germany, September
+ *    2014.
  *  }}}
  *  changelog {{{
  *    <ul>

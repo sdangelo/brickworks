@@ -28,6 +28,12 @@
  *
  *    It turns a normalized phase signal, such as that geneated by
  *    [bw\_phase\_gen](bw_phase_gen), into a pulse wave.
+ *
+ *    The antialiasing algorithm is based on
+ *
+ *    V. Valimaki and A. Huovilainen, "Antialiasing Oscillators in Subtractive
+ *    Synthesis", IEEE Signal Processing Magazine, vol. 24, no. 2, pp. 116-125,
+ *    March 2007.
  *  }}}
  *  changelog {{{
  *    <ul>

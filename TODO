@@ -39,7 +39,6 @@ code:
 * check assumptions w.r.t. usage of math functions
 * sample rate-constant coeffs? (pan case)
 * sr-dependent vs cr-dependent coeffs? see synth poly example
-* src x != y?
 
 build system:
 * single header generation (vs modules in bwp... to think about)

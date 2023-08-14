@@ -44,6 +44,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clarified that the same buffer cannot be used for both input and
+ *              output.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -109,7 +111,7 @@ static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT c
  *
  *    #### bw_src_int_process()
  *  ```>>> */
-static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT state, const float *x, float *y, size_t n_in_samples);
+static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT state, const float *BW_RESTRICT x, float *BW_RESTRICT y, size_t n_in_samples);
 /*! <<<```
  *    Processes the first `n_in_samples` of the input buffer `x` and fills the
  *    output buffer `y` using `coeffs`, while using and updating `state`.
@@ -118,11 +120,13 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
  *    `n_in_samples` if `ratio` is positive, otherwise at most `n_in_samples`
  *    divided by `-ratio` and then rounded towards positive infinity.
  *
+ *    `x` and `y` must point to different buffers.
+ *
  *    Returns the number of generated output samples.
  *
  *    #### bw_src_int_process_multi()
  *  ```>>> */
-static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *BW_RESTRICT n, size_t n_channels, size_t n_in_samples);
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *BW_RESTRICT x, float *BW_RESTRICT const *BW_RESTRICT y, size_t *BW_RESTRICT n, size_t n_channels, size_t n_in_samples);
 /*! <<<```
  *    Processes the first `n_in_samples` of the `n_channels` input buffers `x`
  *    and fills the `n_channels` output buffers `y` using `coeffs`, while using
@@ -132,6 +136,8 @@ static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT
  *    `ratio` times `n_in_samples` if `ratio` is positive, otherwise at most
  *    `n_in_samples` divided by `-ratio` and then rounded towards positive
  *    infinity.
+ *
+ *    A given buffer cannot be used both as an input and output buffer.
  *
  *    `n` is filled with the number of generated output samples for each output
  *    buffer, if not `NULL`.
@@ -204,7 +210,7 @@ static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT c
 	}
 }
 
-static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT state, const float *x, float *y, size_t n_in_samples) {
+static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT state, const float *BW_RESTRICT x, float *BW_RESTRICT y, size_t n_in_samples) {
 	size_t n = 0;
 	if (coeffs->ratio < 0) {
 		for (size_t i = 0; i < n_in_samples; i++) {
@@ -240,7 +246,7 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
 	return n;
 }
 
-static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t *BW_RESTRICT n, size_t n_channels, size_t n_in_samples) {
+static inline void bw_src_int_process_multi(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *BW_RESTRICT x, float *BW_RESTRICT const *BW_RESTRICT y, size_t *BW_RESTRICT n, size_t n_channels, size_t n_in_samples) {
 	if (n != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			n[i] = bw_src_int_process(coeffs, state[i], x[i], y[i], n_in_samples);

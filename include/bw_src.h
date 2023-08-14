@@ -39,6 +39,8 @@
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Removed useless computation when upsampling.</li>
+ *          <li>Clarified that the same buffer cannot be used for both input and
+ *              output.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -102,7 +104,7 @@ static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_src_process()
  *  ```>>> */
-static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples);
+static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *BW_RESTRICT x, float *BW_RESTRICT y, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples` of the input buffer `x` and
  *    fills the output buffer `y` with at most `n_out_samples` using `coeffs`,
@@ -112,9 +114,11 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
  *    number of consumed input samples and generated output samples,
  *    respectively.
  *
+ *    `x` and `y` must point to different buffers.
+ *
  *    #### bw_src_process_multi()
  *  ```>>> */
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples);
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *BW_RESTRICT x, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples);
 /*! <<<```
  *    Processes at most the first `n_in_samples[i]` of each input buffer `x[i]`
  *    and fills the corresponding output buffer `y[i]` with at most
@@ -125,6 +129,8 @@ static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs,
  *    contain the actual number of consumed input samples and generated output
  *    samples, respectively, for each of the `n_channels` input/output buffer
  *    couples.
+ *
+ *    A given buffer cannot be used both as an input and output buffer.
  *  }}} */
 
 #ifdef __cplusplus
@@ -200,7 +206,7 @@ static inline void bw_src_reset_state(const bw_src_coeffs *BW_RESTRICT coeffs, b
 	state->xz3 = x_0;
 }
 
-static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *x, float *y, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples) {
+static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT state, const float *BW_RESTRICT x, float *BW_RESTRICT y, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples) {
 	size_t i = 0;
 	size_t j = 0;
 	if (coeffs->k < 0) {
@@ -267,7 +273,7 @@ static inline void bw_src_process(const bw_src_coeffs *BW_RESTRICT coeffs, bw_sr
 	*n_out_samples = j;
 }
 
-static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples) {
+static inline void bw_src_process_multi(const bw_src_coeffs *BW_RESTRICT coeffs, bw_src_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *BW_RESTRICT x, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t *BW_RESTRICT n_in_samples, size_t *BW_RESTRICT n_out_samples) {
 	for (size_t i = 0; i < n_channels; i++)
 		bw_src_process(coeffs, state[i], x[i], y[i], n_in_samples + i, n_out_samples + i);
 }

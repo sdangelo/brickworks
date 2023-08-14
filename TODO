@@ -6,7 +6,6 @@ code:
 * check all examples again
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
-* should rather use backward Euler in bw_onepole?
 * one pole process const input? (return also if const out)
 * empty functions etc. to keep consistency and forward compatibility?
 * float in [-1,1] for velocity, pitch bend, mod wheel

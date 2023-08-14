@@ -40,6 +40,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Now using backward Euler rather than impulse invariant
+ *              method.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -364,7 +366,7 @@ struct bw_one_pole_coeffs {
 #endif
 
 	// Coefficients
-	float				Ttm2pi;
+	float				fs_2pi;
 
 	float				mA1u;
 	float				mA1d;
@@ -412,7 +414,7 @@ static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT c
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_init);
 
-	coeffs->Ttm2pi = -6.283185307179586f / sample_rate;
+	coeffs->fs_2pi = 0.15915494309189535f * sample_rate;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->state = bw_one_pole_coeffs_state_set_sample_rate;
@@ -424,10 +426,10 @@ static inline void bw_one_pole_set_sample_rate(bw_one_pole_coeffs *BW_RESTRICT c
 static inline void bw_one_pole_do_update_coeffs_ctrl(bw_one_pole_coeffs *BW_RESTRICT coeffs) {
 	if (coeffs->param_changed) {
 		if (coeffs->param_changed & BW_ONE_POLE_PARAM_CUTOFF_UP)
-			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : bw_expf(coeffs->Ttm2pi * coeffs->cutoff_up);
+			coeffs->mA1u = coeffs->cutoff_up > 1.591549430918953e8f ? 0.f : coeffs->fs_2pi * bw_rcpf(coeffs->fs_2pi + coeffs->cutoff_up);
 			// tau < 1 ns is instantaneous for any practical purpose
 		if (coeffs->param_changed & BW_ONE_POLE_PARAM_CUTOFF_DOWN)
-			coeffs->mA1d = coeffs->cutoff_down > 1.591549430918953e8f ? 0.f : bw_expf(coeffs->Ttm2pi * coeffs->cutoff_down);
+			coeffs->mA1d = coeffs->cutoff_down > 1.591549430918953e8f ? 0.f : coeffs->fs_2pi * bw_rcpf(coeffs->fs_2pi + coeffs->cutoff_down);
 			// as before
 		if (coeffs->param_changed & BW_ONE_POLE_PARAM_STICKY_THRESH)
 			coeffs->st2 = coeffs->sticky_thresh * coeffs->sticky_thresh;

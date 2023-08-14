@@ -234,7 +234,7 @@ static inline void bw_osc_pulse_update_coeffs_audio(bw_osc_pulse_coeffs *BW_REST
 }
 
 static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x) {
-	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state);
+	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state); // output should always be in bounds given good input
 	return bw_signf(pw - x);
 }
 
@@ -246,7 +246,7 @@ static inline float bw_osc_pulse_blep_diff(float x) {
 }
 
 static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc) {
-	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state);
+	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state); // output should always be in bounds given good input
 	const float pw_m_phase = pw - x;
 	float v = bw_copysignf(1.f, pw_m_phase); // pw = phase case should be properly compensated by the AA
 	if (x_phase_inc != 0.f) {

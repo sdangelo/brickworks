@@ -7,12 +7,11 @@ code:
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
 * empty functions etc. to keep consistency and forward compatibility?
-* should clip slope in triangle?
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * svf bandpass out polarity too confusing (inverted in mm2)?
 * get_y_z1, common strategy?
 * bw_satur gain compensation to divide by actual gain (derivative) rather than gain parameter?
-* add initial state (x0) to reset state of lp1, ap1, mm1, hs1, ls1, others? all?
+* add initial state (x0) to reset state of all modules?
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?

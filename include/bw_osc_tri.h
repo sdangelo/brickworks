@@ -236,7 +236,7 @@ static inline void bw_osc_tri_update_coeffs_audio(bw_osc_tri_coeffs *BW_RESTRICT
 }
 
 static inline float bw_osc_tri_process1(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x) {
-	const float slope = bw_one_pole_get_y_z1(&coeffs->smooth_state);
+	const float slope = bw_one_pole_get_y_z1(&coeffs->smooth_state); // output should always be in bounds given good input
 	const float phase_d = x + x;
 	return x < slope ? (phase_d - slope) * bw_rcpf(slope) : (1.f + slope - phase_d) * bw_rcpf(1.f - slope);
 }
@@ -249,7 +249,7 @@ static inline float bw_osc_tri_blamp_diff(float x) {
 }
 
 static inline float bw_osc_tri_process1_antialias(const bw_osc_tri_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc) {
-	const float slope = bw_one_pole_get_y_z1(&coeffs->smooth_state);
+	const float slope = bw_one_pole_get_y_z1(&coeffs->smooth_state); // output should always be in bounds given good input
 	const float s_1_p_pw = 1.f + slope;
 	const float s_1_m_pw = 1.f - slope;
 	const float phase_d = x + x;

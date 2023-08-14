@@ -6,7 +6,6 @@ code:
 * check all examples again
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
-* one pole process const input? (return also if const out)
 * empty functions etc. to keep consistency and forward compatibility?
 * float in [-1,1] for velocity, pitch bend, mod wheel
 * should clip slope in triangle?
@@ -25,7 +24,6 @@ code:
 * bw_fuzz gain compensation?
 * make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
-* update state ctrl -> process ctrl?
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
 * sr_reduce reset_coeffs? update_coeffs? process_multi?
@@ -71,6 +69,7 @@ code:
 * any chance to avoid casts in C for const X * const * input arguments?
 * heavy debug (e.g. also stripping restrict) vs light debug vs release vs optimized makefile rules
 * smaller optimized modules (e.g., simple one pole)
+* one pole, slew lim, maybe others: process const input? (return also if const out)
 
 build system:
 * make makefiles handle paths with spaces etc

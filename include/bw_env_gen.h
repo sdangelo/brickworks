@@ -42,6 +42,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Renamed <code>bw_env_gen_update_state_ctrl()</code> as
+ *              <code>bw_env_gen_process_ctrl()</code>.</li>
  *          <li><code>bw_env_gen_process()</code> and
  *              <code>bw_env_gen_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
@@ -168,9 +170,9 @@ static inline void bw_env_gen_update_coeffs_audio(bw_env_gen_coeffs *BW_RESTRICT
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
- *    #### bw_env_gen_update_state_ctrl()
+ *    #### bw_env_gen_process_ctrl()
  *  ```>>> */
-static inline void bw_env_gen_update_state_ctrl(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate);
+static inline void bw_env_gen_process_ctrl(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate);
 /*! <<<```
  *    Triggers control-rate update of the internal `state` using `coeffs` and
  *    the given `gate` value (`0` for off, non-`0` for on).
@@ -342,7 +344,7 @@ static inline void bw_env_gen_update_coeffs_audio(bw_env_gen_coeffs *BW_RESTRICT
 	(void)coeffs;
 }
 
-static inline void bw_env_gen_update_state_ctrl(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate) {
+static inline void bw_env_gen_process_ctrl(const bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate) {
 	(void)coeffs;
 	if (gate) {
 		if (state->phase == bw_env_gen_phase_off || state->phase == bw_env_gen_phase_release)
@@ -391,7 +393,7 @@ static inline float bw_env_gen_process1(const bw_env_gen_coeffs *BW_RESTRICT coe
 
 static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT state, char gate, float *BW_RESTRICT y, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
-	bw_env_gen_update_state_ctrl(coeffs, state, gate);
+	bw_env_gen_process_ctrl(coeffs, state, gate);
 	if (y != NULL)
 		for (size_t i = 0; i < n_samples; i++)
 			y[i] = bw_env_gen_process1(coeffs, state);
@@ -403,7 +405,7 @@ static inline void bw_env_gen_process(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_
 static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeffs, bw_env_gen_state *BW_RESTRICT const *BW_RESTRICT state, const char *BW_RESTRICT gate, float *BW_RESTRICT const *BW_RESTRICT y, size_t n_channels, size_t n_samples) {
 	bw_env_gen_update_coeffs_ctrl(coeffs);
 	for (size_t j = 0; j < n_channels; j++)
-		bw_env_gen_update_state_ctrl(coeffs, state[j], gate[j]);
+		bw_env_gen_process_ctrl(coeffs, state[j], gate[j]);
 	if (y != NULL)
 		for (size_t i = 0; i < n_samples; i++)
 			for (size_t j = 0; j < n_channels; j++) {

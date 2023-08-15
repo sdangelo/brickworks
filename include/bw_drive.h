@@ -223,6 +223,7 @@ static inline void bw_drive_init(bw_drive_coeffs *BW_RESTRICT coeffs) {
 	bw_peak_set_cutoff(&coeffs->peak_coeffs, 500.f);
 	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 9.5f);
 	bw_satur_set_gain(&coeffs->satur_coeffs, 1.5f);
+	bw_satur_set_gain_compensation(&coeffs->satur_coeffs, 1);
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, 400.f + (5e3f - 400.f) * 0.125f);
 }
 

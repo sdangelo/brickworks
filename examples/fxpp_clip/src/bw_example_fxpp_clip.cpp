@@ -21,7 +21,7 @@
 #include "bw_example_fxpp_clip.h"
 
 void bw_example_fxpp_clip_init(bw_example_fxpp_clip *instance) {
-	(void)instance;
+	instance->clip.setGainCompensation(true);
 }
 
 void bw_example_fxpp_clip_set_sample_rate(bw_example_fxpp_clip *instance, float sample_rate) {

@@ -21,7 +21,7 @@
 #include "bw_example_fxpp_satur.h"
 
 void bw_example_fxpp_satur_init(bw_example_fxpp_satur *instance) {
-	(void)instance;
+	instance->satur.setGainCompensation(true);
 }
 
 void bw_example_fxpp_satur_set_sample_rate(bw_example_fxpp_satur *instance, float sample_rate) {

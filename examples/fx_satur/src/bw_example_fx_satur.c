@@ -24,6 +24,7 @@ void bw_example_fx_satur_init(bw_example_fx_satur *instance) {
 	bw_satur_init(&instance->satur_coeffs);
 	bw_src_int_init(&instance->src_up_coeffs, 2);
 	bw_src_int_init(&instance->src_down_coeffs, -2);
+	bw_satur_set_gain_compensation(&instance->satur_coeffs, 1);
 }
 
 void bw_example_fx_satur_set_sample_rate(bw_example_fx_satur *instance, float sample_rate) {

@@ -214,7 +214,6 @@ static inline void bw_fuzz_init(bw_fuzz_coeffs *BW_RESTRICT coeffs) {
 	bw_peak_set_cutoff(&coeffs->peak_coeffs, 500.f);
 	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 6.6f);
 	bw_satur_set_bias(&coeffs->satur_coeffs, 0.145f);
-	bw_satur_set_gain_compensation(&coeffs->satur_coeffs, 0);
 	bw_hp1_set_cutoff(&coeffs->hp1_out_coeffs, 30.f);
 }
 

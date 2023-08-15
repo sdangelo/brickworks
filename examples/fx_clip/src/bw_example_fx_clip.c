@@ -24,6 +24,7 @@ void bw_example_fx_clip_init(bw_example_fx_clip *instance) {
 	bw_clip_init(&instance->clip_coeffs);
 	bw_src_int_init(&instance->src_up_coeffs, 2);
 	bw_src_int_init(&instance->src_down_coeffs, -2);
+	bw_clip_set_gain_compensation(&instance->clip_coeffs, 1);
 }
 
 void bw_example_fx_clip_set_sample_rate(bw_example_fx_clip *instance, float sample_rate) {

@@ -10,15 +10,12 @@ code:
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * svf bandpass out polarity too confusing (inverted in mm2)?
 * get_y_z1, common strategy?
-* bw_satur gain compensation to divide by actual gain (derivative) rather than gain parameter?
 * add initial state (x0) to reset state of all modules?
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
 * prewarp control in all derived filtering modules
 * src inside distortions? w/ control from outside?
-* bw_fuzz gain compensation?
-* make gain of distortions homogeneous?
 * max_delay -> set sample rate? see reverb
 * mem req -> return value of set sample rate?
 * peak gain + Q ???
@@ -68,6 +65,8 @@ code:
 * one pole, slew lim, maybe others: process const input? (return also if const out)
 * pan process with no out: should just reset coeffs?
 * float in [0,1] or [-1,1] for velocity, pitch bend, mod wheel in examples
+* bw_satur gain compensation, divide by actual gain (derivative) mode? what about around flat line? bw_clip?
+* gain compensation in distortions?
 
 build system:
 * make makefiles handle paths with spaces etc

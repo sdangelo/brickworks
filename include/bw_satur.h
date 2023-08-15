@@ -47,6 +47,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Changed default value for gain compensation to off.</li>
  *          <li><code>bw_satur_process()</code> and
  *              <code>bw_satur_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
@@ -197,7 +198,7 @@ static inline void bw_satur_set_gain_compensation(bw_satur_coeffs *BW_RESTRICT c
  *    Sets whether the output should be divided by gain (`value` non-`0`) or not
  *    (`0`).
  *
- *    Default value: `1` (on).
+ *    Default value: `0` (off).
  *  }}} */
 
 #ifdef __cplusplus
@@ -249,7 +250,7 @@ static inline void bw_satur_init(bw_satur_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
 	coeffs->bias = 0.f;
 	coeffs->gain = 1.f;
-	coeffs->gain_compensation = 1;
+	coeffs->gain_compensation = 0;
 }
 
 static inline void bw_satur_set_sample_rate(bw_satur_coeffs *BW_RESTRICT coeffs, float sample_rate) {

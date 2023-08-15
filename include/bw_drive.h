@@ -266,7 +266,7 @@ static inline void bw_drive_update_coeffs_audio(bw_drive_coeffs *BW_RESTRICT coe
 
 static inline float bw_drive_process1(const bw_drive_coeffs *BW_RESTRICT coeffs, bw_drive_state *BW_RESTRICT state, float x) {
 	float v_lp, v_hp, v_bp;
-	bw_svf_process1(&coeffs->hp2_coeffs, &state->hp2_state, x, &v_lp, &v_bp, &v_hp);
+	bw_svf_process1(&coeffs->hp2_coeffs, &state->hp2_state, 0.316f * x, &v_lp, &v_bp, &v_hp);
 	float y = bw_hs1_process1(&coeffs->hs1_coeffs, &state->hs1_state, v_hp);
 	y = bw_peak_process1(&coeffs->peak_coeffs, &state->peak_state, y);
 	y = v_hp + bw_satur_process1_comp(&coeffs->satur_coeffs, &state->satur_state, y - v_hp);

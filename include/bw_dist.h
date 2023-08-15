@@ -34,6 +34,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Adjusted internal peak cutoff to more sensible value.</li>
  *          <li><code>bw_dist_process()</code> and
  *              <code>bw_dist_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -215,7 +216,7 @@ static inline void bw_dist_init(bw_dist_coeffs *BW_RESTRICT coeffs) {
 	bw_lp1_init(&coeffs->lp1_coeffs);
 	bw_gain_init(&coeffs->gain_coeffs);
 	bw_hp1_set_cutoff(&coeffs->hp1_coeffs, 7.f);
-	bw_peak_set_cutoff(&coeffs->peak_coeffs, 600.f);
+	bw_peak_set_cutoff(&coeffs->peak_coeffs, 2e3f);
 	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 10.f);
 	bw_clip_set_bias(&coeffs->clip_coeffs, 0.75f / 4.25f);
 	bw_clip_set_gain(&coeffs->clip_coeffs, 1.f / 4.25f);

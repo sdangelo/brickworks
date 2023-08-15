@@ -22,8 +22,8 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 1.0.0 }}}
  *  requires {{{
- *    bw_common bw_gain bw_lp1 bw_math bw_mm2 bw_one_pole bw_peak bw_satur
- *    bw_svf
+ *    bw_common bw_gain bw_hs1 bw_lp1 bw_math bw_mm2 bw_one_pole bw_peak
+ *    bw_satur bw_svf
  *  }}}
  *  description {{{
  *    Overdrive effect.
@@ -180,6 +180,7 @@ static inline void bw_drive_set_volume(bw_drive_coeffs *BW_RESTRICT coeffs, floa
  * change at any time in future versions. Please, do not use it directly. */
 
 #include <bw_svf.h>
+#include <bw_hs1.h>
 #include <bw_peak.h>
 #include <bw_satur.h>
 #include <bw_lp1.h>
@@ -192,6 +193,7 @@ extern "C" {
 struct bw_drive_coeffs {
 	// Sub-components
 	bw_svf_coeffs	hp2_coeffs;
+	bw_hs1_coeffs	hs1_coeffs;
 	bw_peak_coeffs	peak_coeffs;
 	bw_satur_coeffs	satur_coeffs;
 	bw_lp1_coeffs	lp1_coeffs;
@@ -201,6 +203,7 @@ struct bw_drive_coeffs {
 struct bw_drive_state {
 	// Sub-components
 	bw_svf_state	hp2_state;
+	bw_hs1_state	hs1_state;
 	bw_peak_state	peak_state;
 	bw_satur_state	satur_state;
 	bw_lp1_state	lp1_state;
@@ -208,25 +211,30 @@ struct bw_drive_state {
 
 static inline void bw_drive_init(bw_drive_coeffs *BW_RESTRICT coeffs) {
 	bw_svf_init(&coeffs->hp2_coeffs);
+	bw_hs1_init(&coeffs->hs1_coeffs);
 	bw_peak_init(&coeffs->peak_coeffs);
 	bw_satur_init(&coeffs->satur_coeffs);
 	bw_lp1_init(&coeffs->lp1_coeffs);
 	bw_gain_init(&coeffs->gain_coeffs);
 	bw_svf_set_cutoff(&coeffs->hp2_coeffs, 16.f);
-	bw_peak_set_peak_gain_dB(&coeffs->peak_coeffs, 20.f);
-	bw_peak_set_cutoff(&coeffs->peak_coeffs, 2e3f);
-	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 10.f);
+	bw_hs1_set_cutoff(&coeffs->hs1_coeffs, 200.f);
+	bw_hs1_set_high_gain_dB(&coeffs->hs1_coeffs, 20.f);
+	bw_peak_set_peak_gain_dB(&coeffs->peak_coeffs, 0.f);
+	bw_peak_set_cutoff(&coeffs->peak_coeffs, 500.f);
+	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 9.5f);
 	bw_satur_set_gain(&coeffs->satur_coeffs, 1.5f);
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, 400.f + (5e3f - 400.f) * 0.125f);
 }
 
 static inline void bw_drive_set_sample_rate(bw_drive_coeffs *BW_RESTRICT coeffs, float sample_rate) {
 	bw_svf_set_sample_rate(&coeffs->hp2_coeffs, sample_rate);
+	bw_hs1_set_sample_rate(&coeffs->hs1_coeffs, sample_rate);
 	bw_peak_set_sample_rate(&coeffs->peak_coeffs, sample_rate);
 	bw_satur_set_sample_rate(&coeffs->satur_coeffs, sample_rate);
 	bw_lp1_set_sample_rate(&coeffs->lp1_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_coeffs, sample_rate);
 	bw_svf_reset_coeffs(&coeffs->hp2_coeffs);
+	bw_hs1_reset_coeffs(&coeffs->hs1_coeffs);
 	bw_satur_reset_coeffs(&coeffs->satur_coeffs);
 }
 
@@ -238,6 +246,7 @@ static inline void bw_drive_reset_coeffs(bw_drive_coeffs *BW_RESTRICT coeffs) {
 
 static inline void bw_drive_reset_state(const bw_drive_coeffs *BW_RESTRICT coeffs, bw_drive_state *BW_RESTRICT state) {
 	bw_svf_reset_state(&coeffs->hp2_coeffs, &state->hp2_state, 0.f);
+	bw_hs1_reset_state(&coeffs->hs1_coeffs, &state->hs1_state, 0.f);
 	bw_peak_reset_state(&coeffs->peak_coeffs, &state->peak_state, 0.f);
 	bw_satur_reset_state(&coeffs->satur_coeffs, &state->satur_state);
 	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, 0.f);
@@ -258,7 +267,8 @@ static inline void bw_drive_update_coeffs_audio(bw_drive_coeffs *BW_RESTRICT coe
 static inline float bw_drive_process1(const bw_drive_coeffs *BW_RESTRICT coeffs, bw_drive_state *BW_RESTRICT state, float x) {
 	float v_lp, v_hp, v_bp;
 	bw_svf_process1(&coeffs->hp2_coeffs, &state->hp2_state, x, &v_lp, &v_bp, &v_hp);
-	float y = bw_peak_process1(&coeffs->peak_coeffs, &state->peak_state, v_hp);
+	float y = bw_hs1_process1(&coeffs->hs1_coeffs, &state->hs1_state, v_hp);
+	y = bw_peak_process1(&coeffs->peak_coeffs, &state->peak_state, y);
 	y = v_hp + bw_satur_process1_comp(&coeffs->satur_coeffs, &state->satur_state, y - v_hp);
 	y = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, y);
 	return bw_gain_process1(&coeffs->gain_coeffs, y);
@@ -282,7 +292,7 @@ static inline void bw_drive_process_multi(bw_drive_coeffs *BW_RESTRICT coeffs, b
 }
 
 static inline void bw_drive_set_drive(bw_drive_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_peak_set_peak_gain_dB(&coeffs->peak_coeffs, 20.f + 20.f * value);
+	bw_peak_set_peak_gain_dB(&coeffs->peak_coeffs, 20.f * value);
 }
 
 static inline void bw_drive_set_tone(bw_drive_coeffs *BW_RESTRICT coeffs, float value) {

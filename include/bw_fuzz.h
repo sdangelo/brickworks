@@ -22,8 +22,8 @@
  *  module_type {{{ dsp }}}
  *  version {{{ 1.0.0 }}}
  *  requires {{{
- *    bw_common bw_gain bw_hp1 bw_hs1 bw_lp1 bw_math bw_mm1 bw_one_pole bw_satur
- *    bw_svf
+ *    bw_common bw_gain bw_hp1 bw_lp1 bw_math bw_mm2 bw_one_pole bw_peak
+ *    bw_satur bw_svf
  *  }}}
  *  description {{{
  *    Fuzz effect.
@@ -34,6 +34,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Improved algorithm to be a bit more faithful to the
+ *              original.</li>
  *          <li><code>bw_fuzz_process()</code> and
  *              <code>bw_fuzz_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -169,8 +171,9 @@ static inline void bw_fuzz_set_volume(bw_fuzz_coeffs *BW_RESTRICT coeffs, float 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
+#include <bw_hp1.h>
 #include <bw_svf.h>
-#include <bw_hs1.h>
+#include <bw_peak.h>
 #include <bw_satur.h>
 #include <bw_hp1.h>
 #include <bw_gain.h>
@@ -181,74 +184,85 @@ extern "C" {
 
 struct bw_fuzz_coeffs {
 	// Sub-components
-	bw_svf_coeffs	svf_coeffs;
-	bw_hs1_coeffs	hs1_coeffs;
+	bw_hp1_coeffs	hp1_in_coeffs;
+	bw_svf_coeffs	lp2_coeffs;
+	bw_peak_coeffs	peak_coeffs;
 	bw_satur_coeffs	satur_coeffs;
-	bw_hp1_coeffs	hp1_coeffs;
+	bw_hp1_coeffs	hp1_out_coeffs;
 	bw_gain_coeffs	gain_coeffs;
 };
 
 struct bw_fuzz_state {
 	// Sub-components
-	bw_svf_state	svf_state;
-	bw_hs1_state	hs1_state;
+	bw_hp1_state	hp1_in_state;
+	bw_svf_state	lp2_1_state;
+	bw_svf_state	lp2_2_state;
+	bw_peak_state	peak_state;
 	bw_satur_state	satur_state;
-	bw_hp1_state	hp1_state;
+	bw_hp1_state	hp1_out_state;
 };
 
 static inline void bw_fuzz_init(bw_fuzz_coeffs *BW_RESTRICT coeffs) {
-	bw_svf_init(&coeffs->svf_coeffs);
-	bw_hs1_init(&coeffs->hs1_coeffs);
+	bw_hp1_init(&coeffs->hp1_in_coeffs);
+	bw_svf_init(&coeffs->lp2_coeffs);
+	bw_peak_init(&coeffs->peak_coeffs);
 	bw_satur_init(&coeffs->satur_coeffs);
-	bw_hp1_init(&coeffs->hp1_coeffs);
+	bw_hp1_init(&coeffs->hp1_out_coeffs);
 	bw_gain_init(&coeffs->gain_coeffs);
-	bw_svf_set_cutoff(&coeffs->svf_coeffs, 5e3f);
-	bw_svf_set_Q(&coeffs->svf_coeffs, 0.87f);
-	bw_hs1_set_cutoff(&coeffs->hs1_coeffs, 50.f);
-	bw_satur_set_bias(&coeffs->satur_coeffs, 0.11f);
+	bw_hp1_set_cutoff(&coeffs->hp1_in_coeffs, 4.f);
+	bw_svf_set_cutoff(&coeffs->lp2_coeffs, 7e3f);
+	bw_peak_set_cutoff(&coeffs->peak_coeffs, 500.f);
+	bw_peak_set_bandwidth(&coeffs->peak_coeffs, 6.6f);
+	bw_satur_set_bias(&coeffs->satur_coeffs, 0.145f);
 	bw_satur_set_gain_compensation(&coeffs->satur_coeffs, 0);
-	bw_hp1_set_cutoff(&coeffs->hp1_coeffs, 30.f);
+	bw_hp1_set_cutoff(&coeffs->hp1_out_coeffs, 30.f);
 }
 
 static inline void bw_fuzz_set_sample_rate(bw_fuzz_coeffs *BW_RESTRICT coeffs, float sample_rate) {
-	bw_svf_set_sample_rate(&coeffs->svf_coeffs, sample_rate);
-	bw_hs1_set_sample_rate(&coeffs->hs1_coeffs, sample_rate);
+	bw_hp1_set_sample_rate(&coeffs->hp1_in_coeffs, sample_rate);
+	bw_svf_set_sample_rate(&coeffs->lp2_coeffs, sample_rate);
+	bw_peak_set_sample_rate(&coeffs->peak_coeffs, sample_rate);
 	bw_satur_set_sample_rate(&coeffs->satur_coeffs, sample_rate);
-	bw_hp1_set_sample_rate(&coeffs->hp1_coeffs, sample_rate);
+	bw_hp1_set_sample_rate(&coeffs->hp1_out_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_coeffs, sample_rate);
-	bw_svf_reset_coeffs(&coeffs->svf_coeffs);
+	bw_hp1_reset_coeffs(&coeffs->hp1_in_coeffs);
+	bw_svf_reset_coeffs(&coeffs->lp2_coeffs);
 	bw_satur_reset_coeffs(&coeffs->satur_coeffs);
-	bw_hp1_reset_coeffs(&coeffs->hp1_coeffs);
+	bw_hp1_reset_coeffs(&coeffs->hp1_out_coeffs);
 }
 
 static inline void bw_fuzz_reset_coeffs(bw_fuzz_coeffs *BW_RESTRICT coeffs) {
-	bw_hs1_reset_coeffs(&coeffs->hs1_coeffs);
+	bw_peak_reset_coeffs(&coeffs->peak_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_coeffs);
 }
 
 static inline void bw_fuzz_reset_state(const bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT state) {
-	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, 0.f);
-	bw_hs1_reset_state(&coeffs->hs1_coeffs, &state->hs1_state, 0.f);
+	bw_hp1_reset_state(&coeffs->hp1_in_coeffs, &state->hp1_in_state, 0.f);
+	bw_svf_reset_state(&coeffs->lp2_coeffs, &state->lp2_1_state, 0.f);
+	bw_svf_reset_state(&coeffs->lp2_coeffs, &state->lp2_2_state, 0.f);
+	bw_peak_reset_state(&coeffs->peak_coeffs, &state->peak_state, 0.f);
 	bw_satur_reset_state(&coeffs->satur_coeffs, &state->satur_state);
-	bw_hp1_reset_state(&coeffs->hp1_coeffs, &state->hp1_state, 0.f);
+	bw_hp1_reset_state(&coeffs->hp1_out_coeffs, &state->hp1_out_state, 0.f);
 }
 
 static inline void bw_fuzz_update_coeffs_ctrl(bw_fuzz_coeffs *BW_RESTRICT coeffs) {
-	bw_hs1_update_coeffs_ctrl(&coeffs->hs1_coeffs);
+	bw_peak_update_coeffs_ctrl(&coeffs->peak_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_coeffs);
 }
 
 static inline void bw_fuzz_update_coeffs_audio(bw_fuzz_coeffs *BW_RESTRICT coeffs) {
-	bw_hs1_update_coeffs_audio(&coeffs->hs1_coeffs);
+	bw_peak_update_coeffs_audio(&coeffs->peak_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_coeffs);
 }
 
 static inline float bw_fuzz_process1(const bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_fuzz_state *BW_RESTRICT state, float x) {
+	float y = bw_hp1_process1(&coeffs->hp1_in_coeffs, &state->hp1_in_state, x);
 	float v_lp, v_hp, v_bp;
-	bw_svf_process1(&coeffs->svf_coeffs, &state->svf_state, x, &v_lp, &v_bp, &v_hp);
-	float y = bw_hs1_process1(&coeffs->hs1_coeffs, &state->hs1_state, v_lp);
+	bw_svf_process1(&coeffs->lp2_coeffs, &state->lp2_1_state, x, &v_lp, &v_bp, &v_hp);
+	bw_svf_process1(&coeffs->lp2_coeffs, &state->lp2_2_state, v_lp, &v_lp, &v_bp, &v_hp);
+	y = bw_peak_process1(&coeffs->peak_coeffs, &state->peak_state, v_lp);
 	y = bw_satur_process1(&coeffs->satur_coeffs, &state->satur_state, y);
-	y = bw_hp1_process1(&coeffs->hp1_coeffs, &state->hp1_state, y);
+	y = bw_hp1_process1(&coeffs->hp1_out_coeffs, &state->hp1_out_state, y);
 	return bw_gain_process1(&coeffs->gain_coeffs, y);
 }
 
@@ -270,7 +284,7 @@ static inline void bw_fuzz_process_multi(bw_fuzz_coeffs *BW_RESTRICT coeffs, bw_
 }
 
 static inline void bw_fuzz_set_fuzz(bw_fuzz_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_hs1_set_high_gain_dB(&coeffs->hs1_coeffs, 35.f * value);
+	bw_peak_set_peak_gain_dB(&coeffs->peak_coeffs, 30.f * value);
 }
 
 static inline void bw_fuzz_set_volume(bw_fuzz_coeffs *BW_RESTRICT coeffs, float value) {

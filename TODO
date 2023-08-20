@@ -1,33 +1,34 @@
 1.0.0
 -----
 
+in progress:
+* add initial state (x0) to reset state of all modules
+* check assumptions w.r.t. usage of math functions
+* empty functions etc. to keep consistency and forward compatibility?
+* format declarations in a more readable way
 code:
-* debugging - also check outputs different (incl bw_buf)
-* check all examples again
+ general:
+* mem req -> return value of set sample rate? or sample rate argument of mem req?
+* c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
+* common smoothing policy (as control rate as possible?) - smoothing control?
+* check unititialized warnings (check fxpp_comp in particular vs fxpp_satur)
+ semi-specific:
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
-* empty functions etc. to keep consistency and forward compatibility?
-* common smoothing policy (as control rate as possible?) - smoothing control?
+* max_delay -> set sample rate? see reverb
+ specific:
 * svf bandpass out polarity too confusing (inverted in mm2)?
-* get_y_z1, common strategy?
-* add initial state (x0) to reset state of all modules?
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
 * prewarp control in all derived filtering modules
 * src inside distortions? w/ control from outside?
-* max_delay -> set sample rate? see reverb
-* mem req -> return value of set sample rate?
 * peak gain + Q ???
-* sr_reduce reset_coeffs? update_coeffs? process_multi?
 * better src filter
-* c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
-* check unititialized warnings (check fxpp_comp in particular vs fxpp_satur)
+finally:
+* debugging - also check outputs different (incl bw_buf)
+* check all examples again
 * clearly specify that state is tied to a particular set of coeffs (1:N)
-* modulation vs process (multi) no update (post 1.0.0)???
-* check assumptions w.r.t. usage of math functions
-* sample rate-constant coeffs? (pan case)
-* sr-dependent vs cr-dependent coeffs? see synth poly example
 * thank scientific paper authors
 
 build system:
@@ -67,6 +68,8 @@ code:
 * float in [0,1] or [-1,1] for velocity, pitch bend, mod wheel in examples
 * bw_satur gain compensation, divide by actual gain (derivative) mode? what about around flat line? bw_clip?
 * gain compensation in distortions?
+* sr-dependent vs cr-dependent coeffs? see synth poly example and pan case
+* modulation vs process (multi) no update (post 1.0.0)???
 
 build system:
 * make makefiles handle paths with spaces etc

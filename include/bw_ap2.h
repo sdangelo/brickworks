@@ -30,6 +30,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li><code>bw_ap2_process()</code> and
  *              <code>bw_ap2_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -91,25 +93,32 @@ typedef struct bw_ap2_state bw_ap2_state;
  *
  *    #### bw_ap2_init()
  *  ```>>> */
-static inline void bw_ap2_init(bw_ap2_coeffs *BW_RESTRICT coeffs);
+static inline void bw_ap2_init(
+	bw_ap2_coeffs *BW_RESTRICT	coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_ap2_set_sample_rate()
  *  ```>>> */
-static inline void bw_ap2_set_sample_rate(bw_ap2_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_ap2_set_sample_rate(
+	bw_ap2_coeffs *BW_RESTRICT	coeffs,
+	float				sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
  *    #### bw_ap2_reset_coeffs()
  *  ```>>> */
-static inline void bw_ap2_reset_coeffs(bw_ap2_coeffs *BW_RESTRICT coeffs);
+static inline void bw_ap2_reset_coeffs(
+	bw_ap2_coeffs *BW_RESTRICT	coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_ap2_reset_state()
  *  ```>>> */
-static inline void bw_ap2_reset_state(const bw_ap2_coeffs *BW_RESTRICT coeffs, bw_ap2_state *BW_RESTRICT state, float x_0);
+static inline void bw_ap2_reset_state(
+	const bw_ap2_coeffs *BW_RESTRICT	coeffs,
+	bw_ap2_state *BW_RESTRICT		state,
+	float					x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
  *    and the quiescent/initial input value `x_0`.
@@ -268,13 +277,15 @@ public:
 
 	void setSampleRate(float sampleRate);
 	void reset(float x_0 = 0.f);
+	void reset(const float *BW_RESTRICT x_0);
+	void reset(const std::array<float, N_CHANNELS> x_0);
 	void process(
 		const float * const *x,
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setCutoff(float value);
@@ -315,6 +326,18 @@ inline void AP2<N_CHANNELS>::reset(float x_0) {
 }
 
 template<size_t N_CHANNELS>
+inline void AP2<N_CHANNELS>::reset(const float *BW_RESTRICT x_0) {
+	bw_ap2_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_ap2_reset_state(&coeffs, states + i, x_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void AP2<N_CHANNELS>::reset(const std::array<float, N_CHANNELS> x_0) {
+	reset(x_0.data());
+}
+
+template<size_t N_CHANNELS>
 inline void AP2<N_CHANNELS>::process(
 		const float * const *x,
 		float * const *y,
@@ -324,8 +347,8 @@ inline void AP2<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void AP2<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }

@@ -48,6 +48,8 @@
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Changed default value for gain compensation to off.</li>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li><code>bw_clip_process()</code> and
  *              <code>bw_clip_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -115,9 +117,10 @@ static inline void bw_clip_reset_coeffs(bw_clip_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_clip_reset_state()
  *  ```>>> */
-static inline void bw_clip_reset_state(const bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state *BW_RESTRICT state);
+static inline void bw_clip_reset_state(const bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state *BW_RESTRICT state, float x_0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_clip_update_coeffs_ctrl()
  *  ```>>> */
@@ -258,9 +261,10 @@ static inline void bw_clip_reset_coeffs(bw_clip_coeffs *BW_RESTRICT coeffs) {
 	bw_clip_do_update_coeffs(coeffs, 1);
 }
 
-static inline void bw_clip_reset_state(const bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state *BW_RESTRICT state) {
-	state->x_z1 = bw_one_pole_get_y_z1(&coeffs->smooth_bias_state);
-	const float a = bw_absf(state->x_z1);
+static inline void bw_clip_reset_state(const bw_clip_coeffs *BW_RESTRICT coeffs, bw_clip_state *BW_RESTRICT state, float x_0) {
+	const float x = bw_one_pole_get_y_z1(&coeffs->smooth_gain_state) * x_0 + bw_one_pole_get_y_z1(&coeffs->smooth_bias_state);
+	const float a = bw_absf(x_0);
+	state->x_z1 = x;
 	state->F_z1 = a > 1.f ? a - 0.5f : 0.5f * a * a;
 }
 
@@ -346,14 +350,16 @@ public:
 	Clip();
 
 	void setSampleRate(float sampleRate);
-	void reset();
+	void reset(float x_0 = 0.f);
+	void reset(const float *BW_RESTRICT x_0);
+	void reset(const std::array<float, N_CHANNELS> x_0);
 	void process(
 		const float * const *x,
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setBias(float value);
@@ -388,10 +394,22 @@ inline void Clip<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void Clip<N_CHANNELS>::reset() {
+inline void Clip<N_CHANNELS>::reset(float x_0) {
 	bw_clip_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_clip_reset_state(&coeffs, states + i);
+		bw_clip_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void Clip<N_CHANNELS>::reset(const float *BW_RESTRICT x_0) {
+	bw_clip_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_clip_reset_state(&coeffs, states + i, x_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void Clip<N_CHANNELS>::reset(const std::array<float, N_CHANNELS> x_0) {
+	reset(x_0.data());
 }
 
 template<size_t N_CHANNELS>
@@ -404,8 +422,8 @@ inline void Clip<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void Clip<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }

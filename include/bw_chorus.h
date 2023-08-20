@@ -38,6 +38,10 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added initial value argument in
+ *              <code>bw_chorus_reset_state()</code>.</li>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li><code>bw_chorus_process()</code> and
@@ -129,9 +133,10 @@ static inline void bw_chorus_reset_coeffs(bw_chorus_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_chorus_reset_state()
  *  ```>>> */
-static inline void bw_chorus_reset_state(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state);
+static inline void bw_chorus_reset_state(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, float x_0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_chorus_update_coeffs_ctrl()
  *  ```>>> */
@@ -278,8 +283,8 @@ static inline void bw_chorus_reset_coeffs(bw_chorus_coeffs *BW_RESTRICT coeffs) 
 	bw_comb_reset_coeffs(&coeffs->comb_coeffs);
 }
 
-static inline void bw_chorus_reset_state(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state) {
-	bw_comb_reset_state(&coeffs->comb_coeffs, &state->comb_state);
+static inline void bw_chorus_reset_state(const bw_chorus_coeffs *BW_RESTRICT coeffs, bw_chorus_state *BW_RESTRICT state, float x_0) {
+	bw_comb_reset_state(&coeffs->comb_coeffs, &state->comb_state, x_0);
 }
 
 static inline void bw_chorus_update_coeffs_ctrl(bw_chorus_coeffs *BW_RESTRICT coeffs) {
@@ -362,14 +367,16 @@ public:
 	~Chorus();
 
 	void setSampleRate(float sampleRate);
-	void reset();
+	void reset(float x_0 = 0.f);
+	void reset(const float *BW_RESTRICT x_0);
+	void reset(const std::array<float, N_CHANNELS> x_0);
 	void process(
 		const float * const *x,
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setRate(float value);
@@ -422,10 +429,22 @@ inline void Chorus<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void Chorus<N_CHANNELS>::reset() {
+inline void Chorus<N_CHANNELS>::reset(float x_0) {
 	bw_chorus_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_chorus_reset_state(&coeffs, states + i);
+		bw_chorus_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::reset(const float *BW_RESTRICT x_0) {
+	bw_chorus_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_chorus_reset_state(&coeffs, states + i, x_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void Chorus<N_CHANNELS>::reset(const std::array<float, N_CHANNELS> x_0) {
+	reset(x_0.data());
 }
 
 template<size_t N_CHANNELS>
@@ -438,8 +457,8 @@ inline void Chorus<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void Chorus<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }

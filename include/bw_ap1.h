@@ -30,6 +30,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li><code>bw_ap1_process()</code> and
  *              <code>bw_ap1_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -93,51 +95,69 @@ typedef struct bw_ap1_state bw_ap1_state;
  *
  *    #### bw_ap1_init()
  *  ```>>> */
-static inline void bw_ap1_init(bw_ap1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_ap1_init(
+	bw_ap1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_ap1_set_sample_rate()
  *  ```>>> */
-static inline void bw_ap1_set_sample_rate(bw_ap1_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_ap1_set_sample_rate(
+	bw_ap1_coeffs *BW_RESTRICT coeffs,
+	float                      sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
  *    #### bw_ap1_reset_coeffs()
  *  ```>>> */
-static inline void bw_ap1_reset_coeffs(bw_ap1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_ap1_reset_coeffs(
+	bw_ap1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_ap1_reset_state()
  *  ```>>> */
-static inline void bw_ap1_reset_state(const bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT state, float x_0);
+static inline float bw_ap1_reset_state(
+	const bw_ap1_coeffs *BW_RESTRICT coeffs,
+	bw_ap1_state *BW_RESTRICT        state,
+	float                            x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x_0`.
+ *    and the quiescent/initial input value `x_0`. Returns the corresponding
+ *    quiescent/initial output value.
  *
  *    #### bw_ap1_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_ap1_update_coeffs_ctrl(bw_ap1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_ap1_update_coeffs_ctrl(
+	bw_ap1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
  *    #### bw_ap1_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_ap1_update_coeffs_audio(bw_ap1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_ap1_update_coeffs_audio(
+	bw_ap1_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_ap1_process1()
  *  ```>>> */
-static inline float bw_ap1_process1(const bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT state, float x);
+static inline float bw_ap1_process1(
+	const bw_ap1_coeffs *BW_RESTRICT coeffs,
+	bw_ap1_state *BW_RESTRICT        state,
+	float                            x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. Returns the corresponding output sample.
  *
  *    #### bw_ap1_process()
  *  ```>>> */
-static inline void bw_ap1_process(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
+static inline void bw_ap1_process(
+	bw_ap1_coeffs *BW_RESTRICT	coeffs,
+	bw_ap1_state *BW_RESTRICT	state,
+	const float *			x,
+	float *				y,
+	size_t				n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -145,7 +165,13 @@ static inline void bw_ap1_process(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_stat
  *
  *    #### bw_ap1_process_multi()
  *  ```>>> */
-static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_ap1_process_multi(
+	bw_ap1_coeffs *BW_RESTRICT			coeffs,
+	bw_ap1_state *BW_RESTRICT const *BW_RESTRICT	state,
+	const float * const *				x,
+	float * const *					y,
+	size_t						n_channels,
+	size_t						n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -154,7 +180,9 @@ static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap
  *
  *    #### bw_ap1_set_cutoff()
  *  ```>>> */
-static inline void bw_ap1_set_cutoff(bw_ap1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_ap1_set_cutoff(
+	bw_ap1_coeffs *BW_RESTRICT	coeffs,
+	float				value);
 /*! <<<```
  *    Sets the cutoff frequency `value` (Hz) in `coeffs`.
  *
@@ -185,36 +213,54 @@ struct bw_ap1_state {
 	bw_lp1_state	lp1_state;
 };
 
-static inline void bw_ap1_init(bw_ap1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_ap1_init(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs) {
 	bw_lp1_init(&coeffs->lp1_coeffs);
 }
 
-static inline void bw_ap1_set_sample_rate(bw_ap1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_ap1_set_sample_rate(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs,
+		float				sample_rate) {
 	bw_lp1_set_sample_rate(&coeffs->lp1_coeffs, sample_rate);
 }
 
-static inline void bw_ap1_reset_coeffs(bw_ap1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_ap1_reset_coeffs(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs) {
 	bw_lp1_reset_coeffs(&coeffs->lp1_coeffs);
 }
 
-static inline void bw_ap1_reset_state(const bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT state, float x_0) {
-	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+static inline float bw_ap1_reset_state(
+		const bw_ap1_coeffs *BW_RESTRICT	coeffs,
+		bw_ap1_state *BW_RESTRICT		state,
+		float					x_0) {
+	const float lp = bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+	return x_0 - lp - lp;
 }
 
-static inline void bw_ap1_update_coeffs_ctrl(bw_ap1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_ap1_update_coeffs_ctrl(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs) {
 	bw_lp1_update_coeffs_ctrl(&coeffs->lp1_coeffs);
 }
 
-static inline void bw_ap1_update_coeffs_audio(bw_ap1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_ap1_update_coeffs_audio(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs) {
 	bw_lp1_update_coeffs_audio(&coeffs->lp1_coeffs);
 }
 
-static inline float bw_ap1_process1(const bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT state, float x) {
+static inline float bw_ap1_process1(
+		const bw_ap1_coeffs *BW_RESTRICT	coeffs,
+		bw_ap1_state *BW_RESTRICT		state,
+		float					x) {
 	const float lp = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, x);
 	return x - lp - lp;
 }
 
-static inline void bw_ap1_process(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
+static inline void bw_ap1_process(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs,
+		bw_ap1_state *BW_RESTRICT	state,
+		const float *			x,
+		float *				y,
+		size_t				n_samples) {
 	bw_ap1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_ap1_update_coeffs_audio(coeffs);
@@ -222,7 +268,13 @@ static inline void bw_ap1_process(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_stat
 	}
 }
 
-static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap1_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_ap1_process_multi(
+		bw_ap1_coeffs *BW_RESTRICT			coeffs,
+		bw_ap1_state *BW_RESTRICT const *BW_RESTRICT	state,
+		const float * const *				x,
+		float * const *					y,
+		size_t						n_channels,
+		size_t						n_samples) {
 	bw_ap1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_ap1_update_coeffs_audio(coeffs);
@@ -231,7 +283,9 @@ static inline void bw_ap1_process_multi(bw_ap1_coeffs *BW_RESTRICT coeffs, bw_ap
 	}
 }
 
-static inline void bw_ap1_set_cutoff(bw_ap1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_ap1_set_cutoff(
+		bw_ap1_coeffs *BW_RESTRICT	coeffs,
+		float				value) {
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, value);
 }
 
@@ -252,18 +306,30 @@ class AP1 {
 public:
 	AP1();
 
-	void setSampleRate(float sampleRate);
-	void reset(float x_0 = 0.f);
+	void setSampleRate(
+		float sampleRate);
+		
+	void reset(
+		float              x_0 = 0.f,
+		float *BW_RESTRICT y_0 = nullptr);
+	void reset(
+		const float * x_0,
+		float *       y_0);
+	void reset(
+		const std::array<float, N_CHANNELS> x_0
+		const std::array<float, N_CHANNELS> y_0);
+		
 	void process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples);
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS>       y,
+		size_t                                      nSamples);
 
-	void setCutoff(float value);
+	void setCutoff(
+		float value);
 /*! <<<...
  *  }
  *  ```
@@ -288,35 +354,52 @@ inline AP1<N_CHANNELS>::AP1() {
 }
 
 template<size_t N_CHANNELS>
-inline void AP1<N_CHANNELS>::setSampleRate(float sampleRate) {
+inline void AP1<N_CHANNELS>::setSampleRate(
+		float	sampleRate) {
 	bw_ap1_set_sample_rate(&coeffs, sampleRate);
 }
 
 template<size_t N_CHANNELS>
-inline void AP1<N_CHANNELS>::reset(float x_0) {
+inline void AP1<N_CHANNELS>::reset(
+		float	x_0) {
 	bw_ap1_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
 		bw_ap1_reset_state(&coeffs, states + i, x_0);
 }
 
 template<size_t N_CHANNELS>
+inline void AP1<N_CHANNELS>::reset(
+		const float *BW_RESTRICT	x_0) {
+	bw_ap1_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_ap1_reset_state(&coeffs, states + i, x_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void AP1<N_CHANNELS>::reset(
+		const std::array<float, N_CHANNELS>	x_0) {
+	reset(x_0.data());
+}
+
+template<size_t N_CHANNELS>
 inline void AP1<N_CHANNELS>::process(
-		const float * const *x,
-		float * const *y,
+		const float * const *	x,
+		float * const *		y,
 		size_t nSamples) {
 	bw_ap1_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void AP1<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS>	x,
+		const std::array<float *, N_CHANNELS>		y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>
-inline void AP1<N_CHANNELS>::setCutoff(float value) {
+inline void AP1<N_CHANNELS>::setCutoff(
+		float	value) {
 	bw_ap1_set_cutoff(&coeffs, value);
 }
 

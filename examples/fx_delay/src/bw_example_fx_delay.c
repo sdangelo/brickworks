@@ -38,7 +38,7 @@ void bw_example_fx_delay_mem_set(bw_example_fx_delay *instance, void *mem) {
 
 void bw_example_fx_delay_reset(bw_example_fx_delay *instance) {
 	bw_delay_reset_coeffs(&instance->delay_coeffs);
-	bw_delay_reset_state(&instance->delay_coeffs, &instance->delay_state);
+	bw_delay_reset_state(&instance->delay_coeffs, &instance->delay_state, 0.f);
 }
 
 void bw_example_fx_delay_process(bw_example_fx_delay *instance, const float** x, float** y, int n_samples) {

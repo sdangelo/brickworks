@@ -33,6 +33,10 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added initial value argument in
+ *              <code>bw_delay_reset_state()</code>.</li>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li><code>bw_delay_process()</code> and
@@ -123,9 +127,10 @@ static inline void bw_delay_reset_coeffs(bw_delay_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_delay_reset_state()
  *  ```>>> */
-static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state);
+static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float x_0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_delay_read()
  *  ```>>> */
@@ -254,8 +259,8 @@ static inline void bw_delay_reset_coeffs(bw_delay_coeffs *BW_RESTRICT coeffs) {
 	bw_delay_update_coeffs_ctrl(coeffs);
 }
 
-static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state) {
-	bw_buf_fill(0.f, state->buf, coeffs->len);
+static inline void bw_delay_reset_state(const bw_delay_coeffs *BW_RESTRICT coeffs, bw_delay_state *BW_RESTRICT state, float x_0) {
+	bw_buf_fill(x_0, state->buf, coeffs->len);
 	state->idx = 0;
 }
 
@@ -332,14 +337,16 @@ public:
 	~Delay();
 
 	void setSampleRate(float sampleRate);
-	void reset();
+	void reset(float x_0 = 0.f);
+	void reset(const float *BW_RESTRICT x_0);
+	void reset(const std::array<float, N_CHANNELS> x_0);
 	void process(
 		const float * const *x,
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 		
 	float read(size_t channel, size_t di, float df);
@@ -392,10 +399,22 @@ inline void Delay<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void Delay<N_CHANNELS>::reset() {
+inline void Delay<N_CHANNELS>::reset(float x_0) {
 	bw_delay_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_delay_reset_state(&coeffs, states + i);
+		bw_delay_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void Delay<N_CHANNELS>::reset(const float *BW_RESTRICT x_0) {
+	bw_delay_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_delay_reset_state(&coeffs, states + i, x_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void Delay<N_CHANNELS>::reset(const std::array<float, N_CHANNELS> x_0) {
+	reset(x_0.data());
 }
 
 template<size_t N_CHANNELS>
@@ -408,8 +427,8 @@ inline void Delay<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void Delay<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }

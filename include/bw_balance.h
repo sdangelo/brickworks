@@ -259,10 +259,10 @@ public:
 		float * const *y_r,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x_l,
-		std::array<const float *, N_CHANNELS> x_r,
-		std::array<float *, N_CHANNELS> y_l,
-		std::array<float *, N_CHANNELS> y_r,
+		const std::array<const float *, N_CHANNELS> x_l,
+		const std::array<const float *, N_CHANNELS> x_r,
+		const std::array<float *, N_CHANNELS> y_l,
+		const std::array<float *, N_CHANNELS> y_r,
 		size_t nSamples);
 
 	void setBalance(float value);
@@ -307,10 +307,10 @@ inline void Balance<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x_l,
-		std::array<const float *, N_CHANNELS> x_r,
-		std::array<float *, N_CHANNELS> y_l,
-		std::array<float *, N_CHANNELS> y_r,
+		const std::array<const float *, N_CHANNELS> x_l,
+		const std::array<const float *, N_CHANNELS> x_r,
+		const std::array<float *, N_CHANNELS> y_l,
+		const std::array<float *, N_CHANNELS> y_r,
 		size_t nSamples) {
 	process(x_l.data(), x_r.data(), y_l.data(), y_r.data(), nSamples);
 }

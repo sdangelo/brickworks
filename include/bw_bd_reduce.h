@@ -233,8 +233,8 @@ public:
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setBitDepth(char value);
@@ -272,8 +272,8 @@ inline void BDReduce<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void BDReduce<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }

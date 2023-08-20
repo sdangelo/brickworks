@@ -39,6 +39,10 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added initial value argument in
+ *              <code>bw_chorus_reset_state()</code>.</li>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li><code>bw_comb_process()</code> and
@@ -130,9 +134,10 @@ static inline void bw_comb_reset_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_comb_reset_state()
  *  ```>>> */
-static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state);
+static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x_0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_comb_update_coeffs_ctrl()
  *  ```>>> */
@@ -328,8 +333,8 @@ static inline void bw_comb_reset_coeffs(bw_comb_coeffs *BW_RESTRICT coeffs) {
 	bw_comb_do_update_coeffs(coeffs, 1);
 }
 
-static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state) {
-	bw_delay_reset_state(&coeffs->delay_coeffs, &state->delay_state);
+static inline void bw_comb_reset_state(const bw_comb_coeffs *BW_RESTRICT coeffs, bw_comb_state *BW_RESTRICT state, float x_0) {
+	bw_delay_reset_state(&coeffs->delay_coeffs, &state->delay_state, x_0);
 }
 
 static inline void bw_comb_update_coeffs_ctrl(bw_comb_coeffs *BW_RESTRICT coeffs) {
@@ -409,14 +414,16 @@ public:
 	~Comb();
 
 	void setSampleRate(float sampleRate);
-	void reset();
+	void reset(float x_0 = 0.f);
+	void reset(const float *BW_RESTRICT x_0);
+	void reset(const std::array<float, N_CHANNELS> x_0);
 	void process(
 		const float * const *x,
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setDelayFF(float value);
@@ -468,10 +475,22 @@ inline void Comb<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void Comb<N_CHANNELS>::reset() {
+inline void Comb<N_CHANNELS>::reset(float x_0) {
 	bw_comb_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_comb_reset_state(&coeffs, states + i);
+		bw_comb_reset_state(&coeffs, states + i, x_0);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::reset(const float *BW_RESTRICT x_0) {
+	bw_comb_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_comb_reset_state(&coeffs, states + i, x_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void Comb<N_CHANNELS>::reset(const std::array<float, N_CHANNELS> x_0) {
+	reset(x_0.data());
 }
 
 template<size_t N_CHANNELS>
@@ -484,8 +503,8 @@ inline void Comb<N_CHANNELS>::process(
 
 template<size_t N_CHANNELS>
 inline void Comb<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
 	process(x.data(), y.data(), nSamples);
 }

@@ -31,6 +31,7 @@
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
+ *          <li>C++ API now uses <code>size_t</code> to count samples.</li>
  *          <li>Changed order of arguments to improve consistency.</li>
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments.</li>
@@ -323,13 +324,13 @@ template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
 		float *BW_RESTRICT const *BW_RESTRICT dest,
-		int nSamples);
+		size_t nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
 		std::array<float *BW_RESTRICT, N_CHANNELS> dest,
-		int nSamples);
+		size_t nSamples);
 /*! <<<```
  *
  *    ##### Brickworks::bufNeg
@@ -338,13 +339,13 @@ template<size_t N_CHANNELS>
 inline void bufNeg(
 		const float * const *src,
 		float * const *dest,
-		int nSamples);
+		size_t nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufNeg(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
+		const std::array<const float *, N_CHANNELS> src,
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples);
 /*! <<<```
  *
  *    ##### Brickworks::bufAdd
@@ -352,16 +353,16 @@ inline void bufNeg(
 template<size_t N_CHANNELS>
 inline void bufAdd(
 		const float * const *src,
-		float * const *dest,
 		float k,
-		int nSamples);
+		float * const *dest,
+		size_t nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufAdd(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
+		const std::array<const float *, N_CHANNELS> src,
 		float k,
-		int nSamples);
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples);
 /*! <<<```
  *
  *    ##### Brickworks::bufScale
@@ -371,14 +372,14 @@ inline void bufScale(
 		const float * const *src,
 		float k,
 		float * const *dest,
-		int nSamples);
+		size_t nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufScale(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
+		const std::array<const float *, N_CHANNELS> src,
 		float k,
-		int nSamples);
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples);
 /*! <<<```
  *
  *    ##### Brickworks::bufMix
@@ -388,14 +389,14 @@ inline void bufMix(
 		const float * const *src1,
 		const float * const *src2,
 		float * const *dest,
-		int nSamples);
+		size_t nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufMix(
-		std::array<const float *, N_CHANNELS> src1,
-		std::array<const float *, N_CHANNELS> src2,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
+		const std::array<const float *, N_CHANNELS> src1,
+		const std::array<const float *, N_CHANNELS> src2,
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples);
 /*! <<<```
  *
  *    ##### Brickworks::bufMul
@@ -405,14 +406,14 @@ inline void bufMul(
 		const float * const *src1,
 		const float * const *src2,
 		float * const *dest,
-		int nSamples);
+		size_t nSamples);
 
 template<size_t N_CHANNELS>
 inline void bufMul(
-		std::array<const float *, N_CHANNELS> src1,
-		std::array<const float *, N_CHANNELS> src2,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples);
+		const std::array<const float *, N_CHANNELS> src1,
+		const std::array<const float *, N_CHANNELS> src2,
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples);
 /*! <<<```
  *  }}} */
 
@@ -425,15 +426,15 @@ template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
 		float *BW_RESTRICT const *BW_RESTRICT dest,
-		int nSamples) {
+		size_t nSamples) {
 	bw_buf_fill_multi(k, dest, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufFill(
 		float k,
-		std::array<float *BW_RESTRICT, N_CHANNELS> dest,
-		int nSamples) {
+		const std::array<float *BW_RESTRICT, N_CHANNELS> dest,
+		size_t nSamples) {
 	bufFill<N_CHANNELS>(k, dest.data(), nSamples);
 }
 
@@ -441,33 +442,33 @@ template<size_t N_CHANNELS>
 inline void bufNeg(
 		const float * const *src,
 		float * const *dest,
-		int nSamples) {
+		size_t nSamples) {
 	bw_buf_neg_multi(src, dest, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufNeg(
-		std::array<const float *, N_CHANNELS> src,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples) {
+		const std::array<const float *, N_CHANNELS> src,
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples) {
 	bufNeg<N_CHANNELS>(src.data(), dest.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufAdd(
 		const float * const *src,
-		float * const *dest,
 		float k,
-		int nSamples) {
+		float * const *dest,
+		size_t nSamples) {
 	bw_buf_add_multi(src, k, dest, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufAdd(
-		std::array<const float *, N_CHANNELS> src,
+		const std::array<const float *, N_CHANNELS> src,
 		float k,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples) {
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples) {
 	bufAdd<N_CHANNELS>(src.data(), k, dest.data(), nSamples);
 }
 
@@ -476,16 +477,16 @@ inline void bufScale(
 		const float * const *src,
 		float k,
 		float * const *dest,
-		int nSamples) {
+		size_t nSamples) {
 	bw_buf_scale_multi(src, k, dest, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufScale(
-		std::array<const float *, N_CHANNELS> src,
+		const std::array<const float *, N_CHANNELS> src,
 		float k,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples) {
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples) {
 	bufScale<N_CHANNELS>(src.data(), k, dest.data(), nSamples);
 }
 
@@ -494,16 +495,16 @@ inline void bufMix(
 		const float * const *src1,
 		const float * const *src2,
 		float * const *dest,
-		int nSamples) {
+		size_t nSamples) {
 	bw_buf_mix_multi(src1, src2, dest, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufMix(
-		std::array<const float *, N_CHANNELS> src1,
-		std::array<const float *, N_CHANNELS> src2,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples) {
+		const std::array<const float *, N_CHANNELS> src1,
+		const std::array<const float *, N_CHANNELS> src2,
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples) {
 	bufMix<N_CHANNELS>(src1.data(), src2.data(), dest.data(), nSamples);
 }
 
@@ -512,16 +513,16 @@ inline void bufMul(
 		const float * const *src1,
 		const float * const *src2,
 		float * const *dest,
-		int nSamples) {
+		size_t nSamples) {
 	bw_buf_mul_multi(src1, src2, dest, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void bufMul(
-		std::array<const float *, N_CHANNELS> src1,
-		std::array<const float *, N_CHANNELS> src2,
-		std::array<float *, N_CHANNELS> dest,
-		int nSamples) {
+		const std::array<const float *, N_CHANNELS> src1,
+		const std::array<const float *, N_CHANNELS> src2,
+		const std::array<float *, N_CHANNELS> dest,
+		size_t nSamples) {
 	bufMul<N_CHANNELS>(src1.data(), src2.data(), dest.data(), nSamples);
 }
 

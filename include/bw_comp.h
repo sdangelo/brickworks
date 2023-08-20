@@ -31,6 +31,10 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added initial value arguments in
+ *              <code>bw_comp_reset_state()</code>.</li>
+ *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
+ *              as arguments.</li>
  *          <li><code>bw_comp_process()</code> and
  *              <code>bw_comp_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -106,9 +110,11 @@ static inline void bw_comp_reset_coeffs(bw_comp_coeffs *BW_RESTRICT coeffs);
  *
  *    #### bw_comp_reset_state()
  *  ```>>> */
-static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state);
+static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x_0, float x_sc_0);
 /*! <<<```
- *    Resets the given `state` to its initial values using the given `coeffs`.
+ *    Resets the given `state` to its initial values using the given `coeffs`
+ *    and the quiescent/initial input value `x_0` and sidechain input value
+ *    `x_sc_0`.
  *
  *    #### bw_comp_update_coeffs_ctrl()
  *  ```>>> */
@@ -271,8 +277,9 @@ static inline void bw_comp_reset_coeffs(bw_comp_coeffs *BW_RESTRICT coeffs) {
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
 }
 
-static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state) {
-	bw_env_follow_reset_state(&coeffs->env_follow_coeffs, &state->env_follow_state);
+static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x_0, float x_sc_0) {
+	(void)x_0;
+	bw_env_follow_reset_state(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc_0);
 }
 
 static inline void bw_comp_update_coeffs_ctrl(bw_comp_coeffs *BW_RESTRICT coeffs) {
@@ -357,16 +364,24 @@ public:
 	Comp();
 
 	void setSampleRate(float sampleRate);
-	void reset();
+	void reset(
+		float x_0 = 0.f,
+		float x_sc_0 = 0.f);
+	void reset(
+		const float *x_0,
+		const float *x_sc_0);
+	void reset(
+		const std::array<float, N_CHANNELS> x_0,
+		const std::array<float, N_CHANNELS> x_sc_0);
 	void process(
 		const float * const *x,
-		const float * const *xSC,
+		const float * const *x_sc,
 		float * const *y,
 		size_t nSamples);
 	void process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> xSC,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<const float *, N_CHANNELS> x_sc,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples);
 
 	void setTreshLin(float value);
@@ -405,28 +420,46 @@ inline void Comp<N_CHANNELS>::setSampleRate(float sampleRate) {
 }
 
 template<size_t N_CHANNELS>
-inline void Comp<N_CHANNELS>::reset() {
+inline void Comp<N_CHANNELS>::reset(
+		float x_0,
+		float x_sc_0) {
 	bw_comp_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_comp_reset_state(&coeffs, states + i);
+		bw_comp_reset_state(&coeffs, states + i, x_0, x_sc_0);
+}
+
+template<size_t N_CHANNELS>
+inline void Comp<N_CHANNELS>::reset(
+		const float *x_0,
+		const float *x_sc_0) {
+	bw_comp_reset_coeffs(&coeffs);
+	for (size_t i = 0; i < N_CHANNELS; i++)
+		bw_comp_reset_state(&coeffs, states + i, x_0[i], x_sc_0[i]);
+}
+
+template<size_t N_CHANNELS>
+inline void Comp<N_CHANNELS>::reset(
+		const std::array<float, N_CHANNELS> x_0,
+		const std::array<float, N_CHANNELS> x_sc_0) {
+	reset(x_0.data(), x_sc_0.data());
 }
 
 template<size_t N_CHANNELS>
 inline void Comp<N_CHANNELS>::process(
 		const float * const *x,
-		const float * const *xSC,
+		const float * const *x_sc,
 		float * const *y,
 		size_t nSamples) {
-	bw_comp_process_multi(&coeffs, statesP, x, xSC, y, N_CHANNELS, nSamples);
+	bw_comp_process_multi(&coeffs, statesP, x, x_sc, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void Comp<N_CHANNELS>::process(
-		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> xSC,
-		std::array<float *, N_CHANNELS> y,
+		const std::array<const float *, N_CHANNELS> x,
+		const std::array<const float *, N_CHANNELS> x_sc,
+		const std::array<float *, N_CHANNELS> y,
 		size_t nSamples) {
-	process(x.data(), xSC.data(), y.data(), nSamples);
+	process(x.data(), x_sc.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>

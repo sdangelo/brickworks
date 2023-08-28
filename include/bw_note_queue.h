@@ -270,6 +270,7 @@ public:
 	NoteQueue();
 	
 	void clear();
+
 	void add(
 		unsigned char note,
 		bool          pressed,

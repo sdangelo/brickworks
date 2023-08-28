@@ -73,8 +73,8 @@ extern "C" {
  *    #### bw_note_queue_status
  *  ```>>> */
 typedef struct {
-	char		pressed;
-	float		velocity;
+	char  pressed;
+	float velocity;
 } bw_note_queue_status;
 /*! <<<```
  *    Note status:
@@ -85,8 +85,8 @@ typedef struct {
  *    #### bw_note_queue_event
  *  ```>>> */
 typedef struct {
-	unsigned char		note;
-	char			went_off;
+	unsigned char note;
+	char          went_off;
 } bw_note_queue_event;
 /*! <<<```
  *    Note on/off event:
@@ -97,10 +97,10 @@ typedef struct {
  *    #### bw_note_queue
  *  ```>>> */
 typedef struct {
-	bw_note_queue_event	events[128];
-	bw_note_queue_status	status[128];
-	unsigned char		n_events;
-	unsigned char		n_pressed;
+	bw_note_queue_event  events[128];
+	bw_note_queue_status status[128];
+	unsigned char        n_events;
+	unsigned char        n_pressed;
 } bw_note_queue;
 /*! <<<```
  *    Note on/off event queue and pressed key status:
@@ -115,21 +115,28 @@ typedef struct {
  *
  *    #### bw_note_queue_reset()
  *  ```>>> */
-static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue);
+static inline void bw_note_queue_reset(
+	bw_note_queue * BW_RESTRICT queue);
 /*! <<<```
  *    Clear both the event queue (no events) and the note statuses (all notes
  *    off, all velocities `0.f`) in `queue`.
  *
  *    #### bw_note_queue_clear()
  *  ```>>> */
-static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue);
+static inline void bw_note_queue_clear(
+	bw_note_queue * BW_RESTRICT queue);
 /*! <<<```
  *    Clears the event queue (no events) in `queue` without affecting the note
  *    statuses.
  *
  *    #### bw_note_queue_add()
  *  ```>>> */
-static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off);
+static inline void bw_note_queue_add(
+	bw_note_queue * BW_RESTRICT queue,
+	unsigned char               note,
+	char                        pressed,
+	float                       velocity,
+	char                        force_went_off);
 /*! <<<```
  *    Adds a new event to `queue` with the specified `note` number, `pressed`
  *    value, and `velocity`.
@@ -139,7 +146,8 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
  *
  *    #### bw_note_queue_is_valid()
  *  ```>>> */
-static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue);
+static inline char bw_note_queue_is_valid(
+	const bw_note_queue * BW_RESTRICT queue);
 /*! <<<```
  *    Tries to determine whether `queue` is valid and returns non-`0` if it
  *    seems to be the case and `0` if it is certainly not. False positives are
@@ -162,7 +170,8 @@ static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue
 extern "C" {
 #endif
 
-static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue) {
+static inline void bw_note_queue_reset(
+		bw_note_queue * BW_RESTRICT queue) {
 	BW_ASSERT(queue != NULL);
 	for (int i = 0; i < 128; i++) {
 		queue->status[i].pressed = 0;
@@ -173,13 +182,19 @@ static inline void bw_note_queue_reset(bw_note_queue *BW_RESTRICT queue) {
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 }
 
-static inline void bw_note_queue_clear(bw_note_queue *BW_RESTRICT queue) {
+static inline void bw_note_queue_clear(
+		bw_note_queue * BW_RESTRICT queue) {
 	BW_ASSERT(queue != NULL);
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 	queue->n_events = 0;
 }
 
-static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned char note, char pressed, float velocity, char force_went_off) {
+static inline void bw_note_queue_add(
+		bw_note_queue * BW_RESTRICT queue,
+		unsigned char               note,
+		char                        pressed,
+		float                       velocity,
+		char                        force_went_off) {
 	BW_ASSERT(queue != NULL);
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 	BW_ASSERT(note < 128);
@@ -210,7 +225,8 @@ static inline void bw_note_queue_add(bw_note_queue *BW_RESTRICT queue, unsigned 
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 }
 
-static inline char bw_note_queue_is_valid(const bw_note_queue *BW_RESTRICT queue) {
+static inline char bw_note_queue_is_valid(
+		const bw_note_queue * BW_RESTRICT queue) {
 	BW_ASSERT(queue != NULL);
 
 	if (queue->n_events >= 128 || queue->n_pressed >= 128)
@@ -254,9 +270,13 @@ public:
 	NoteQueue();
 	
 	void clear();
-	void add(unsigned char note, bool pressed, float velocity, bool force_went_off);
+	void add(
+		unsigned char note,
+		bool          pressed,
+		float         velocity,
+		bool          forceWentOff);
 	
-	bw_note_queue	queue;
+	bw_note_queue queue;
 };
 /*! <<<```
  *  }}} */
@@ -274,8 +294,12 @@ inline void NoteQueue::clear() {
 	bw_note_queue_clear(&queue);
 }
 
-inline void NoteQueue::add(unsigned char note, bool pressed, float velocity, bool force_went_off) {
-	bw_note_queue_add(&queue, note, pressed, velocity, force_went_off);
+inline void NoteQueue::add(
+		unsigned char note,
+		bool          pressed,
+		float         velocity,
+		bool          forceWentOff) {
+	bw_note_queue_add(&queue, note, pressed, velocity, forceWentOff);
 }
 
 }

@@ -170,8 +170,8 @@
  *
  *    Otherwise, `BW_ASSERT` and `BW_ASSERT_DEEP` can either be provided by you,
  *    otherwise `BW_ASSERT` is defined as `assert` (`assert.h` is `#include`d
- *    and `BW_NO_STDLIB` must not be defined -- please mid that `assert.h` is
- *    still influenced by `NDEBUG`), and `BW_ASSERT_DEEP` is defined as
+ *    and `BW_NO_STDLIB` must not be defined &mdash; please mid that `assert.h`
+ *    is still influenced by `NDEBUG`), and `BW_ASSERT_DEEP` is defined as
  *    `BW_ASSERT`.
  *
  *  >>> */
@@ -208,40 +208,49 @@ extern "C" {
  *
  *    #### bw_is_inf()
  *  ```>>> */
-static inline char bw_is_inf(float x);
+static inline char bw_is_inf(
+	float x);
 /*! <<<```
  *    Returns non-`0` if `x` is positive or negative infinity, `0` otherwise.
  *
  *    #### bw_is_nan()
  *  ```>>> */
-static inline char bw_is_nan(float x);
+static inline char bw_is_nan(
+	float x);
 /*! <<<```
  *    Returns non-`0` if `x` is NaN, `0` otherwise.
  *
  *    #### bw_is_finite()
  *  ```>>> */
-static inline char bw_is_finite(float x);
+static inline char bw_is_finite(
+	float x);
 /*! <<<```
  *    Returns non-`0` if `x` is finite (neither NaN nor positive or negative
  *    infinity), `0` otherwise.
  *
  *    #### bw_has_inf()
  *  ```>>> */
-static inline char bw_has_inf(const float *BW_RESTRICT x, size_t n_elems);
+static inline char bw_has_inf(
+	const float * BW_RESTRICT x,
+	size_t                    n_elems);
 /*! <<<```
  *    Scans the fist `n_elems` in buffer `x` and returns non-`0` if it contains
  *    at least one positive or negative inifinity value, `0` otherwise.
  *
  *    #### bw_has_nan()
  *  ```>>> */
-static inline char bw_has_nan(const float *BW_RESTRICT x, size_t n_elems);
+static inline char bw_has_nan(
+	const float * BW_RESTRICT x,
+	size_t                    n_elems);
 /*! <<<```
  *    Scans the fist `n_elems` in buffer `x` and returns non-`0` if it contains
  *    at least one NaN value, `0` otherwise.
  *
  *    #### bw_has_only_finite()
  *  ```>>> */
-static inline char bw_has_only_finite(const float *BW_RESTRICT x, size_t n_elems);
+static inline char bw_has_only_finite(
+	const float * BW_RESTRICT x,
+	size_t                    n_elems);
 /*! <<<```
  *    Scans the fist `n_elems` in buffer `x` and returns non-`0` if it only
  *    finds finite values (neither NaN nor positive or negative infinity), `0`
@@ -249,7 +258,8 @@ static inline char bw_has_only_finite(const float *BW_RESTRICT x, size_t n_elems
  *
  *    #### bw_hash_sdbm()
  *  ```>>> */
-static inline uint32_t bw_hash_sdbm(const char *BW_RESTRICT string);
+static inline uint32_t bw_hash_sdbm(
+	const char * BW_RESTRICT string);
 /*! <<<```
  *    Returns the sdbm hash of the given `string`.
  *  }}} */
@@ -267,46 +277,56 @@ static inline uint32_t bw_hash_sdbm(const char *BW_RESTRICT string);
 extern "C" {
 #endif
 
-static inline char bw_is_inf(float x) {
+static inline char bw_is_inf(
+		float x) {
 	union { uint32_t u; float f; } v;
 	v.f = x;
 	return (v.u & 0x7fffffff) == 0x7f800000;
 }
 
-static inline char bw_is_nan(float x) {
+static inline char bw_is_nan(
+		float x) {
 	union { uint32_t u; float f; } v;
 	v.f = x;
 	return ((v.u & 0x7f800000) == 0x7f800000) && (v.u & 0x7fffff);
 }
 
-static inline char bw_is_finite(float x) {
+static inline char bw_is_finite(
+		float x) {
 	union { uint32_t u; float f; } v;
 	v.f = x;
 	return (v.u & 0x7f800000) != 0x7f800000;
 }
 
-static inline char bw_has_inf(const float *BW_RESTRICT x, size_t n_elems) {
+static inline char bw_has_inf(
+		const float * BW_RESTRICT x,
+		size_t                    n_elems) {
 	char ret = 0;
 	for (size_t i = 0; i < n_elems && !ret; i++)
 		ret = bw_is_inf(x[i]);
 	return ret;
 }
 
-static inline char bw_has_nan(const float *BW_RESTRICT x, size_t n_elems) {
+static inline char bw_has_nan(
+		const float * BW_RESTRICT x,
+		size_t                    n_elems) {
 	char ret = 0;
 	for (size_t i = 0; i < n_elems && !ret; i++)
 		ret = bw_is_nan(x[i]);
 	return ret;
 }
 
-static inline char bw_has_only_finite(const float *BW_RESTRICT x, size_t n_elems) {
+static inline char bw_has_only_finite(
+		const float * BW_RESTRICT x,
+		size_t                    n_elems) {
 	char ret = 1;
 	for (size_t i = 0; i < n_elems && ret; i++)
 		ret = bw_is_finite(x[i]);
 	return ret;
 }
 
-static inline uint32_t bw_hash_sdbm(const char *BW_RESTRICT string) {
+static inline uint32_t bw_hash_sdbm(
+		const char * BW_RESTRICT string) {
 	uint32_t hash = 0;
 	for (; *string != '\0'; string++)
 		hash = *string + (hash << 6) + (hash << 16) - hash;

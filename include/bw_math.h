@@ -125,93 +125,121 @@ extern "C" {
 /*! api {{{
  *    #### bw_signfilli32()
  *  ```>>> */
-static inline int32_t bw_signfilli32(int32_t x);
+static inline int32_t bw_signfilli32(
+	int32_t x);
 /*! <<<```
  *    Returns `~0` if `x` is negative, `0` otherwise.
  *
  *    #### bw_mini32()
  *  ```>>> */
-static inline int32_t bw_mini32(int32_t a, int32_t b);
+static inline int32_t bw_mini32(
+	int32_t a,
+	int32_t b);
 /*! <<<```
  *    Returns the minimum of `a` and `b`.
  *
  *    #### bw_maxi32()
  *  ```>>> */
-static inline int32_t bw_maxi32(int32_t a, int32_t b);
+static inline int32_t bw_maxi32(
+	int32_t a,
+	int32_t b);
 /*! <<<```
  *    Returns the maximum of `a` and `b`.
  *
  *    #### bw_clipi32()
  *  ```>>> */
-static inline int32_t bw_clipi32(int32_t x, int32_t m, int32_t M);
+static inline int32_t bw_clipi32(
+	int32_t x,
+	int32_t m,
+	int32_t M);
 /*! <<<```
  *    Returns `x` unless it is smaller than `m`, in which case it returns `m`,
  *    or bigger than `M`, in which case it returns `M`.
  *
  *    #### bw_minu32()
  *  ```>>> */
-static inline uint32_t bw_minu32(uint32_t a, uint32_t b);
+static inline uint32_t bw_minu32(
+	uint32_t a,
+	uint32_t b);
 /*! <<<```
  *    Returns the minimum of `a` and `b`.
  *
  *    #### bw_maxu32()
  *  ```>>> */
-static inline uint32_t bw_maxu32(uint32_t a, uint32_t b);
+static inline uint32_t bw_maxu32(
+	uint32_t a,
+	uint32_t b);
 /*! <<<```
  *    Returns the maximum of `a` and `b`.
  *
  *    #### bw_clipu32()
  *  ```>>> */
-static inline uint32_t bw_clipu32(uint32_t x, uint32_t m, uint32_t M);
+static inline uint32_t bw_clipu32(
+	uint32_t x,
+	uint32_t m,
+	uint32_t M);
 /*! <<<```
  *    Returns `x` unless it is smaller than `m`, in which case it returns `m`,
  *    or bigger than `M`, in which case it returns `M`.
  *
  *    #### bw_copysignf()
  *  ```>>> */
-static inline float bw_copysignf(float x, float y);
+static inline float bw_copysignf(
+	float x,
+	float y);
 /*! <<<```
  *    Returns a value that has the absolute value of `x` and the sign of `y`.
  *
  *    #### bw_signf()
  *  ```>>> */
-static inline float bw_signf(float x);
+static inline float bw_signf(
+	float x);
 /*! <<<```
  *    Returns `1.f` if `x > 0.f`, `-1.f` if `x < 0.f` and `0.f` if `x == 0.f`.
  *
  *    #### bw_absf()
  *  ```>>> */
-static inline float bw_absf(float x);
+static inline float bw_absf(
+	float x);
 /*! <<<```
  *    Returns the absolute value of `x`.
  *
  *    #### bw_min0f()
  *  ```>>> */
-static inline float bw_min0f(float x);
+static inline float bw_min0f(
+	float x);
 /*! <<<```
  *    Returns the minimum of `0.f` and `x`.
  *
  *    #### bw_max0f()
  *  ```>>> */
-static inline float bw_max0f(float x);
+static inline float bw_max0f(
+	float x);
 /*! <<<```
  *    Returns the maximum of `0.f` and `x`.
  *
  *    #### bw_minf()
  *  ```>>> */
-static inline float bw_minf(float a, float b);
+static inline float bw_minf(
+	float a,
+	float b);
 /*! <<<```
  *    Returns the minimum of `a` and `b`.
  *
  *    #### bw_maxf()
  *  ```>>> */
-static inline float bw_maxf(float a, float b);
+static inline float bw_maxf(
+	float a,
+	float b);
 /*! <<<```
  *    Returns the maximum of `a` and `b`.
  *
  *    #### bw_clipf()
  *  ```>>> */
-static inline float bw_clipf(float x, float m, float M);
+static inline float bw_clipf(
+	float x,
+	float m,
+	float M);
 /*! <<<```
  *    Returns `x` unless it is smaller than `m`, in which case it returns `m`,
  *    or bigger than `M`, in which case it returns `M`.
@@ -220,7 +248,8 @@ static inline float bw_clipf(float x, float m, float M);
  *
  *    #### bw_truncf()
  *  ```>>> */
-static inline float bw_truncf(float x);
+static inline float bw_truncf(
+	float x);
 /*! <<<```
  *    Returns `x` with its fractional part set to zero (i.e., rounded towards
  *    zero).
@@ -229,7 +258,8 @@ static inline float bw_truncf(float x);
  *
  *    #### bw_roundf()
  *  ```>>> */
-static inline float bw_roundf(float x);
+static inline float bw_roundf(
+	float x);
 /*! <<<```
  *    Returns `x` rounded to the nearest integer.
  *
@@ -240,7 +270,8 @@ static inline float bw_roundf(float x);
  *
  *    #### bw_floorf()
  *  ```>>> */
-static inline float bw_floorf(float x);
+static inline float bw_floorf(
+	float x);
 /*! <<<```
  *    Returns the biggest integer less or equal than `x` (i.e., `x` is rounded
  *    down).
@@ -249,7 +280,8 @@ static inline float bw_floorf(float x);
  *
  *    #### bw_ceilf()
  *  ```>>> */
-static inline float bw_ceilf(float x);
+static inline float bw_ceilf(
+	float x);
 /*! <<<```
  *    Returns the smallest integer greater or equal than `x` (i.e., `x` is
  *    rounded up).
@@ -258,7 +290,10 @@ static inline float bw_ceilf(float x);
  *
  *    #### bw_intfracf()
  *  ```>>> */
-static inline void bw_intfracf(float x, float *BW_RESTRICT i, float *BW_RESTRICT f);
+static inline void bw_intfracf(
+	float               x,
+	float * BW_RESTRICT i,
+	float * BW_RESTRICT f);
 /*! <<<```
  *    Puts the integer part (floor) of `x` in `i` and the fractional part in
  *    `f`.
@@ -267,7 +302,8 @@ static inline void bw_intfracf(float x, float *BW_RESTRICT i, float *BW_RESTRICT
  *
  *    #### bw_rcpf()
  *  ```>>> */
-static inline float bw_rcpf(float x);
+static inline float bw_rcpf(
+	float x);
 /*! <<<```
  *    Returns the reciprocal of `x` (i.e., `1.f / x`).
  *
@@ -277,7 +313,8 @@ static inline float bw_rcpf(float x);
  *
  *    #### bw_sin2pif()
  *  ```>>> */
-static inline float bw_sin2pif(float x);
+static inline float bw_sin2pif(
+	float x);
 /*! <<<```
  *    Returns an approximation of the sine of 2 * pi * `x`, where `x` is given
  *    in radians.
@@ -288,7 +325,8 @@ static inline float bw_sin2pif(float x);
  *
  *    #### bw_sinf()
  *  ```>>> */
-static inline float bw_sinf(float x);
+static inline float bw_sinf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the sine of `x`, where `x` is given in
  *    radians.
@@ -299,7 +337,8 @@ static inline float bw_sinf(float x);
  *
  *    #### bw_cos2pif()
  *  ```>>> */
-static inline float bw_cos2pif(float x); 
+static inline float bw_cos2pif(
+	float x);
 /*! <<<```
  *    Returns an approximation of the cosine of 2 * pi * `x`, where `x` is given
  *    in radians.
@@ -310,7 +349,8 @@ static inline float bw_cos2pif(float x);
  *
  *    #### bw_cosf()
  *  ```>>> */
-static inline float bw_cosf(float x);
+static inline float bw_cosf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the cosine of `x`, where `x` is given in
  *    radians.
@@ -321,7 +361,8 @@ static inline float bw_cosf(float x);
  *
  *    #### bw_tan2pif()
  *  ```>>> */
-static inline float bw_tan2pif(float x);
+static inline float bw_tan2pif(
+	float x);
 /*! <<<```
  *    Returns an approximation of the tangent of 2 * pi * `x`, where `x` is
  *    given in radians.
@@ -333,7 +374,8 @@ static inline float bw_tan2pif(float x);
  *
  *    #### bw_tanf()
  *  ```>>> */
-static inline float bw_tanf(float x);
+static inline float bw_tanf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the tangent of `x`, where `x` is given in
  *    radians.
@@ -345,7 +387,8 @@ static inline float bw_tanf(float x);
  *
  *    #### bw_log2f()
  *  ```>>> */
-static inline float bw_log2f(float x);
+static inline float bw_log2f(
+	float x);
 /*! <<<```
  *    Returns an approximation of the base-2 logarithm of `x`.
  *
@@ -355,7 +398,8 @@ static inline float bw_log2f(float x);
  *
  *    #### bw_logf()
  *  ```>>> */
-static inline float bw_logf(float x);
+static inline float bw_logf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the natural logarithm of `x`.
  * 
@@ -365,7 +409,8 @@ static inline float bw_logf(float x);
  *
  *    #### bw_log10f()
  *  ```>>> */
-static inline float bw_log10f(float x);
+static inline float bw_log10f(
+	float x);
 /*! <<<```
  *    Returns an approximation of the base-10 logarithm of `x`.
  *
@@ -375,7 +420,8 @@ static inline float bw_log10f(float x);
  *
  *    #### bw_pow2f()
  *  ```>>> */
-static inline float bw_pow2f(float x);
+static inline float bw_pow2f(
+	float x);
 /*! <<<```
  *    Returns an approximation of 2 raised to the power of `x`. For `x < -126.f`
  *    it just returns `0.f`.
@@ -386,7 +432,8 @@ static inline float bw_pow2f(float x);
  *
  *    #### bw_expf()
  *  ```>>> */
-static inline float bw_expf(float x);
+static inline float bw_expf(
+	float x);
 /*! <<<```
  *    Returns an approximation of e (Euler's number) raised to the power of `x`.
  *    For `x < -87.3365447505531f` it just returns `0`.
@@ -397,7 +444,8 @@ static inline float bw_expf(float x);
  *
  *    #### bw_pow10f() 
  *  ```>>> */
-static inline float bw_pow10f(float x);
+static inline float bw_pow10f(
+	float x);
 /*! <<<```
  *    Returns an approximation of 10 raised to the power of `x`. For
  *    `x < -37.92977945366162f` it just returns `0`.
@@ -408,7 +456,8 @@ static inline float bw_pow10f(float x);
  *
  *    #### bw_dB2linf()
  *  ```>>> */
-static inline float bw_dB2linf(float x);
+static inline float bw_dB2linf(
+	float x);
 /*! <<<```
  *    Returns an approximation of 10 raised to the power of `x` / 20 (dB to
  *    linear ratio conversion). For `x < -758.5955890732315f` it just returns
@@ -420,7 +469,8 @@ static inline float bw_dB2linf(float x);
  *
  *    #### bw_lin2dBf()
  *  ```>>> */
-static inline float bw_lin2dBf(float x);
+static inline float bw_lin2dBf(
+	float x);
 /*! <<<```
  *    Returns an approximation of 20 times the base-10 logarithm of `x` (linear
  *    ratio to dB conversion).
@@ -431,7 +481,8 @@ static inline float bw_lin2dBf(float x);
  * 
  *    #### bw_sqrtf()
  *  ```>>> */
-static inline float bw_sqrtf(float x);
+static inline float bw_sqrtf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the square root of `x`.
  *
@@ -441,7 +492,8 @@ static inline float bw_sqrtf(float x);
  *
  *    #### bw_tanhf()
  *  ```>>> */
-static inline float bw_tanhf(float x);
+static inline float bw_tanhf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic tangent of `x`.
  *
@@ -449,7 +501,8 @@ static inline float bw_tanhf(float x);
  *
  *    #### bw_sinhf()
  *  ```>>> */
-static inline float bw_sinhf(float x);
+static inline float bw_sinhf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic sine of `x`.
  *
@@ -459,7 +512,8 @@ static inline float bw_sinhf(float x);
  *
  *    #### bw_coshf()
  *  ```>>> */
-static inline float bw_coshf(float x);
+static inline float bw_coshf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic cosine of `x`.
  *
@@ -469,7 +523,8 @@ static inline float bw_coshf(float x);
  *
  *    #### bw_asinhf()
  *  ```>>> */
-static inline float bw_asinhf(float x);
+static inline float bw_asinhf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic arcsine of `x`.
  *
@@ -479,7 +534,8 @@ static inline float bw_asinhf(float x);
  *
  *    #### bw_acoshf()
  *  ```>>> */
-static inline float bw_acoshf(float x);
+static inline float bw_acoshf(
+	float x);
 /*! <<<```
  *    Returns an approximation of the hyperbolic arccosine of `x`.
  *
@@ -503,38 +559,55 @@ extern "C" {
 
 // I hope the target architecture and compiler will use conditional ops here
 
-static inline int32_t bw_signfilli32(int32_t x) {
+static inline int32_t bw_signfilli32(
+		int32_t x) {
 	return x < 0 ? ~0 : 0;
 }
 
-static inline int32_t bw_mini32(int32_t a, int32_t b) {
+static inline int32_t bw_mini32(
+		int32_t a,
+		int32_t b) {
 	return a < b ? a : b;
 }
 
-static inline int32_t bw_maxi32(int32_t a, int32_t b) {
+static inline int32_t bw_maxi32(
+		int32_t a,
+		int32_t b) {
 	return a > b ? a : b;
 }
 
-static inline int32_t bw_clipi32(int32_t x, int32_t m, int32_t M) {
+static inline int32_t bw_clipi32(
+		int32_t x,
+		int32_t m,
+		int32_t M) {
 	return x < m ? m : (x > M ? M : x);
 }
 
-static inline uint32_t bw_minu32(uint32_t a, uint32_t b) {
+static inline uint32_t bw_minu32(
+		uint32_t a,
+		uint32_t b) {
 	return a < b ? a : b;
 }
 
-static inline uint32_t bw_maxu32(uint32_t a, uint32_t b) {
+static inline uint32_t bw_maxu32(
+		uint32_t a,
+		uint32_t b) {
 	return a > b ? a : b;
 }
 
-static inline uint32_t bw_clipu32(uint32_t x, uint32_t m, uint32_t M) {
+static inline uint32_t bw_clipu32(
+		uint32_t x,
+		uint32_t m,
+		uint32_t M) {
 	return x < m ? m : (x > M ? M : x);
 }
 
 // Here instead I don't trust C semantics to get close to conditional ops for
 // floating point numbers
 
-static inline float bw_copysignf(float x, float y) {
+static inline float bw_copysignf(
+		float x,
+		float y) {
 	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(!bw_is_nan(y));
 	union { float f; uint32_t u; } v, s;
@@ -545,7 +618,8 @@ static inline float bw_copysignf(float x, float y) {
 	return v.f;
 }
 
-static inline float bw_signf(float x) {
+static inline float bw_signf(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	static const float y[4] = { 0.f, 1.f, 0.f, -1.f };
 	union { float f; uint32_t u; } v;
@@ -555,7 +629,8 @@ static inline float bw_signf(float x) {
 	return r;
 }
 
-static inline float bw_absf(float x) {
+static inline float bw_absf(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	union { float f; uint32_t u; } v;
 	v.f = x;
@@ -564,7 +639,8 @@ static inline float bw_absf(float x) {
 	return v.f;
 }
 
-static inline float bw_min0f(float x) {
+static inline float bw_min0f(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	union { float f; int32_t i; } v;
 	v.f = x;
@@ -573,7 +649,8 @@ static inline float bw_min0f(float x) {
 	return v.f;
 }
 
-static inline float bw_max0f(float x) {
+static inline float bw_max0f(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	union { float f; int32_t i; } v;
 	v.f = x;
@@ -582,7 +659,9 @@ static inline float bw_max0f(float x) {
 	return v.f;
 }
 
-static inline float bw_minf(float a, float b) {
+static inline float bw_minf(
+		float a,
+		float b) {
 	BW_ASSERT(!bw_is_nan(a));
 	BW_ASSERT(!bw_is_nan(b));
 	const float y = a < b ? a : b;
@@ -590,7 +669,9 @@ static inline float bw_minf(float a, float b) {
 	return y;
 }
 
-static inline float bw_maxf(float a, float b) {
+static inline float bw_maxf(
+		float a,
+		float b) {
 	BW_ASSERT(!bw_is_nan(a));
 	BW_ASSERT(!bw_is_nan(b));
 	const float y = a > b ? a : b;
@@ -598,7 +679,10 @@ static inline float bw_maxf(float a, float b) {
 	return y;
 }
 
-static inline float bw_clipf(float x, float m, float M) {
+static inline float bw_clipf(
+		float x,
+		float m,
+		float M) {
 	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(!bw_is_nan(m));
 	BW_ASSERT(!bw_is_nan(M));
@@ -608,7 +692,8 @@ static inline float bw_clipf(float x, float m, float M) {
 	return y;
 }
 
-static inline float bw_truncf(float x) {
+static inline float bw_truncf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	union { float f; uint32_t u; } v;
 	v.f = x;
@@ -620,7 +705,8 @@ static inline float bw_truncf(float x) {
 	return v.f;
 }
 
-static inline float bw_roundf(float x) {
+static inline float bw_roundf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	union { float f; uint32_t u; } v, s;
 	v.f = x;
@@ -639,7 +725,8 @@ static inline float bw_roundf(float x) {
 	return y;
 }
 
-static inline float bw_floorf(float x) {
+static inline float bw_floorf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	union { float f; int32_t i; } t, y, s;
 	t.f = bw_truncf(x); // first bit set when t < 0
@@ -651,7 +738,8 @@ static inline float bw_floorf(float x) {
 	return r;
 }
 
-static inline float bw_ceilf(float x) {
+static inline float bw_ceilf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	union { float f; int32_t i; } t, y, s;
 	t.f = bw_truncf(x); // first bit set when t < 0
@@ -663,7 +751,10 @@ static inline float bw_ceilf(float x) {
 	return r;
 }
 
-static inline void bw_intfracf(float x, float *BW_RESTRICT i, float *BW_RESTRICT f) {
+static inline void bw_intfracf(
+		float               x,
+		float * BW_RESTRICT i,
+		float * BW_RESTRICT f) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(i != NULL);
 	BW_ASSERT(f != NULL);
@@ -674,7 +765,8 @@ static inline void bw_intfracf(float x, float *BW_RESTRICT i, float *BW_RESTRICT
 	BW_ASSERT(bw_is_finite(*f));
 }
 
-static inline float bw_rcpf(float x) {
+static inline float bw_rcpf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x >= 8.077935669e-28f && x <= 1.237940039e27f) || (x <= -8.077935669e-28f && x >= -1.237940039e27f));
 	union { float f; int32_t i; } v;
@@ -686,7 +778,8 @@ static inline float bw_rcpf(float x) {
 	return v.f;
 }
 
-static inline float bw_sin2pif(float x) {
+static inline float bw_sin2pif(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	x = x - bw_floorf(x);
 	float xp1 = x + x - 1.f;
@@ -697,28 +790,32 @@ static inline float bw_sin2pif(float x) {
 	return y;
 }
 
-static inline float bw_sinf(float x) {
+static inline float bw_sinf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	const float y = bw_sin2pif(0.1591549430918953f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_cos2pif(float x) {
+static inline float bw_cos2pif(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	const float y = bw_sin2pif(x + 0.25f);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_cosf(float x) {
+static inline float bw_cosf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	const float y = bw_cos2pif(0.1591549430918953f * x);
 	BW_ASSERT(bw_is_finite(y));
 	return y;
 }
 
-static inline float bw_tan2pif(float x) {
+static inline float bw_tan2pif(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x - 0.5f * bw_floorf(x + x) <= 0.249840845056908f)
 			|| (x - 0.5f * bw_floorf(x + x) >= 0.250159154943092f));
@@ -727,7 +824,8 @@ static inline float bw_tan2pif(float x) {
 	return y;
 }
 
-static inline float bw_tanf(float x) {
+static inline float bw_tanf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT((x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) <= 1.569796326794897f)
 			|| (x - 3.141592653589793f * bw_floorf(0.318309886183791f * x) >= 1.571796326794896f));
@@ -737,7 +835,8 @@ static inline float bw_tanf(float x) {
 	return y;
 }
 
-static inline float bw_log2f(float x) {
+static inline float bw_log2f(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	union { float f; int32_t i; } v;
@@ -749,7 +848,8 @@ static inline float bw_log2f(float x) {
 	return y;
 }
 
-static inline float bw_logf(float x) {
+static inline float bw_logf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	const float y = 0.693147180559945f * bw_log2f(x);
@@ -757,7 +857,8 @@ static inline float bw_logf(float x) {
 	return y;
 }
 
-static inline float bw_log10f(float x) {
+static inline float bw_log10f(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	const float y = 0.3010299956639811f * bw_log2f(x);
@@ -765,7 +866,8 @@ static inline float bw_log10f(float x) {
 	return y;
 }
 
-static inline float bw_pow2f(float x) {
+static inline float bw_pow2f(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 127.999f);
 	if (x < -126.f)
@@ -781,7 +883,8 @@ static inline float bw_pow2f(float x) {
 	return y;
 }
 
-static inline float bw_expf(float x) {
+static inline float bw_expf(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 88.722f);
 	const float y = bw_pow2f(1.442695040888963f * x);
@@ -789,7 +892,8 @@ static inline float bw_expf(float x) {
 	return y;
 }
 
-static inline float bw_pow10f(float x) {
+static inline float bw_pow10f(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 38.531f);
 	const float y = bw_pow2f(3.321928094887363f * x);
@@ -797,7 +901,8 @@ static inline float bw_pow10f(float x) {
 	return y;
 }
 
-static inline float bw_dB2linf(float x) {
+static inline float bw_dB2linf(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	BW_ASSERT(x <= 770.630f);
 	const float y = bw_pow2f(0.1660964047443682f * x);
@@ -805,7 +910,8 @@ static inline float bw_dB2linf(float x) {
 	return y;
 }
 
-static inline float bw_lin2dBf(float x) {
+static inline float bw_lin2dBf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.175494350822287e-38f);
 	const float y = 20.f * bw_log10f(x);
@@ -813,7 +919,8 @@ static inline float bw_lin2dBf(float x) {
 	return y;
 }
 
-static inline float bw_sqrtf(float x) {
+static inline float bw_sqrtf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 0.f);
 	if (x < 1.1754943508222875e-38f)
@@ -831,7 +938,8 @@ static inline float bw_sqrtf(float x) {
 	return v.f;
 }
 
-static inline float bw_tanhf(float x) {
+static inline float bw_tanhf(
+		float x) {
 	BW_ASSERT(!bw_is_nan(x));
 	const float xm = bw_clipf(x, -2.115287308554551f, 2.115287308554551f);
 	const float axm = bw_absf(xm);
@@ -840,7 +948,8 @@ static inline float bw_tanhf(float x) {
 	return y;
 }
 
-static inline float bw_sinhf(float x) {
+static inline float bw_sinhf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -88.722f && x <= 88.722f);
 	const float y = 0.5f * (bw_expf(x) - bw_expf(-x));
@@ -848,7 +957,8 @@ static inline float bw_sinhf(float x) {
 	return y;
 }
 
-static inline float bw_coshf(float x) {
+static inline float bw_coshf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -88.722f && x <= 88.722f);
 	const float y = 0.5f * (bw_expf(x) + bw_expf(-x));
@@ -856,7 +966,8 @@ static inline float bw_coshf(float x) {
 	return y;
 }
 
-static inline float bw_asinhf(float x) {
+static inline float bw_asinhf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= -8.507059173023462e+37f && x <= 8.507059173023462e+37f);
 	float a = bw_absf(x);
@@ -865,7 +976,8 @@ static inline float bw_asinhf(float x) {
 	return y;
 }
 
-static inline float bw_acoshf(float x) {
+static inline float bw_acoshf(
+		float x) {
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(x >= 1.f && x <= 8.507059173023462e+37f);
 	const float y = bw_logf((x >= 8192.f ? x : bw_sqrtf(x * x - 1.f)) + x);

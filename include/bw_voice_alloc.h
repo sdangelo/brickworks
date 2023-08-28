@@ -84,12 +84,22 @@ typedef enum {
  *    #### bw_voice_alloc_opts
  *  ```>>> */
 typedef struct {
-	bw_voice_alloc_priority	priority;
+	bw_voice_alloc_priority priority;
 
-	void (*note_on)(void *BW_RESTRICT voice, unsigned char note, float velocity);
-	void (*note_off)(void *BW_RESTRICT voice, float velocity);
-	unsigned char (*get_note)(const void *BW_RESTRICT voice);
-	char (*is_free)(const void *BW_RESTRICT voice);
+	void (*note_on)(
+		void * BW_RESTRICT voice,
+		unsigned char      note,
+		float              velocity);
+
+	void (*note_off)(
+		void * BW_RESTRICT voice,
+		float              velocity);
+
+	unsigned char (*get_note)(
+		const void * BW_RESTRICT voice);
+
+	char (*is_free)(
+		const void * BW_RESTRICT voice);
 } bw_voice_alloc_opts;
 /*! <<<```
  *    Voice allocation options:
@@ -108,7 +118,11 @@ typedef struct {
  *
  *    #### bw_voice_alloc()
  *  ```>>> */
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void *BW_RESTRICT const *BW_RESTRICT voices, size_t n_voices);
+void bw_voice_alloc(
+	const bw_voice_alloc_opts * BW_RESTRICT opts,
+	bw_note_queue * BW_RESTRICT             queue,
+	void * BW_RESTRICT const * BW_RESTRICT  voices,
+	size_t                                  n_voices);
 /*! <<<```
  *    It performs voice allocation according to `opts` and using the events in
  *    `queue`.
@@ -130,7 +144,11 @@ void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *
 extern "C" {
 #endif
 
-void bw_voice_alloc(const bw_voice_alloc_opts *BW_RESTRICT opts, bw_note_queue *BW_RESTRICT queue, void *BW_RESTRICT const *BW_RESTRICT voices, size_t n_voices) {
+void bw_voice_alloc(
+		const bw_voice_alloc_opts * BW_RESTRICT opts,
+		bw_note_queue * BW_RESTRICT             queue,
+		void * BW_RESTRICT const * BW_RESTRICT  voices,
+		size_t                                  n_voices) {
 	BW_ASSERT(opts != NULL);
 	BW_ASSERT(opts->priority == bw_voice_alloc_priority_low || opts->priority == bw_voice_alloc_priority_high);
 	BW_ASSERT(n_voices == 0 || opts->note_on != NULL);

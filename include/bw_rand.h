@@ -83,7 +83,8 @@ extern "C" {
 /*! api {{{
  *    #### bw_randu32()
  *  ```>>> */
-static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state);
+static inline uint32_t bw_randu32(
+	uint64_t * BW_RESTRICT state);
 /*! <<<```
  *    Returns a pseudo-random unsigned 32-bit integer in the range
  *    [`0`, `UINT32_MAX`].
@@ -93,7 +94,8 @@ static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state);
  *
  *    #### bw_randf()
  *  ```>>> */
-static inline float bw_randf(uint64_t *BW_RESTRICT state);
+static inline float bw_randf(
+	uint64_t * BW_RESTRICT state);
 /*! <<<```
  *    Returns a pseudo-random unsigned 32-bit floating point number in the range
  *    [`-1.f`, `1.f`].
@@ -115,7 +117,8 @@ extern "C" {
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
 
-static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
+static inline uint32_t bw_randu32(
+		uint64_t * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
 	// Permuted Congruential Generator,
 	// taken from https://nullprogram.com/blog/2017/09/21/
@@ -123,7 +126,8 @@ static inline uint32_t bw_randu32(uint64_t *BW_RESTRICT state) {
 	return (uint32_t)(*state >> (29 - (*state >> 61)));
 }
 
-static inline float bw_randf(uint64_t *BW_RESTRICT state) {
+static inline float bw_randf(
+		uint64_t * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
 	const float y = (2.f / (float)UINT32_MAX) * (float)bw_randu32(state) - 1.f;
 	BW_ASSERT(bw_is_finite(y));

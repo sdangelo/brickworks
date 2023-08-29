@@ -227,7 +227,7 @@ static inline void bw_dist_init(bw_dist_coeffs *BW_RESTRICT coeffs) {
 	bw_clip_set_gain(&coeffs->clip_coeffs, 1.f / 4.25f);
 	bw_clip_set_gain_compensation(&coeffs->clip_coeffs, 1);
 	bw_satur_set_gain(&coeffs->satur_coeffs, 1.f / 0.7f);
-	bw_satur_set_gain_compensation(&coeffs->clip_coeffs, 1);
+	bw_satur_set_gain_compensation(&coeffs->satur_coeffs, 1);
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, 475.f + (20e3f - 475.f) * 0.125f);
 }
 

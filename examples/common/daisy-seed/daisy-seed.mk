@@ -13,12 +13,14 @@ include ${SYSTEM_FILES_DIR}/Makefile
 
 CPPFLAGS += \
 	-DNDEBUG \
+	-DBW_NO_DEBUG \
 	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../../include
 
 CFLAGS += \
 	-DNDEBUG \
+	-DBW_NO_DEBUG \
 	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${ROOT_DIR}/../../../include \

@@ -6,8 +6,6 @@ TEMPLATE_DIR := ${ROOT_DIR}/../../common/vst3/template.vst3
 BUILD_PLUGIN_DIR := build/${NAME}.vst3
 
 CXXFLAGS := \
-	-DRELEASE=1 \
-	-DNDEBUG \
 	-I${ROOT_DIR} \
 	-I${ROOT_DIR}/../src \
 	-I${COMMON_DIR} \

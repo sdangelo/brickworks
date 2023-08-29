@@ -31,6 +31,7 @@ D8 := ${BUILD_TOOLS_DIR}/d8
 CXXFLAGS := \
 	-fPIC \
 	-DNDEBUG \
+	-DBW_NO_DEBUG \
 	-I${ROOT_DIR}/../src \
 	-I${COMMON_DIR} \
 	-I${ROOT_DIR}/../../../include \

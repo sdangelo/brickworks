@@ -592,6 +592,7 @@ static inline float bw_one_pole_process1(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 == 0.f);
 
 	const float y = x + coeffs->mA1u * (state->y_z1 - x);
 	state->y_z1 = y;
@@ -616,6 +617,7 @@ static inline float bw_one_pole_process1_sticky_abs(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_abs);
 
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
@@ -643,6 +645,7 @@ static inline float bw_one_pole_process1_sticky_rel(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_rel);
 
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
@@ -670,6 +673,7 @@ static inline float bw_one_pole_process1_asym(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 == 0.f);
 
 	const float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	state->y_z1 = y;
@@ -694,6 +698,7 @@ static inline float bw_one_pole_process1_asym_sticky_abs(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_abs);
 
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
@@ -721,6 +726,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_rel);
 
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
@@ -817,7 +823,7 @@ static inline void bw_one_pole_process(
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-	BW_ASSERT_DEEP(!bw_has_nan(y, n_samples));
+	BW_ASSERT_DEEP(y != NULL ? !bw_has_nan(y, n_samples) : 1);
 }
 
 static inline void bw_one_pole_process_multi(
@@ -1154,7 +1160,7 @@ public:
 	void process(
 		const float * const * x,
 		float * const *       y,
-		size_t               nSamples);
+		size_t                nSamples);
 
 	void process(
 		std::array<const float *, N_CHANNELS> x,

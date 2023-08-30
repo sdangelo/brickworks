@@ -468,7 +468,7 @@ static inline void bw_lp1_process(
 	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(x != NULL);
-	BW_ASSERT_DEEP(!bw_has_nan(x, n_samples));
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 	BW_ASSERT(y != NULL);
 
 	for (size_t i = 0; i < n_samples; i++) {
@@ -480,7 +480,7 @@ static inline void bw_lp1_process(
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-	BW_ASSERT_DEEP(!bw_has_nan(y, n_samples));
+	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
 static inline void bw_lp1_process_multi(
@@ -513,7 +513,7 @@ static inline void bw_lp1_set_cutoff(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_init);
-	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(bw_is_finite(value));
 	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
 
 	coeffs->cutoff = value;
@@ -541,6 +541,7 @@ static inline void bw_lp1_set_prewarp_freq(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
 	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
 
 	coeffs->prewarp_freq = value;

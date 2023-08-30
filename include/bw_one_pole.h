@@ -759,7 +759,7 @@ static inline void bw_one_pole_process(
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(x != NULL);
-	BW_ASSERT_DEEP(!bw_has_nan(x, n_samples));
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 
 	bw_one_pole_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
@@ -826,7 +826,7 @@ static inline void bw_one_pole_process(
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-	BW_ASSERT_DEEP(y != NULL ? !bw_has_nan(y, n_samples) : 1);
+	BW_ASSERT_DEEP(y != NULL ? bw_has_only_finite(y, n_samples) : 1);
 }
 
 static inline void bw_one_pole_process_multi(

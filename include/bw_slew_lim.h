@@ -555,7 +555,7 @@ static inline void bw_slew_lim_process(
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
 	BW_ASSERT(x != NULL);
-	BW_ASSERT_DEEP(!bw_has_nan(x, n_samples));
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
 	if (y != NULL) {
@@ -597,7 +597,7 @@ static inline void bw_slew_lim_process(
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-	BW_ASSERT_DEEP(y != NULL ? !bw_has_nan(y, n_samples) : 1);
+	BW_ASSERT_DEEP(y != NULL ? bw_has_only_finite(y, n_samples) : 1);
 }
 
 static inline void bw_slew_lim_process_multi(
@@ -646,7 +646,7 @@ static inline void bw_slew_lim_process_multi(
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
 					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
 					BW_ASSERT(x[j] != NULL);
-					BW_ASSERT_DEEP(!bw_has_nan(x[j], n_samples));
+					BW_ASSERT_DEEP(bw_has_only_finite(x[j], n_samples));
 
 					if (y[j] != NULL)
 						for (size_t i = 0; i < n_samples; i++)
@@ -654,8 +654,8 @@ static inline void bw_slew_lim_process_multi(
 					state[j]->y_z1 = x[j][n_samples - 1];
 
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
-					BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-					BW_ASSERT_DEEP(y[j] != NULL ? !bw_has_nan(y[j], n_samples) : 1);
+					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT_DEEP(y[j] != NULL ? bw_has_only_finite(y[j], n_samples) : 1);
 				}
 		}
 	} else {
@@ -679,12 +679,12 @@ static inline void bw_slew_lim_process_multi(
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
 					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
 					BW_ASSERT(x[j] != NULL);
-					BW_ASSERT_DEEP(!bw_has_nan(x[j], n_samples));
+					BW_ASSERT_DEEP(bw_has_only_finite(x[j], n_samples));
 
 					state[j]->y_z1 = x[j][n_samples - 1];
 
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
-					BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
 				}
 		}
 	}

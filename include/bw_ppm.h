@@ -32,6 +32,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Enforced minimum output value `-600.f`.</li>
  *          <li><code>bw_ppm_process()</code> and
  *              <code>bw_ppm_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -128,7 +129,8 @@ static inline void bw_ppm_update_coeffs_audio(bw_ppm_coeffs *BW_RESTRICT coeffs)
 static inline float bw_ppm_process1(const bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state *BW_RESTRICT state, float x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
- *    `state`. Returns the corresponding output sample.
+ *    `state`. Returns the corresponding output sample value in dBSF (minimum
+ *    `-600.f`).
  *
  *    #### bw_ppm_process()
  *  ```>>> */
@@ -138,7 +140,7 @@ static inline void bw_ppm_process(bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_stat
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
- *    Output sample values are in dBFS.
+ *    Output sample values are in dBFS (minimum `-600.f`).
  *
  *    `y` may be `NULL`.
  *
@@ -151,7 +153,7 @@ static inline void bw_ppm_process_multi(bw_ppm_coeffs *BW_RESTRICT coeffs, bw_pp
  *    using and updating both the common `coeffs` and each of the `n_channels`
  *    `state`s (control and audio rate).
  * 
- *    Output sample values are in dBFS.
+ *    Output sample values are in dBFS (minimum `-600.f`).
  *
  *    `y` or any element of `y` may be `NULL`.
  *
@@ -210,7 +212,7 @@ static inline void bw_ppm_reset_coeffs(bw_ppm_coeffs *BW_RESTRICT coeffs) {
 
 static inline void bw_ppm_reset_state(const bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state *BW_RESTRICT state) {
 	bw_env_follow_reset_state(&coeffs->env_follow_coeffs, &state->env_follow_state);
-	state->y_z1 = -INFINITY;
+	state->y_z1 = -600.f; // minimum, see below
 }
 
 static inline void bw_ppm_update_coeffs_ctrl(bw_ppm_coeffs *BW_RESTRICT coeffs) {
@@ -223,7 +225,7 @@ static inline void bw_ppm_update_coeffs_audio(bw_ppm_coeffs *BW_RESTRICT coeffs)
 
 static inline float bw_ppm_process1(const bw_ppm_coeffs *BW_RESTRICT coeffs, bw_ppm_state *BW_RESTRICT state, float x) {
 	const float yl = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x);
-	const float y = yl >= 1e-30f ? bw_lin2dBf(yl) : -INFINITY; // -600 dB is quiet enough
+	const float y = yl >= 1e-30f ? bw_lin2dBf(yl) : -600.f; // -600 dB is quiet enough
 	state->y_z1 = y;
 	return y;
 }

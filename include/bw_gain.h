@@ -92,44 +92,56 @@ typedef struct bw_gain_coeffs bw_gain_coeffs;
  *
  *    #### bw_gain_init()
  *  ```>>> */
-static inline void bw_gain_init(bw_gain_coeffs *BW_RESTRICT coeffs);
+static inline void bw_gain_init(
+	bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_gain_set_sample_rate()
  *  ```>>> */
-static inline void bw_gain_set_sample_rate(bw_gain_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_gain_set_sample_rate(
+	bw_gain_coeffs * BW_RESTRICT coeffs,
+	float                        sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
  *    #### bw_gain_reset_coeffs()
  *  ```>>> */
-static inline void bw_gain_reset_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs);
+static inline void bw_gain_reset_coeffs(
+	bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_gain_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_gain_update_coeffs_ctrl(bw_gain_coeffs *BW_RESTRICT coeffs);
+static inline void bw_gain_update_coeffs_ctrl(
+	bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
  *    #### bw_gain_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_gain_update_coeffs_audio(bw_gain_coeffs *BW_RESTRICT coeffs);
+static inline void bw_gain_update_coeffs_audio(
+	bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_gain_process1()
  *  ```>>> */
-static inline float bw_gain_process1(const bw_gain_coeffs *BW_RESTRICT coeffs, float x);
+static inline float bw_gain_process1(
+	const bw_gain_coeffs * BW_RESTRICT coeffs,
+	float                              x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs` and returns the
  *    corresponding output sample.
  *
  *    #### bw_gain_process()
  *  ```>>> */
-static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples);
+static inline void bw_gain_process(
+	bw_gain_coeffs * BW_RESTRICT coeffs,
+	const float *                x,
+	float *                      y,
+	size_t                       n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
@@ -137,7 +149,12 @@ static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const flo
  *
  *    #### bw_gain_process_multi()
  *  ```>>> */
-static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_gain_process_multi(
+	bw_gain_coeffs * BW_RESTRICT coeffs,
+	const float * const *        x,
+	float * const *              y,
+	size_t                       n_channels,
+	size_t                       n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -145,7 +162,9 @@ static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, con
  *
  *    #### bw_gain_set_gain_lin()
  *  ```>>> */
-static inline void bw_gain_set_gain_lin(bw_gain_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_gain_set_gain_lin(
+	bw_gain_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the gain parameter to the given `value` (linear gain) in `coeffs`.
  *
@@ -153,7 +172,9 @@ static inline void bw_gain_set_gain_lin(bw_gain_coeffs *BW_RESTRICT coeffs, floa
  *
  *    #### bw_gain_set_gain_dB()
  *  ```>>> */
-static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_gain_set_gain_dB(
+	bw_gain_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the gain parameter to the given `value` (dB) in `coeffs`.
  *
@@ -161,7 +182,9 @@ static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float
  *
  *    #### bw_gain_set_smooth_tau()
  *  ```>>> */
-static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_gain_set_smooth_tau(
+	bw_gain_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the smoothing time constant `value` (s) in `coeffs`.
  *
@@ -169,7 +192,8 @@ static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, fl
  *
  *    #### bw_gain_get_gain()
  *  ```>>> */
-static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs);
+static inline float bw_gain_get_gain(
+	const bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the actual current gain coefficient (linear gain) in `coeffs`.
  *  }}} */

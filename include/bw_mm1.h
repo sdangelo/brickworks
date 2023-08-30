@@ -90,51 +90,68 @@ typedef struct bw_mm1_state bw_mm1_state;
  *
  *    #### bw_mm1_init()
  *  ```>>> */
-static inline void bw_mm1_init(bw_mm1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_mm1_init(
+	bw_mm1_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_mm1_set_sample_rate()
  *  ```>>> */
-static inline void bw_mm1_set_sample_rate(bw_mm1_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_mm1_set_sample_rate(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	float                       sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
  *    #### bw_mm1_reset_coeffs()
  *  ```>>> */
-static inline void bw_mm1_reset_coeffs(bw_mm1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_mm1_reset_coeffs(
+	bw_mm1_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_mm1_reset_state()
  *  ```>>> */
-static inline void bw_mm1_reset_state(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, float x_0);
+static inline void bw_mm1_reset_state(
+	const bw_mm1_coeffs * BW_RESTRICT coeffs,
+	bw_mm1_state * BW_RESTRICT        state,
+	float                             x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
  *    and the quiescent/initial input value `x_0`.
  *
  *    #### bw_mm1_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_mm1_update_coeffs_ctrl(bw_mm1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_mm1_update_coeffs_ctrl(
+	bw_mm1_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
  *    #### bw_mm1_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_mm1_update_coeffs_audio(bw_mm1_coeffs *BW_RESTRICT coeffs);
+static inline void bw_mm1_update_coeffs_audio(
+	bw_mm1_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_mm1_process1()
  *  ```>>> */
-static inline float bw_mm1_process1(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, float x);
+static inline float bw_mm1_process1(
+	const bw_mm1_coeffs * BW_RESTRICT coeffs,
+	bw_mm1_state * BW_RESTRICT        state,
+	float                             x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`, while using and updating
  *    `state`. Returns the corresponding output sample.
  *
  *    #### bw_mm1_process()
  *  ```>>> */
-static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples);
+static inline void bw_mm1_process(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	bw_mm1_state * BW_RESTRICT  state,
+	const float *               x,
+	float *                     y,
+	size_t                      n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating both
@@ -142,7 +159,13 @@ static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_stat
  *
  *    #### bw_mm1_process_multi()
  *  ```>>> */
-static inline void bw_mm1_process_multi(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_mm1_process_multi(
+	bw_mm1_coeffs * BW_RESTRICT                    coeffs,
+	bw_mm1_state * BW_RESTRICT const * BW_RESTRICT state,
+	const float * const *                          x,
+	float * const *                                y,
+	size_t                                         n_channels,
+	size_t                                         n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -151,15 +174,21 @@ static inline void bw_mm1_process_multi(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm
  *
  *    #### bw_mm1_set_cutoff()
  *  ```>>> */
-static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_mm1_set_cutoff(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	float                       value);
 /*! <<<```
  *    Sets the cutoff frequency `value` (Hz) in `coeffs`.
+ *
+ *    Valid range: [`1e-6f`, `1e6f`].
  *
  *    Default value: `1e3f`.
  *
  *    #### bw_mm1_set_prewarp_at_cutoff()
  *  ```>>> */
-static inline void bw_mm1_set_prewarp_at_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, char value);
+static inline void bw_mm1_set_prewarp_at_cutoff(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	char                        value);
 /*! <<<```
  *    Sets whether bilinear transform prewarping frequency should match the
  *    cutoff frequency (non-`0`) or not (`0`).
@@ -168,27 +197,39 @@ static inline void bw_mm1_set_prewarp_at_cutoff(bw_mm1_coeffs *BW_RESTRICT coeff
  *
  *    #### bw_mm1_set_prewarp_freq()
  *  ```>>> */
-static inline void bw_mm1_set_prewarp_freq(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_mm1_set_prewarp_freq(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	float                       value);
 /*! <<<```
  *    Sets the prewarping frequency `value` (Hz) in `coeffs`.
  *
  *    Only used when the prewarp\_at\_cutoff parameter is off.
  *
+ *    Valid range: [`1e-6f`, `1e6f`].
+ *
  *    Default value: `1e3f`.
  *
  *    #### bw_mm1_set_coeff_x()
  *  ```>>> */
-static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_mm1_set_coeff_x(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	float                       value);
 /*! <<<```
  *    Sets the input mode coefficient `value` in `coeffs`.
+ *
+ *    `value` must be finite.
  *
  *    Default value: `1.f`.
  *
  *    #### bw_mm1_set_coeff_lp()
  *  ```>>> */
-static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_mm1_set_coeff_lp(
+	bw_mm1_coeffs * BW_RESTRICT coeffs,
+	float                       value);
 /*! <<<```
  *    Sets the lowpass mode coefficient `value` in `coeffs`.
+ *
+ *    `value` must be finite.
  *
  *    Default value: `0.f`.
  *  }}} */
@@ -220,7 +261,8 @@ struct bw_mm1_state {
 	bw_lp1_state	lp1_state;
 };
 
-static inline void bw_mm1_init(bw_mm1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_mm1_init(
+		bw_mm1_coeffs * BW_RESTRICT coeffs) {
 	bw_lp1_init(&coeffs->lp1_coeffs);
 	bw_gain_init(&coeffs->gain_x_coeffs);
 	bw_gain_init(&coeffs->gain_lp_coeffs);
@@ -230,42 +272,58 @@ static inline void bw_mm1_init(bw_mm1_coeffs *BW_RESTRICT coeffs) {
 	bw_gain_set_gain_lin(&coeffs->gain_lp_coeffs, 0.f);
 }
 
-static inline void bw_mm1_set_sample_rate(bw_mm1_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_mm1_set_sample_rate(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		float                       sample_rate) {
 	bw_lp1_set_sample_rate(&coeffs->lp1_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_x_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_lp_coeffs, sample_rate);
 }
 
-static inline void bw_mm1_reset_coeffs(bw_mm1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_mm1_reset_coeffs(
+		bw_mm1_coeffs * BW_RESTRICT coeffs) {
 	bw_lp1_reset_coeffs(&coeffs->lp1_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_x_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_lp_coeffs);
 }
 
-static inline void bw_mm1_reset_state(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, float x_0) {
+static inline void bw_mm1_reset_state(
+		const bw_mm1_coeffs * BW_RESTRICT coeffs,
+		bw_mm1_state * BW_RESTRICT        state,
+		float                             x_0) {
 	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
 }
 
-static inline void bw_mm1_update_coeffs_ctrl(bw_mm1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_mm1_update_coeffs_ctrl(
+		bw_mm1_coeffs * BW_RESTRICT coeffs) {
 	bw_lp1_update_coeffs_ctrl(&coeffs->lp1_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_x_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_lp_coeffs);
 }
 
-static inline void bw_mm1_update_coeffs_audio(bw_mm1_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_mm1_update_coeffs_audio(
+		bw_mm1_coeffs * BW_RESTRICT coeffs) {
 	bw_lp1_update_coeffs_audio(&coeffs->lp1_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_x_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_lp_coeffs);
 }
 
-static inline float bw_mm1_process1(const bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, float x) {
+static inline float bw_mm1_process1(
+		const bw_mm1_coeffs * BW_RESTRICT coeffs,
+		bw_mm1_state * BW_RESTRICT        state,
+		float                             x) {
 	const float lp = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, x);
 	const float vx = bw_gain_process1(&coeffs->gain_x_coeffs, x);
 	const float vlp = bw_gain_process1(&coeffs->gain_lp_coeffs, lp);
 	return vx + vlp;
 }
 
-static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT state, const float *x, float *y, size_t n_samples) {
+static inline void bw_mm1_process(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		bw_mm1_state * BW_RESTRICT  state,
+		const float *               x,
+		float *                     y,
+		size_t                      n_samples) {
 	bw_mm1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm1_update_coeffs_audio(coeffs);
@@ -273,7 +331,13 @@ static inline void bw_mm1_process(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_stat
 	}
 }
 
-static inline void bw_mm1_process_multi(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm1_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_mm1_process_multi(
+		bw_mm1_coeffs * BW_RESTRICT                    coeffs,
+		bw_mm1_state * BW_RESTRICT const * BW_RESTRICT state,
+		const float * const *                          x,
+		float * const *                                y,
+		size_t                                         n_channels,
+		size_t                                         n_samples) {
 	bw_mm1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm1_update_coeffs_audio(coeffs);
@@ -282,23 +346,33 @@ static inline void bw_mm1_process_multi(bw_mm1_coeffs *BW_RESTRICT coeffs, bw_mm
 	}
 }
 
-static inline void bw_mm1_set_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_mm1_set_cutoff(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, value);
 }
 
-static inline void bw_mm1_set_prewarp_at_cutoff(bw_mm1_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_mm1_set_prewarp_at_cutoff(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		char                        value) {
 	bw_lp1_set_prewarp_at_cutoff(&coeffs->lp1_coeffs, value);
 }
 
-static inline void bw_mm1_set_prewarp_freq(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_mm1_set_prewarp_freq(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	bw_lp1_set_prewarp_freq(&coeffs->lp1_coeffs, value);
 }
 
-static inline void bw_mm1_set_coeff_x(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_mm1_set_coeff_x(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	bw_gain_set_gain_lin(&coeffs->gain_x_coeffs, value);
 }
 
-static inline void bw_mm1_set_coeff_lp(bw_mm1_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_mm1_set_coeff_lp(
+		bw_mm1_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	bw_gain_set_gain_lin(&coeffs->gain_lp_coeffs, value);
 }
 
@@ -319,22 +393,36 @@ class MM1 {
 public:
 	MM1();
 
-	void setSampleRate(float sampleRate);
-	void reset(float x_0 = 0.f);
+	void setSampleRate(
+		float sampleRate);
+
+	void reset(
+		float x_0 = 0.f);
+
 	void process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples);
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples);
+
 	void process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples);
 
-	void setCutoff(float value);
-	void setPrewarpAtCutoff(bool value);
-	void setPrewarpFreq(float value);
-	void setCoeffX(float value);
-	void setCoeffLp(float value);
+	void setCutoff(
+		float value);
+
+	void setPrewarpAtCutoff(
+		bool value);
+
+	void setPrewarpFreq(
+		float value);
+
+	void setCoeffX(
+		float value);
+
+	void setCoeffLp(
+		float value);
 /*! <<<...
  *  }
  *  ```

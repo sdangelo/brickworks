@@ -43,7 +43,8 @@
  *          <li>Now using backward Euler rather than impulse invariant
  *              method.</li>
  *          <li>Clearly specificed parameter validity ranges.</li>
- *          <li>Added more debugging code.</li>
+ *          <li>Added more debugging code and added `coeffs` argument to
+ *              <code>bw_one_pole_state_is_valid()</code>.</li>
  *          <li>Added pragmas to silence bogus GCC uninitialized variable
  *              warnings.</li>
  *        </ul>
@@ -404,11 +405,15 @@ static inline char bw_one_pole_coeffs_is_valid(
  *    #### bw_one_pole_state_is_valid()
  *  ```>>> */
 static inline char bw_one_pole_state_is_valid(
-	const bw_one_pole_state * BW_RESTRICT state);
+	const bw_one_pole_coeffs * BW_RESTRICT coeffs,
+	const bw_one_pole_state * BW_RESTRICT  state);
 /*! <<<```
  *    Tries to determine whether `state` is valid and returns non-`0` if it
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
+ *
+ *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
+ *    is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_one_pole_state`.
@@ -559,8 +564,7 @@ static inline void bw_one_pole_reset_state(
 #endif
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 }
 
 static inline void bw_one_pole_update_coeffs_ctrl(
@@ -592,8 +596,7 @@ static inline float bw_one_pole_process1(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 == 0.f);
 
@@ -602,8 +605,7 @@ static inline float bw_one_pole_process1(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -617,8 +619,7 @@ static inline float bw_one_pole_process1_sticky_abs(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_abs);
 
@@ -630,8 +631,7 @@ static inline float bw_one_pole_process1_sticky_abs(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -645,8 +645,7 @@ static inline float bw_one_pole_process1_sticky_rel(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_rel);
 
@@ -658,8 +657,7 @@ static inline float bw_one_pole_process1_sticky_rel(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -673,8 +671,7 @@ static inline float bw_one_pole_process1_asym(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 == 0.f);
 
@@ -683,8 +680,7 @@ static inline float bw_one_pole_process1_asym(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -698,8 +694,7 @@ static inline float bw_one_pole_process1_asym_sticky_abs(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_abs);
 
@@ -711,8 +706,7 @@ static inline float bw_one_pole_process1_asym_sticky_abs(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -726,8 +720,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_rel);
 
@@ -739,8 +732,7 @@ static inline float bw_one_pole_process1_asym_sticky_rel(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -756,8 +748,7 @@ static inline void bw_one_pole_process(
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 
@@ -824,8 +815,7 @@ static inline void bw_one_pole_process(
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(y != NULL ? bw_has_only_finite(y, n_samples) : 1);
 }
 
@@ -1086,7 +1076,7 @@ static inline void bw_one_pole_set_sticky_mode(
 static inline float bw_one_pole_get_y_z1(
 		const bw_one_pole_state * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
+	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(NULL, state));
 
 	return state->y_z1;
 }
@@ -1131,13 +1121,19 @@ static inline char bw_one_pole_coeffs_is_valid(
 }
 
 static inline char bw_one_pole_state_is_valid(
-		const bw_one_pole_state * BW_RESTRICT state) {
+		const bw_one_pole_coeffs * BW_RESTRICT coeffs,
+		const bw_one_pole_state * BW_RESTRICT  state) {
 	BW_ASSERT(state != NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_one_pole_state"))
 		return 0;
+
+	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+		return 0;
 #endif
+
+	(void)coeffs;
 
 	return bw_is_finite(state->y_z1);
 }

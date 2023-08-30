@@ -282,11 +282,15 @@ static inline char bw_slew_lim_coeffs_is_valid(
  *    #### bw_slew_lim_state_is_valid()
  *  ```>>> */
 static inline char bw_slew_lim_state_is_valid(
-	const bw_slew_lim_state * BW_RESTRICT state);
+	const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
+	const bw_slew_lim_state * BW_RESTRICT  state);
 /*! <<<```
  *    Tries to determine whether `state` is valid and returns non-`0` if it
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
+ *
+ *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
+ *    is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_slew_lim_state`.
@@ -418,8 +422,7 @@ static inline void bw_slew_lim_reset_state(
 #endif
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 }
 
 static inline void bw_slew_lim_update_coeffs_ctrl(
@@ -451,8 +454,7 @@ static inline float bw_slew_lim_process1(
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(bw_is_finite(coeffs->max_inc) && bw_is_finite(coeffs->max_dec));
 
@@ -461,8 +463,7 @@ static inline float bw_slew_lim_process1(
 
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -476,8 +477,7 @@ static inline float bw_slew_lim_process1_up(
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(bw_is_finite(coeffs->max_inc) && !bw_is_finite(coeffs->max_dec));
 
@@ -486,8 +486,7 @@ static inline float bw_slew_lim_process1_up(
 
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -501,8 +500,7 @@ static inline float bw_slew_lim_process1_down(
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(!bw_is_finite(coeffs->max_inc) && bw_is_finite(coeffs->max_dec));
 
@@ -511,8 +509,7 @@ static inline float bw_slew_lim_process1_down(
 
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -526,8 +523,7 @@ static inline float bw_slew_lim_process1_none(
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(!bw_is_finite(coeffs->max_inc) && !bw_is_finite(coeffs->max_dec));
 
@@ -536,8 +532,7 @@ static inline float bw_slew_lim_process1_none(
 
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 
 	return x;
 }
@@ -552,8 +547,7 @@ static inline void bw_slew_lim_process(
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 
@@ -595,8 +589,7 @@ static inline void bw_slew_lim_process(
 
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(y != NULL ? bw_has_only_finite(y, n_samples) : 1);
 }
 
@@ -643,8 +636,7 @@ static inline void bw_slew_lim_process_multi(
 			else
 				for (size_t j = 0; j < n_channels; j++) {
 					BW_ASSERT(state[j] != NULL);
-					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
-					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
 					BW_ASSERT(x[j] != NULL);
 					BW_ASSERT_DEEP(bw_has_only_finite(x[j], n_samples));
 
@@ -653,8 +645,7 @@ static inline void bw_slew_lim_process_multi(
 							y[j][i] = x[j][i];
 					state[j]->y_z1 = x[j][n_samples - 1];
 
-					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
-					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
 					BW_ASSERT_DEEP(y[j] != NULL ? bw_has_only_finite(y[j], n_samples) : 1);
 				}
 		}
@@ -676,15 +667,13 @@ static inline void bw_slew_lim_process_multi(
 			else
 				for (size_t j = 0; j < n_channels; j++) {
 					BW_ASSERT(state[j] != NULL);
-					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
-					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
 					BW_ASSERT(x[j] != NULL);
 					BW_ASSERT_DEEP(bw_has_only_finite(x[j], n_samples));
 
 					state[j]->y_z1 = x[j][n_samples - 1];
 
-					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
-					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
 				}
 		}
 	}
@@ -742,7 +731,7 @@ static inline void bw_slew_lim_set_max_rate_down(
 static inline float bw_slew_lim_get_y_z1(
 		const bw_slew_lim_state * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(NULL, state));
 
 	return state->y_z1;
 }
@@ -781,13 +770,19 @@ static inline char bw_slew_lim_coeffs_is_valid(
 }
 
 static inline char bw_slew_lim_state_is_valid(
-		const bw_slew_lim_state * BW_RESTRICT state) {
+		const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
+		const bw_slew_lim_state * BW_RESTRICT  state) {
 	BW_ASSERT(state != NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_slew_lim_state"))
 		return 0;
+
+	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+		return 0;
 #endif
+
+	(void)coeffs;
 
 	return bw_is_finite(state->y_z1);
 }

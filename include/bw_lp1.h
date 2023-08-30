@@ -232,11 +232,15 @@ static inline char bw_lp1_coeffs_is_valid(
  *    #### bw_lp1_state_is_valid()
  *  ```>>> */
 static inline char bw_lp1_state_is_valid(
-	const bw_lp1_state * BW_RESTRICT state);
+	const bw_lp1_coeffs * BW_RESTRICT coeffs,
+	const bw_lp1_state * BW_RESTRICT  state);
 /*! <<<```
  *    Tries to determine whether `state` is valid and returns non-`0` if it
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
+ *
+ *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
+ *    is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_lp1_state`.
@@ -404,8 +408,7 @@ static inline void bw_lp1_reset_state(
 #endif
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_lp1_state_is_valid(coeffs, state));
 }
 
 static inline void bw_lp1_update_coeffs_ctrl(
@@ -437,8 +440,7 @@ static inline float bw_lp1_process1(
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_lp1_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 
 	const float X = coeffs->X_x * (x - state->y_z1) - coeffs->X_X_z1 * state->X_z1;
@@ -448,8 +450,7 @@ static inline float bw_lp1_process1(
 
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_lp1_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -465,8 +466,7 @@ static inline void bw_lp1_process(
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_lp1_state_is_valid(coeffs, state));
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 	BW_ASSERT(y != NULL);
@@ -478,8 +478,7 @@ static inline void bw_lp1_process(
 
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(bw_lp1_state_is_valid(state));
-	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+	BW_ASSERT_DEEP(bw_lp1_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
@@ -590,13 +589,19 @@ static inline char bw_lp1_coeffs_is_valid(
 }
 
 static inline char bw_lp1_state_is_valid(
-		const bw_lp1_state * BW_RESTRICT state) {
+		const bw_lp1_coeffs * BW_RESTRICT coeffs,
+		const bw_lp1_state * BW_RESTRICT  state) {
 	BW_ASSERT(state != NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_lp1_state"))
 		return 0;
+
+	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+		return 0;
 #endif
+
+	(void)coeffs;
 
 	return bw_is_finite(state->y_z1) && bw_is_finite(state->X_z1);
 }

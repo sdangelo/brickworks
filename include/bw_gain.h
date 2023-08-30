@@ -462,8 +462,7 @@ static inline char bw_gain_coeffs_is_valid(
 	if (!bw_is_finite(coeffs->gain))
 		return 0;
 
-	return bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs) && bw_one_pole_state_is_valid(&coeffs->smooth_state);
-	// reset id...
+	return bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs) && bw_one_pole_state_is_valid(&coeffs->smooth_coeffs, &coeffs->smooth_state);
 }
 
 struct bw_gain_coeffs {

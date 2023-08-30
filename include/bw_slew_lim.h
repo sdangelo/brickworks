@@ -311,7 +311,7 @@ enum bw_slew_lim_coeffs_state {
 	bw_slew_lim_coeffs_state_invalid,
 	bw_slew_lim_coeffs_state_init,
 	bw_slew_lim_coeffs_state_set_sample_rate,
-	bw_slew_lim_coeffs_state_reset_coeffs,
+	bw_slew_lim_coeffs_state_reset_coeffs
 };
 #endif
 
@@ -323,14 +323,14 @@ struct bw_slew_lim_coeffs {
 #endif
 
 	// Coefficients
-	float	T;
+	float				T;
 
-	float	max_inc;
-	float	max_dec;
+	float				max_inc;
+	float				max_dec;
 
 	// Parameters
-	float	max_rate_up;
-	float	max_rate_down;
+	float				max_rate_up;
+	float				max_rate_down;
 };
 
 struct bw_slew_lim_state {
@@ -339,7 +339,7 @@ struct bw_slew_lim_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
-	float	y_z1;
+	float		y_z1;
 };
 
 static inline void bw_slew_lim_init(
@@ -553,7 +553,7 @@ static inline void bw_slew_lim_process(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-	BW_ASSERT(n_samples == 0 || x != NULL);
+	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(x, n_samples));
 
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
@@ -641,10 +641,20 @@ static inline void bw_slew_lim_process_multi(
 							bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
 				for (size_t j = 0; j < n_channels; j++) {
+					BW_ASSERT(state[j] != NULL);
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
+					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT(x[j] != NULL);
+					BW_ASSERT_DEEP(!bw_has_nan(x[j], n_samples));
+
 					if (y[j] != NULL)
 						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = x[j][i];
 					state[j]->y_z1 = x[j][n_samples - 1];
+
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
+					BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+					BW_ASSERT_DEEP(y[j] != NULL ? !bw_has_nan(y[j], n_samples) : 1);
 				}
 		}
 	} else {
@@ -663,8 +673,18 @@ static inline void bw_slew_lim_process_multi(
 					for (size_t i = 0; i < n_samples; i++)
 						bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
-				for (size_t j = 0; j < n_channels; j++)
+				for (size_t j = 0; j < n_channels; j++) {
+					BW_ASSERT(state[j] != NULL);
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
+					BW_ASSERT_DEEP(coeffs->reset_id == state[j]->coeffs_reset_id);
+					BW_ASSERT(x[j] != NULL);
+					BW_ASSERT_DEEP(!bw_has_nan(x[j], n_samples));
+
 					state[j]->y_z1 = x[j][n_samples - 1];
+
+					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(state[j]));
+					BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
+				}
 		}
 	}
 
@@ -744,7 +764,7 @@ static inline char bw_slew_lim_coeffs_is_valid(
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->state >= bw_slew_lim_coeffs_state_set_sample_rate) {
-		if (!bw_is_finite(coeffs->T) || coeffs->T < 0.f)
+		if (!bw_is_finite(coeffs->T) || coeffs->T <= 0.f)
 			return 0;
 	}
 

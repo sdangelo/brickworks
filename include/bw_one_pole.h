@@ -431,7 +431,7 @@ enum bw_one_pole_coeffs_state {
 	bw_one_pole_coeffs_state_invalid,
 	bw_one_pole_coeffs_state_init,
 	bw_one_pole_coeffs_state_set_sample_rate,
-	bw_one_pole_coeffs_state_reset_coeffs,
+	bw_one_pole_coeffs_state_reset_coeffs
 };
 #endif
 
@@ -755,7 +755,7 @@ static inline void bw_one_pole_process(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(state));
 	BW_ASSERT_DEEP(coeffs->reset_id == state->coeffs_reset_id);
-	BW_ASSERT(n_samples == 0 || x != NULL);
+	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(x, n_samples));
 
 	bw_one_pole_update_coeffs_ctrl(coeffs);
@@ -1101,7 +1101,7 @@ static inline char bw_one_pole_coeffs_is_valid(
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->state >= bw_one_pole_coeffs_state_set_sample_rate) {
-		if (!bw_is_finite(coeffs->fs_2pi) || coeffs->fs_2pi < 0.f)
+		if (!bw_is_finite(coeffs->fs_2pi) || coeffs->fs_2pi <= 0.f)
 			return 0;
 	}
 

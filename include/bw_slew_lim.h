@@ -43,6 +43,7 @@
  *              <code>bw_slew_lim_init()</code>.</li>
  *          <li>Fixed documentation of
  *              <code>bw_slew_lim_update_coeffs_audio()</code>.</li>
+ *          <li>Clearly specificed parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
@@ -747,7 +748,7 @@ static inline float bw_slew_lim_get_y_z1(
 }
 
 static inline char bw_slew_lim_coeffs_is_valid(
-	const bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
+		const bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != NULL);
 
 #ifdef BW_DEBUG_DEEP
@@ -780,7 +781,7 @@ static inline char bw_slew_lim_coeffs_is_valid(
 }
 
 static inline char bw_slew_lim_state_is_valid(
-	const bw_slew_lim_state * BW_RESTRICT state) {
+		const bw_slew_lim_state * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
 
 #ifdef BW_DEBUG_DEEP

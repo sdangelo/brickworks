@@ -42,6 +42,7 @@
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Fixed theoretical bug in <code>bw_lp1_init()</code>.</li>
+ *          <li>Clearly specificed parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
@@ -549,7 +550,7 @@ static inline void bw_lp1_set_prewarp_freq(
 }
 
 static inline char bw_lp1_coeffs_is_valid(
-	const bw_lp1_coeffs * BW_RESTRICT coeffs) {
+		const bw_lp1_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != NULL);
 
 #ifdef BW_DEBUG_DEEP
@@ -588,7 +589,7 @@ static inline char bw_lp1_coeffs_is_valid(
 }
 
 static inline char bw_lp1_state_is_valid(
-	const bw_lp1_state * BW_RESTRICT state) {
+		const bw_lp1_state * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
 
 #ifdef BW_DEBUG_DEEP
@@ -596,8 +597,7 @@ static inline char bw_lp1_state_is_valid(
 		return 0;
 #endif
 
-	return bw_is_finite(state->y_z1);
-	return bw_is_finite(state->X_z1);
+	return bw_is_finite(state->y_z1) && bw_is_finite(state->X_z1);
 }
 
 #ifdef __cplusplus

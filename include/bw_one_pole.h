@@ -42,6 +42,7 @@
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Now using backward Euler rather than impulse invariant
  *              method.</li>
+ *          <li>Clearly specificed parameter validity ranges.</li>
  *          <li>Added more debugging code.</li>
  *          <li>Added pragmas to silence bogus GCC uninitialized variable
  *              warnings.</li>

@@ -38,6 +38,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Added pragmas to silence bogus GCC uninitialized variable
+ *              warnings.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -293,7 +295,10 @@ static inline void bw_hs2_process_multi(bw_hs2_coeffs *BW_RESTRICT coeffs, bw_hs
 static inline void bw_hs2_set_cutoff(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->cutoff) {
 		coeffs->cutoff = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_HS2_PARAM_CUTOFF;
+#pragma GCC diagnostic pop
 	}
 }
 
@@ -304,7 +309,10 @@ static inline void bw_hs2_set_Q(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) 
 static inline void bw_hs2_set_high_gain_lin(bw_hs2_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->high_gain != value) {
 		coeffs->high_gain = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_HS2_PARAM_HIGH_GAIN;
+#pragma GCC diagnostic pop
 	}
 }
 

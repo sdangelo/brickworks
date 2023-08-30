@@ -53,6 +53,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Added pragmas to silence bogus GCC uninitialized variable
+ *              warnings.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -422,28 +424,40 @@ static inline void bw_env_gen_process_multi(bw_env_gen_coeffs *BW_RESTRICT coeff
 static inline void bw_env_gen_set_attack(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->attack != value) {
 		coeffs->attack = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_ATTACK;
+#pragma GCC diagnostic pop
 	}
 }
 
 static inline void bw_env_gen_set_decay(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->decay != value) {
 		coeffs->decay = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_DECAY;
+#pragma GCC diagnostic pop
 	}
 }
 
 static inline void bw_env_gen_set_sustain(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->sustain != value) {
 		coeffs->sustain = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_SUSTAIN;
+#pragma GCC diagnostic pop
 	}
 }
 
 static inline void bw_env_gen_set_release(bw_env_gen_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->release != value) {
 		coeffs->release = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_RELEASE;
+#pragma GCC diagnostic pop
 	}
 }
 

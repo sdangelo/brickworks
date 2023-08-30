@@ -43,6 +43,8 @@
  *          <li>Now using backward Euler rather than impulse invariant
  *              method.</li>
  *          <li>Added more debugging code.</li>
+ *          <li>Added pragmas to silence bogus GCC uninitialized variable
+ *              warnings.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -966,7 +968,10 @@ static inline void bw_one_pole_set_cutoff_up(
 
 	if (coeffs->cutoff_up != value) {
 		coeffs->cutoff_up = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ONE_POLE_PARAM_CUTOFF_UP;
+#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
@@ -984,7 +989,10 @@ static inline void bw_one_pole_set_cutoff_down(
 
 	if (coeffs->cutoff_down != value) {
 		coeffs->cutoff_down = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ONE_POLE_PARAM_CUTOFF_DOWN;
+#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
@@ -1050,7 +1058,10 @@ static inline void bw_one_pole_set_sticky_thresh(
 
 	if (coeffs->sticky_thresh != value) {
 		coeffs->sticky_thresh = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ONE_POLE_PARAM_STICKY_THRESH;
+#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));

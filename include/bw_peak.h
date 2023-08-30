@@ -46,6 +46,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Added pragmas to silence bogus GCC uninitialized variable
+ *              warnings.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -331,14 +333,20 @@ static inline void bw_peak_set_cutoff(bw_peak_coeffs *BW_RESTRICT coeffs, float 
 static inline void bw_peak_set_Q(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->Q != value) {
 		coeffs->Q = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_Q;
+#pragma GCC diagnostic pop
 	}
 }
 
 static inline void bw_peak_set_peak_gain_lin(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->peak_gain != value) {
 		coeffs->peak_gain = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_PEAK_GAIN;
+#pragma GCC diagnostic pop
 	}
 }
 
@@ -349,14 +357,20 @@ static inline void bw_peak_set_peak_gain_dB(bw_peak_coeffs *BW_RESTRICT coeffs, 
 static inline void bw_peak_set_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
 	if (coeffs->bandwidth != value) {
 		coeffs->bandwidth = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_BANDWIDTH;
+#pragma GCC diagnostic pop
 	}
 }
 
 static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, char value) {
 	if ((coeffs->use_bandwidth && !value) || (!coeffs->use_bandwidth && value)) {
 		coeffs->use_bandwidth = value;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_Q | BW_PEAK_PARAM_BANDWIDTH;
+#pragma GCC diagnostic pop
 	}
 }
 

@@ -271,7 +271,7 @@ struct bw_hp1_coeffs {
 #endif
 
 	// Sub-components
-	bw_lp1_coeffs	lp1_coeffs;
+	bw_lp1_coeffs			lp1_coeffs;
 };
 
 struct bw_hp1_state {

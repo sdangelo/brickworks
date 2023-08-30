@@ -30,6 +30,7 @@ finally:
 * check all examples again
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * state that sample rate is finite and > 0
+* state that audio cannot be inf
 * thank scientific paper authors
 
 build system:

@@ -29,6 +29,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Simplified implementation to use less memory.</li>
  *          <li><code>bw_gain_process()</code> and
  *              <code>bw_gain_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -38,6 +39,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clearly specificed parameter validity ranges.</li>
+ *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -168,6 +171,8 @@ static inline void bw_gain_set_gain_lin(
 /*! <<<```
  *    Sets the gain parameter to the given `value` (linear gain) in `coeffs`.
  *
+ *    `value` must be finite.
+ *
  *    Default value: `1.f`.
  *
  *    #### bw_gain_set_gain_dB()
@@ -177,6 +182,8 @@ static inline void bw_gain_set_gain_dB(
 	float                        value);
 /*! <<<```
  *    Sets the gain parameter to the given `value` (dB) in `coeffs`.
+ *
+ *    `value` must be finite if positive.
  *
  *    Default value: `0.f`.
  *
@@ -188,6 +195,8 @@ static inline void bw_gain_set_smooth_tau(
 /*! <<<```
  *    Sets the smoothing time constant `value` (s) in `coeffs`.
  *
+ *    `value` must be non-negative.
+ *
  *    Default value: `0.05f`.
  *
  *    #### bw_gain_get_gain()
@@ -196,6 +205,18 @@ static inline float bw_gain_get_gain(
 	const bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the actual current gain coefficient (linear gain) in `coeffs`.
+ *
+ *    #### bw_gain_coeffs_is_valid()
+ *  ```>>> */
+static inline char bw_gain_coeffs_is_valid(
+	const bw_gain_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Tries to determine whether `coeffs` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `coeffs` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_gain_coeffs`.
  *  }}} */
 
 #ifdef __cplusplus
@@ -214,86 +235,250 @@ static inline float bw_gain_get_gain(
 extern "C" {
 #endif
 
+#ifdef BW_DEBUG_DEEP
+enum bw_gain_coeffs_state {
+	bw_gain_coeffs_state_invalid,
+	bw_gain_coeffs_state_init,
+	bw_gain_coeffs_state_set_sample_rate,
+	bw_gain_coeffs_state_reset_coeffs
+};
+#endif
+
 struct bw_gain_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum bw_gain_coeffs_state	state;
+#endif
+
 	// Sub-components
-	bw_one_pole_coeffs	smooth_coeffs;
-	bw_one_pole_state	smooth_state;
+	bw_one_pole_coeffs		smooth_coeffs;
+	bw_one_pole_state		smooth_state;
 
 	// Parameters
-	float			gain;
-	float			smooth_tau;
-	float			smooth_tau_prev;
+	float				gain;
 };
 
-static inline void bw_gain_init(bw_gain_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_gain_init(
+		bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	coeffs->gain = 1.f;
 	coeffs->smooth_tau = 0.05f;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->hash = bw_hash_sdbm("bw_gain_coeffs");
+	coeffs->state = bw_gain_coeffs_state_init;
+#endif
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_gain_coeffs_state_init);
 }
 
-static inline void bw_gain_set_sample_rate(bw_gain_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_gain_set_sample_rate(
+		bw_gain_coeffs * BW_RESTRICT coeffs,
+		float                        sample_rate) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
+
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_gain_coeffs_state_set_sample_rate;
+#endif
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_gain_coeffs_state_set_sample_rate);
+}
+
+static inline void bw_gain_reset_coeffs(
+		bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_set_sample_rate);
+
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
-}
-
-static inline void bw_gain_do_update_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs, char force) {
-	if (force || coeffs->smooth_tau != coeffs->smooth_tau_prev) {
-		bw_one_pole_set_tau(&coeffs->smooth_coeffs, coeffs->smooth_tau);
-		bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
-		coeffs->smooth_tau_prev = coeffs->smooth_tau;
-	}
-}
-
-static inline void bw_gain_reset_coeffs(bw_gain_coeffs *BW_RESTRICT coeffs) {
-	bw_gain_do_update_coeffs(coeffs, 1);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->gain);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_hp1_coeffs_state_reset_coeffs;
+#endif
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_gain_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_gain_update_coeffs_ctrl(bw_gain_coeffs *BW_RESTRICT coeffs) {
-	bw_gain_do_update_coeffs(coeffs, 0);
+static inline void bw_gain_update_coeffs_ctrl(
+		bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+
+	bw_one_pole_update_coeffs_ctrl(&coeffs->smooth_coeffs);
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_gain_update_coeffs_audio(bw_gain_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_gain_update_coeffs_audio(
+		bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+
+	bw_one_pole_update_coeffs_audio(&coeffs->smooth_coeffs);
 	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->gain);
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
 }
 
-static inline float bw_gain_process1(const bw_gain_coeffs *BW_RESTRICT coeffs, float x) {
-	return bw_one_pole_get_y_z1(&coeffs->smooth_state) * x;
+static inline float bw_gain_process1(
+		const bw_gain_coeffs * BW_RESTRICT coeffs,
+		float                              x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(x));
+
+	const float y = bw_one_pole_get_y_z1(&coeffs->smooth_state) * x;
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(y));
+
+	return y;
 }
 
-static inline void bw_gain_process(bw_gain_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples) {
+static inline void bw_gain_process(
+		bw_gain_coeffs * BW_RESTRICT coeffs,
+		const float *                x,
+		float *                      y,
+		size_t                       n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(y != NULL);
+
 	bw_gain_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_gain_update_coeffs_audio(coeffs);
 		y[i] = bw_gain_process1(coeffs, x[i]);
 	}
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
-static inline void bw_gain_process_multi(bw_gain_coeffs *BW_RESTRICT coeffs, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_gain_process_multi(
+		bw_gain_coeffs * BW_RESTRICT coeffs,
+		const float * const *        x,
+		float * const *              y,
+		size_t                       n_channels,
+		size_t                       n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT(y != NULL);
+
 	bw_gain_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_gain_update_coeffs_audio(coeffs);
 		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_gain_process1(coeffs, x[j][i]);
 	}
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_gain_set_gain_lin(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_gain_set_gain_lin(
+		bw_gain_coeffs * BW_RESTRICT coeffs,
+		float                        value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+
 	coeffs->gain = value;
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 }
 
-static inline void bw_gain_set_gain_dB(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_gain_set_gain_dB(
+		bw_gain_coeffs * BW_RESTRICT coeffs,
+		float                        value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value > 0.f ? bw_is_finite(value) : 1);
+
 	coeffs->gain = bw_dB2linf(value);
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 }
 
-static inline void bw_gain_set_smooth_tau(bw_gain_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_gain_set_smooth_tau(
+		bw_gain_coeffs * BW_RESTRICT coeffs,
+		float                        value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_init);
+	BW_ASSERT(!bw_is_nan(value));
+	BW_ASSERT(value >= 0.f);
+
 	coeffs->smooth_tau = value;
+
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 }
 
-static inline float bw_gain_get_gain(const bw_gain_coeffs *BW_RESTRICT coeffs) {
+static inline float bw_gain_get_gain(
+		const bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+
 	return bw_one_pole_get_y_z1(&coeffs->smooth_state);
 }
+
+static inline char bw_gain_coeffs_is_valid(
+		const bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->hash != bw_hash_sdbm("bw_gain_coeffs"))
+		return 0;
+	if (coeffs->state < bw_gain_coeffs_state_init || coeffs->state > bw_gain_coeffs_state_reset_coeffs)
+		return 0;
+#endif
+
+	if (!bw_is_finite(coeffs->gain))
+		return 0;
+
+	return bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs) && bw_one_pole_state_is_valid(&coeffs->smooth_state);
+	// reset id...
+}
+
+struct bw_gain_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum bw_gain_coeffs_state	state;
+#endif
+
+	// Sub-components
+	bw_one_pole_coeffs		smooth_coeffs;
+	bw_one_pole_state		smooth_state;
+
+	// Parameters
+	float				gain;
+};
 
 #ifdef __cplusplus
 }
@@ -312,21 +497,30 @@ class Gain {
 public:
 	Gain();
 
-	void setSampleRate(float sampleRate);
+	void setSampleRate(
+		float sampleRate);
+
 	void reset();
+
 	void process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples);
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples);
+
 	void process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples);
 
-	void setGainLin(float value);
-	void setGainDB(float value);
-	void setSmoothTau(float value);
-	
+	void setGainLin(
+		float value);
+
+	void setGainDB(
+		float value);
+
+	void setSmoothTau(
+		float value);
+
 	float getGain();
 /*! <<<...
  *  }
@@ -348,7 +542,8 @@ inline Gain<N_CHANNELS>::Gain() {
 }
 
 template<size_t N_CHANNELS>
-inline void Gain<N_CHANNELS>::setSampleRate(float sampleRate) {
+inline void Gain<N_CHANNELS>::setSampleRate(
+		float sampleRate) {
 	bw_gain_set_sample_rate(&coeffs, sampleRate);
 }
 
@@ -359,32 +554,35 @@ inline void Gain<N_CHANNELS>::reset() {
 
 template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples) {
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples) {
 	bw_gain_process_multi(&coeffs, x, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples) {
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>
-inline void Gain<N_CHANNELS>::setGainLin(float value) {
+inline void Gain<N_CHANNELS>::setGainLin(
+		float value) {
 	bw_gain_set_gain_lin(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void Gain<N_CHANNELS>::setGainDB(float value) {
+inline void Gain<N_CHANNELS>::setGainDB(
+		float value) {
 	bw_gain_set_gain_dB(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void Gain<N_CHANNELS>::setSmoothTau(float value) {
+inline void Gain<N_CHANNELS>::setSmoothTau(
+		float value) {
 	bw_gain_set_smooth_tau(&coeffs, value);
 }
 

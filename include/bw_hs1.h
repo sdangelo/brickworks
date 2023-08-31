@@ -41,6 +41,8 @@
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Fixed bug when setting default parameter values in
  *              <code>bw_hs1_init()</code>.</li>
+ *          <li>Fixed documentation to indicate correct default parameter
+ *              values.</li>
  *          <li>Clearly specificed parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>

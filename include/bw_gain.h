@@ -265,7 +265,6 @@ static inline void bw_gain_init(
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	coeffs->gain = 1.f;
-	coeffs->smooth_tau = 0.05f;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_gain_coeffs");
@@ -302,7 +301,7 @@ static inline void bw_gain_reset_coeffs(
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->gain);
 
 #ifdef BW_DEBUG_DEEP
-	coeffs->state = bw_hp1_coeffs_state_reset_coeffs;
+	coeffs->state = bw_gain_coeffs_state_reset_coeffs;
 #endif
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state == bw_gain_coeffs_state_reset_coeffs);
@@ -401,7 +400,7 @@ static inline void bw_gain_set_gain_lin(
 		float                        value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
-	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_init);
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
 
 	coeffs->gain = value;
@@ -415,7 +414,7 @@ static inline void bw_gain_set_gain_dB(
 		float                        value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
-	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_init);
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 	BW_ASSERT(!bw_is_nan(value));
 	BW_ASSERT(value > 0.f ? bw_is_finite(value) : 1);
 
@@ -430,11 +429,11 @@ static inline void bw_gain_set_smooth_tau(
 		float                        value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
-	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_init);
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 	BW_ASSERT(!bw_is_nan(value));
 	BW_ASSERT(value >= 0.f);
 
-	coeffs->smooth_tau = value;
+	bw_one_pole_set_tau(&coeffs->smooth_coeffs, value);
 
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
@@ -462,22 +461,16 @@ static inline char bw_gain_coeffs_is_valid(
 	if (!bw_is_finite(coeffs->gain))
 		return 0;
 
-	return bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs) && bw_one_pole_state_is_valid(&coeffs->smooth_coeffs, &coeffs->smooth_state);
-}
+	if (!bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs))
+		return 0;
 
-struct bw_gain_coeffs {
 #ifdef BW_DEBUG_DEEP
-	uint32_t			hash;
-	enum bw_gain_coeffs_state	state;
+	if (coeffs->state >= bw_gain_coeffs_state_reset_coeffs && !bw_one_pole_state_is_valid(&coeffs->smooth_coeffs, &coeffs->smooth_state))
+		return 0;
 #endif
 
-	// Sub-components
-	bw_one_pole_coeffs		smooth_coeffs;
-	bw_one_pole_state		smooth_state;
-
-	// Parameters
-	float				gain;
-};
+	return 1;
+}
 
 #ifdef __cplusplus
 }

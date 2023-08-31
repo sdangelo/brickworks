@@ -12,6 +12,7 @@ code:
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * check unititialized warnings (check fxpp_comp in particular vs fxpp_satur)
+* IMPLEMENTATION prepocessor def???
  semi-specific:
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?

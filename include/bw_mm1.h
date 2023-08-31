@@ -38,6 +38,8 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clearly specificed parameter validity ranges.</li>
+ *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -232,6 +234,34 @@ static inline void bw_mm1_set_coeff_lp(
  *    `value` must be finite.
  *
  *    Default value: `0.f`.
+ *
+ *    #### bw_mm1_coeffs_is_valid()
+ *  ```>>> */
+static inline char bw_mm1_coeffs_is_valid(
+	const bw_mm1_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Tries to determine whether `coeffs` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `coeffs` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_mm1_coeffs`.
+ *
+ *    #### bw_mm1_state_is_valid()
+ *  ```>>> */
+static inline char bw_mm1_state_is_valid(
+	const bw_mm1_coeffs * BW_RESTRICT coeffs,
+	const bw_mm1_state * BW_RESTRICT  state);
+/*! <<<```
+ *    Tries to determine whether `state` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
+ *    is supposed to be associated to `coeffs`).
+ *
+ *    `state` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_mm1_state`.
  *  }}} */
 
 #ifdef __cplusplus
@@ -250,19 +280,41 @@ static inline void bw_mm1_set_coeff_lp(
 extern "C" {
 #endif
 
+#ifdef BW_DEBUG_DEEP
+enum bw_mm1_coeffs_state {
+	bw_mm1_coeffs_state_invalid,
+	bw_mm1_coeffs_state_init,
+	bw_mm1_coeffs_state_set_sample_rate,
+	bw_mm1_coeffs_state_reset_coeffs
+};
+#endif
+
 struct bw_mm1_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum bw_mm1_coeffs_state	state;
+	uint32_t			reset_id;
+#endif
+
 	// Sub-components
-	bw_lp1_coeffs	lp1_coeffs;
-	bw_gain_coeffs	gain_x_coeffs;
-	bw_gain_coeffs	gain_lp_coeffs;
+	bw_lp1_coeffs			lp1_coeffs;
+	bw_gain_coeffs			gain_x_coeffs;
+	bw_gain_coeffs			gain_lp_coeffs;
 };
 
 struct bw_mm1_state {
+#ifdef BW_DEBUG_DEEP
+	uint32_t	hash;
+	uint32_t	coeffs_reset_id;
+#endif
+
 	bw_lp1_state	lp1_state;
 };
 
 static inline void bw_mm1_init(
 		bw_mm1_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
 	bw_lp1_init(&coeffs->lp1_coeffs);
 	bw_gain_init(&coeffs->gain_x_coeffs);
 	bw_gain_init(&coeffs->gain_lp_coeffs);
@@ -270,52 +322,124 @@ static inline void bw_mm1_init(
 	bw_gain_set_smooth_tau(&coeffs->gain_lp_coeffs, 0.005f);
 	bw_gain_set_gain_lin(&coeffs->gain_x_coeffs, 1.f);
 	bw_gain_set_gain_lin(&coeffs->gain_lp_coeffs, 0.f);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->hash = bw_hash_sdbm("bw_mm1_coeffs");
+	coeffs->state = bw_mm1_coeffs_state_init;
+	coeffs->reset_id = coeffs->hash + 1;
+#endif
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_mm1_coeffs_state_init);
 }
 
 static inline void bw_mm1_set_sample_rate(
 		bw_mm1_coeffs * BW_RESTRICT coeffs,
 		float                       sample_rate) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
+
 	bw_lp1_set_sample_rate(&coeffs->lp1_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_x_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_lp_coeffs, sample_rate);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_mm1_coeffs_state_set_sample_rate;
+#endif
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_mm1_coeffs_state_set_sample_rate);
 }
 
 static inline void bw_mm1_reset_coeffs(
 		bw_mm1_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_set_sample_rate);
+
 	bw_lp1_reset_coeffs(&coeffs->lp1_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_x_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_lp_coeffs);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_mm1_coeffs_state_reset_coeffs;
+	coeffs->reset_id++;
+#endif
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_mm1_coeffs_state_reset_coeffs);
 }
 
 static inline void bw_mm1_reset_state(
 		const bw_mm1_coeffs * BW_RESTRICT coeffs,
 		bw_mm1_state * BW_RESTRICT        state,
 		float                             x_0) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT(bw_is_finite(x_0));
+
 	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+
+#ifdef BW_DEBUG_DEEP
+	state->hash = bw_hash_sdbm("bw_mm1_state");
+	state->coeffs_reset_id = coeffs->reset_id;
+#endif
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_mm1_state_is_valid(coeffs, state));
 }
 
 static inline void bw_mm1_update_coeffs_ctrl(
 		bw_mm1_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+
 	bw_lp1_update_coeffs_ctrl(&coeffs->lp1_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_x_coeffs);
 	bw_gain_update_coeffs_ctrl(&coeffs->gain_lp_coeffs);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
 }
 
 static inline void bw_mm1_update_coeffs_audio(
 		bw_mm1_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+
 	bw_lp1_update_coeffs_audio(&coeffs->lp1_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_x_coeffs);
 	bw_gain_update_coeffs_audio(&coeffs->gain_lp_coeffs);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
 }
 
 static inline float bw_mm1_process1(
 		const bw_mm1_coeffs * BW_RESTRICT coeffs,
 		bw_mm1_state * BW_RESTRICT        state,
 		float                             x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_mm1_state_is_valid(coeffs, state));
+	BW_ASSERT(bw_is_finite(x));
+
 	const float lp = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, x);
 	const float vx = bw_gain_process1(&coeffs->gain_x_coeffs, x);
 	const float vlp = bw_gain_process1(&coeffs->gain_lp_coeffs, lp);
-	return vx + vlp;
+	const float y = vx + vlp;
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_mm1_state_is_valid(coeffs, state));
+	BW_ASSERT(bw_is_finite(y));
+
+	return y;
 }
 
 static inline void bw_mm1_process(
@@ -324,11 +448,25 @@ static inline void bw_mm1_process(
 		const float *               x,
 		float *                     y,
 		size_t                      n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_mm1_state_is_valid(coeffs, state));
+	BW_ASSERT(x != NULL);
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(y != NULL);
+
 	bw_mm1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm1_update_coeffs_audio(coeffs);
 		y[i] = bw_mm1_process1(coeffs, state, x[i]);
 	}
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_mm1_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
 static inline void bw_mm1_process_multi(
@@ -338,42 +476,125 @@ static inline void bw_mm1_process_multi(
 		float * const *                                y,
 		size_t                                         n_channels,
 		size_t                                         n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT(y != NULL);
+
 	bw_mm1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_mm1_update_coeffs_audio(coeffs);
 		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_mm1_process1(coeffs, state[j], x[j][i]);
 	}
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_reset_coeffs);
 }
 
 static inline void bw_mm1_set_cutoff(
 		bw_mm1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+
 	bw_lp1_set_cutoff(&coeffs->lp1_coeffs, value);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
 }
 
 static inline void bw_mm1_set_prewarp_at_cutoff(
 		bw_mm1_coeffs * BW_RESTRICT coeffs,
 		char                        value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+
 	bw_lp1_set_prewarp_at_cutoff(&coeffs->lp1_coeffs, value);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
 }
 
 static inline void bw_mm1_set_prewarp_freq(
 		bw_mm1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+
 	bw_lp1_set_prewarp_freq(&coeffs->lp1_coeffs, value);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
 }
 
 static inline void bw_mm1_set_coeff_x(
 		bw_mm1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+
 	bw_gain_set_gain_lin(&coeffs->gain_x_coeffs, value);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
 }
 
 static inline void bw_mm1_set_coeff_lp(
 		bw_mm1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+
 	bw_gain_set_gain_lin(&coeffs->gain_lp_coeffs, value);
+
+	BW_ASSERT_DEEP(bw_mm1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_mm1_coeffs_state_init);
+}
+
+static inline char bw_mm1_coeffs_is_valid(
+		const bw_mm1_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->hash != bw_hash_sdbm("bw_mm1_coeffs"))
+		return 0;
+	if (coeffs->state < bw_mm1_coeffs_state_init || coeffs->state > bw_mm1_coeffs_state_reset_coeffs)
+		return 0;
+#endif
+
+	return bw_lp1_coeffs_is_valid(&coeffs->lp1_coeffs) && bw_gain_coeffs_is_valid(&coeffs->gain_x_coeffs) && bw_gain_coeffs_is_valid(&coeffs->gain_lp_coeffs);
+}
+
+static inline char bw_mm1_state_is_valid(
+		const bw_mm1_coeffs * BW_RESTRICT coeffs,
+		const bw_mm1_state * BW_RESTRICT  state) {
+	BW_ASSERT(state != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (state->hash != bw_hash_sdbm("bw_mm1_state"))
+		return 0;
+
+	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+		return 0;
+#endif
+
+	(void)coeffs;
+
+	return bw_lp1_state_is_valid(&coeffs->lp1_coeffs, &state->lp1_state);
 }
 
 #ifdef __cplusplus
@@ -397,7 +618,7 @@ public:
 		float sampleRate);
 
 	void reset(
-		float x_0 = 0.f);
+		float x0 = 0.f);
 
 	void process(
 		const float * const * x,
@@ -447,55 +668,62 @@ inline MM1<N_CHANNELS>::MM1() {
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::setSampleRate(float sampleRate) {
+inline void MM1<N_CHANNELS>::setSampleRate(
+		float sampleRate) {
 	bw_mm1_set_sample_rate(&coeffs, sampleRate);
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::reset(float x_0) {
+inline void MM1<N_CHANNELS>::reset(
+		float x0) {
 	bw_mm1_reset_coeffs(&coeffs);
 	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_mm1_reset_state(&coeffs, states + i, x_0);
+		bw_mm1_reset_state(&coeffs, states + i, x0);
 }
 
 template<size_t N_CHANNELS>
 inline void MM1<N_CHANNELS>::process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples) {
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples) {
 	bw_mm1_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void MM1<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples) {
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::setCutoff(float value) {
+inline void MM1<N_CHANNELS>::setCutoff(
+		float value) {
 	bw_mm1_set_cutoff(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::setPrewarpAtCutoff(bool value) {
+inline void MM1<N_CHANNELS>::setPrewarpAtCutoff(
+		bool value) {
 	bw_mm1_set_prewarp_at_cutoff(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::setPrewarpFreq(float value) {
+inline void MM1<N_CHANNELS>::setPrewarpFreq(
+		float value) {
 	bw_mm1_set_prewarp_freq(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::setCoeffX(float value) {
+inline void MM1<N_CHANNELS>::setCoeffX(
+		float value) {
 	bw_mm1_set_coeff_x(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void MM1<N_CHANNELS>::setCoeffLp(float value) {
+inline void MM1<N_CHANNELS>::setCoeffLp(
+		float value) {
 	bw_mm1_set_coeff_lp(&coeffs, value);
 }
 

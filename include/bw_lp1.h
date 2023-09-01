@@ -32,6 +32,10 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_lp1_reset_state_multi()</code> and updated C++
+ *              API in this regard.</li>
+ *          <li>Now <code>bw_lp1_reset_state()</code> returns the initial output
+ *              value.</li>
  *          <li><code>bw_lp1_process()</code> and
  *              <code>bw_lp1_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -42,7 +46,7 @@
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Fixed theoretical bug in <code>bw_lp1_init()</code>.</li>
- *          <li>Clearly specificed parameter validity ranges.</li>
+ *          <li>Clearly specified parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
@@ -119,13 +123,31 @@ static inline void bw_lp1_reset_coeffs(
  *
  *    #### bw_lp1_reset_state()
  *  ```>>> */
-static inline void bw_lp1_reset_state(
+static inline float bw_lp1_reset_state(
 	const bw_lp1_coeffs * BW_RESTRICT coeffs,
 	bw_lp1_state * BW_RESTRICT        state,
 	float                             x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
  *    and the quiescent/initial input value `x_0`.
+ *
+ *    Returns the corresponding quiescent/initial output value.
+ *
+ *    #### bw_lp1_reset_state_multi()
+ *  ```>>> */
+static inline void bw_lp1_reset_state_multi(
+	const bw_lp1_coeffs * BW_RESTRICT              coeffs,
+	bw_lp1_state * BW_RESTRICT const * BW_RESTRICT state,
+	const float *                                  x_0,
+	float *                                        y_0,
+	size_t                                         n_channels);
+/*! <<<```
+ *    Resets each of the `n_channels` `state`s to its initial values using the
+ *    given `coeffs` and the corresponding quiescent/initial input value in the
+ *    `x_0` array.
+ *
+ *    The corresponding quiescent/initial output values are written into the
+ *    `y_0` array, if not `NULL`.
  *
  *    #### bw_lp1_update_coeffs_ctrl()
  *  ```>>> */
@@ -388,7 +410,7 @@ static inline void bw_lp1_reset_coeffs(
 	BW_ASSERT_DEEP(coeffs->state == bw_lp1_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_lp1_reset_state(
+static inline float bw_lp1_reset_state(
 		const bw_lp1_coeffs * BW_RESTRICT coeffs,
 		bw_lp1_state * BW_RESTRICT        state,
 		float                             x_0) {
@@ -399,6 +421,7 @@ static inline void bw_lp1_reset_state(
 	BW_ASSERT(bw_is_finite(x_0));
 
 	(void)coeffs;
+	const float y = x_0;
 	state->y_z1 = x_0;
 	state->X_z1 = 0.f;
 
@@ -409,6 +432,33 @@ static inline void bw_lp1_reset_state(
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_lp1_state_is_valid(coeffs, state));
+	BW_ASSERT(bw_is_finite(y));
+
+	return y;
+}
+
+static inline void bw_lp1_reset_state_multi(
+		const bw_lp1_coeffs * BW_RESTRICT              coeffs,
+		bw_lp1_state * BW_RESTRICT const * BW_RESTRICT state,
+		const float *                                  x_0,
+		float *                                        y_0,
+		size_t                                         n_channels) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
+	BW_ASSERT(state != NULL);
+	BW_ASSERT(x_0 != NULL);
+
+	if (y_0 != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			y_0[i] = bw_lp1_reset_state(coeffs, state[i], x_0[i]);
+	else
+		for (size_t i = 0; i < n_channels; i++)
+			bw_lp1_reset_state(coeffs, state[i], x_0[i]);
+
+	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
 }
 
 static inline void bw_lp1_update_coeffs_ctrl(
@@ -626,7 +676,21 @@ public:
 	void setSampleRate(
 		float sampleRate);
 
-	void reset(float x0 = 0.f);
+	void reset(
+		float   x0 = 0.f,
+		float * y0 = nullptr);
+
+	void reset(
+		float                           x0,
+		std::array<float, N_CHANNELS> & y0);
+
+	void reset(
+		const float * x0,
+		float *       y0 = nullptr);
+
+	void reset(
+		std::array<float, N_CHANNELS>   x0,
+		std::array<float, N_CHANNELS> & y0);
 
 	void process(
 		const float * const * x,
@@ -657,9 +721,9 @@ public:
  * change at any time in future versions. Please, do not use it directly. */
 
 private:
-	bw_lp1_coeffs	 coeffs;
-	bw_lp1_state	 states[N_CHANNELS];
-	bw_lp1_state	*BW_RESTRICT statesP[N_CHANNELS];
+	bw_lp1_coeffs			coeffs;
+	bw_lp1_state			states[N_CHANNELS];
+	bw_lp1_state * BW_RESTRICT	statesP[N_CHANNELS];
 };
 
 template<size_t N_CHANNELS>
@@ -677,10 +741,37 @@ inline void LP1<N_CHANNELS>::setSampleRate(
 
 template<size_t N_CHANNELS>
 inline void LP1<N_CHANNELS>::reset(
-		float x0) {
+		float   x0,
+		float * y0) {
 	bw_lp1_reset_coeffs(&coeffs);
-	for (size_t i = 0; i < N_CHANNELS; i++)
-		bw_lp1_reset_state(&coeffs, states + i, x0);
+	if (y0 != nullptr)
+		for (size_t i = 0; i < N_CHANNELS; i++)
+			y0[i] = bw_lp1_reset_state(&coeffs, states + i, x0);
+	else
+		for (size_t i = 0; i < N_CHANNELS; i++)
+			bw_lp1_reset_state(&coeffs, states + i, x0);
+}
+
+template<size_t N_CHANNELS>
+inline void LP1<N_CHANNELS>::reset(
+		float                           x0,
+		std::array<float, N_CHANNELS> & y0) {
+	reset(x0, y0.data());
+}
+
+template<size_t N_CHANNELS>
+inline void LP1<N_CHANNELS>::reset(
+		const float * x0,
+		float *       y0) {
+	bw_lp1_reset_coeffs(&coeffs);
+	bw_lp1_reset_state_multi(&coeffs, statesP, x0, y0, N_CHANNELS);
+}
+
+template<size_t N_CHANNELS>
+inline void LP1<N_CHANNELS>::reset(
+		std::array<float, N_CHANNELS>   x0,
+		std::array<float, N_CHANNELS> & y0) {
+	reset(x0.data(), y0.data());
 }
 
 template<size_t N_CHANNELS>

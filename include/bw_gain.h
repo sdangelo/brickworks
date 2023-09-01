@@ -29,6 +29,9 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_gain_get_gain_lin()</code>.</li>
+ *          <li>Renamed <code>bw_gain_get_gain()</code> as
+ *              <code>bw_gain_get_gain_cur()</code>.</li>
  *          <li>Simplified implementation to use less memory.</li>
  *          <li><code>bw_gain_process()</code> and
  *              <code>bw_gain_process_multi()</code> now use <code>size_t</code>
@@ -39,7 +42,7 @@
  *          <li>Added overladed C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
- *          <li>Clearly specificed parameter validity ranges.</li>
+ *          <li>Clearly specified parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
@@ -199,9 +202,16 @@ static inline void bw_gain_set_smooth_tau(
  *
  *    Default value: `0.05f`.
  *
- *    #### bw_gain_get_gain()
+ *    #### bw_gain_get_gain_lin()
  *  ```>>> */
-static inline float bw_gain_get_gain(
+static inline float bw_gain_get_gain_lin(
+	const bw_gain_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Returns the current gain parameter value (linear gain) in `coeffs`.
+ *
+ *    #### bw_gain_get_gain_cur()
+ *  ```>>> */
+static inline float bw_gain_get_gain_cur(
 	const bw_gain_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Returns the actual current gain coefficient (linear gain) in `coeffs`.
@@ -439,7 +449,15 @@ static inline void bw_gain_set_smooth_tau(
 	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 }
 
-static inline float bw_gain_get_gain(
+static inline float bw_gain_get_gain_lin(
+		const bw_gain_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+
+	return coeffs->gain;
+}
+
+static inline float bw_gain_get_gain_cur(
 		const bw_gain_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
@@ -513,7 +531,9 @@ public:
 	void setSmoothTau(
 		float value);
 
-	float getGain();
+	float getGainLin();
+
+	float getGainCur();
 /*! <<<...
  *  }
  *  ```
@@ -579,8 +599,13 @@ inline void Gain<N_CHANNELS>::setSmoothTau(
 }
 
 template<size_t N_CHANNELS>
-inline float Gain<N_CHANNELS>::getGain() {
-	return bw_gain_get_gain(&coeffs);
+inline float Gain<N_CHANNELS>::getGainLin() {
+	return bw_gain_get_gain_lin(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline float Gain<N_CHANNELS>::getGainCur() {
+	return bw_gain_get_gain_cur(&coeffs);
 }
 
 }

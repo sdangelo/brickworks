@@ -41,6 +41,7 @@ post 1.0.0
 ----------
 
 code:
+* get() parameters?
 * blep etc in a module?
 * optimize triangle generation for constant pulse width
 * compute bit depth reduction only when input changes? (state, option?)

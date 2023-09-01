@@ -183,7 +183,7 @@ static inline void bw_dry_wet_update_coeffs_audio(bw_dry_wet_coeffs *BW_RESTRICT
 }
 
 static inline float bw_dry_wet_process1(const bw_dry_wet_coeffs *BW_RESTRICT coeffs, float x_dry, float x_wet) {
-	return bw_gain_get_gain(&coeffs->gain_coeffs) * (x_wet - x_dry) + x_dry;
+	return bw_gain_process1(&coeffs->gain_coeffs, x_wet - x_dry) + x_dry;
 }
 
 static inline void bw_dry_wet_process(bw_dry_wet_coeffs *BW_RESTRICT coeffs, const float *x_dry, const float *x_wet, float *y, size_t n_samples) {

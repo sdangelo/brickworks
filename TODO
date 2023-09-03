@@ -31,7 +31,8 @@ finally:
 * check all examples again
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * state that sample rate is finite and > 0
-* state that audio cannot be inf
+* state that audio cannot be inf (also in reset)
+* state that you need different output buffers to reset
 * thank scientific paper authors
 
 build system:
@@ -74,6 +75,8 @@ code:
 * gain compensation in distortions?
 * sr-dependent vs cr-dependent coeffs? see synth poly example and pan case
 * modulation vs process (multi) no update (post 1.0.0)???
+* reset_state_multi allow NULL input?
+* process allow NULL output?
 
 build system:
 * make makefiles handle paths with spaces etc

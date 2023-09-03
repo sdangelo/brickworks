@@ -597,20 +597,20 @@ public:
 		float sampleRate);
 
 	void reset(
-		float   x0 = 0.f,
-		float * y0 = nullptr);
+		float               x0 = 0.f,
+		float * BW_RESTRICT y0 = nullptr);
 
 	void reset(
-		float                           x0,
-		std::array<float, N_CHANNELS> & y0);
+		float                                       x0,
+		std::array<float, N_CHANNELS> * BW_RESTRICT y0);
 
 	void reset(
 		const float * x0,
 		float *       y0 = nullptr);
 
 	void reset(
-		std::array<float, N_CHANNELS>   x0,
-		std::array<float, N_CHANNELS> & y0);
+		std::array<float, N_CHANNELS>               x0,
+		std::array<float, N_CHANNELS> * BW_RESTRICT y0 = nullptr);
 
 	void process(
 		const float * const * x,
@@ -661,8 +661,8 @@ inline void HP1<N_CHANNELS>::setSampleRate(
 
 template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::reset(
-		float   x0,
-		float * y0) {
+		float               x0,
+		float * BW_RESTRICT y0) {
 	bw_hp1_reset_coeffs(&coeffs);
 	if (y0 != nullptr)
 		for (size_t i = 0; i < N_CHANNELS; i++)
@@ -674,9 +674,9 @@ inline void HP1<N_CHANNELS>::reset(
 
 template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::reset(
-		float                           x0,
-		std::array<float, N_CHANNELS> & y0) {
-	reset(x0, y0.data());
+		float                                       x0,
+		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
+	reset(x0, y0 != nullptr ? y0->data() : y0);
 }
 
 template<size_t N_CHANNELS>
@@ -689,9 +689,9 @@ inline void HP1<N_CHANNELS>::reset(
 
 template<size_t N_CHANNELS>
 inline void HP1<N_CHANNELS>::reset(
-		std::array<float, N_CHANNELS>   x0,
-		std::array<float, N_CHANNELS> & y0) {
-	reset(x0.data(), y0.data());
+		std::array<float, N_CHANNELS>               x0,
+		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
+	reset(x0.data(), y0 != nullptr ? y0->data() : nullptr);
 }
 
 template<size_t N_CHANNELS>

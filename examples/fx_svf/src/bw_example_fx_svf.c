@@ -30,7 +30,8 @@ void bw_example_fx_svf_set_sample_rate(bw_example_fx_svf *instance, float sample
 
 void bw_example_fx_svf_reset(bw_example_fx_svf *instance) {
 	bw_svf_reset_coeffs(&instance->svf_coeffs);
-	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state, 0.f);
+	float v_lp, v_bp, v_hp;
+	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state, 0.f, &v_lp, &v_bp, &v_hp);
 }
 
 void bw_example_fx_svf_process(bw_example_fx_svf *instance, const float** x, float** y, int n_samples) {

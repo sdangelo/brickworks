@@ -40,7 +40,7 @@
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>process()</code> function taking
+ *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Fixed bug when setting default parameter values in
@@ -438,7 +438,8 @@ static inline float bw_hs1_reset_state(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
-	const float y = bw_mm1_reset_state(&coeffs->mm1_coeffs, &state->mm1_state, x_0);
+	const float y = x_0;
+	bw_mm1_reset_state(&coeffs->mm1_coeffs, &state->mm1_state, x_0);
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_hs1_state");

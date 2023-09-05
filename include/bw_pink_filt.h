@@ -48,7 +48,7 @@
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>process()</code> function taking
+ *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>

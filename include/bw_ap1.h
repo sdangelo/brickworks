@@ -34,17 +34,18 @@
  *              API in this regard.</li>
  *          <li>Now <code>bw_ap1_reset_state()</code> returns the initial output
  *              value.</li>
- *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
- *              as arguments.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li><code>bw_ap1_process()</code> and
  *              <code>bw_ap1_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>process()</code> function taking
+ *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Fixed output polarity.</li>
  *          <li>Clearly specified parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
@@ -300,7 +301,7 @@ struct bw_ap1_coeffs {
 #endif
 
 	// Sub-components
-	bw_lp1_coeffs	lp1_coeffs;
+	bw_lp1_coeffs			lp1_coeffs;
 };
 
 struct bw_ap1_state {
@@ -370,8 +371,8 @@ static inline float bw_ap1_reset_state(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
-	const float lp = bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
-	const float y = x_0 - lp - lp;
+	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+	const float y = x_0;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_ap1_state");
@@ -380,6 +381,7 @@ static inline float bw_ap1_reset_state(
 	BW_ASSERT_DEEP(bw_ap1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ap1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_ap1_state_is_valid(coeffs, state));
+	BW_ASSERT(bw_is_finite(y));
 
 	return y;
 }
@@ -444,7 +446,7 @@ static inline float bw_ap1_process1(
 	BW_ASSERT(bw_is_finite(x));
 
 	const float lp = bw_lp1_process1(&coeffs->lp1_coeffs, &state->lp1_state, x);
-	const float y = x - lp - lp;
+	const float y = lp + lp - x;
 
 	BW_ASSERT_DEEP(bw_ap1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ap1_coeffs_state_reset_coeffs);
@@ -480,7 +482,6 @@ static inline void bw_ap1_process(
 	BW_ASSERT_DEEP(bw_ap1_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
-
 
 static inline void bw_ap1_process_multi(
 		bw_ap1_coeffs * BW_RESTRICT                    coeffs,

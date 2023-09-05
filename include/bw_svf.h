@@ -40,19 +40,21 @@
  *          <li>Changed model to get positive polarity at the bandpass
  *              output.</li>
  *          <li>Limited actual prewarping frequency to prevent instability.</li>
+ *          <li>Now using relative sticky threshold for smoothing all
+ *              "continuous" parameters.</li>
  *          <li>Added <code>bw_svf_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_svf_reset_state()</code> returns the initial output
- *              value.</li>
- *          <li>Now using relative sticky threshold for smoothing all
- *              "continuous" parameters.</li>
+ *              values.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li><code>bw_svf_process()</code> and
  *              <code>bw_svf_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>process()</code> function taking
+ *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Fixed theoretical bug in <code>bw_svf_init()</code>.</li>

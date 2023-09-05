@@ -36,7 +36,7 @@
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ functions taking C-style arrays as
+ *          <li>Added overloaded C++ functions taking C-style arrays as
  *              arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Now enforcing that buffers are never <code>NULL</code> in

@@ -48,15 +48,15 @@
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Changed default value for gain compensation to off.</li>
- *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
- *              as arguments.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li><code>bw_clip_process()</code> and
  *              <code>bw_clip_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>process()</code> function taking
+ *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>

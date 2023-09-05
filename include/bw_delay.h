@@ -35,8 +35,8 @@
  *        <ul>
  *          <li>Added initial value argument in
  *              <code>bw_delay_reset_state()</code>.</li>
- *          <li>Added overladed C++ <code>reset()</code> functions taking arrays
- *              as arguments.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li><code>bw_delay_process()</code> and
@@ -45,7 +45,7 @@
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>
  *              specifiers to input arguments and implementation.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>process()</code> function taking
+ *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>

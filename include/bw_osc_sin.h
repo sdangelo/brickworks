@@ -38,7 +38,7 @@
  *          <li>Added more <code>const</code> specifiers to input
  *              arguments.</li>
  *          <li>Moved C++ code to C header.</li>
- *          <li>Added overladed C++ <code>oscSinProcess()</code> function taking
+ *          <li>Added overloaded C++ <code>oscSinProcess()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *        </ul>

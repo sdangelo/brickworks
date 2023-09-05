@@ -352,7 +352,7 @@ static inline void bw_mm2_set_coeff_lp(bw_mm2_coeffs *BW_RESTRICT coeffs, float 
 }
 
 static inline void bw_mm2_set_coeff_bp(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {
-	bw_gain_set_gain_lin(&coeffs->gain_bp_coeffs, -value);
+	bw_gain_set_gain_lin(&coeffs->gain_bp_coeffs, value);
 }
 
 static inline void bw_mm2_set_coeff_hp(bw_mm2_coeffs *BW_RESTRICT coeffs, float value) {

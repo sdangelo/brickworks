@@ -32,6 +32,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Limited actual prewarping frequency to prevent instability.</li>
  *          <li>Added <code>bw_lp1_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_lp1_reset_state()</code> returns the initial output
@@ -380,7 +381,7 @@ static inline void bw_lp1_do_update_coeffs(
 	if (prewarp_freq_changed || cutoff_changed) {
 		if (prewarp_freq_changed) {
 			prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
-			coeffs->t = bw_tanf(bw_minf(coeffs->t_k * prewarp_freq_cur, 1.569796326794897f));
+			coeffs->t = bw_tanf(bw_minf(coeffs->t_k * prewarp_freq_cur, 1.567654734141306f)); // max = 0.499 * fs
 		}
 		if (cutoff_changed) {
 			cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);

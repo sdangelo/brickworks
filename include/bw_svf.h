@@ -37,6 +37,9 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Changed model to get positive polarity at the bandpass
+ *              output.</li>
+ *          <li>Limited actual prewarping frequency to prevent instability.</li>
  *          <li>Added <code>bw_svf_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_svf_reset_state()</code> returns the initial output
@@ -364,6 +367,7 @@ struct bw_svf_coeffs {
 	
 	// Coefficients
 	float				t_k;
+	float				prewarp_freq_max;
 
 	float				t;
 	float				kf;
@@ -424,6 +428,7 @@ static inline void bw_svf_set_sample_rate(
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
 	coeffs->t_k = 3.141592653589793f / sample_rate;
+	coeffs->prewarp_freq_max = 0.499f * sample_rate;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->state = bw_svf_coeffs_state_set_sample_rate;
@@ -448,8 +453,9 @@ static inline void bw_svf_do_update_coeffs(
 				cutoff_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_cutoff_state, coeffs->cutoff);
 			if (prewarp_freq_changed) {
 				prewarp_freq_cur = bw_one_pole_process1_sticky_rel(&coeffs->smooth_coeffs, &coeffs->smooth_prewarp_freq_state, prewarp_freq);
-				coeffs->t = bw_tanf(coeffs->t_k * prewarp_freq_cur);
-				coeffs->kf = coeffs->t * bw_rcpf(prewarp_freq_cur);
+				const float f = bw_minf(prewarp_freq_cur, coeffs->prewarp_freq_max);
+				coeffs->t = bw_tanf(coeffs->t_k * f);
+				coeffs->kf = coeffs->t * bw_rcpf(f);
 			}
 			coeffs->kbl = coeffs->kf * cutoff_cur;
 		}
@@ -629,11 +635,11 @@ static inline void bw_svf_process1(
 	BW_ASSERT(y_hp != NULL);
 
 	const float kk = coeffs->kf * state->cutoff_z1;
-	const float lp_xz1 = state->lp_z1 - kk * state->bp_z1;
-	const float bp_xz1 = state->bp_z1 - kk * state->hp_z1;
-	*y_hp = coeffs->hp_x * (x + coeffs->hp_hb * bp_xz1 - lp_xz1);
-	*y_bp = bp_xz1 - coeffs->kbl * *y_hp;
-	*y_lp = lp_xz1 - coeffs->kbl * *y_bp;
+	const float lp_xz1 = state->lp_z1 + kk * state->bp_z1;
+	const float bp_xz1 = state->bp_z1 + kk * state->hp_z1;
+	*y_hp = coeffs->hp_x * (x - coeffs->hp_hb * bp_xz1 - lp_xz1);
+	*y_bp = bp_xz1 + coeffs->kbl * *y_hp;
+	*y_lp = lp_xz1 + coeffs->kbl * *y_bp;
 	state->hp_z1 = *y_hp;
 	state->lp_z1 = *y_lp;
 	state->bp_z1 = *y_bp;
@@ -937,6 +943,8 @@ static inline char bw_svf_coeffs_is_valid(
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->state >= bw_svf_coeffs_state_set_sample_rate) {
 		if (!bw_is_finite(coeffs->t_k) || coeffs->t_k <= 0.f)
+			return 0;
+		if (!bw_is_finite(coeffs->prewarp_freq_max) || coeffs->prewarp_freq_max <= 0.f)
 			return 0;
 	}
 

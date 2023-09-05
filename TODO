@@ -11,17 +11,14 @@ code:
 * mem req -> return value of set sample rate? or sample rate argument of mem req?
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * common smoothing policy (as control rate as possible?) - smoothing control?
-* check unititialized warnings (check fxpp_comp in particular vs fxpp_satur)
 * IMPLEMENTATION prepocessor def???
  semi-specific:
 * osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
 * audio rate optional pulse width/slope inputs?
 * max_delay -> set sample rate? see reverb
  specific:
-* svf bandpass out polarity too confusing (inverted in mm2)?
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
-* bw_svf/lp1 automatically limited (max) prewarp frequency to avoid instability?
 * prewarp control in all derived filtering modules
 * src inside distortions? w/ control from outside?
 * peak gain + Q ???

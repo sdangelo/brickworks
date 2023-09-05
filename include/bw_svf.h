@@ -253,7 +253,7 @@ static inline void bw_svf_set_cutoff(
 /*! <<<```
  *    Sets the cutoff frequency to the given `value` (Hz) in `coeffs`.
  *
- *    Valid range: [`1e-6f`, `1e6f`].
+ *    Valid range: [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -265,7 +265,7 @@ static inline void bw_svf_set_Q(
 /*! <<<```
  *    Sets the quality factor to the given `value` in `coeffs`.
  *
- *    `value` must be equal or bigger than `0.5f`.
+ *    Valid range: [`1e-6f`, `1e6f`].
  *
  *    Default value: `0.5f`.
  * 
@@ -291,7 +291,7 @@ static inline void bw_svf_set_prewarp_freq(
  *    Only used when the prewarp\_at\_cutoff parameter is off and however
  *    internally limited to avoid instability.
  *
- *    Valid range: [`1e-6f`, `1e6f`].
+ *    Valid range: [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -860,7 +860,7 @@ static inline void bw_svf_set_cutoff(
 	BW_ASSERT_DEEP(bw_svf_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_svf_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+	BW_ASSERT(value >= 1e-6f && value <= 1e12f);
 
 	coeffs->cutoff = value;
 
@@ -903,7 +903,7 @@ static inline void bw_svf_set_prewarp_freq(
 	BW_ASSERT_DEEP(bw_svf_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_svf_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+	BW_ASSERT(value >= 1e-6f && value <= 1e12f);
 
 	coeffs->prewarp_freq = value;
 
@@ -922,13 +922,13 @@ static inline char bw_svf_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (coeffs->cutoff < 1e-6f || coeffs->cutoff > 1e6f)
+	if (coeffs->cutoff < 1e-6f || coeffs->cutoff > 1e12f)
 		return 0;
 	if (coeffs->Q < 1e-6f || coeffs->Q > 1e6f)
 		return 0;
 	if (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f)
 		return 0;
-	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e6f)
+	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
 
 	if (!bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs))
@@ -987,7 +987,7 @@ static inline char bw_svf_state_is_valid(
 		return 0;
 	if (!bw_is_finite(state->bp_z1))
 		return 0;
-	if (!bw_is_finite(state->cutoff_z1) || state->cutoff_z1 < 1e-6f || state->cutoff_z1 > 1e6f)
+	if (!bw_is_finite(state->cutoff_z1) || state->cutoff_z1 < 1e-6f || state->cutoff_z1 > 1e12f)
 		return 0;
 
 	return 1;

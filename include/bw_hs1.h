@@ -213,7 +213,7 @@ static inline void bw_hs1_set_cutoff(
  *
  *    By the time `bw_hs1_update_coeffs_ctrl()`, `bw_hs1_update_coeffs_audio()`,
  *    `bw_hs1_process()`, or `bw_hs1_process_multi()` is called,
- *    `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e6f`].
+ *    `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -239,7 +239,7 @@ static inline void bw_hs1_set_prewarp_freq(
  *    Only used when the prewarp\_at\_cutoff parameter is off and however
  *    internally limited to avoid instability.
  *
- *    Valid range: [`1e-6f`, `1e6f`].
+ *    Valid range: [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -256,7 +256,7 @@ static inline void bw_hs1_set_high_gain_lin(
  *
  *    By the time `bw_hs1_update_coeffs_ctrl()` or
  *    `bw_hs1_update_coeffs_audio()` is called, `cutoff * bw_sqrtf(high_gain)`
- *    must be in [`1e-6f`, `1e6f`].
+ *    must be in [`1e-6f`, `1e12f`].
  *
  *    Default value: `1.f`.
  *
@@ -275,7 +275,7 @@ static inline void bw_hs1_set_high_gain_dB(
  *
  *    By the time `bw_hs1_update_coeffs_ctrl()`, `bw_hs1_update_coeffs_audio()`,
  *    `bw_hs1_process()`, or `bw_hs1_process_multi()` is called,
- *    `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e6f`].
+ *    `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e12f`].
  *
  *    Default value: `0.f`.
  *
@@ -481,7 +481,7 @@ static inline void bw_hs1_update_coeffs_ctrl(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e6f);
+	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
 
 	bw_hs1_update_mm1_params(coeffs);
 	bw_mm1_update_coeffs_ctrl(&coeffs->mm1_coeffs);
@@ -495,7 +495,7 @@ static inline void bw_hs1_update_coeffs_audio(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e6f);
+	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
 
 	bw_mm1_update_coeffs_audio(&coeffs->mm1_coeffs);
 
@@ -614,7 +614,7 @@ static inline void bw_hs1_set_prewarp_freq(
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+	BW_ASSERT(value >= 1e-6f && value <= 1e12f);
 
 	coeffs->prewarp_freq = value;
 
@@ -670,7 +670,7 @@ static inline char bw_hs1_coeffs_is_valid(
 		return 0;
 	if (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f)
 		return 0;
-	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e6f)
+	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
 	if (!bw_is_finite(coeffs->high_gain) || coeffs->high_gain < 0.f)
 		return 0;

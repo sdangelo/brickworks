@@ -209,7 +209,7 @@ static inline void bw_lp1_set_cutoff(
 /*! <<<```
  *    Sets the cutoff frequency `value` (Hz) in `coeffs`.
  *
- *    Valid range: [`1e-6f`, `1e6f`].
+ *    Valid range: [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -235,7 +235,7 @@ static inline void bw_lp1_set_prewarp_freq(
  *    Only used when the prewarp\_at\_cutoff parameter is off and however
  *    internally limited to avoid instability.
  *
- *    Valid range: [`1e-6f`, `1e6f`].
+ *    Valid range: [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -563,7 +563,7 @@ static inline void bw_lp1_set_cutoff(
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+	BW_ASSERT(value >= 1e-6f && value <= 1e12f);
 
 	coeffs->cutoff = value;
 
@@ -591,7 +591,7 @@ static inline void bw_lp1_set_prewarp_freq(
 	BW_ASSERT_DEEP(bw_lp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_lp1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 1e-6f && value <= 1e6f);
+	BW_ASSERT(value >= 1e-6f && value <= 1e12f);
 
 	coeffs->prewarp_freq = value;
 
@@ -610,11 +610,11 @@ static inline char bw_lp1_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (coeffs->cutoff < 1e-6f || coeffs->cutoff > 1e6f)
+	if (coeffs->cutoff < 1e-6f || coeffs->cutoff > 1e12f)
 		return 0;
 	if (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f)
 		return 0;
-	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e6f)
+	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
 
 	if (!bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs))

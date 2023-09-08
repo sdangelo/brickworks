@@ -34,6 +34,8 @@
  *              API in this regard.</li>
  *          <li>Now <code>bw_hp1_reset_state()</code> returns the initial output
  *              value.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li>Added prewarp_at_cutoff and prewarp_freq parameters.</li>
  *          <li><code>bw_hp1_process()</code> and
  *              <code>bw_hp1_process_multi()</code> now use <code>size_t</code>

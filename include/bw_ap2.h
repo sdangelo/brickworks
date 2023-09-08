@@ -222,7 +222,7 @@ static inline void bw_ap2_set_Q(
  *    Valid range: [`1e-6f`, `1e6f`].
  *
  *    Default value: `0.5f`.
- * 
+ *
  *    #### bw_ap2_set_prewarp_at_cutoff()
  *  ```>>> */
 static inline void bw_ap2_set_prewarp_at_cutoff(

@@ -36,6 +36,8 @@
  *              C++ API in this regard.</li>
  *          <li>Now <code>bw_one_pole_reset_state()</code> returns the initial
  *              output value.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li>Now using <code>size_t</code> instead of
  *              <code>BW_SIZE_T</code>.</li>
  *          <li>Added more <code>const</code> and <code>BW_RESTRICT</code>

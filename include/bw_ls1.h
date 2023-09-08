@@ -34,6 +34,8 @@
  *              API in this regard.</li>
  *          <li>Now <code>bw_ls1_reset_state()</code> returns the initial output
  *              value.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li>Added prewarp_at_cutoff and prewarp_freq parameters.</li>
  *          <li><code>bw_ls1_process()</code> and
  *              <code>bw_ls1_process_multi()</code> now use <code>size_t</code>
@@ -211,8 +213,9 @@ static inline void bw_ls1_set_cutoff(
  *    `value` must be finite and positive.
  *
  *    By the time `bw_ls1_update_coeffs_ctrl()`, `bw_ls1_update_coeffs_audio()`,
- *    `bw_ls1_process()`, or `bw_ls1_process_multi()` is called,
- *    `cutoff * bw_rcpf(bw_sqrtf(dc_gain))` must be in [`1e-6f`, `1e12f`].
+ *    `bw_ls1_process1()`, `bw_ls1_process()`, or `bw_ls1_process_multi()` is
+ *    called, `cutoff * bw_rcpf(bw_sqrtf(dc_gain))` must be in [`1e-6f`,
+ *    `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -253,8 +256,9 @@ static inline void bw_ls1_set_dc_gain_lin(
  *    `value` must be finite and greater than or equal to `1e-30f`.
  *
  *    By the time `bw_ls1_update_coeffs_ctrl()`, `bw_ls1_update_coeffs_audio()`,
- *    `bw_ls1_process()`, or `bw_ls1_process_multi()` is called,
- *    `cutoff * bw_rcpf(bw_sqrtf(dc_gain))` must be in [`1e-6f`, `1e12f`].
+ *    `bw_ls1_process1()`, `bw_ls1_process()`, or `bw_ls1_process_multi()` is
+ *    called, `cutoff * bw_rcpf(bw_sqrtf(dc_gain))` must be in [`1e-6f`,
+ *    `1e12f`].
  *
  *    Default value: `1.f`.
  *
@@ -269,8 +273,9 @@ static inline void bw_ls1_set_dc_gain_dB(
  *    `value` must be finite and greater than or equal to `-600.f`.
  *
  *    By the time `bw_ls1_update_coeffs_ctrl()`, `bw_ls1_update_coeffs_audio()`,
- *    `bw_ls1_process()`, or `bw_ls1_process_multi()` is called,
- *    `cutoff * bw_rcpf(bw_sqrtf(dc_gain))` must be in [`1e-6f`, `1e12f`].
+ *    `bw_ls1_process1()`, `bw_ls1_process()`, or `bw_ls1_process_multi()` is
+ *    called, `cutoff * bw_rcpf(bw_sqrtf(dc_gain))` must be in [`1e-6f`,
+ *    `1e12f`].
  *
  *    Default value: `0.f`.
  *
@@ -504,6 +509,7 @@ static inline float bw_ls1_process1(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_ls1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)) >= 1e-6f && coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)) <= 1e12f);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_ls1_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
@@ -527,6 +533,7 @@ static inline void bw_ls1_process(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_ls1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)) >= 1e-6f && coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)) <= 1e12f);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_ls1_state_is_valid(coeffs, state));
 	BW_ASSERT(x != NULL);
@@ -555,6 +562,7 @@ static inline void bw_ls1_process_multi(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_ls1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls1_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)) >= 1e-6f && coeffs->cutoff * bw_rcpf(bw_sqrtf(coeffs->dc_gain)) <= 1e12f);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);

@@ -33,6 +33,8 @@
  *              C++ API in this regard.</li>
  *          <li>Now <code>bw_slew_lim_reset_state()</code> returns the initial
  *              output value.</li>
+ *          <li>Added overloaded C++ <code>reset()</code> functions taking
+ *              arrays as arguments.</li>
  *          <li>Added <code>bw_slew_lim_process1_none()</code>.</li>
  *          <li><code>bw_slew_lim_process()</code> and
  *              <code>bw_slew_lim_process_multi()</code> now use

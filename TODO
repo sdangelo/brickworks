@@ -21,7 +21,6 @@ code:
 * bw_comb: integer target delay values?
 * prewarp control in all derived filtering modules
 * src inside distortions? w/ control from outside?
-* peak gain + Q ???
 * better src filter
 finally:
 * debugging - also check outputs different (incl bw_buf)

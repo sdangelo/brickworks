@@ -253,7 +253,7 @@ static inline void bw_ls1_set_dc_gain_lin(
 /*! <<<```
  *    Sets the dc gain parameter to the given `value` (linear gain) in `coeffs`.
  *
- *    `value` must be finite and greater than or equal to `1e-30f`.
+ *    Valid range: [`1e-30f`, `1e30f`].
  *
  *    By the time `bw_ls1_update_coeffs_ctrl()`, `bw_ls1_update_coeffs_audio()`,
  *    `bw_ls1_process1()`, `bw_ls1_process()`, or `bw_ls1_process_multi()` is
@@ -270,7 +270,7 @@ static inline void bw_ls1_set_dc_gain_dB(
 /*! <<<```
  *    Sets the dc gain parameter to the given `value` (dB) in `coeffs`.
  *
- *    `value` must be finite and greater than or equal to `-600.f`.
+ *    Valid range: [`-600.f`, `600.f`].
  *
  *    By the time `bw_ls1_update_coeffs_ctrl()`, `bw_ls1_update_coeffs_audio()`,
  *    `bw_ls1_process1()`, `bw_ls1_process()`, or `bw_ls1_process_multi()` is
@@ -631,7 +631,7 @@ static inline void bw_ls1_set_dc_gain_lin(
 	BW_ASSERT_DEEP(bw_ls1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 1e-30f);
+	BW_ASSERT(value >= 1e-30f && value <= 1e30f);
 
 	if (value != coeffs->dc_gain) {
 		coeffs->dc_gain = value;
@@ -649,7 +649,7 @@ static inline void bw_ls1_set_dc_gain_dB(
 	BW_ASSERT_DEEP(bw_ls1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= -600.f);
+	BW_ASSERT(value >= -600.f && value <= 600.f);
 
 	bw_ls1_set_dc_gain_lin(coeffs, bw_dB2linf(value));
 
@@ -674,7 +674,7 @@ static inline char bw_ls1_coeffs_is_valid(
 		return 0;
 	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
-	if (!bw_is_finite(coeffs->dc_gain) || coeffs->dc_gain < 1e-30f)
+	if (!bw_is_finite(coeffs->dc_gain) || coeffs->dc_gain < 1e-30f || coeffs->dc_gain > 1e30f)
 		return 0;
 
 	return bw_mm1_coeffs_is_valid(&coeffs->mm1_coeffs);

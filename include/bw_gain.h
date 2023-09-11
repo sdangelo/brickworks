@@ -186,7 +186,7 @@ static inline void bw_gain_set_gain_dB(
 /*! <<<```
  *    Sets the gain parameter to the given `value` (dB) in `coeffs`.
  *
- *    `value` must be finite if positive.
+ *    `value` must be less than or equal to `770.630f`.
  *
  *    Default value: `0.f`.
  *
@@ -426,7 +426,7 @@ static inline void bw_gain_set_gain_dB(
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_init);
 	BW_ASSERT(!bw_is_nan(value));
-	BW_ASSERT(value > 0.f ? bw_is_finite(value) : 1);
+	BW_ASSERT(value <= 770.630f);
 
 	coeffs->gain = bw_dB2linf(value);
 

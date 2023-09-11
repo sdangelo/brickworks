@@ -266,7 +266,7 @@ static inline void bw_hs2_set_high_gain_lin(
  *    Sets the high-frequency gain parameter to the given `value` (linear gain)
  *    in `coeffs`.
  *
- *    `value` must be finite and non-negative.
+ *    Valid range: [`1e-30f`, `1e30f`].
  *
  *    By the time `bw_hs2_update_coeffs_ctrl()`, `bw_hs2_update_coeffs_audio()`,
  *    `bw_hs2_process1()`, `bw_hs2_process()`, or `bw_hs2_process_multi()` is
@@ -284,7 +284,7 @@ static inline void bw_hs2_set_high_gain_dB(
  *    Sets the high-frequency gain parameter to the given `value` (dB) in
  *    `coeffs`.
  *
- *    `value` must be finite if positive.
+ *    Valid range: [`-600.f`, `600.f`].
  *
  *    By the time `bw_hs2_update_coeffs_ctrl()`, `bw_hs2_update_coeffs_audio()`,
  *    `bw_hs2_process1()`, `bw_hs2_process()`, or `bw_hs2_process_multi()` is
@@ -674,7 +674,7 @@ static inline void bw_hs2_set_high_gain_lin(
 	BW_ASSERT_DEEP(bw_hs2_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs2_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value >= 0.f);
+	BW_ASSERT(value >= 1e-30f && value <= 1e30f);
 
 	if (coeffs->high_gain != value) {
 		coeffs->high_gain = value;
@@ -695,7 +695,7 @@ static inline void bw_hs2_set_high_gain_dB(
 	BW_ASSERT_DEEP(bw_hs2_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs2_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value > 0.f ? bw_is_finite(value) : 1);
+	BW_ASSERT(value >= -600.f && value <= 600.f);
 
 	bw_hs2_set_high_gain_lin(coeffs, bw_dB2linf(value));
 
@@ -720,7 +720,7 @@ static inline char bw_hs2_coeffs_is_valid(
 		return 0;
 	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
-	if (!bw_is_finite(coeffs->high_gain) || coeffs->high_gain < 0.f)
+	if (!bw_is_finite(coeffs->high_gain) || coeffs->high_gain < 1e-30f || coeffs->high_gain > 1e30f)
 		return 0;
 
 #ifdef BW_DEBUG_DEEP

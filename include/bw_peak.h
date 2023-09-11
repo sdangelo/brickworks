@@ -269,13 +269,13 @@ static inline void bw_peak_set_peak_gain_lin(
  *    Sets the peak gain parameter to the given `value` (linear gain) in
  *    `coeffs`.
  *
- *    `value` must be finite and positive.
+ *    Valid range: [`1e-30f`, `1e30f`].
  *
  *    If actually using the bandwidth parameter to control Q,  by the time
  *    `bw_peak_update_coeffs_ctrl()`, `bw_peak_update_coeffs_audio()`,
  *    `bw_peak_process1()`, `bw_peak_process()`, or `bw_peak_process_multi()` is
- *    called, `bw_sqrtf(bw_pow2f(bandwidth) * peak_gain)
- *    * bw_rcpf(bw_pow2f(bandwidth) - 1.f)` must be in [`1e-6f`, `1e6f`].
+ *    called, `bw_sqrtf(bw_pow2f(bandwidth) * peak_gain) *
+ *    bw_rcpf(bw_pow2f(bandwidth) - 1.f)` must be in [`1e-6f`, `1e6f`].
  *
  *    Default value: `1.f`.
  *
@@ -287,13 +287,13 @@ static inline void bw_peak_set_peak_gain_dB(
 /*! <<<```
  *    Sets the peak gain parameter to the given `value` (dB) in `coeffs`.
  *
- *    `value` must be finite.
+ *    Valid range: [`-600.f`, `600.f`].
  *
  *    If actually using the bandwidth parameter to control Q,  by the time
  *    `bw_peak_update_coeffs_ctrl()`, `bw_peak_update_coeffs_audio()`,
  *    `bw_peak_process1()`, `bw_peak_process()`, or `bw_peak_process_multi()` is
- *    called, `bw_sqrtf(bw_pow2f(bandwidth) * peak_gain)
- *    * bw_rcpf(bw_pow2f(bandwidth) - 1.f)` must be in [`1e-6f`, `1e6f`].
+ *    called, `bw_sqrtf(bw_pow2f(bandwidth) * peak_gain) *
+ *    bw_rcpf(bw_pow2f(bandwidth) - 1.f)` must be in [`1e-6f`, `1e6f`].
  *
  *    Default value: `0.f`.
  *
@@ -305,13 +305,13 @@ static inline void bw_peak_set_bandwidth(
 /*! <<<```
  *    Sets the bandwidth `value` (octaves) in `coeffs`.
  *
+ *    Valid range: [`1e-6f`, `90.f`].
+ *
  *    If actually using the bandwidth parameter to control Q,  by the time
  *    `bw_peak_update_coeffs_ctrl()`, `bw_peak_update_coeffs_audio()`,
  *    `bw_peak_process1()`, `bw_peak_process()`, or `bw_peak_process_multi()` is
- *    called, `bw_sqrtf(bw_pow2f(bandwidth) * peak_gain)
- *    * bw_rcpf(bw_pow2f(bandwidth) - 1.f)` must be in [`1e-6f`, `1e6f`].
- *
- *    Valid range: [`1e-6f`, `90.f`].
+ *    called, `bw_sqrtf(bw_pow2f(bandwidth) * peak_gain) *
+ *    bw_rcpf(bw_pow2f(bandwidth) - 1.f)` must be in [`1e-6f`, `1e6f`].
  *
  *    Default value: `2.543106606327224f`.
  *
@@ -726,7 +726,7 @@ static inline void bw_peak_set_peak_gain_lin(
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
-	BW_ASSERT(value > 0.f);
+	BW_ASSERT(value >= 1e-30f && value <= 1e30f);
 
 	if (coeffs->peak_gain != value) {
 		coeffs->peak_gain = value;
@@ -747,6 +747,7 @@ static inline void bw_peak_set_peak_gain_dB(
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
+	BW_ASSERT(value >= -600.f && value <= 600.f);
 
 	bw_peak_set_peak_gain_lin(coeffs, bw_dB2linf(value));
 
@@ -805,7 +806,7 @@ static inline char bw_peak_coeffs_is_valid(
 
 	if (!bw_is_finite(coeffs->Q) || coeffs->Q < 1e-6f || coeffs->Q > 1e6f)
 		return 0;
-	if (!bw_is_finite(coeffs->peak_gain) || coeffs->peak_gain <= 0.f)
+	if (!bw_is_finite(coeffs->peak_gain) || coeffs->peak_gain < 1e-30f || coeffs->peak_gain > 1e30f)
 		return 0;
 	if (!bw_is_finite(coeffs->bandwidth) || coeffs->bandwidth < 1e-6f || coeffs->bandwidth > 90.f)
 		return 0;

@@ -73,6 +73,7 @@ code:
 * modulation vs process (multi) no update (post 1.0.0)???
 * reset_state_multi allow NULL input?
 * process allow NULL output?
+* #if __cplusplus >= 201103L ? - see https://stackoverflow.com/questions/5047971/how-do-i-check-for-c11-support
 
 build system:
 * make makefiles handle paths with spaces etc

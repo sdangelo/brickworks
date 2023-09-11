@@ -126,9 +126,9 @@ static inline float bw_mm1_reset_state(
 	float                             x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x_0`.
+ *    and the initial input value `x_0`.
  *
- *    Returns the corresponding quiescent/initial output value.
+ *    Returns the corresponding initial output value.
  *
  *    #### bw_mm1_reset_state_multi()
  *  ```>>> */
@@ -140,11 +140,11 @@ static inline void bw_mm1_reset_state_multi(
 	size_t                                         n_channels);
 /*! <<<```
  *    Resets each of the `n_channels` `state`s to its initial values using the
- *    given `coeffs` and the corresponding quiescent/initial input value in the
- *    `x_0` array.
+ *    given `coeffs` and the corresponding initial input value in the `x_0`
+ *    array.
  *
- *    The corresponding quiescent/initial output values are written into the
- *    `y_0` array, if not `NULL`.
+ *    The corresponding initial output values are written into the `y_0` array,
+ *    if not `NULL`.
  *
  *    #### bw_mm1_update_coeffs_ctrl()
  *  ```>>> */
@@ -403,8 +403,8 @@ static inline float bw_mm1_reset_state(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
-	const float y = (bw_gain_get_gain_lin(&coeffs->gain_x_coeffs) + bw_gain_get_gain_lin(&coeffs->gain_lp_coeffs)) * x_0;
 	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+	const float y = (bw_gain_get_gain_lin(&coeffs->gain_x_coeffs) + bw_gain_get_gain_lin(&coeffs->gain_lp_coeffs)) * x_0;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_mm1_state");

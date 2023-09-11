@@ -144,11 +144,11 @@ static inline void bw_hs2_reset_state_multi(
 	size_t                                         n_channels);
 /*! <<<```
  *    Resets each of the `n_channels` `state`s to its initial values using the
- *    given `coeffs` and the corresponding quiescent/initial input value in the
- *    `x_0` array.
+ *    given `coeffs` and the corresponding initial input value in the `x_0`
+ *    array.
  *
- *    The corresponding quiescent/initial output values are written into the
- *    `y_0` array, if not `NULL`.
+ *    The corresponding initial output values are written into the `y_0` array,
+ *    if not `NULL`.
  *
  *    #### bw_hs2_update_coeffs_ctrl()
  *  ```>>> */
@@ -462,8 +462,7 @@ static inline float bw_hs2_reset_state(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
-	const float y = x_0;
-	bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state, x_0);
+	const float y = bw_mm2_reset_state(&coeffs->mm2_coeffs, &state->mm2_state, x_0);
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_hs2_state");

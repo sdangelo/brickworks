@@ -162,10 +162,10 @@ static inline void bw_svf_reset_state(
 	float * BW_RESTRICT               y_hp_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x_0`.
+ *    and the initial input value `x_0`.
  *
- *    The corresponding quiescent/initial lowpass, bandpass, and highpass output
- *    values are put into `y_lp_0`, `y_bp_0`, and `y_hp_0` respectively.
+ *    The corresponding initial lowpass, bandpass, and highpass output values
+ *    are put into `y_lp_0`, `y_bp_0`, and `y_hp_0` respectively.
  *
  *    #### bw_svf_reset_state_multi()
  *  ```>>> */
@@ -179,12 +179,12 @@ static inline void bw_svf_reset_state_multi(
 	size_t                                         n_channels);
 /*! <<<```
  *    Resets each of the `n_channels` `state`s to its initial values using the
- *    given `coeffs` and the corresponding quiescent/initial input value in the
- *    `x_0` array.
+ *    given `coeffs` and the corresponding initial input value in the `x_0`
+ *    array.
  *
- *    The corresponding quiescent/initial lowpass, bandpass, and highpass output
- *    values are put into `y_lp_0`, `y_bp_0`, and `y_hp_0` respectively, if they
- *    are not `NULL`.
+ *    The corresponding initial lowpass, bandpass, and highpass output values
+ *    are put into `y_lp_0`, `y_bp_0`, and `y_hp_0` respectively, if they are
+ *    not `NULL`.
  *
  *    #### bw_svf_update_coeffs_ctrl()
  *  ```>>> */

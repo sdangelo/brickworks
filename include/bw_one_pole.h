@@ -156,9 +156,9 @@ static inline float bw_one_pole_reset_state(
 	float                                  x_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x_0`.
+ *    and the initial input value `x_0`.
  *
- *    Returns the corresponding quiescent/initial output value.
+ *    Returns the corresponding initial output value.
  *
  *    #### bw_one_pole_reset_state_multi()
  *  ```>>> */
@@ -170,10 +170,10 @@ static inline void bw_one_pole_reset_state_multi(
 	size_t                                              n_channels);
 /*! <<<```
  *    Resets each of the `n_channels` `state`s to its initial values using the
- *    given `coeffs` and the corresponding quiescent/initial input value in the
- *    `x_0` array.
+ *    given `coeffs` and the corresponding initial input value in the `x_0`
+ *    array.
  *
- *    The corresponding quiescent/initial output values are written into the
+ *    The corresponding initial output values are written into the
  *    `y_0` array, if not `NULL`.
  *
  *    #### bw_one_pole_update_coeffs_ctrl()

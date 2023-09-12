@@ -310,6 +310,7 @@ struct bw_ap1_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// Sub-components
 	bw_lp1_state	lp1_state;
 };
 
@@ -371,8 +372,8 @@ static inline float bw_ap1_reset_state(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
-	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
-	const float y = x_0;
+	const float lp = bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+	const float y = lp + lp - x_0;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_ap1_state");

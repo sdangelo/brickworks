@@ -495,6 +495,7 @@ struct bw_one_pole_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// States
 	float		y_z1;
 };
 

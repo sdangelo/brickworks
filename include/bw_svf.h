@@ -391,6 +391,7 @@ struct bw_svf_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// States
 	float		hp_z1;
 	float		lp_z1;
 	float		bp_z1;

@@ -326,6 +326,7 @@ struct bw_lp1_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// States
 	float		y_z1;
 	float		X_z1;
 };

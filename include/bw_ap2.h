@@ -319,6 +319,7 @@ struct bw_ap2_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// Sub-components
 	bw_svf_state	svf_state;
 };
 
@@ -382,7 +383,8 @@ static inline float bw_ap2_reset_state(
 
 	float lp, bp, hp;
 	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, x_0, &lp, &bp, &hp);
-	const float y = x_0;
+	const float lh = lp + hp;
+	const float y = lh + lh - x_0;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_ap2_state");

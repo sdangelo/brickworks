@@ -375,6 +375,7 @@ struct bw_hs2_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// Sub-components
 	bw_mm2_state	mm2_state;
 };
 

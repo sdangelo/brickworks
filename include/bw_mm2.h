@@ -371,6 +371,7 @@ struct bw_mm2_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// Sub-components
 	bw_svf_state	svf_state;
 };
 
@@ -454,7 +455,11 @@ static inline float bw_mm2_reset_state(
 
 	float lp, bp, hp;
 	bw_svf_reset_state(&coeffs->svf_coeffs, &state->svf_state, x_0, &lp, &bp, &hp);
-	const float y = (bw_gain_get_gain_lin(&coeffs->gain_x_coeffs) + bw_gain_get_gain_lin(&coeffs->gain_lp_coeffs)) * x_0;
+	const float y =
+		bw_gain_get_gain_lin(&coeffs->gain_x_coeffs) * x_0
+		+ bw_gain_get_gain_lin(&coeffs->gain_lp_coeffs) * lp
+		+ bw_gain_get_gain_lin(&coeffs->gain_bp_coeffs) * bp
+		+ bw_gain_get_gain_lin(&coeffs->gain_hp_coeffs) * hp;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_mm2_state");

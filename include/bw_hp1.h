@@ -308,6 +308,7 @@ struct bw_hp1_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// Sub-components
 	bw_lp1_state	lp1_state;
 };
 
@@ -369,7 +370,8 @@ static inline float bw_hp1_reset_state(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
-	bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+	const float lp = bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
+	const float y = x_0 - lp;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_hp1_state");
@@ -378,8 +380,9 @@ static inline float bw_hp1_reset_state(
 	BW_ASSERT_DEEP(bw_hp1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hp1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_hp1_state_is_valid(coeffs, state));
+	BW_ASSERT(bw_is_finite(y));
 
-	return 0.f;
+	return y;
 }
 
 static inline void bw_hp1_reset_state_multi(

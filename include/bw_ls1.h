@@ -357,6 +357,7 @@ struct bw_ls1_state {
 	uint32_t	coeffs_reset_id;
 #endif
 
+	// Sub-components
 	bw_mm1_state	mm1_state;
 };
 

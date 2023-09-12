@@ -30,7 +30,7 @@ void bw_example_fx_wah_set_sample_rate(bw_example_fx_wah *instance, float sample
 
 void bw_example_fx_wah_reset(bw_example_fx_wah *instance) {
 	bw_wah_reset_coeffs(&instance->wah_coeffs);
-	bw_wah_reset_state(&instance->wah_coeffs, &instance->wah_state);
+	bw_wah_reset_state(&instance->wah_coeffs, &instance->wah_state, 0.f);
 }
 
 void bw_example_fx_wah_process(bw_example_fx_wah *instance, const float** x, float** y, int n_samples) {

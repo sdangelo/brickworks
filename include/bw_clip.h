@@ -422,11 +422,12 @@ static inline float bw_clip_reset_state(
 	BW_ASSERT(bw_is_finite(x_0));
 
 	const float x = bw_one_pole_get_y_z1(&coeffs->smooth_gain_state) * x_0 + bw_one_pole_get_y_z1(&coeffs->smooth_bias_state);
-	const float a = bw_absf(x_0);
+	const float a = bw_absf(x);
+	const float F = a > 1.f ? a - 0.5f : 0.5f * a * a;
 	const float yb = bw_clipf(x, -1.f, 1.f);
 	const float y = yb - coeffs->bias_dc;
 	state->x_z1 = x;
-	state->F_z1 = a > 1.f ? a - 0.5f : 0.5f * a * a;
+	state->F_z1 = F;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_clip_state");

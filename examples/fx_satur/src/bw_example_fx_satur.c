@@ -33,7 +33,7 @@ void bw_example_fx_satur_set_sample_rate(bw_example_fx_satur *instance, float sa
 
 void bw_example_fx_satur_reset(bw_example_fx_satur *instance) {
 	bw_satur_reset_coeffs(&instance->satur_coeffs);
-	bw_satur_reset_state(&instance->satur_coeffs, &instance->satur_state);
+	bw_satur_reset_state(&instance->satur_coeffs, &instance->satur_state, 0.f);
 	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
 	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }

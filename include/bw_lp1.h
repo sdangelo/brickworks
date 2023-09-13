@@ -46,7 +46,6 @@
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
- *          <li>Fixed theoretical bug in <code>bw_lp1_init()</code>.</li>
  *          <li>Clearly specified parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
@@ -338,7 +337,6 @@ static inline void bw_lp1_init(
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
 	bw_one_pole_set_sticky_thresh(&coeffs->smooth_coeffs, 1e-3f);
-	bw_one_pole_set_sticky_mode(&coeffs->smooth_coeffs, bw_one_pole_sticky_mode_rel);
 	coeffs->cutoff = 1e3f;
 	coeffs->prewarp_k = 1.f;
 	coeffs->prewarp_freq = 1e3f;
@@ -612,11 +610,11 @@ static inline char bw_lp1_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (coeffs->cutoff < 1e-6f || coeffs->cutoff > 1e12f)
+	if (!bw_is_finite(coeffs->cutoff) || coeffs->cutoff < 1e-6f || coeffs->cutoff > 1e12f)
 		return 0;
-	if (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f)
+	if (!bw_is_finite(coeffs->prewarp_k) || (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f))
 		return 0;
-	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
+	if (!bw_is_finite(coeffs->prewarp_freq) || coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
 
 	if (!bw_one_pole_coeffs_is_valid(&coeffs->smooth_coeffs))

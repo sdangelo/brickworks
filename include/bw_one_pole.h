@@ -247,6 +247,8 @@ static inline float bw_one_pole_process1_asym_sticky_rel(
  *       not `0.f`, and that the distance metric for sticky behavior is set to
  *       `bw_one_pole_sticky_mode_rel`.
  *
+ *    Such assumptions are unchecked even for debugging purposes.
+ *
  *    #### bw_one_pole_process()
  *  ```>>> */
 static inline void bw_one_pole_process(
@@ -651,7 +653,6 @@ static inline float bw_one_pole_process1(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 == 0.f);
 
 	const float y = x + coeffs->mA1u * (state->y_z1 - x);
 	state->y_z1 = y;
@@ -674,7 +675,6 @@ static inline float bw_one_pole_process1_sticky_abs(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_abs);
 
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
@@ -700,7 +700,6 @@ static inline float bw_one_pole_process1_sticky_rel(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT_DEEP(coeffs->mA1u == coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_rel);
 
 	float y = x + coeffs->mA1u * (state->y_z1 - x);
 	const float d = y - x;
@@ -726,7 +725,6 @@ static inline float bw_one_pole_process1_asym(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 == 0.f);
 
 	const float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	state->y_z1 = y;
@@ -749,7 +747,6 @@ static inline float bw_one_pole_process1_asym_sticky_abs(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_abs);
 
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
@@ -775,7 +772,6 @@ static inline float bw_one_pole_process1_asym_sticky_rel(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT_DEEP(coeffs->mA1u != coeffs->mA1d && coeffs->st2 != 0.f && coeffs->sticky_mode == bw_one_pole_sticky_mode_rel);
 
 	float y = x + (x >= state->y_z1 ? coeffs->mA1u : coeffs->mA1d) * (state->y_z1 - x);
 	const float d = y - x;
@@ -1149,7 +1145,7 @@ static inline char bw_one_pole_coeffs_is_valid(
 		return 0;
 	if (coeffs->cutoff_down < 0.f)
 		return 0;
-	if (coeffs->sticky_thresh < 0.f || coeffs->sticky_thresh > 1e18f)
+	if (!bw_is_finite(coeffs->sticky_thresh) || coeffs->sticky_thresh < 0.f || coeffs->sticky_thresh > 1e18f)
 		return 0;
 	if (coeffs->sticky_mode != bw_one_pole_sticky_mode_abs && coeffs->sticky_mode != bw_one_pole_sticky_mode_rel)
 		return 0;

@@ -708,9 +708,9 @@ static inline char bw_ls2_coeffs_is_valid(
 
 	if (!bw_is_finite(coeffs->cutoff) || coeffs->cutoff <= 0.f)
 		return 0;
-	if (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f)
+	if (!bw_is_finite(coeffs->prewarp_k) || (coeffs->prewarp_k != 0.f && coeffs->prewarp_k != 1.f))
 		return 0;
-	if (coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
+	if (!bw_is_finite(coeffs->prewarp_freq) || coeffs->prewarp_freq < 1e-6f || coeffs->prewarp_freq > 1e12f)
 		return 0;
 	if (!bw_is_finite(coeffs->dc_gain) || coeffs->dc_gain < 1e-30f || coeffs->dc_gain > 1e30f)
 		return 0;

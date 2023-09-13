@@ -203,6 +203,9 @@ static inline float bw_slew_lim_process1_none(
  *     * `bw_slew_lim_process1_none()` assumes that both the maximum upgoing and
  *       downgoing variation rates are infinite;
  *
+ *    Whether maximum upgoing and downgoing variation rates are actually
+ *    infinite is unchecked even for debugging purposes.
+ *
  *    #### bw_slew_lim_process()
  *  ```>>> */
 static inline void bw_slew_lim_process(
@@ -532,7 +535,7 @@ static inline float bw_slew_lim_process1_up(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(bw_is_finite(coeffs->max_inc) && !bw_is_finite(coeffs->max_dec));
+	BW_ASSERT(bw_is_finite(coeffs->max_inc));
 
 	const float y = bw_minf(x, state->y_z1 + coeffs->max_inc);
 	state->y_z1 = y;
@@ -555,7 +558,7 @@ static inline float bw_slew_lim_process1_down(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(!bw_is_finite(coeffs->max_inc) && bw_is_finite(coeffs->max_dec));
+	BW_ASSERT(bw_is_finite(coeffs->max_dec));
 
 	const float y = bw_maxf(x, state->y_z1 - coeffs->max_dec);
 	state->y_z1 = y;
@@ -578,7 +581,6 @@ static inline float bw_slew_lim_process1_none(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(!bw_is_finite(coeffs->max_inc) && !bw_is_finite(coeffs->max_dec));
 
 	(void)coeffs;
 	state->y_z1 = x;
@@ -800,9 +802,9 @@ static inline char bw_slew_lim_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (coeffs->max_rate_up < 0.f)
+	if (!bw_is_finite(coeffs->max_rate_up) || coeffs->max_rate_up < 0.f)
 		return 0;
-	if (coeffs->max_rate_down < 0.f)
+	if (!bw_is_finite(coeffs->max_rate_down) || coeffs->max_rate_down < 0.f)
 		return 0;
 
 #ifdef BW_DEBUG_DEEP
@@ -812,9 +814,9 @@ static inline char bw_slew_lim_coeffs_is_valid(
 	}
 
 	if (coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs) {
-		if (coeffs->max_inc < 0.f)
+		if (!bw_is_finite(coeffs->max_inc) || coeffs->max_inc < 0.f)
 			return 0;
-		if (coeffs->max_dec < 0.f)
+		if (!bw_is_finite(coeffs->max_dec) || coeffs->max_dec < 0.f)
 			return 0;
 	}
 #endif

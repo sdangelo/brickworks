@@ -33,7 +33,7 @@ void bw_example_fx_clip_set_sample_rate(bw_example_fx_clip *instance, float samp
 
 void bw_example_fx_clip_reset(bw_example_fx_clip *instance) {
 	bw_clip_reset_coeffs(&instance->clip_coeffs);
-	bw_clip_reset_state(&instance->clip_coeffs, &instance->clip_state);
+	bw_clip_reset_state(&instance->clip_coeffs, &instance->clip_state, 0.f);
 	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
 	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }

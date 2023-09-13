@@ -35,6 +35,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li><code>Fixed frequency response and improved speed.</code></li>
  *          <li><code>bw_src_int_lim_process()</code> and
  *              <code>bw_src_int_lim_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
@@ -160,13 +161,11 @@ extern "C" {
 
 struct bw_src_int_coeffs {
 	int	ratio;
-	float	a1;
-	float	a2;
-	float	a3;
-	float	a4;
 	float	b0;
-	float	b1;
-	float	b2;
+	float	ma1;
+	float	ma2;
+	float	ma3;
+	float	ma4;
 };
 
 struct bw_src_int_state {
@@ -185,28 +184,27 @@ static inline void bw_src_int_init(bw_src_int_coeffs *BW_RESTRICT coeffs, int ra
 	const float T2 = T * T;
 	const float k = 1.f / (T * (T * (T * (T + 2.613125929752753f) + 3.414213562373095f) + 2.613125929752753f) + 1.f);
 	coeffs->b0 = k * T2 * T2;
-	coeffs->b1 = 4.f * coeffs->b0;
-	coeffs->b2 = 6.f * coeffs->b0;
-	coeffs->a1 = k * (T * (T2 * (4.f * T + 5.226251859505504f) - 5.226251859505504f) - 4.f);
-	coeffs->a2 = k * (T2 * (6.f * T2 - 6.82842712474619f) + 6.f);
-	coeffs->a3 = k * (T * (T2 * (4.f * T - 5.226251859505504f) + 5.226251859505504f) - 4.f);
-	coeffs->a4 = k * (T * (T * (T * (T - 2.613125929752753f) + 3.414213562373095f) - 2.613125929752753f) + 1.f);
+	coeffs->ma1 = k * (T * (T2 * (-5.226251859505504f - 4.f * T) + 5.226251859505504f) + 4.f);
+	coeffs->ma2 = k * ((6.82842712474619f - 6.f * T2) * T2 - 6.f);
+	coeffs->ma3 = k * (T * (T2 * (5.226251859505504f - 4.f * T) - 5.226251859505504f) + 4.f);
+	coeffs->ma4 = k * (T * (T * ((2.613125929752753f - T) * T - 3.414213562373095f) + 2.613125929752753f) - 1.f);
 }
 
 static inline void bw_src_int_reset_state(const bw_src_int_coeffs *BW_RESTRICT coeffs, bw_src_int_state *BW_RESTRICT state, float x_0) {
 	if (coeffs->ratio < 0) {
 		// DF-II
-		state->z1 = x_0 / (1.f + coeffs->a1 + coeffs->a2 + coeffs->a3 + coeffs->a4);
+		state->z1 = x_0 / (1.f - coeffs->ma1 - coeffs->ma2 - coeffs->ma3 - coeffs->ma4);
 		state->z2 = state->z1;
 		state->z3 = state->z2;
 		state->z4 = state->z3;
 		state->i = 0;
 	} else {
 		// TDF-II
-		state->z4 = (coeffs->b0 - coeffs->a4) * x_0;
-		state->z3 = (coeffs->b1 - coeffs->a3) * x_0 + state->z4;
-		state->z2 = (coeffs->b2 - coeffs->a2) * x_0 + state->z3;
-		state->z1 = (coeffs->b1 - coeffs->a1) * x_0 + state->z2;
+		const float k = 4.f * coeffs->b0;
+		state->z4 = (coeffs->b0 + coeffs->ma4) * x_0;
+		state->z3 = (k + coeffs->ma3) * x_0 + state->z4;
+		state->z2 = (6.f * coeffs->b0 + coeffs->ma2) * x_0 + state->z3;
+		state->z1 = (k + coeffs->ma1) * x_0 + state->z2;
 	}
 }
 
@@ -215,10 +213,10 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
 	if (coeffs->ratio < 0) {
 		for (size_t i = 0; i < n_in_samples; i++) {
 			// DF-II
-			const float z0 = x[i] - coeffs->a1 * state->z1 - coeffs->a2 * state->z2 - coeffs->a3 * state->z3 - coeffs->a4 * state->z4;
+			const float z0 = x[i] + coeffs->ma1 * state->z1 + coeffs->ma2 * state->z2 + coeffs->ma3 * state->z3 + coeffs->ma4 * state->z4;
 			if (!state->i) {
 				state->i = -coeffs->ratio;
-				y[n] = coeffs->b0 * (z0 + state->z4) + coeffs->b1 * (state->z1 + state->z3) + coeffs->b2 * state->z2;
+				y[n] = coeffs->b0 * (z0 + state->z4 + 4.f * (state->z1 + state->z3) + 6.f * state->z2);
 				n++;
 			}
 			state->i--;
@@ -230,15 +228,24 @@ static inline size_t bw_src_int_process(const bw_src_int_coeffs *BW_RESTRICT coe
 	} else {
 		for (size_t i = 0; i < n_in_samples; i++) {
 			// TDF-II
-			const float v0 = coeffs->b0 * x[i];
-			const float v1 = coeffs->b1 * x[i];
-			const float v2 = coeffs->b2 * x[i];
-			for (int j = 0; j < coeffs->ratio; j++) {
-				y[n] = v0 + state->z1;
-				state->z1 = v1 - coeffs->a1 * y[n] + state->z2;
-				state->z2 = v2 - coeffs->a2 * y[n] + state->z3;
-				state->z3 = v1 - coeffs->a3 * y[n] + state->z4;
-				state->z4 = v0 - coeffs->a4 * y[n];
+			const float in = coeffs->ratio * x[i];
+			const float v0 = coeffs->b0 * in;
+			const float v1 = 4.f * v0;
+			const float v2 = 6.f * v0;
+			float o = v0 + state->z1;
+			state->z1 = v1 + coeffs->ma1 * o + state->z2;
+			state->z2 = v2 + coeffs->ma2 * o + state->z3;
+			state->z3 = v1 + coeffs->ma3 * o + state->z4;
+			state->z4 = v0 + coeffs->ma4 * o;
+			y[n] = o;
+			n++;
+			for (int j = 1; j < coeffs->ratio; j++) {
+				o = state->z1;
+				state->z1 = coeffs->ma1 * o + state->z2;
+				state->z2 = coeffs->ma2 * o + state->z3;
+				state->z3 = coeffs->ma3 * o + state->z4;
+				state->z4 = coeffs->ma4 * o;
+				y[n] = o;
 				n++;
 			}
 		}

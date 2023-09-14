@@ -32,7 +32,7 @@ void bw_example_fx_fuzz_set_sample_rate(bw_example_fx_fuzz *instance, float samp
 
 void bw_example_fx_fuzz_reset(bw_example_fx_fuzz *instance) {
 	bw_fuzz_reset_coeffs(&instance->fuzz_coeffs);
-	bw_fuzz_reset_state(&instance->fuzz_coeffs, &instance->fuzz_state);
+	bw_fuzz_reset_state(&instance->fuzz_coeffs, &instance->fuzz_state, 0.f);
 	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
 	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }

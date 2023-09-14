@@ -32,7 +32,7 @@ void bw_example_fx_drive_set_sample_rate(bw_example_fx_drive *instance, float sa
 
 void bw_example_fx_drive_reset(bw_example_fx_drive *instance) {
 	bw_drive_reset_coeffs(&instance->drive_coeffs);
-	bw_drive_reset_state(&instance->drive_coeffs, &instance->drive_state);
+	bw_drive_reset_state(&instance->drive_coeffs, &instance->drive_state, 0.f);
 	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
 	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }

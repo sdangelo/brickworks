@@ -34,6 +34,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Adjusted internal peak cutoff to more sensible value.</li>
  *          <li>Added initial input value to
  *              <code>bw_dist_reset_state()</code>.</li>
  *          <li>Added <code>bw_dist_reset_state_multi()</code> and updated C++
@@ -42,7 +43,6 @@
  *              output value.</li>
  *          <li>Added overloaded C++ <code>reset()</code> functions taking
  *              arrays as arguments.</li>
- *          <li>Adjusted internal peak cutoff to more sensible value.</li>
  *          <li><code>bw_dist_process()</code> and
  *              <code>bw_dist_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>

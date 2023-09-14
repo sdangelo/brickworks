@@ -425,7 +425,7 @@ static inline float bw_clip_reset_state(
 	const float a = bw_absf(x);
 	const float F = a > 1.f ? a - 0.5f : 0.5f * a * a;
 	const float yb = bw_clipf(x, -1.f, 1.f);
-	const float y = yb - coeffs->bias_dc;
+	const float y = (coeffs->gain_compensation ? coeffs->inv_gain : 1.f) * (yb - coeffs->bias_dc);
 	state->x_z1 = x;
 	state->F_z1 = F;
 

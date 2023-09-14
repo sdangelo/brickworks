@@ -445,7 +445,7 @@ static inline float bw_satur_reset_state(
 	const float ax = bw_absf(x);
 	const float F = ax >= 2.115287308554551f ? ax - 0.6847736211329452f : ax * ax * ((0.00304518315009429f * ax - 0.09167437770414569f) * ax + 0.5f);
 	const float yb = bw_satur_tanhf(x);
-	const float y = yb - coeffs->bias_dc;
+	const float y = (coeffs->gain_compensation ? coeffs->inv_gain : 1.f) * (yb - coeffs->bias_dc);
 	state->x_z1 = x;
 	state->F_z1 = F;
 

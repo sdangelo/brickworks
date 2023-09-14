@@ -216,8 +216,9 @@ static inline void bw_wah_set_wah(
 	bw_wah_coeffs * BW_RESTRICT coeffs,
 	float                       value);
 /*! <<<```
- *    Sets the wah pedal position to the given `value` in [`0.f` (low cutoff),
- *    `1.f` (high cutoff)] in `coeffs`.
+ *    Sets the wah pedal position to the given `value`.
+ *
+ *    Valid range: [`0.f` (low cutoff), `1.f` (high cutoff)].
  *
  *    Default value: `0.5f`.
  *

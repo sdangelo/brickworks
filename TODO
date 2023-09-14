@@ -30,6 +30,7 @@ finally:
 * state that audio cannot be inf (also in reset)
 * state that you need different output buffers to reset
 * thank scientific paper authors
+* change config.h in examples version 1.0.0
 
 build system:
 * single header generation (vs modules in bwp... to think about)

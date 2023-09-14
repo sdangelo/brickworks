@@ -32,7 +32,7 @@ void bw_example_fx_dist_set_sample_rate(bw_example_fx_dist *instance, float samp
 
 void bw_example_fx_dist_reset(bw_example_fx_dist *instance) {
 	bw_dist_reset_coeffs(&instance->dist_coeffs);
-	bw_dist_reset_state(&instance->dist_coeffs, &instance->dist_state);
+	bw_dist_reset_state(&instance->dist_coeffs, &instance->dist_state, 0.f);
 	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
 	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }

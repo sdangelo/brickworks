@@ -30,7 +30,7 @@ void bw_example_fx_comp_set_sample_rate(bw_example_fx_comp *instance, float samp
 
 void bw_example_fx_comp_reset(bw_example_fx_comp *instance) {
 	bw_comp_reset_coeffs(&instance->comp_coeffs);
-	bw_comp_reset_state(&instance->comp_coeffs, &instance->comp_state);
+	bw_comp_reset_state(&instance->comp_coeffs, &instance->comp_state, 0.f, 0.f);
 }
 
 void bw_example_fx_comp_process(bw_example_fx_comp *instance, const float** x, float** y, int n_samples) {

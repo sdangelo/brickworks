@@ -75,6 +75,7 @@ code:
 * reset_state_multi allow NULL input?
 * process allow NULL output?
 * #if __cplusplus >= 201103L ? - see https://stackoverflow.com/questions/5047971/how-do-i-check-for-c11-support
+* get current compression level, knee
 
 build system:
 * make makefiles handle paths with spaces etc

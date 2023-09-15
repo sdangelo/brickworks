@@ -31,8 +31,10 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Added initial value arguments in
- *              <code>bw_comp_reset_state()</code>.</li>
+ *          <li>Added <code>bw_comp_reset_state_multi()</code> and updated C++
+ *              API in this regard.</li>
+ *          <li>Now <code>bw_comp_reset_state()</code> returns the initial
+ *              output value.</li>
  *          <li>Added overloaded C++ <code>reset()</code> functions taking
  *              arrays as arguments.</li>
  *          <li><code>bw_comp_process()</code> and
@@ -44,6 +46,8 @@
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clearly specified parameter validity ranges.</li>
+ *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -92,45 +96,77 @@ typedef struct bw_comp_state bw_comp_state;
  *
  *    #### bw_comp_init()
  *  ```>>> */
-static inline void bw_comp_init(bw_comp_coeffs *BW_RESTRICT coeffs);
+static inline void bw_comp_init(
+	bw_comp_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_comp_set_sample_rate()
  *  ```>>> */
-static inline void bw_comp_set_sample_rate(bw_comp_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_comp_set_sample_rate(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
  *    #### bw_comp_reset_coeffs()
  *  ```>>> */
-static inline void bw_comp_reset_coeffs(bw_comp_coeffs *BW_RESTRICT coeffs);
+static inline void bw_comp_reset_coeffs(
+	bw_comp_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_comp_reset_state()
  *  ```>>> */
-static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x_0, float x_sc_0);
+static inline float bw_comp_reset_state(
+	const bw_comp_coeffs * BW_RESTRICT coeffs,
+	bw_comp_state * BW_RESTRICT        state,
+	float                              x_0,
+	float                              x_sc_0);
 /*! <<<```
  *    Resets the given `state` to its initial values using the given `coeffs`
- *    and the quiescent/initial input value `x_0` and sidechain input value
- *    `x_sc_0`.
+ *    and the initial input value `x_0` and sidechain input value `x_sc_0`.
+ *
+ *    Returns the corresponding initial output value.
+ *
+ *    #### bw_comp_reset_state_multi()
+ *  ```>>> */
+static inline void bw_comp_reset_state_multi(
+	const bw_comp_coeffs * BW_RESTRICT              coeffs,
+	bw_comp_state * BW_RESTRICT const * BW_RESTRICT state,
+	const float *                                   x_0,
+	const float *                                   x_sc_0,
+	float *                                         y_0,
+	size_t                                          n_channels);
+/*! <<<```
+ *    Resets each of the `n_channels` `state`s to its initial values using the
+ *    given `coeffs` and the corresponding initial input value in the `x_0`
+ *    array and sidechain input value in the `x_sc_0` array.
+ *
+ *    The corresponding initial output values are written into the `y_0` array,
+ *    if not `NULL`.
  *
  *    #### bw_comp_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_comp_update_coeffs_ctrl(bw_comp_coeffs *BW_RESTRICT coeffs);
+static inline void bw_comp_update_coeffs_ctrl(
+	bw_comp_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
  *    #### bw_comp_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_comp_update_coeffs_audio(bw_comp_coeffs *BW_RESTRICT coeffs);
+static inline void bw_comp_update_coeffs_audio(
+	bw_comp_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_comp_process1()
  *  ```>>> */
-static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x, float x_sc);
+static inline float bw_comp_process1(
+	const bw_comp_coeffs * BW_RESTRICT coeffs,
+	bw_comp_state * BW_RESTRICT        state,
+	float                              x,
+	float                              x_sc);
 /*! <<<```
  *    Processes one input sample `x` and the corresponding sidechain input
  *    sample `x_sc` using `coeffs`, while using and updating `state`. Returns
@@ -138,7 +174,13 @@ static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, b
  *
  *    #### bw_comp_process()
  *  ```>>> */
-static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, size_t n_samples);
+static inline void bw_comp_process(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	bw_comp_state * BW_RESTRICT  state,
+	const float *                x,
+	const float *                x_sc,
+	float *                      y,
+	size_t                       n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and the first
  *    `n_samples` of the sidechain input buffer `x_sc`, and fills the first
@@ -147,7 +189,14 @@ static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_s
  *
  *    #### bw_comp_process_multi()
  *  ```>>> */
-static inline void bw_comp_process_multi(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT const *BW_RESTRICT state, const float * const *x, const float * const *x_sc, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_comp_process_multi(
+	bw_comp_coeffs * BW_RESTRICT                    coeffs,
+	bw_comp_state * BW_RESTRICT const * BW_RESTRICT state,
+	const float * const *                           x,
+	const float * const *                           x_sc,
+	float * const *                                 y,
+	size_t                                          n_channels,
+	size_t                                          n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    the first `n_samples` of the `n_channels` sidechain input buffers `x_sc`,
@@ -157,23 +206,33 @@ static inline void bw_comp_process_multi(bw_comp_coeffs *BW_RESTRICT coeffs, bw_
  *
  *    #### bw_comp_set_thresh_lin()
  *  ```>>> */
-static inline void bw_comp_set_thresh_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_thresh_lin(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the threshold `value` (linear) in `coeffs`.
+ *
+ *    Valid range: [`1e-20f`, `1e20f`].
  *
  *    Default value: `1.f`.
  *
  *    #### bw_comp_set_thresh_dBFS()
  *  ```>>> */
-static inline void bw_comp_set_thresh_dBFS(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_thresh_dBFS(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the threshold `value` (dBFS) in `coeffs`.
+ *
+ *    Valid range: [`-400.f`, `400.f`].
  *
  *    Default value: `0.f`.
  *
  *    #### bw_comp_set_ratio()
  *  ```>>> */
-static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_ratio(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the compression ratio `value` in `coeffs`.
  *
@@ -186,33 +245,49 @@ static inline void bw_comp_set_ratio(bw_comp_coeffs *BW_RESTRICT coeffs, float v
  *
  *    #### bw_comp_set_attack_tau()
  *  ```>>> */
-static inline void bw_comp_set_attack_tau(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_attack_tau(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the attack time constant `value` (s) in `coeffs`.
+ *
+ *    `value` must be non-negative.
  *
  *    Default value: `0.f`.
  *
  *    #### bw_comp_set_release_tau()
  *  ```>>> */
-static inline void bw_comp_set_release_tau(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_release_tau(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the release time constant `value` (s) in `coeffs`.
+ *
+ *    `value` must be non-negative.
  *
  *    Default value: `0.f`.
  *
  *    #### bw_comp_set_gain_lin()
  *  ```>>> */
-static inline void bw_comp_set_gain_lin(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_gain_lin(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the output makeup gain `value` (linear ratio) in `coeffs`.
+ *
+ *    `value` must be finite.
  *
  *    Default value: `1.f`.
  *
  *    #### bw_comp_set_gain_dB()
  *  ```>>> */
-static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_comp_set_gain_dB(
+	bw_comp_coeffs * BW_RESTRICT coeffs,
+	float                        value);
 /*! <<<```
  *    Sets the output makeup gain `value` (dB) in `coeffs`.
+ *
+ *    `value` must be less than or equal to `770.630f`.
  *
  *    Default value: `0.f`.
  *  }}} */
@@ -235,49 +310,110 @@ static inline void bw_comp_set_gain_dB(bw_comp_coeffs *BW_RESTRICT coeffs, float
 extern "C" {
 #endif
 
+#ifdef BW_DEBUG_DEEP
+enum bw_comp_coeffs_state {
+	bw_comp_coeffs_state_invalid,
+	bw_comp_coeffs_state_init,
+	bw_comp_coeffs_state_set_sample_rate,
+	bw_comp_coeffs_state_reset_coeffs
+};
+#endif
+
 struct bw_comp_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum bw_comp_coeffs_state	state;
+	uint32_t			reset_id;
+#endif
+
 	// Sub-components
-	bw_env_follow_coeffs	env_follow_coeffs;
-	bw_gain_coeffs		gain_coeffs;
-	bw_one_pole_coeffs	smooth_coeffs;
-	bw_one_pole_state	smooth_thresh_state;
-	bw_one_pole_state	smooth_ratio_state;
+	bw_env_follow_coeffs		env_follow_coeffs;
+	bw_gain_coeffs			gain_coeffs;
+	bw_one_pole_coeffs		smooth_coeffs;
+	bw_one_pole_state		smooth_thresh_state;
+	bw_one_pole_state		smooth_ratio_state;
 	
 	// Coefficients
-	float			kc;
+	float				kc;
 
 	// Parameters
-	float			thresh;
-	float			ratio;
+	float				thresh;
+	float				ratio;
 };
 
 struct bw_comp_state {
+#ifdef BW_DEBUG_DEEP
+	uint32_t		hash;
+	uint32_t		coeffs_reset_id;
+#endif
+
+	// Sub-components
 	bw_env_follow_state	env_follow_state;
 };
 
-static inline void bw_comp_init(bw_comp_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_comp_init(
+		bw_comp_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
 	bw_env_follow_init(&coeffs->env_follow_coeffs);
 	bw_gain_init(&coeffs->gain_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
 	coeffs->thresh = 1.f;
 	coeffs->ratio = 1.f;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->hash = bw_hash_sdbm("bw_comp_coeffs");
+	coeffs->state = bw_comp_coeffs_state_init;
+	coeffs->reset_id = coeffs->hash + 1;
+#endif
+	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_comp_coeffs_state_init);
 }
 
-static inline void bw_comp_set_sample_rate(bw_comp_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_comp_set_sample_rate(
+		bw_comp_coeffs * BW_RESTRICT coeffs,
+		float                        sample_rate) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_comp_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
+
 	bw_env_follow_set_sample_rate(&coeffs->env_follow_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&coeffs->gain_coeffs, sample_rate);
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_comp_coeffs_state_set_sample_rate;
+#endif
+	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_comp_coeffs_state_set_sample_rate);
 }
 
-static inline void bw_comp_reset_coeffs(bw_comp_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_comp_reset_coeffs(
+		bw_comp_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_comp_coeffs_state_set_sample_rate);
+
 	bw_env_follow_reset_coeffs(&coeffs->env_follow_coeffs);
 	bw_gain_reset_coeffs(&coeffs->gain_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_comp_coeffs_state_reset_coeffs;
+	coeffs->reset_id++;
+#endif
+	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_comp_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_comp_reset_state(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x_0, float x_sc_0) {
+static inline float bw_comp_reset_state(
+		const bw_comp_coeffs * BW_RESTRICT coeffs,
+		bw_comp_state * BW_RESTRICT state,
+		float x_0,
+		float x_sc_0) {
 	(void)x_0;
 	bw_env_follow_reset_state(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc_0);
 }
@@ -297,8 +433,18 @@ static inline void bw_comp_update_coeffs_audio(bw_comp_coeffs *BW_RESTRICT coeff
 static inline float bw_comp_process1(const bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, float x, float x_sc) {
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
 	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
-	const float y = env > thresh ? bw_pow2f(coeffs->kc * bw_log2f(thresh * bw_rcpf(env))) * x : x;
-	return bw_gain_process1(&coeffs->gain_coeffs, y);
+	float y;
+	if (env > thresh) {
+		float v = thresh * bw_rcpf(env);
+		if (v >= 1.175494350822287e-38f) {
+			v = coeffs->kc * bw_log2f(v);
+			y = v > -126.f ? bw_pow2f(v) * x: thresh;
+		} else
+			y = thresh;
+	} else
+		y = x;
+	y = bw_gain_process1(&coeffs->gain_coeffs, y);
+	return y;
 }
 
 static inline void bw_comp_process(bw_comp_coeffs *BW_RESTRICT coeffs, bw_comp_state *BW_RESTRICT state, const float *x, const float *x_sc, float *y, size_t n_samples) {

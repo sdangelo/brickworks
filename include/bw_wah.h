@@ -535,9 +535,7 @@ static inline char bw_wah_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_svf_state_is_valid(&coeffs->svf_coeffs, &state->svf_state);
+	return bw_svf_state_is_valid(coeffs ? &coeffs->svf_coeffs : NULL, &state->svf_state);
 }
 
 #ifdef __cplusplus

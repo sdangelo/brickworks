@@ -773,9 +773,7 @@ static inline char bw_comp_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_env_follow_state_is_valid(&coeffs->env_follow_coeffs, &state->env_follow_state);
+	return bw_env_follow_state_is_valid(coeffs ? &coeffs->env_follow_coeffs : NULL, &state->env_follow_state);
 }
 
 #ifdef __cplusplus

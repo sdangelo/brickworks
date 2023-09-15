@@ -599,14 +599,12 @@ static inline char bw_fuzz_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_hp1_state_is_valid(&coeffs->hp1_in_coeffs, &state->hp1_in_state)
-		&& bw_svf_state_is_valid(&coeffs->lp2_coeffs, &state->lp2_1_state)
-		&& bw_svf_state_is_valid(&coeffs->lp2_coeffs, &state->lp2_2_state)
-		&& bw_peak_state_is_valid(&coeffs->peak_coeffs, &state->peak_state)
-		&& bw_satur_state_is_valid(&coeffs->satur_coeffs, &state->satur_state)
-		&& bw_hp1_state_is_valid(&coeffs->hp1_out_coeffs, &state->hp1_out_state);
+	return bw_hp1_state_is_valid(coeffs ? &coeffs->hp1_in_coeffs : NULL, &state->hp1_in_state)
+		&& bw_svf_state_is_valid(coeffs ? &coeffs->lp2_coeffs : NULL, &state->lp2_1_state)
+		&& bw_svf_state_is_valid(coeffs ? &coeffs->lp2_coeffs : NULL, &state->lp2_2_state)
+		&& bw_peak_state_is_valid(coeffs ? &coeffs->peak_coeffs : NULL, &state->peak_state)
+		&& bw_satur_state_is_valid(coeffs ? &coeffs->satur_coeffs : NULL, &state->satur_state)
+		&& bw_hp1_state_is_valid(coeffs ? &coeffs->hp1_out_coeffs : NULL, &state->hp1_out_state);
 }
 
 #ifdef __cplusplus

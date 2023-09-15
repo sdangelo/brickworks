@@ -694,9 +694,7 @@ static inline char bw_ls1_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_mm1_state_is_valid(&coeffs->mm1_coeffs, &state->mm1_state);
+	return bw_mm1_state_is_valid(coeffs ? &coeffs->mm1_coeffs : NULL, &state->mm1_state);
 }
 
 #ifdef __cplusplus

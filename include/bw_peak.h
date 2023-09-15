@@ -835,9 +835,7 @@ static inline char bw_peak_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_mm2_state_is_valid(&coeffs->mm2_coeffs, &state->mm2_state);
+	return bw_mm2_state_is_valid(coeffs ? &coeffs->mm2_coeffs : NULL, &state->mm2_state);
 }
 
 #undef BW_PEAK_PARAM_Q

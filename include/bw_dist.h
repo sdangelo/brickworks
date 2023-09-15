@@ -627,13 +627,11 @@ static inline char bw_dist_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_hp1_state_is_valid(&coeffs->hp1_coeffs, &state->hp1_state)
-		&& bw_peak_state_is_valid(&coeffs->peak_coeffs, &state->peak_state)
-		&& bw_clip_state_is_valid(&coeffs->clip_coeffs, &state->clip_state)
-		&& bw_satur_state_is_valid(&coeffs->satur_coeffs, &state->satur_state)
-		&& bw_lp1_state_is_valid(&coeffs->lp1_coeffs, &state->lp1_state);
+	return bw_hp1_state_is_valid(coeffs ? &coeffs->hp1_coeffs : NULL, &state->hp1_state)
+		&& bw_peak_state_is_valid(coeffs ? &coeffs->peak_coeffs : NULL, &state->peak_state)
+		&& bw_clip_state_is_valid(coeffs ? &coeffs->clip_coeffs : NULL, &state->clip_state)
+		&& bw_satur_state_is_valid(coeffs ? &coeffs->satur_coeffs : NULL, &state->satur_state)
+		&& bw_lp1_state_is_valid(coeffs ? &coeffs->lp1_coeffs : NULL, &state->lp1_state);
 }
 
 #ifdef __cplusplus

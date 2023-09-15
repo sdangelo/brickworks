@@ -628,13 +628,11 @@ static inline char bw_drive_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_svf_state_is_valid(&coeffs->hp2_coeffs, &state->hp2_state)
-		&& bw_hs1_state_is_valid(&coeffs->hs1_coeffs, &state->hs1_state)
-		&& bw_peak_state_is_valid(&coeffs->peak_coeffs, &state->peak_state)
-		&& bw_satur_state_is_valid(&coeffs->satur_coeffs, &state->satur_state)
-		&& bw_lp1_state_is_valid(&coeffs->lp1_coeffs, &state->lp1_state);
+	return bw_svf_state_is_valid(coeffs ? &coeffs->hp2_coeffs : NULL, &state->hp2_state)
+		&& bw_hs1_state_is_valid(coeffs ? &coeffs->hs1_coeffs : NULL, &state->hs1_state)
+		&& bw_peak_state_is_valid(coeffs ? &coeffs->peak_coeffs : NULL, &state->peak_state)
+		&& bw_satur_state_is_valid(coeffs ? &coeffs->satur_coeffs : NULL, &state->satur_state)
+		&& bw_lp1_state_is_valid(coeffs ? &coeffs->lp1_coeffs : NULL, &state->lp1_state);
 }
 
 #ifdef __cplusplus

@@ -366,8 +366,9 @@ static inline float bw_wah_reset_state(
 	BW_ASSERT_DEEP(bw_wah_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_wah_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_wah_state_is_valid(coeffs, state));
+	BW_ASSERT(bw_is_finite(bp));
 
-	return 0.f;
+	return bp;
 }
 
 static inline void bw_wah_reset_state_multi(

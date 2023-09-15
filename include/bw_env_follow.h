@@ -589,9 +589,7 @@ static inline char bw_env_follow_state_is_valid(
 		return 0;
 #endif
 
-	(void)coeffs;
-
-	return bw_one_pole_state_is_valid(&coeffs->one_pole_coeffs, &state->one_pole_state);
+	return bw_one_pole_state_is_valid(coeffs ? &coeffs->one_pole_coeffs : NULL, &state->one_pole_state);
 }
 
 #ifdef __cplusplus

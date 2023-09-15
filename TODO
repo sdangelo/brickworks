@@ -19,9 +19,6 @@ code:
  specific:
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
-* prewarp control in all derived filtering modules
-* src inside distortions? w/ control from outside?
-* better src filter
 finally:
 * debugging - also check outputs different (incl bw_buf)
 * check all examples again
@@ -76,6 +73,8 @@ code:
 * process allow NULL output?
 * #if __cplusplus >= 201103L ? - see https://stackoverflow.com/questions/5047971/how-do-i-check-for-c11-support
 * get current compression level, knee
+* src inside distortions? w/ control from outside?
+* make all outs nullable?
 
 build system:
 * make makefiles handle paths with spaces etc

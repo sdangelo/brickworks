@@ -802,9 +802,9 @@ static inline char bw_slew_lim_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (!bw_is_finite(coeffs->max_rate_up) || coeffs->max_rate_up < 0.f)
+	if (bw_is_nan(coeffs->max_rate_up) || coeffs->max_rate_up < 0.f)
 		return 0;
-	if (!bw_is_finite(coeffs->max_rate_down) || coeffs->max_rate_down < 0.f)
+	if (bw_is_nan(coeffs->max_rate_down) || coeffs->max_rate_down < 0.f)
 		return 0;
 
 #ifdef BW_DEBUG_DEEP
@@ -814,9 +814,9 @@ static inline char bw_slew_lim_coeffs_is_valid(
 	}
 
 	if (coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs) {
-		if (!bw_is_finite(coeffs->max_inc) || coeffs->max_inc < 0.f)
+		if (bw_is_nan(coeffs->max_inc) || coeffs->max_inc < 0.f)
 			return 0;
-		if (!bw_is_finite(coeffs->max_dec) || coeffs->max_dec < 0.f)
+		if (bw_is_nan(coeffs->max_dec) || coeffs->max_dec < 0.f)
 			return 0;
 	}
 #endif

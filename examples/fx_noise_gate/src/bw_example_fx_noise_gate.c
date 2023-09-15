@@ -30,7 +30,7 @@ void bw_example_fx_noise_gate_set_sample_rate(bw_example_fx_noise_gate *instance
 
 void bw_example_fx_noise_gate_reset(bw_example_fx_noise_gate *instance) {
 	bw_noise_gate_reset_coeffs(&instance->noise_gate_coeffs);
-	bw_noise_gate_reset_state(&instance->noise_gate_coeffs, &instance->noise_gate_state);
+	bw_noise_gate_reset_state(&instance->noise_gate_coeffs, &instance->noise_gate_state, 0.f, 0.f);
 }
 
 void bw_example_fx_noise_gate_process(bw_example_fx_noise_gate *instance, const float** x, float** y, int n_samples) {

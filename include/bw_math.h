@@ -307,7 +307,7 @@ static inline float bw_rcpf(
 /*! <<<```
  *    Returns the reciprocal of `x` (i.e., `1.f / x`).
  *
- *    |`x`| must be in [2^-90, 2^90].
+ *    |`x`| must be in [`8.077935669463161e-28f`, `1.237940039285380e+27`].
  *
  *    Relative error < 0.0013%.
  *

@@ -1141,9 +1141,9 @@ static inline char bw_one_pole_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (coeffs->cutoff_up < 0.f)
+	if (bw_is_nan(coeffs->cutoff_up) || coeffs->cutoff_up < 0.f)
 		return 0;
-	if (coeffs->cutoff_down < 0.f)
+	if (bw_is_nan(coeffs->cutoff_down) || coeffs->cutoff_down < 0.f)
 		return 0;
 	if (!bw_is_finite(coeffs->sticky_thresh) || coeffs->sticky_thresh < 0.f || coeffs->sticky_thresh > 1e18f)
 		return 0;

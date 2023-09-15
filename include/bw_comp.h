@@ -46,6 +46,9 @@
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Fixed missing smoothing filter initialization.</li>
+ *          <li>Fixed missing forced coefficients' update in
+ *              <code>bw_comp_reset_coeffs()</code>.</li>
+ *          <li>Improved and strengthened algorithm.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Clearly specified parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
@@ -364,6 +367,7 @@ struct bw_comp_coeffs {
 	
 	// Coefficients
 	float				kc;
+	float				lt;
 
 	// Parameters
 	float				thresh;
@@ -420,6 +424,15 @@ static inline void bw_comp_set_sample_rate(
 	BW_ASSERT_DEEP(coeffs->state == bw_comp_coeffs_state_set_sample_rate);
 }
 
+static inline void bw_comp_do_update_coeffs_audio(
+		bw_comp_coeffs * BW_RESTRICT coeffs) {
+	bw_env_follow_update_coeffs_audio(&coeffs->env_follow_coeffs);
+	bw_gain_update_coeffs_audio(&coeffs->gain_coeffs);
+	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
+	coeffs->kc = 1.f - bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
+	coeffs->lt = bw_log2f(bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state));
+}
+
 static inline void bw_comp_reset_coeffs(
 		bw_comp_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != NULL);
@@ -430,6 +443,7 @@ static inline void bw_comp_reset_coeffs(
 	bw_gain_reset_coeffs(&coeffs->gain_coeffs);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
+	bw_comp_do_update_coeffs_audio(coeffs);
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->state = bw_comp_coeffs_state_reset_coeffs;
@@ -449,19 +463,10 @@ static inline float bw_comp_reset_state(
 	BW_ASSERT_DEEP(coeffs->state >= bw_comp_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(bw_is_finite(x_0));
+	BW_ASSERT(bw_is_finite(x_sc_0));
 
 	const float env = bw_env_follow_reset_state(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc_0);
-	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
-	float y;
-	if (env > thresh) {
-		float v = thresh * bw_rcpf(env);
-		if (v >= 1.175494350822287e-38f) {
-			v = coeffs->kc * bw_log2f(v);
-			y = v > -126.f ? bw_pow2f(v) * x_0 : thresh;
-		} else
-			y = thresh;
-	} else
-		y = x_0;
+	float y = env > bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state) ? bw_pow2f(coeffs->kc * (coeffs->lt - bw_log2f(env))) * x_0 : x_0;
 	y = bw_gain_get_gain_cur(&coeffs->gain_coeffs) * y;
 
 #ifdef BW_DEBUG_DEEP
@@ -526,6 +531,7 @@ static inline void bw_comp_update_coeffs_audio(
 	bw_gain_update_coeffs_audio(&coeffs->gain_coeffs);
 	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state, coeffs->thresh);
 	coeffs->kc = 1.f - bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_ratio_state, coeffs->ratio);
+	coeffs->lt = bw_log2f(bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state));
 
 	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_comp_coeffs_state_reset_coeffs);
@@ -545,17 +551,7 @@ static inline float bw_comp_process1(
 	BW_ASSERT(bw_is_finite(x_sc));
 
 	const float env = bw_env_follow_process1(&coeffs->env_follow_coeffs, &state->env_follow_state, x_sc);
-	const float thresh = bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state);
-	float y;
-	if (env > thresh) {
-		float v = thresh * bw_rcpf(env);
-		if (v >= 1.175494350822287e-38f) {
-			v = coeffs->kc * bw_log2f(v);
-			y = v > -126.f ? bw_pow2f(v) * x : thresh;
-		} else
-			y = thresh;
-	} else
-		y = x;
+	float y = env > bw_one_pole_get_y_z1(&coeffs->smooth_thresh_state) ? bw_pow2f(coeffs->kc * (coeffs->lt - bw_log2f(env))) * x : x;
 	y = bw_gain_process1(&coeffs->gain_coeffs, y);
 
 	BW_ASSERT_DEEP(bw_comp_coeffs_is_valid(coeffs));
@@ -580,6 +576,8 @@ static inline void bw_comp_process(
 	BW_ASSERT_DEEP(bw_comp_state_is_valid(coeffs, state));
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(x_sc != NULL);
+	BW_ASSERT_DEEP(bw_has_only_finite(x_sc, n_samples));
 	BW_ASSERT(y != NULL);
 
 	bw_comp_update_coeffs_ctrl(coeffs);
@@ -747,6 +745,8 @@ static inline char bw_comp_coeffs_is_valid(
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->state >= bw_comp_coeffs_state_reset_coeffs) {
 		if (!bw_is_finite(coeffs->kc) || coeffs->kc < 0.f || coeffs->kc > 1.f)
+			return 0;
+		if (!bw_is_finite(coeffs->lt))
 			return 0;
 
 		if (!bw_one_pole_state_is_valid(&coeffs->smooth_coeffs, &coeffs->smooth_thresh_state))

@@ -33,8 +33,8 @@ void bw_example_fx_balance_set_sample_rate(bw_example_fx_balance *instance, floa
 void bw_example_fx_balance_reset(bw_example_fx_balance *instance) {
 	bw_balance_reset_coeffs(&instance->balance_coeffs);
 	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
-	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_l_state);
-	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_r_state);
+	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_l_state, 0.f);
+	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_r_state, 0.f);
 }
 
 void bw_example_fx_balance_process(bw_example_fx_balance *instance, const float** x, float** y, int n_samples) {

@@ -180,8 +180,8 @@ static inline void bw_svf_reset_state_multi(
  *    array.
  *
  *    The corresponding initial lowpass, bandpass, and highpass output values
- *    are put into `y_lp_0`, `y_bp_0`, and `y_hp_0` respectively, if they are
- *    not `NULL`.
+ *    are put into the `y_lp_0`, `y_bp_0`, and `y_hp_0` arrays, respectively, if
+ *    they are not `NULL`.
  *
  *    #### bw_svf_update_coeffs_ctrl()
  *  ```>>> */

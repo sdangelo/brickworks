@@ -28,6 +28,7 @@ finally:
 * state that you need different output buffers to reset
 * thank scientific paper authors
 * change config.h in examples version 1.0.0
+* "Templates must have C++ linkage"?
 
 build system:
 * single header generation (vs modules in bwp... to think about)
@@ -75,6 +76,7 @@ code:
 * get current compression level, knee
 * src inside distortions? w/ control from outside?
 * make all outs nullable?
+* make all reset state outs nullable (svf, phase_gen, ...)?
 
 build system:
 * make makefiles handle paths with spaces etc

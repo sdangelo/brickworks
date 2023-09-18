@@ -44,16 +44,18 @@ void bw_example_synth_simple_set_sample_rate(bw_example_synth_simple *instance, 
 
 void bw_example_synth_simple_reset(bw_example_synth_simple *instance) {
 	bw_phase_gen_reset_coeffs(&instance->phase_gen_coeffs);
-	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state, 0.f);
+	float p, inc;
+	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state, 0.f, &p, &inc);
 	bw_osc_pulse_reset_coeffs(&instance->osc_pulse_coeffs);
 	bw_osc_filt_reset_state(&instance->osc_filt_state);
 	bw_svf_reset_coeffs(&instance->svf_coeffs);
-	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state, 0.f);
+	float lp, bp, hp;
+	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state, 0.f, &lp, &bp, &hp);
 	bw_env_gen_reset_coeffs(&instance->env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->env_gen_coeffs, &instance->env_gen_state);
 	bw_gain_reset_coeffs(&instance->gain_coeffs);
 	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
-	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state);
+	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state, 0.f);
 	instance->note = -1;
 }
 

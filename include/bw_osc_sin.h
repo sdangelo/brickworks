@@ -41,6 +41,7 @@
  *          <li>Added overloaded C++ <code>oscSinProcess()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -80,15 +81,18 @@ extern "C" {
 /*! api {{{
  *    #### bw_osc_sin_process1()
  *  ```>>> */
-static inline float bw_osc_sin_process1(float x);
+static inline float bw_osc_sin_process1(
+	float x);
 /*! <<<```
- *    Processes one input sample `x`, indicating the normalized phase, and
- *    returns the corresponding output
- *    sample.
+ *    Processes one input sample `x`, representing the normalized phase, and
+ *    returns the corresponding output sample.
  *
  *    #### bw_osc_sin_process()
  *  ```>>> */
-static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples);
+static inline void bw_osc_sin_process(
+	const float * x,
+	float *       y,
+	size_t        n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
@@ -96,7 +100,11 @@ static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples
  *
  *    #### bw_osc_sin_process_multi()
  *  ```>>> */
-static inline void bw_osc_sin_process_multi(const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_osc_sin_process_multi(
+	const float * const * x,
+	float * const *       y,
+	size_t                n_channels,
+	size_t                n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
@@ -118,16 +126,39 @@ static inline void bw_osc_sin_process_multi(const float * const *x, float * cons
 extern "C" {
 #endif
 
-static inline float bw_osc_sin_process1(float x) {
-	return bw_sin2pif(x);
+static inline float bw_osc_sin_process1(
+		float x) {
+	BW_ASSERT(bw_is_finite(x));
+
+	const float y = bw_sin2pif(x);
+
+	BW_ASSERT(bw_is_finite(y));
+
+	return y;
 }
 
-static inline void bw_osc_sin_process(const float *x, float *y, size_t n_samples) {
+static inline void bw_osc_sin_process(
+		const float * x,
+		float *       y,
+		size_t        n_samples) {
+	BW_ASSERT(x != NULL);
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(y != NULL);
+
 	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_osc_sin_process1(x[i]);
+
+	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
-static inline void bw_osc_sin_process_multi(const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_osc_sin_process_multi(
+		const float * const * x,
+		float * const *       y,
+		size_t                n_channels,
+		size_t                n_samples) {
+	BW_ASSERT(x != NULL);
+	BW_ASSERT(y != NULL);
+
 	for (size_t i = 0; i < n_channels; i++)
 		bw_osc_sin_process(x[i], y[i], n_samples);
 }
@@ -146,15 +177,15 @@ namespace Brickworks {
  *  ```>>> */
 template<size_t N_CHANNELS>
 void oscSinProcess(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples);
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples);
 
 template<size_t N_CHANNELS>
 void oscSinProcess(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples);
 /*! <<<```
  *  }}} */
 
@@ -165,17 +196,17 @@ void oscSinProcess(
 
 template<size_t N_CHANNELS>
 inline void oscSinProcess(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples) {
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples) {
 	bw_osc_sin_process_multi(x, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void oscSinProcess(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples) {
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples) {
 	oscSinProcess<N_CHANNELS>(x.data(), y.data(), nSamples);
 }
 

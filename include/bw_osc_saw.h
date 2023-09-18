@@ -106,7 +106,7 @@ static inline void bw_osc_saw_init(bw_osc_saw_coeffs *BW_RESTRICT coeffs);
 static inline float bw_osc_saw_process1(const bw_osc_saw_coeffs *BW_RESTRICT coeffs, float x);
 static inline float bw_osc_saw_process1_antialias(const bw_osc_saw_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc);
 /*! <<<```
- *    These function process one input sample `x`, indicating the normalized
+ *    These function process one input sample `x`, representing the normalized
  *    phase, using `coeffs`. They return the corresponding output sample.
  *
  *    In particular:

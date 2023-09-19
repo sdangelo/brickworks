@@ -30,7 +30,7 @@ void bw_example_fx_trem_set_sample_rate(bw_example_fx_trem *instance, float samp
 
 void bw_example_fx_trem_reset(bw_example_fx_trem *instance) {
 	bw_trem_reset_coeffs(&instance->trem_coeffs);
-	bw_trem_reset_state(&instance->trem_coeffs, &instance->trem_state);
+	bw_trem_reset_state(&instance->trem_coeffs, &instance->trem_state, 0.f);
 }
 
 void bw_example_fx_trem_process(bw_example_fx_trem *instance, const float** x, float** y, int n_samples) {

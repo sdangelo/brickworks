@@ -77,6 +77,7 @@ code:
 * src inside distortions? w/ control from outside?
 * make all outs nullable?
 * make all reset state outs nullable (svf, phase_gen, ...)?
+* ring mod fx module?
 
 build system:
 * make makefiles handle paths with spaces etc

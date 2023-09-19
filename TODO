@@ -78,6 +78,7 @@ code:
 * make all outs nullable?
 * make all reset state outs nullable (svf, phase_gen, ...)?
 * ring mod fx module?
+* bitcrusher module?
 
 build system:
 * make makefiles handle paths with spaces etc

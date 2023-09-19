@@ -26,12 +26,13 @@ void bw_example_fx_bitcrush_init(bw_example_fx_bitcrush *instance) {
 }
 
 void bw_example_fx_bitcrush_set_sample_rate(bw_example_fx_bitcrush *instance, float sample_rate) {
-	(void)instance;
-	(void)sample_rate;
+	bw_sr_reduce_set_sample_rate(&instance->sr_reduce_coeffs, sample_rate);
+	bw_bd_reduce_set_sample_rate(&instance->bd_reduce_coeffs, sample_rate);
 }
 
 void bw_example_fx_bitcrush_reset(bw_example_fx_bitcrush *instance) {
-	bw_sr_reduce_reset_state(&instance->sr_reduce_coeffs, &instance->sr_reduce_state);
+	bw_sr_reduce_reset_coeffs(&instance->sr_reduce_coeffs);
+	bw_sr_reduce_reset_state(&instance->sr_reduce_coeffs, &instance->sr_reduce_state, 0.f);
 	bw_bd_reduce_reset_coeffs(&instance->bd_reduce_coeffs);
 }
 

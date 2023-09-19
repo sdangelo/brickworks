@@ -33,6 +33,7 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
+ *          <li>Added <code>bw_bd_reduce_set_sample_rate()</code>.</li>
  *          <li><code>bw_bd_reduce_process()</code> and
  *              <code>bw_bd_reduce_process_multi()</code> now use
  *              <code>size_t</code> to count samples and channels.</li>
@@ -42,6 +43,8 @@
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clearly specified parameter validity ranges.</li>
+ *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -87,38 +90,56 @@ typedef struct bw_bd_reduce_coeffs bw_bd_reduce_coeffs;
  *
  *    #### bw_bd_reduce_init()
  *  ```>>> */
-static inline void bw_bd_reduce_init(bw_bd_reduce_coeffs *BW_RESTRICT coeffs);
+static inline void bw_bd_reduce_init(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
+ *    #### bw_bw_reduce_set_sample_rate()
+ *  ```>>> */
+static inline void bw_bd_reduce_set_sample_rate(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	float                             sample_rate);
+/*! <<<```
+ *    Sets the `sample_rate` (Hz) value in `coeffs`.
+ *
  *    #### bw_bd_reduce_reset_coeffs()
  *  ```>>> */
-static inline void bw_bd_reduce_reset_coeffs(bw_bd_reduce_coeffs *BW_RESTRICT coeffs);
+static inline void bw_bd_reduce_reset_coeffs(
+	bw_bd_reduce_coeffs *BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_bd_reduce_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_bd_reduce_update_coeffs_ctrl(bw_bd_reduce_coeffs *BW_RESTRICT coeffs);
+static inline void bw_bd_reduce_update_coeffs_ctrl(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
  *    #### bw_bd_reduce_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_bd_reduce_update_coeffs_audio(bw_bd_reduce_coeffs *BW_RESTRICT coeffs);
+static inline void bw_bd_reduce_update_coeffs_audio(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_bd_reduce_process1()
  *  ```>>> */
-static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT coeffs, float x);
+static inline float bw_bd_reduce_process1(
+	const bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	float                                   x);
 /*! <<<```
  *    Processes one input sample `x` using `coeffs`. Returns the corresponding
  *    output sample.
  *
  *    #### bw_bd_reduce_process()
  *  ```>>> */
-static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples);
+static inline void bw_bd_reduce_process(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	const float *                     x,
+	float *                           y,
+	size_t                            n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x` and fills the
  *    first `n_samples` of the output buffer `y`, while using and updating
@@ -126,7 +147,12 @@ static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs,
  *
  *    #### bw_bd_reduce_process_multi()
  *  ```>>> */
-static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float * const *x, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_bd_reduce_process_multi(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	const float * const *             x,
+	float * const *                   y,
+	size_t                            n_channels,
+	size_t                            n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x` and
  *    fills the first `n_samples` of the `n_channels` output buffers `y`, while
@@ -134,11 +160,27 @@ static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT c
  *
  *    #### bw_bd_reduce_set_bit_depth()
  *  ```>>> */
-static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, char value);
+static inline void bw_bd_reduce_set_bit_depth(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	char                              value);
 /*! <<<```
- *    Sets the output bit depth `value` in `coeffs`. `value` must be strictly positive.
+ *    Sets the output bit depth `value` in `coeffs`.
+ *
+ *    Valid range: [`1`, `64`].
  *
  *    Default value: `16`.
+ *
+ *    #### bw_bd_reduce_coeffs_is_valid()
+ *  ```>>> */
+static inline char bw_bd_reduce_coeffs_is_valid(
+	const bw_bd_reduce_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Tries to determine whether `coeffs` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `coeffs` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_bd_reduce_coeffs`.
  *  }}} */
 
 #ifdef __cplusplus
@@ -156,27 +198,65 @@ static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT c
 extern "C" {
 #endif
 
+#ifdef BW_DEBUG_DEEP
+enum bw_bd_reduce_coeffs_state {
+	bw_bd_reduce_coeffs_state_invalid,
+	bw_bd_reduce_coeffs_state_init,
+	bw_bd_reduce_coeffs_state_set_sample_rate,
+	bw_bd_reduce_coeffs_state_reset_coeffs
+};
+#endif
+
 struct bw_bd_reduce_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum bw_bd_reduce_coeffs_state	state;
+#endif
+
 	// Coefficients
-	float	ki;
-	float	k;
-	float	max;
+	float				ki;
+	float				k;
+	float				max;
 	
 	// Parameters
-	char	bit_depth;
-	char	bit_depth_prev;
+	char				bit_depth;
+	char				bit_depth_prev;
 };
 
-static inline void bw_bd_reduce_init(bw_bd_reduce_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_bd_reduce_init(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
 	coeffs->bit_depth = 16;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->hash = bw_hash_sdbm("bw_bd_reduce_coeffs");
+	coeffs->state = bw_bd_reduce_coeffs_state_init;
+#endif
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_bd_reduce_coeffs_state_init);
 }
 
-static inline void bw_bd_reduce_reset_coeffs(bw_bd_reduce_coeffs *BW_RESTRICT coeffs) {
-	coeffs->bit_depth_prev = 0;
-	bw_bd_reduce_update_coeffs_ctrl(coeffs);
+static inline void bw_bd_reduce_set_sample_rate(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		float                             sample_rate) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
+
+	(void)coeffs;
+	(void)sample_rate;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_bd_reduce_coeffs_state_set_sample_rate;
+#endif
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_bd_reduce_coeffs_state_set_sample_rate);
 }
 
-static inline void bw_bd_reduce_update_coeffs_ctrl(bw_bd_reduce_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_bd_reduce_do_update_coeffs_ctrl(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
 	if (coeffs->bit_depth_prev != coeffs->bit_depth) {
 		coeffs->k = bw_pow2f(coeffs->bit_depth - 1);
 		coeffs->ki = bw_rcpf(coeffs->k);
@@ -185,29 +265,144 @@ static inline void bw_bd_reduce_update_coeffs_ctrl(bw_bd_reduce_coeffs *BW_RESTR
 	}
 }
 
-static inline void bw_bd_reduce_update_coeffs_audio(bw_bd_reduce_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_bd_reduce_reset_coeffs(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_set_sample_rate);
+
+	coeffs->bit_depth_prev = 0;
+	bw_bd_reduce_do_update_coeffs_ctrl(coeffs);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_bd_reduce_coeffs_state_reset_coeffs;
+#endif
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_bd_reduce_coeffs_state_reset_coeffs);
+}
+
+static inline void bw_bd_reduce_update_coeffs_ctrl(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+
+	bw_bd_reduce_do_update_coeffs_ctrl(coeffs);
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+}
+
+static inline void bw_bd_reduce_update_coeffs_audio(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+
 	(void)coeffs;
 }
 
-static inline float bw_bd_reduce_process1(const bw_bd_reduce_coeffs *BW_RESTRICT coeffs, float x) {
-	return coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + 0.5f);
+static inline float bw_bd_reduce_process1(
+		const bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		float                                   x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(x));
+
+	const float y = coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + 0.5f);
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(y));
+
+	return y;
 }
 
-static inline void bw_bd_reduce_process(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float *x, float *y, size_t n_samples) {
+static inline void bw_bd_reduce_process(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		const float *                     x,
+		float *                           y,
+		size_t                            n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(y != NULL);
+
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_bd_reduce_process1(coeffs, x[i]);
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
-static inline void bw_bd_reduce_process_multi(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, const float * const *x, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_bd_reduce_process_multi(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		const float * const *             x,
+		float * const *                   y,
+		size_t                            n_channels,
+		size_t                            n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT(y != NULL);
+
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++)
 		for (size_t j = 0; j < n_channels; j++)
 			y[j][i] = bw_bd_reduce_process1(coeffs, x[j][i]);
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_bd_reduce_set_bit_depth(bw_bd_reduce_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_bd_reduce_set_bit_depth(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		char                              value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+	BW_ASSERT(value >= 1 && value <= 64);
+
 	coeffs->bit_depth = value;
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+}
+
+static inline char bw_bd_reduce_coeffs_is_valid(
+		const bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->hash != bw_hash_sdbm("bw_bd_reduce_coeffs"))
+		return 0;
+	if (coeffs->state < bw_bd_reduce_coeffs_state_init || coeffs->state > bw_bd_reduce_coeffs_state_reset_coeffs)
+		return 0;
+#endif
+
+	if (coeffs->bit_depth < 1 || coeffs->bit_depth > 64)
+		return 0;
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs) {
+		if (coeffs->bit_depth_prev < 1 || coeffs->bit_depth_prev > 64)
+			return 0;
+		if (!bw_is_finite(coeffs->k) || coeffs->k <= 0.f)
+			return 0;
+		if (!bw_is_finite(coeffs->ki) || coeffs->ki <= 0.f)
+			return 0;
+		if (!bw_is_finite(coeffs->max) || coeffs->max < 0.5f || coeffs->max > 1.f)
+			return 0;
+	}
+#endif
+
+	return 1;
 }
 
 #ifdef __cplusplus
@@ -226,18 +421,24 @@ template<size_t N_CHANNELS>
 class BDReduce {
 public:
 	BDReduce();
-	
-	void reset();
-	void process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples);
-	void process(
-		const std::array<const float *, N_CHANNELS> x,
-		const std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
 
-	void setBitDepth(char value);
+	void setSampleRate(
+		float sampleRate);
+
+	void reset();
+
+	void process(
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples);
+
+	void process(
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples);
+
+	void setBitDepth(
+		char value);
 /*! <<<...
  *  }
  *  ```
@@ -258,28 +459,35 @@ inline BDReduce<N_CHANNELS>::BDReduce() {
 }
 
 template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::setSampleRate(
+		float sampleRate) {
+	bw_bd_reduce_set_sample_rate(&coeffs, sampleRate);
+}
+
+template<size_t N_CHANNELS>
 inline void BDReduce<N_CHANNELS>::reset() {
 	bw_bd_reduce_reset_coeffs(&coeffs);
 }
 
 template<size_t N_CHANNELS>
 inline void BDReduce<N_CHANNELS>::process(
-		const float * const *x,
-		float * const *y,
-		size_t nSamples) {
+		const float * const * x,
+		float * const *       y,
+		size_t                nSamples) {
 	bw_bd_reduce_process_multi(&coeffs, x, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void BDReduce<N_CHANNELS>::process(
-		const std::array<const float *, N_CHANNELS> x,
-		const std::array<float *, N_CHANNELS> y,
-		size_t nSamples) {
+		std::array<const float *, N_CHANNELS> x,
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>
-inline void BDReduce<N_CHANNELS>::setBitDepth(char value) {
+inline void BDReduce<N_CHANNELS>::setBitDepth(
+		char value) {
 	bw_bd_reduce_set_bit_depth(&coeffs, value);
 }
 

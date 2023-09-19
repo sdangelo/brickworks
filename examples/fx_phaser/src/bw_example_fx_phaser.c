@@ -30,7 +30,7 @@ void bw_example_fx_phaser_set_sample_rate(bw_example_fx_phaser *instance, float 
 
 void bw_example_fx_phaser_reset(bw_example_fx_phaser *instance) {
 	bw_phaser_reset_coeffs(&instance->phaser_coeffs);
-	bw_phaser_reset_state(&instance->phaser_coeffs, &instance->phaser_state);
+	bw_phaser_reset_state(&instance->phaser_coeffs, &instance->phaser_state, 0.f);
 }
 
 void bw_example_fx_phaser_process(bw_example_fx_phaser *instance, const float** x, float** y, int n_samples) {

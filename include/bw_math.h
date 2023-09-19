@@ -486,7 +486,7 @@ static inline float bw_sqrtf(
 /*! <<<```
  *    Returns an approximation of the square root of `x`.
  *
- *    `x` must be finite and greater than or equal to `0.f`.
+ *    `x` must be finite and non-negative.
  *
  *    Absolute error < 1.09e-19 or relative error < 0.0007%, whatever is worse.
  *

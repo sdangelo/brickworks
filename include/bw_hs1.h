@@ -211,9 +211,10 @@ static inline void bw_hs1_set_cutoff(
  *
  *    `value` must be finite and positive.
  *
- *    By the time `bw_hs1_update_coeffs_ctrl()`, `bw_hs1_update_coeffs_audio()`,
- *    `bw_hs1_process1()`, `bw_hs1_process()`, or `bw_hs1_process_multi()` is
- *    called, `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e12f`].
+ *    By the time `bw_hs1_reset_coeffs()`, `bw_hs1_update_coeffs_ctrl()`,
+ *    `bw_hs1_update_coeffs_audio()`, `bw_hs1_process1()`, `bw_hs1_process()`,
+ *    or `bw_hs1_process_multi()` is called, `cutoff * bw_sqrtf(high_gain)` must
+ *    be in [`1e-6f`, `1e12f`].
  *
  *    Default value: `1e3f`.
  *
@@ -254,9 +255,10 @@ static inline void bw_hs1_set_high_gain_lin(
  *
  *    Valid range: [`1e-30f`, `1e30f`].
  *
- *    By the time `bw_hs1_update_coeffs_ctrl()`, `bw_hs1_update_coeffs_audio()`,
- *    `bw_hs1_process1()`, `bw_hs1_process()`, or `bw_hs1_process_multi()` is
- *    called, `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e12f`].
+ *    By the time `bw_hs1_reset_coeffs()`, `bw_hs1_update_coeffs_ctrl()`,
+ *    `bw_hs1_update_coeffs_audio()`, `bw_hs1_process1()`, `bw_hs1_process()`,
+ *    or `bw_hs1_process_multi()` is called, `cutoff * bw_sqrtf(high_gain)` must
+ *    be in [`1e-6f`, `1e12f`].
  *
  *    Default value: `1.f`.
  *
@@ -271,9 +273,10 @@ static inline void bw_hs1_set_high_gain_dB(
  *
  *    Valid range: [`-600.f`, `600.f`].
  *
- *    By the time `bw_hs1_update_coeffs_ctrl()`, `bw_hs1_update_coeffs_audio()`,
- *    `bw_hs1_process1()`, `bw_hs1_process()`, or `bw_hs1_process_multi()` is
- *    called, `cutoff * bw_sqrtf(high_gain)` must be in [`1e-6f`, `1e12f`].
+ *    By the time `bw_hs1_reset_coeffs()`, `bw_hs1_update_coeffs_ctrl()`,
+ *    `bw_hs1_update_coeffs_audio()`, `bw_hs1_process1()`, `bw_hs1_process()`,
+ *    or `bw_hs1_process_multi()` is called, `cutoff * bw_sqrtf(high_gain)` must
+ *    be in [`1e-6f`, `1e12f`].
  *
  *    Default value: `0.f`.
  *
@@ -414,6 +417,7 @@ static inline void bw_hs1_reset_coeffs(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_set_sample_rate);
+	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
 
 	coeffs->update = 1;
 	bw_hs1_update_mm1_params(coeffs);

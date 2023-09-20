@@ -52,7 +52,7 @@ void bw_example_synth_simple_reset(bw_example_synth_simple *instance) {
 	float lp, bp, hp;
 	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state, 0.f, &lp, &bp, &hp);
 	bw_env_gen_reset_coeffs(&instance->env_gen_coeffs);
-	bw_env_gen_reset_state(&instance->env_gen_coeffs, &instance->env_gen_state);
+	bw_env_gen_reset_state(&instance->env_gen_coeffs, &instance->env_gen_state, 0);
 	bw_gain_reset_coeffs(&instance->gain_coeffs);
 	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
 	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state, 0.f);

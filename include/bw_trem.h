@@ -222,7 +222,7 @@ static inline void bw_trem_set_amount(
  *
  *    Default value: `1.f`.
  *
-*    #### bw_trem_coeffs_is_valid()
+ *    #### bw_trem_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_trem_coeffs_is_valid(
 	const bw_trem_coeffs * BW_RESTRICT coeffs);

@@ -371,7 +371,8 @@ static inline float bw_osc_pulse_process1(
 }
 
 // PolyBLEP residual based on Parzen window (4th-order B-spline), one-sided (x in [0, 2])
-static inline float bw_osc_pulse_blep_diff(float x) {
+static inline float bw_osc_pulse_blep_diff(
+		float x) {
 	return x < 1.f
 		? x * ((0.25f * x - 0.6666666666666666f) * x * x + 1.333333333333333f) - 1.f
 		: x * (x * ((0.6666666666666666f - 0.08333333333333333f * x) * x - 2.f) + 2.666666666666667f) - 1.333333333333333f;
@@ -393,7 +394,7 @@ static inline float bw_osc_pulse_process1_antialias(
 	const float pw_m_phase = pw - x;
 	float v = bw_copysignf(1.f, pw_m_phase); // pw = phase case should be properly compensated by the AA
 	const float a_inc = bw_absf(x_inc);
-	if (x_inc > 1e-6f) {
+	if (a_inc > 1e-6f) {
 		const float phase_inc_2 = a_inc + a_inc;
 		const float phase_inc_rcp = bw_rcpf(a_inc);
 		const float phase_2 = 0.5f * v + 0.5f - pw_m_phase;

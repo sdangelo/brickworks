@@ -12,40 +12,38 @@ CXXFLAGS := \
 	-I${ROOT_DIR}/../../../include \
 	-I${VST3_SDK_DIR} \
 	-O3 \
-	-Wall \
-	-Wextra \
-	-Wpedantic \
 	-std=c++11
 LDFLAGS := \
 	-shared
 
 SOURCES_COMMON := \
-	${COMMON_DIR}/entry.cpp \
-	${COMMON_DIR}/plugin.cpp \
-	${COMMON_DIR}/controller.cpp \
-	\
-	${VST3_SDK_DIR}/base/source/fobject.cpp \
-	${VST3_SDK_DIR}/base/source/baseiids.cpp \
-	${VST3_SDK_DIR}/base/source/fstreamer.cpp \
-	${VST3_SDK_DIR}/base/source/fstring.cpp \
-	${VST3_SDK_DIR}/base/source/fbuffer.cpp \
-	${VST3_SDK_DIR}/base/source/updatehandler.cpp \
-	${VST3_SDK_DIR}/base/thread/source/flock.cpp \
-	${VST3_SDK_DIR}/pluginterfaces/base/coreiids.cpp \
-	${VST3_SDK_DIR}/pluginterfaces/base/funknown.cpp \
-	${VST3_SDK_DIR}/pluginterfaces/base/ustring.cpp \
-	${VST3_SDK_DIR}/pluginterfaces/base/conststringtable.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/main/pluginfactory.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/main/moduleinit.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/common/commoniids.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/common/pluginview.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vstcomponentbase.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vstcomponent.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vstaudioeffect.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vstinitiids.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vstbus.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vsteditcontroller.cpp \
-	${VST3_SDK_DIR}/public.sdk/source/vst/vstparameters.cpp
+	entry.cpp \
+	plugin.cpp \
+	controller.cpp \
+
+SOURCES_VST3_SDK := \
+	base/source/fobject.cpp \
+	base/source/baseiids.cpp \
+	base/source/fstreamer.cpp \
+	base/source/fstring.cpp \
+	base/source/fbuffer.cpp \
+	base/source/updatehandler.cpp \
+	base/thread/source/flock.cpp \
+	pluginterfaces/base/coreiids.cpp \
+	pluginterfaces/base/funknown.cpp \
+	pluginterfaces/base/ustring.cpp \
+	pluginterfaces/base/conststringtable.cpp \
+	public.sdk/source/main/pluginfactory.cpp \
+	public.sdk/source/main/moduleinit.cpp \
+	public.sdk/source/common/commoniids.cpp \
+	public.sdk/source/common/pluginview.cpp \
+	public.sdk/source/vst/vstcomponentbase.cpp \
+	public.sdk/source/vst/vstcomponent.cpp \
+	public.sdk/source/vst/vstaudioeffect.cpp \
+	public.sdk/source/vst/vstinitiids.cpp \
+	public.sdk/source/vst/vstbus.cpp \
+	public.sdk/source/vst/vsteditcontroller.cpp \
+	public.sdk/source/vst/vstparameters.cpp
 
 RESOURCE_SOURCES := $(shell find ${TEMPLATE_DIR}/Contents/Resources/ -type f)
 RESOURCE_FILES := $(shell printf '%s\n' ${RESOURCE_SOURCES} | sed s:^${TEMPLATE_DIR}/::g)

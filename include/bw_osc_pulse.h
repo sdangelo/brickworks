@@ -48,6 +48,8 @@
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clearly specified validity ranges for audio-rate signals.</li>
+ *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:
@@ -98,38 +100,50 @@ typedef struct bw_osc_pulse_coeffs bw_osc_pulse_coeffs;
  *
  *    #### bw_osc_pulse_init()
  *  ```>>> */
-static inline void bw_osc_pulse_init(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
+static inline void bw_osc_pulse_init(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Initializes input parameter values in `coeffs`.
  *
  *    #### bw_osc_pulse_set_sample_rate()
  *  ```>>> */
-static inline void bw_osc_pulse_set_sample_rate(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float sample_rate);
+static inline void bw_osc_pulse_set_sample_rate(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	float                             sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
  *    #### bw_osc_pulse_reset_coeffs()
  *  ```>>> */
-static inline void bw_osc_pulse_reset_coeffs(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
+static inline void bw_osc_pulse_reset_coeffs(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
  *    #### bw_osc_pulse_update_coeffs_ctrl()
  *  ```>>> */
-static inline void bw_osc_pulse_update_coeffs_ctrl(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
+static inline void bw_osc_pulse_update_coeffs_ctrl(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers control-rate update of coefficients in `coeffs`.
  *
  *    #### bw_osc_pulse_update_coeffs_audio()
  *  ```>>> */
-static inline void bw_osc_pulse_update_coeffs_audio(bw_osc_pulse_coeffs *BW_RESTRICT coeffs);
+static inline void bw_osc_pulse_update_coeffs_audio(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_osc_pulse_process1\*()
  *  ```>>> */
-static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x);
-static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc);
+static inline float bw_osc_pulse_process1(
+	const bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	float                                   x);
+
+static inline float bw_osc_pulse_process1_antialias(
+	const bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	float                                   x,
+	float                                   x_inc);
 /*! <<<```
  *    These function process one input sample `x`, representing the normalized
  *    phase, using `coeffs`. They return the corresponding output sample.
@@ -138,35 +152,63 @@ static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *B
  *     * `bw_osc_pulse_process1()` assumes that antialiasing is disabled;
  *     * `bw_osc_pulse_process1_antialias()` assumes that antialiasing is
  *       enabled and requires the corresponding phase increment value to be
- *       passed via `x_phase_inc`.
+ *       passed via `x_inc`.
+ *
+ *    Whether antialiasing is enabled or not is unchecked even for debugging
+ *    purposes.
+ *
+ *    `x` must be in [`0.f`, `1.f`).
+ *
+ *    `x_inc` must be in [`-0.5f`, `0.5f`].
  *
  *    #### bw_osc_pulse_process()
  *  ```>>> */
-static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, size_t n_samples);
+static inline void bw_osc_pulse_process(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	const float *                     x,
+	const float *                     x_inc,
+	float *                           y,
+	size_t                            n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
  *    buffer `y`, while using and updating `coeffs` (control and audio rate).
  *
- *    If antialiasing is enabled, `x_phase_inc` must contain phase increment
+ *    If antialiasing is enabled, `x_inc` must contain phase increment
  *    values, otherwise it is ignored and can be `NULL`.
+ *
+ *    All samples in `x` must be in [`0.f`, `1.f`).
+ *
+ *    All samples is `x_inc`, if not ignored, must be in [`-0.5f`, `0.5f`].
  *
  *    #### bw_osc_pulse_process_multi()
  *  ```>>> */
-static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float * const *y, size_t n_channels, size_t n_samples);
+static inline void bw_osc_pulse_process_multi(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	const float * const *             x,
+	const float * const *             x_inc,
+	float * const *                   y,
+	size_t                            n_channels,
+	size_t                            n_samples);
 /*! <<<```
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
  *    of the `n_channels` output buffers `y`, while using and updating the
  *    common `coeffs` (control and audio rate).
  *
- *    If antialiasing is enabled, `x_phase_inc` must contain `n_channels`
- *    buffers of phase increment values, otherwise it is ignored and can be
- *    `NULL`.
+ *    If antialiasing is enabled, each of the `n_channels` buffers pointed by
+ *    `x_inc` must contain phase increment values, otherwise `x_inc` is ignored
+ *    and can be `NULL`.
+ *
+ *    All samples in `x` must be in [`0.f`, `1.f`).
+ *
+ *    All samples is `x_inc`, if not ignored, must be in [`-0.5f`, `0.5f`].
  *
  *    #### bw_osc_pulse_set_antialiasing()
  *  ```>>> */
-static inline void bw_osc_pulse_set_antialiasing(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, char value);
+static inline void bw_osc_pulse_set_antialiasing(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	char                              value);
 /*! <<<```
  *    Sets whether the antialiasing is on (`value` non-`0`) or off (`0`) in
  *    `coeffs`.
@@ -175,12 +217,27 @@ static inline void bw_osc_pulse_set_antialiasing(bw_osc_pulse_coeffs *BW_RESTRIC
  *
  *    #### bw_osc_pulse_set_pulse_width()
  *  ```>>> */
-static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float value);
+static inline void bw_osc_pulse_set_pulse_width(
+	bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+	float                             value);
 /*! <<<```
- *    Sets the pulse width (actually, the duty cycle) to `value` (range
- *    [`0.f`, `1.f`]) in `coeffs`.
+ *    Sets the pulse width (actually, the duty cycle) to `value` in `coeffs`.
+ *
+ *    Valid range: [`0.f` (0% duty cycle), `1.f` (100% duty cycle)].
  *
  *    Default value: `0.5f`.
+ *
+ *    #### bw_osc_pulse_coeffs_is_valid()
+ *  ```>>> */
+static inline char bw_osc_pulse_coeffs_is_valid(
+	const bw_osc_pulse_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Tries to determine whether `coeffs` is valid and returns non-`0` if it
+ *    seems to be the case and `0` if it is certainly not. False positives are
+ *    possible, false negatives are not.
+ *
+ *    `coeffs` must at least point to a readable memory block of size greater
+ *    than or equal to that of `bw_osc_pulse_coeffs`.
  *  }}} */
 
 #ifdef __cplusplus
@@ -199,43 +256,118 @@ static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT
 extern "C" {
 #endif
 
+#ifdef BW_DEBUG_DEEP
+enum bw_osc_pulse_coeffs_state {
+	bw_osc_pulse_coeffs_state_invalid,
+	bw_osc_pulse_coeffs_state_init,
+	bw_osc_pulse_coeffs_state_set_sample_rate,
+	bw_osc_pulse_coeffs_state_reset_coeffs
+};
+#endif
+
 struct bw_osc_pulse_coeffs {
+#ifdef BW_DEBUG_DEEP
+	uint32_t			hash;
+	enum bw_osc_pulse_coeffs_state	state;
+#endif
+
 	// Sub-components
-	bw_one_pole_coeffs	smooth_coeffs;
-	bw_one_pole_state	smooth_state;
+	bw_one_pole_coeffs		smooth_coeffs;
+	bw_one_pole_state		smooth_state;
 
 	// Parameters
-	char			antialiasing;
-	float			pulse_width;
+	char				antialiasing;
+	float				pulse_width;
 };
 
-static inline void bw_osc_pulse_init(bw_osc_pulse_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_osc_pulse_init(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
 	coeffs->antialiasing = 0;
 	coeffs->pulse_width = 0.5f;
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->hash = bw_hash_sdbm("bw_osc_pulse_coeffs");
+	coeffs->state = bw_osc_pulse_coeffs_state_init;
+#endif
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_osc_pulse_coeffs_state_init);
 }
 
-static inline void bw_osc_pulse_set_sample_rate(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float sample_rate) {
+static inline void bw_osc_pulse_set_sample_rate(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		float                             sample_rate) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
+
 	bw_one_pole_set_sample_rate(&coeffs->smooth_coeffs, sample_rate);
 	bw_one_pole_reset_coeffs(&coeffs->smooth_coeffs);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_osc_pulse_coeffs_state_set_sample_rate;
+#endif
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_osc_pulse_coeffs_state_set_sample_rate);
 }
 
-static inline void bw_osc_pulse_reset_coeffs(bw_osc_pulse_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_osc_pulse_reset_coeffs(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_set_sample_rate);
+
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->pulse_width);
+
+#ifdef BW_DEBUG_DEEP
+	coeffs->state = bw_osc_pulse_coeffs_state_reset_coeffs;
+#endif
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state == bw_osc_pulse_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_osc_pulse_update_coeffs_ctrl(bw_osc_pulse_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_osc_pulse_update_coeffs_ctrl(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+
 	(void)coeffs;
 }
 
-static inline void bw_osc_pulse_update_coeffs_audio(bw_osc_pulse_coeffs *BW_RESTRICT coeffs) {
+static inline void bw_osc_pulse_update_coeffs_audio(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+
 	bw_one_pole_process1(&coeffs->smooth_coeffs, &coeffs->smooth_state, coeffs->pulse_width);
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
 }
 
-static inline float bw_osc_pulse_process1(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x) {
-	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state); // output should always be in bounds given good input
-	return bw_signf(pw - x);
+static inline float bw_osc_pulse_process1(
+		const bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		float                                   x) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(x >= 0.f && x < 1.f);
+
+	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state);
+	const float y = bw_signf(pw - x);
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(y));
+
+	return y;
 }
 
 // PolyBLEP residual based on Parzen window (4th-order B-spline), one-sided (x in [0, 2])
@@ -245,13 +377,25 @@ static inline float bw_osc_pulse_blep_diff(float x) {
 		: x * (x * ((0.6666666666666666f - 0.08333333333333333f * x) * x - 2.f) + 2.666666666666667f) - 1.333333333333333f;
 }
 
-static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float x, float x_phase_inc) {
-	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state); // output should always be in bounds given good input
+static inline float bw_osc_pulse_process1_antialias(
+		const bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		float                                   x,
+		float                                   x_inc) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(x >= 0.f && x < 1.f);
+	BW_ASSERT(bw_is_finite(x_inc));
+	BW_ASSERT(x_inc >= -0.5f && x_inc <= 0.5f);
+
+	const float pw = bw_one_pole_get_y_z1(&coeffs->smooth_state);
 	const float pw_m_phase = pw - x;
 	float v = bw_copysignf(1.f, pw_m_phase); // pw = phase case should be properly compensated by the AA
-	if (x_phase_inc != 0.f) {
-		const float phase_inc_2 = x_phase_inc + x_phase_inc;
-		const float phase_inc_rcp = bw_rcpf(x_phase_inc);
+	const float a_inc = bw_absf(x_inc);
+	if (x_inc > 1e-6f) {
+		const float phase_inc_2 = a_inc + a_inc;
+		const float phase_inc_rcp = bw_rcpf(a_inc);
 		const float phase_2 = 0.5f * v + 0.5f - pw_m_phase;
 		const float s_1_m_phase = 1.f - x;
 		const float s_1_m_phase_2 = 1.f - phase_2;
@@ -264,28 +408,63 @@ static inline float bw_osc_pulse_process1_antialias(const bw_osc_pulse_coeffs *B
 		if (phase_2 < phase_inc_2)
 			v -= bw_osc_pulse_blep_diff(phase_2 * phase_inc_rcp);
 	}
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT(bw_is_finite(v));
+
 	return v;
 }
 
-static inline void bw_osc_pulse_process(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float *x, const float *x_phase_inc, float *y, size_t n_samples) {
+static inline void bw_osc_pulse_process(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		const float *                     x,
+		const float *                     x_inc,
+		float *                           y,
+		size_t                            n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(coeffs->antialiasing ? x_inc != NULL : 1);
+	BW_ASSERT_DEEP(coeffs->antialiasing ? bw_has_only_finite(x_inc, n_samples) : 1);
+	BW_ASSERT(y != NULL);
+
 	if (coeffs->antialiasing)
 		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
-			y[i] = bw_osc_pulse_process1_antialias(coeffs, x[i], x_phase_inc[i]);
+			y[i] = bw_osc_pulse_process1_antialias(coeffs, x[i], x_inc[i]);
 		}
 	else
 		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
 			y[i] = bw_osc_pulse_process1(coeffs, x[i]);
 		}
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
-static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, const float * const *x, const float * const *x_phase_inc, float * const *y, size_t n_channels, size_t n_samples) {
+static inline void bw_osc_pulse_process_multi(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		const float * const *             x,
+		const float * const *             x_inc,
+		float * const *                   y,
+		size_t                            n_channels,
+		size_t                            n_samples) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
+	BW_ASSERT(x != NULL);
+	BW_ASSERT(y != NULL);
+
 	if (coeffs->antialiasing)
 		for (size_t i = 0; i < n_samples; i++) {
 			bw_osc_pulse_update_coeffs_audio(coeffs);
 			for (size_t j = 0; j < n_channels; j++)
-				y[j][i] = bw_osc_pulse_process1_antialias(coeffs, x[j][i], x_phase_inc[j][i]);
+				y[j][i] = bw_osc_pulse_process1_antialias(coeffs, x[j][i], x_inc[j][i]);
 		}
 	else
 		for (size_t i = 0; i < n_samples; i++) {
@@ -293,14 +472,51 @@ static inline void bw_osc_pulse_process_multi(bw_osc_pulse_coeffs *BW_RESTRICT c
 			for (size_t j = 0; j < n_channels; j++)
 				y[j][i] = bw_osc_pulse_process1(coeffs, x[j][i]);
 		}
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_osc_pulse_set_antialiasing(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_osc_pulse_set_antialiasing(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		char                              value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_init);
+
 	coeffs->antialiasing = value;
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_init);
 }
 
-static inline void bw_osc_pulse_set_pulse_width(bw_osc_pulse_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_osc_pulse_set_pulse_width(
+		bw_osc_pulse_coeffs * BW_RESTRICT coeffs,
+		float                             value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+	BW_ASSERT(value >= 0.f && value <= 1.f);
+
 	coeffs->pulse_width = value;
+
+	BW_ASSERT_DEEP(bw_osc_pulse_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_init);
+}
+
+static inline char bw_osc_pulse_coeffs_is_valid(
+		const bw_osc_pulse_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != NULL);
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->hash != bw_hash_sdbm("bw_osc_pulse_coeffs"))
+		return 0;
+	if (coeffs->state < bw_osc_pulse_coeffs_state_init || coeffs->state > bw_osc_pulse_coeffs_state_reset_coeffs)
+		return 0;
+#endif
+
+	return bw_is_finite(coeffs->pulse_width) && coeffs->pulse_width >= 0.f && coeffs->pulse_width <= 1.f;
 }
 
 #ifdef __cplusplus
@@ -320,21 +536,28 @@ class OscPulse {
 public:
 	OscPulse();
 	
-	void setSampleRate(float sampleRate);
+	void setSampleRate(
+		float sampleRate);
+
 	void reset();
+
 	void process(
-		const float * const *x,
-		const float * const *x_phase_inc,
-		float * const *y,
-		size_t nSamples);
+		const float * const * x,
+		const float * const * x_inc,
+		float * const *       y,
+		size_t                nSamples);
+
 	void process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> x_phase_inc,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
+		std::array<const float *, N_CHANNELS> x_inc,
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples);
 	
-	void setAntialiasing(bool value);
-	void setPulseWidth(float value);
+	void setAntialiasing(
+		bool value);
+
+	void setPulseWidth(
+		float value);
 /*! <<<...
  *  }
  *  ```
@@ -346,7 +569,7 @@ public:
  * change at any time in future versions. Please, do not use it directly. */
 
 private:
-	bw_osc_pulse_coeffs	 coeffs;
+	bw_osc_pulse_coeffs	coeffs;
 };
 
 template<size_t N_CHANNELS>
@@ -355,7 +578,8 @@ inline OscPulse<N_CHANNELS>::OscPulse() {
 }
 
 template<size_t N_CHANNELS>
-inline void OscPulse<N_CHANNELS>::setSampleRate(float sampleRate) {
+inline void OscPulse<N_CHANNELS>::setSampleRate(
+		float sampleRate) {
 	bw_osc_pulse_set_sample_rate(&coeffs, sampleRate);
 }
 
@@ -366,29 +590,31 @@ inline void OscPulse<N_CHANNELS>::reset() {
 
 template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::process(
-		const float * const *x,
-		const float * const *x_phase_inc,
-		float * const *y,
-		size_t nSamples) {
-	bw_osc_pulse_process_multi(&coeffs, x, x_phase_inc, y, N_CHANNELS, nSamples);
+		const float * const * x,
+		const float * const * x_inc,
+		float * const *       y,
+		size_t                nSamples) {
+	bw_osc_pulse_process_multi(&coeffs, x, x_inc, y, N_CHANNELS, nSamples);
 }
 
 template<size_t N_CHANNELS>
 inline void OscPulse<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> x_phase_inc,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples) {
-	process(x.data(), x_phase_inc.data(), y.data(), nSamples);
+		std::array<const float *, N_CHANNELS> x_inc,
+		std::array<float *, N_CHANNELS>       y,
+		size_t                                nSamples) {
+	process(x.data(), x_inc.data(), y.data(), nSamples);
 }
 
 template<size_t N_CHANNELS>
-inline void OscPulse<N_CHANNELS>::setAntialiasing(bool value) {
+inline void OscPulse<N_CHANNELS>::setAntialiasing(
+		bool value) {
 	bw_osc_pulse_set_antialiasing(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>
-inline void OscPulse<N_CHANNELS>::setPulseWidth(float value) {
+inline void OscPulse<N_CHANNELS>::setPulseWidth(
+		float value) {
 	bw_osc_pulse_set_pulse_width(&coeffs, value);
 }
 

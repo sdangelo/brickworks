@@ -538,6 +538,7 @@ static inline void bw_phase_gen_process1(
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_phase_gen_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(*y));
+	BW_ASSERT(*y >= 0.f && *y < 1.f);
 	BW_ASSERT(bw_is_finite(*y_inc));
 }
 
@@ -563,6 +564,7 @@ static inline void bw_phase_gen_process1_mod(
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_phase_gen_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(*y));
+	BW_ASSERT(*y >= 0.f && *y < 1.f);
 	BW_ASSERT(bw_is_finite(*y_inc));
 }
 

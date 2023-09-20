@@ -87,6 +87,8 @@ static inline float bw_osc_sin_process1(
  *    Processes one input sample `x`, representing the normalized phase, and
  *    returns the corresponding output sample.
  *
+ *    `x` must be in [`0.f`, `1.f`).
+ *
  *    #### bw_osc_sin_process()
  *  ```>>> */
 static inline void bw_osc_sin_process(
@@ -97,6 +99,8 @@ static inline void bw_osc_sin_process(
  *    Processes the first `n_samples` of the input buffer `x`, containing the
  *    normalized phase signal, and fills the first `n_samples` of the output
  *    buffer `y`.
+ *
+ *    All samples in `x` must be in [`0.f`, `1.f`).
  *
  *    #### bw_osc_sin_process_multi()
  *  ```>>> */
@@ -109,6 +113,8 @@ static inline void bw_osc_sin_process_multi(
  *    Processes the first `n_samples` of the `n_channels` input buffers `x`,
  *    containing the normalized phase signals, and fills the first `n_samples`
  *    of the `n_channels` output buffers `y`.
+ *
+ *    All samples in `x` must be in [`0.f`, `1.f`).
  *  }}} */
 
 #ifdef __cplusplus
@@ -129,6 +135,7 @@ extern "C" {
 static inline float bw_osc_sin_process1(
 		float x) {
 	BW_ASSERT(bw_is_finite(x));
+	BW_ASSERT(x >= 0.f && x < 1.f);
 
 	const float y = bw_sin2pif(x);
 

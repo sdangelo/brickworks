@@ -40,14 +40,17 @@ void bw_example_synthpp_mono_init(bw_example_synthpp_mono *instance) {
 
 void bw_example_synthpp_mono_set_sample_rate(bw_example_synthpp_mono *instance, float sample_rate) {
 	instance->vco1PhaseGen.setSampleRate(sample_rate);
+	instance->vco1OscSaw.setSampleRate(sample_rate);
 	instance->vco1OscPulse.setSampleRate(sample_rate);
 	instance->vco1OscTri.setSampleRate(sample_rate);
 	instance->vco1Gain.setSampleRate(sample_rate);
 	instance->vco2PhaseGen.setSampleRate(sample_rate);
+	instance->vco2OscSaw.setSampleRate(sample_rate);
 	instance->vco2OscPulse.setSampleRate(sample_rate);
 	instance->vco2OscTri.setSampleRate(sample_rate);
 	instance->vco2Gain.setSampleRate(sample_rate);
 	instance->vco3PhaseGen.setSampleRate(sample_rate);
+	instance->vco3OscSaw.setSampleRate(sample_rate);
 	instance->vco3OscPulse.setSampleRate(sample_rate);
 	instance->vco3OscTri.setSampleRate(sample_rate);
 	instance->vco3Gain.setSampleRate(sample_rate);
@@ -68,14 +71,17 @@ void bw_example_synthpp_mono_reset(bw_example_synthpp_mono *instance) {
 	instance->vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 
 	instance->vco1PhaseGen.reset();
+	instance->vco1OscSaw.reset();
 	instance->vco1OscPulse.reset();
 	instance->vco1OscTri.reset();
 	instance->vco1Gain.reset();
 	instance->vco2PhaseGen.reset();
+	instance->vco2OscSaw.reset();
 	instance->vco2OscPulse.reset();
 	instance->vco2OscTri.reset();
 	instance->vco2Gain.reset();
 	instance->vco3PhaseGen.reset();
+	instance->vco3OscSaw.reset();
 	instance->vco3OscPulse.reset();
 	instance->vco3OscTri.reset();
 	instance->vco3Gain.reset();

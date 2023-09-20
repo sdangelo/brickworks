@@ -59,6 +59,7 @@ void bw_example_synth_mono_init(bw_example_synth_mono *instance) {
 }
 
 void bw_example_synth_mono_set_sample_rate(bw_example_synth_mono *instance, float sample_rate) {
+	bw_osc_saw_set_sample_rate(&instance->vco_saw_coeffs, sample_rate);
 	bw_phase_gen_set_sample_rate(&instance->vco1_phase_gen_coeffs, sample_rate);
 	bw_osc_pulse_set_sample_rate(&instance->vco1_pulse_coeffs, sample_rate);
 	bw_osc_tri_set_sample_rate(&instance->vco1_tri_coeffs, sample_rate);
@@ -80,6 +81,8 @@ void bw_example_synth_mono_set_sample_rate(bw_example_synth_mono *instance, floa
 	bw_phase_gen_set_sample_rate(&instance->a440_phase_gen_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&instance->gain_coeffs, sample_rate);
 	bw_ppm_set_sample_rate(&instance->ppm_coeffs, sample_rate);
+
+	bw_osc_saw_reset_coeffs(&instance->vco_saw_coeffs);
 }
 
 void bw_example_synth_mono_reset(bw_example_synth_mono *instance) {

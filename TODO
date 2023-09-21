@@ -77,6 +77,7 @@ code:
 * make all reset state outs nullable (svf, phase_gen, ...)?
 * ring mod fx module?
 * bitcrusher module?
+* return output std::array rather than have it as input argument?
 
 build system:
 * make makefiles handle paths with spaces etc

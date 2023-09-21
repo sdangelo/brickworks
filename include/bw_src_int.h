@@ -166,8 +166,8 @@ static inline size_t bw_src_int_process(
 static inline void bw_src_int_process_multi(
 	const bw_src_int_coeffs * BW_RESTRICT              coeffs,
 	bw_src_int_state * BW_RESTRICT const * BW_RESTRICT state,
-	const float * const * BW_RESTRICT                  x,
-	float *BW_RESTRICT const * BW_RESTRICT             y,
+	const float * BW_RESTRICT const * BW_RESTRICT      x,
+	float * BW_RESTRICT const * BW_RESTRICT            y,
 	size_t                                             n_channels,
 	size_t                                             n_in_samples,
 	size_t * BW_RESTRICT                               n_out_samples);
@@ -263,6 +263,7 @@ static inline void bw_src_int_init(
 		bw_src_int_coeffs * BW_RESTRICT coeffs,
 		int ratio) {
 	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(ratio != 0);
 
 	coeffs->ratio = ratio;
 	// 4th-degree Butterworth with cutoff at ratio * Nyquist, using bilinear transform w/ prewarping
@@ -355,6 +356,7 @@ static inline size_t bw_src_int_process(
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_in_samples));
 	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != y);
 
 	size_t n = 0;
 	if (coeffs->ratio < 0) {
@@ -408,8 +410,8 @@ static inline size_t bw_src_int_process(
 static inline void bw_src_int_process_multi(
 		const bw_src_int_coeffs * BW_RESTRICT              coeffs,
 		bw_src_int_state * BW_RESTRICT const * BW_RESTRICT state,
-		const float * const * BW_RESTRICT                  x,
-		float *BW_RESTRICT const * BW_RESTRICT             y,
+		const float * BW_RESTRICT const * BW_RESTRICT      x,
+		float * BW_RESTRICT const * BW_RESTRICT            y,
 		size_t                                             n_channels,
 		size_t                                             n_in_samples,
 		size_t * BW_RESTRICT                               n_out_samples) {
@@ -418,6 +420,7 @@ static inline void bw_src_int_process_multi(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+	BW_ASSERT((void*)x != (void*)y);
 
 	if (n_out_samples != NULL)
 		for (size_t i = 0; i < n_channels; i++)
@@ -484,7 +487,8 @@ namespace Brickworks {
 template<size_t N_CHANNELS>
 class SRCInt {
 public:
-	SRCInt(int ratio);
+	SRCInt(
+		int ratio);
 
 	void reset(
 		float               x0 = 0.f,
@@ -503,10 +507,10 @@ public:
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0 = nullptr);
 
 	void process(
-		const float * const * BW_RESTRICT x,
-		float * const * BW_RESTRICT       y,
-		size_t                            nInSamples,
-		size_t * BW_RESTRICT              nOutSamples = nullptr);
+		const float * BW_RESTRICT const * BW_RESTRICT x,
+		float * const * BW_RESTRICT                   y,
+		size_t                                        nInSamples,
+		size_t * BW_RESTRICT                          nOutSamples = nullptr);
 
 	void process(
 		std::array<const float * BW_RESTRICT, N_CHANNELS> x,
@@ -572,10 +576,10 @@ inline void SRCInt<N_CHANNELS>::reset(
 
 template<size_t N_CHANNELS>
 inline void SRCInt<N_CHANNELS>::process(
-		const float * const * BW_RESTRICT x,
-		float * const * BW_RESTRICT       y,
-		size_t                            nInSamples,
-		size_t * BW_RESTRICT              nOutSamples) {
+		const float * BW_RESTRICT const * BW_RESTRICT x,
+		float * const * BW_RESTRICT                   y,
+		size_t                                        nInSamples,
+		size_t * BW_RESTRICT                          nOutSamples) {
 	bw_src_int_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nInSamples, nOutSamples);
 }
 

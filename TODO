@@ -10,7 +10,6 @@ code:
  general:
 * mem req -> return value of set sample rate? or sample rate argument of mem req?
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
-* common smoothing policy (as control rate as possible?) - smoothing control?
 * IMPLEMENTATION prepocessor def???
  semi-specific:
 * max_delay -> set sample rate? see reverb
@@ -78,6 +77,7 @@ code:
 * ring mod fx module?
 * bitcrusher module?
 * return output std::array rather than have it as input argument?
+* common smoothing policy (as control rate as possible?) - smoothing control?
 
 build system:
 * make makefiles handle paths with spaces etc

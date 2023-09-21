@@ -540,8 +540,8 @@ public:
 	void process(
 		std::array<const float * BW_RESTRICT, N_CHANNELS> x,
 		std::array<float * BW_RESTRICT, N_CHANNELS>       y,
-		std::array<size_t * BW_RESTRICT, N_CHANNELS>      nInSamples,
-		std::array<size_t * BW_RESTRICT, N_CHANNELS>      nOutSamples);
+		std::array<size_t, N_CHANNELS> &                  nInSamples,
+		std::array<size_t, N_CHANNELS> &                  nOutSamples);
 /*! <<<...
  *  }
  *  ```
@@ -612,8 +612,8 @@ template<size_t N_CHANNELS>
 inline void SRC<N_CHANNELS>::process(
 		std::array<const float * BW_RESTRICT, N_CHANNELS> x,
 		std::array<float * BW_RESTRICT, N_CHANNELS>       y,
-		std::array<size_t * BW_RESTRICT, N_CHANNELS>      nInSamples,
-		std::array<size_t * BW_RESTRICT, N_CHANNELS>      nOutSamples) {
+		std::array<size_t, N_CHANNELS> &                  nInSamples,
+		std::array<size_t, N_CHANNELS> &                  nOutSamples) {
 	process(x.data(), y.data(), nInSamples.data(), nOutSamples.data());
 }
 

@@ -33,7 +33,6 @@ void bw_example_synthpp_mono_init(bw_example_synthpp_mono *instance) {
 	instance->vco3OscSaw.setAntialiasing(true);
 	instance->vco3OscPulse.setAntialiasing(true);
 	instance->vco3OscTri.setAntialiasing(true);
-	instance->noiseGen.setSampleRateScaling(true);
 	instance->a440PhaseGen.setFrequency(440.f);
 
 	instance->rand_state = 0xbaddecaf600dfeed;

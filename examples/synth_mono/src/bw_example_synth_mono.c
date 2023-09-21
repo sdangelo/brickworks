@@ -53,7 +53,6 @@ void bw_example_synth_mono_init(bw_example_synth_mono *instance) {
 	bw_osc_tri_set_antialiasing(&instance->vco2_tri_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco3_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco3_tri_coeffs, 1);
-	bw_noise_gen_set_sample_rate_scaling(&instance->noise_gen_coeffs, 1);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	
 	instance->rand_state = 0xbaddecaf600dfeed;

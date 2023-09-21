@@ -4,7 +4,7 @@
 in progress:
 * add initial state (x0) to reset state of all modules
 * check assumptions w.r.t. usage of math functions
-* empty functions etc. to keep consistency and forward compatibility?
+* empty functions etc. to keep consistency and forward compatibility
 * format declarations in a more readable way
 code:
  general:
@@ -13,8 +13,6 @@ code:
 * common smoothing policy (as control rate as possible?) - smoothing control?
 * IMPLEMENTATION prepocessor def???
  semi-specific:
-* osc post filter (and one pole init, slew rate, etc.) val from input? set state instead?
-* audio rate optional pulse width/slope inputs?
 * max_delay -> set sample rate? see reverb
  specific:
 * bw_comb: should also modulate feedback?

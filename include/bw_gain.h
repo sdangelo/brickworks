@@ -461,6 +461,7 @@ static inline float bw_gain_get_gain_cur(
 		const bw_gain_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_gain_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_gain_coeffs_state_reset_coeffs);
 
 	return bw_one_pole_get_y_z1(&coeffs->smooth_state);
 }

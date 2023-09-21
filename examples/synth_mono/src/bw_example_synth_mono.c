@@ -85,6 +85,7 @@ void bw_example_synth_mono_set_sample_rate(bw_example_synth_mono *instance, floa
 
 	bw_osc_saw_reset_coeffs(&instance->vco_saw_coeffs);
 	bw_noise_gen_reset_coeffs(&instance->noise_gen_coeffs);
+	bw_pink_filt_reset_coeffs(&instance->pink_filt_coeffs);
 }
 
 void bw_example_synth_mono_reset(bw_example_synth_mono *instance) {
@@ -109,7 +110,7 @@ void bw_example_synth_mono_reset(bw_example_synth_mono *instance) {
 	bw_osc_tri_reset_coeffs(&instance->vco3_tri_coeffs);
 	bw_gain_reset_coeffs(&instance->vco3_gain_coeffs);
 	bw_osc_filt_reset_state(&instance->osc_filt_state, 0.f);
-	bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state);
+	bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state, 0.f);
 	bw_gain_reset_coeffs(&instance->noise_gain_coeffs);
 	bw_env_gen_reset_coeffs(&instance->vcf_env_gen_coeffs);
 	bw_env_gen_reset_state(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, 0);
@@ -173,7 +174,7 @@ void bw_example_synth_mono_process(bw_example_synth_mono *instance, const float*
 		if (instance->params[p_noise_color] >= 0.5f)
 			bw_pink_filt_process(&instance->pink_filt_coeffs, &instance->pink_filt_state, instance->buf[0], instance->buf[0], n);
 		else
-			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state); // FIXME: calling this here is sloppy coding
+			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state, 0.f); // FIXME: calling this here is sloppy coding
 		bw_buf_scale(instance->buf[0], 5.f, instance->buf[0], n);
 		
 		for (int j = 0; j < n; j++)

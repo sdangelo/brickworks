@@ -291,8 +291,8 @@ struct bw_trem_coeffs {
 
 struct bw_trem_state {
 #ifdef BW_DEBUG_DEEP
-	uint32_t	hash;
-	uint32_t	coeffs_reset_id;
+	uint32_t		hash;
+	uint32_t		coeffs_reset_id;
 #endif
 
 	// Sub-components

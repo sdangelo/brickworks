@@ -162,7 +162,8 @@ static inline float bw_comb_reset_state(
  *
  *    Returns the corresponding initial output value.
  *
- *    If parameter `fb`  has value `-1.f` or `1.f`, then `x_0` must be `0.f`.
+ *    If parameter `coeff_fb`  has value `-1.f` or `1.f`, then `x_0` must be
+ *    `0.f`.
  *
  *    #### bw_comb_reset_state_multi()
  *  ```>>> */
@@ -180,8 +181,8 @@ static inline void bw_comb_reset_state_multi(
  *    The corresponding initial output values are written into the `y_0` array,
  *    if not `NULL`.
  *
- *    If parameter `fb`  has value `-1.f` or `1.f`, then `x_0` must only contain
- *    `0.f`.
+ *    If parameter `coeff_fb`  has value `-1.f` or `1.f`, then `x_0` must only
+ *    contain `0.f`.
  *
  *    #### bw_comb_update_coeffs_ctrl()
  *  ```>>> */

@@ -41,7 +41,7 @@ void bw_example_fx_vibrato_mem_set(bw_example_fx_vibrato *instance, void *mem) {
 
 void bw_example_fx_vibrato_reset(bw_example_fx_vibrato *instance) {
 	bw_chorus_reset_coeffs(&instance->chorus_coeffs);
-	bw_chorus_reset_state(&instance->chorus_coeffs, &instance->chorus_state);
+	bw_chorus_reset_state(&instance->chorus_coeffs, &instance->chorus_state, 0.f);
 }
 
 void bw_example_fx_vibrato_process(bw_example_fx_vibrato *instance, const float** x, float** y, int n_samples) {

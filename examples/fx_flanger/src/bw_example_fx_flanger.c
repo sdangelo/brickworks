@@ -42,7 +42,7 @@ void bw_example_fx_flanger_mem_set(bw_example_fx_flanger *instance, void *mem) {
 
 void bw_example_fx_flanger_reset(bw_example_fx_flanger *instance) {
 	bw_chorus_reset_coeffs(&instance->chorus_coeffs);
-	bw_chorus_reset_state(&instance->chorus_coeffs, &instance->chorus_state);
+	bw_chorus_reset_state(&instance->chorus_coeffs, &instance->chorus_state, 0.f);
 }
 
 void bw_example_fx_flanger_process(bw_example_fx_flanger *instance, const float** x, float** y, int n_samples) {

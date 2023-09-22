@@ -135,7 +135,8 @@ static inline void bw_delay_mem_set(
 	bw_delay_state * BW_RESTRICT        state,
 	void * BW_RESTRICT                  mem);
 /*! <<<```
- *    Associates the contiguous memory block `mem` to the given `state`.
+ *    Associates the contiguous memory block `mem` to the given `state` using
+ *    `coeffs`.
  *
  *    #### bw_delay_reset_coeffs()
  *  ```>>> */
@@ -321,6 +322,14 @@ enum bw_delay_coeffs_state {
 };
 #endif
 
+#ifdef BW_DEBUG_DEEP
+enum bw_delay_state_state {
+	bw_delay_state_state_invalid,
+	bw_delay_state_state_mem_set,
+	bw_delay_state_state_reset_state
+};
+#endif
+
 struct bw_delay_coeffs {
 #ifdef BW_DEBUG_DEEP
 	uint32_t			hash;
@@ -343,13 +352,14 @@ struct bw_delay_coeffs {
 
 struct bw_delay_state {
 #ifdef BW_DEBUG_DEEP
-	uint32_t		hash;
-	uint32_t		coeffs_reset_id;
+	uint32_t			hash;
+	enum bw_delay_state_state	state;
+	uint32_t			coeffs_reset_id;
 #endif
 
 	// States
-	float * BW_RESTRICT	buf;
-	size_t			idx;
+	float * BW_RESTRICT		buf;
+	size_t				idx;
 };
 
 static inline void bw_delay_init(
@@ -410,6 +420,15 @@ static inline void bw_delay_mem_set(
 
 	(void)coeffs;
 	state->buf = (float *)mem;
+
+#ifdef BW_DEBUG_DEEP
+	state->hash = bw_hash_sdbm("bw_delay_state");
+	state->state = bw_delay_state_state_mem_set;
+#endif
+	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_set_sample_rate);
+	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state == bw_delay_state_state_mem_set);
 }
 
 static inline void bw_delay_do_update_coeffs_ctrl(bw_delay_coeffs *BW_RESTRICT coeffs) {
@@ -446,6 +465,8 @@ static inline float bw_delay_reset_state(
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_mem_set);
 	BW_ASSERT(bw_is_finite(x_0));
 
 	bw_buf_fill(x_0, state->buf, coeffs->len);
@@ -453,12 +474,13 @@ static inline float bw_delay_reset_state(
 	const float y = x_0;
 
 #ifdef BW_DEBUG_DEEP
-	state->hash = bw_hash_sdbm("bw_delay_state");
+	state->state = bw_delay_state_state_reset_state;
 	state->coeffs_reset_id = coeffs->reset_id;
 #endif
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -498,6 +520,7 @@ static float bw_delay_read(
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(df));
 	BW_ASSERT(df >= 0.f && df < 1.f);
 	BW_ASSERT(di + df <= coeffs->len);
@@ -509,6 +532,7 @@ static float bw_delay_read(
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -523,6 +547,7 @@ static void bw_delay_write(
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(x));
 
 	state->idx++;
@@ -532,6 +557,7 @@ static void bw_delay_write(
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 }
 
 static inline void bw_delay_update_coeffs_ctrl(
@@ -564,6 +590,7 @@ static inline float bw_delay_process1(
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(x));
 
 	bw_delay_write(coeffs, state, x);
@@ -572,6 +599,7 @@ static inline float bw_delay_process1(
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(y));
 
 	return y;
@@ -588,6 +616,7 @@ static inline void bw_delay_process(
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 	BW_ASSERT(y != NULL);
@@ -599,6 +628,7 @@ static inline void bw_delay_process(
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
+	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT_DEEP(bw_has_only_finite(y, n_samples));
 }
 
@@ -694,8 +724,7 @@ static inline char bw_delay_state_is_valid(
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_delay_state"))
 		return 0;
-
-	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+	if (state->state < bw_delay_state_state_mem_set || state->state > bw_delay_state_state_reset_state)
 		return 0;
 #endif
 
@@ -705,8 +734,13 @@ static inline char bw_delay_state_is_valid(
 		return 0;
 
 #ifdef BW_DEBUG_DEEP
-	if (coeffs != NULL && coeffs->state >= bw_delay_coeffs_state_set_sample_rate && state->idx >= coeffs->len)
-		return 0;
+	if (state->state >= bw_delay_state_state_reset_state && coeffs != NULL) {
+		if (coeffs->reset_id != state->coeffs_reset_id)
+			return 0;
+
+		if (state->idx >= coeffs->len)
+			return 0;
+	}
 #endif
 
 	return 1;

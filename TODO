@@ -18,6 +18,7 @@ finally:
 * thank scientific paper authors
 * change config.h in examples version 1.0.0
 * "Templates must have C++ linkage"?
+* state that mem_set() can/must be called on uninitialized state (before reset_state)
 
 build system:
 * single header generation (vs modules in bwp... to think about)

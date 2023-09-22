@@ -38,7 +38,7 @@ void bw_example_fx_comb_mem_set(bw_example_fx_comb *instance, void *mem) {
 
 void bw_example_fx_comb_reset(bw_example_fx_comb *instance) {
 	bw_comb_reset_coeffs(&instance->comb_coeffs);
-	bw_comb_reset_state(&instance->comb_coeffs, &instance->comb_state);
+	bw_comb_reset_state(&instance->comb_coeffs, &instance->comb_state, 0.f);
 }
 
 void bw_example_fx_comb_process(bw_example_fx_comb *instance, const float** x, float** y, int n_samples) {

@@ -1,14 +1,8 @@
 1.0.0
 -----
 
-in progress:
-* add initial state (x0) to reset state of all modules
-* check assumptions w.r.t. usage of math functions
-* empty functions etc. to keep consistency and forward compatibility
-* format declarations in a more readable way
-code:
+* synth(pp)_poly
 * IMPLEMENTATION prepocessor def???
-finally:
 * debugging - also check outputs different (incl bw_buf)
 * check all examples again
 * clearly specify that state is tied to a particular set of coeffs (1:N)
@@ -21,7 +15,7 @@ finally:
 * state that mem_set() can/must be called on uninitialized state (before reset_state)
 
 build system:
-* single header generation (vs modules in bwp... to think about)
+* single header generation (vs modules in bwp... to think about)?
 
 post 1.0.0
 ----------
@@ -77,6 +71,7 @@ code:
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
 * are we sure about inlining everything?
+* reset style is not enough when you have feedbacks... (see reverb)
 
 build system:
 * make makefiles handle paths with spaces etc

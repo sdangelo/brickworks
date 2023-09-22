@@ -38,7 +38,8 @@ void bw_example_fx_reverb_mem_set(bw_example_fx_reverb *instance, void *mem) {
 
 void bw_example_fx_reverb_reset(bw_example_fx_reverb *instance) {
 	bw_reverb_reset_coeffs(&instance->reverb_coeffs);
-	bw_reverb_reset_state(&instance->reverb_coeffs, &instance->reverb_state);
+	float yl, yr;
+	bw_reverb_reset_state(&instance->reverb_coeffs, &instance->reverb_state, 0.f, 0.f, &yl, &yr);
 }
 
 void bw_example_fx_reverb_process(bw_example_fx_reverb *instance, const float** x, float** y, int n_samples) {

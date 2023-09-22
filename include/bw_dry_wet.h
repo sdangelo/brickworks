@@ -302,7 +302,7 @@ static inline float bw_dry_wet_process1(
 
 	BW_ASSERT_DEEP(bw_dry_wet_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_dry_wet_coeffs_state_reset_coeffs);
-	BW_ASSERT(bw_is_finite(*y));
+	BW_ASSERT(bw_is_finite(y));
 
 	return y;
 }
@@ -418,19 +418,6 @@ template<size_t N_CHANNELS>
 class DryWet {
 public:
 	DryWet();
-
-	void setSampleRate(float sampleRate);
-	void reset();
-	void process(
-		const float * const *x_dry,
-		const float * const *x_wet,
-		float * const *y,
-		size_t nSamples);
-	void process(
-		std::array<const float *, N_CHANNELS> x_dry,
-		std::array<const float *, N_CHANNELS> x_wet,
-		std::array<float *, N_CHANNELS> y,
-		size_t nSamples);
 
 	void setSampleRate(
 		float sampleRate);

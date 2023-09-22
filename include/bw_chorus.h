@@ -399,6 +399,7 @@ struct bw_chorus_state {
 	enum bw_chorus_state_state	state;
 	uint32_t			coeffs_reset_id;
 #endif
+
 	// Sub-components
 	bw_comb_state			comb_state;
 };
@@ -524,9 +525,9 @@ static inline float bw_chorus_reset_state(
 static inline void bw_chorus_reset_state_multi(
 		const bw_chorus_coeffs * BW_RESTRICT              coeffs,
 		bw_chorus_state * BW_RESTRICT const * BW_RESTRICT state,
-		const float *                                   x_0,
-		float *                                         y_0,
-		size_t                                          n_channels) {
+		const float *                                     x_0,
+		float *                                           y_0,
+		size_t                                            n_channels) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_chorus_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_chorus_coeffs_state_reset_coeffs);

@@ -75,6 +75,7 @@ code:
 * c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value pre 1.0.0), delay read/write, process1? process single?
 * bw_comb: should also modulate feedback?
 * bw_comb: integer target delay values?
+* are we sure about inlining everything?
 
 build system:
 * make makefiles handle paths with spaces etc

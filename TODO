@@ -7,15 +7,7 @@ in progress:
 * empty functions etc. to keep consistency and forward compatibility
 * format declarations in a more readable way
 code:
- general:
-* mem req -> return value of set sample rate? or sample rate argument of mem req?
-* c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value), delay read/write, process1? process single?
 * IMPLEMENTATION prepocessor def???
- semi-specific:
-* max_delay -> set sample rate? see reverb
- specific:
-* bw_comb: should also modulate feedback?
-* bw_comb: integer target delay values?
 finally:
 * debugging - also check outputs different (incl bw_buf)
 * check all examples again
@@ -78,6 +70,11 @@ code:
 * bitcrusher module?
 * return output std::array rather than have it as input argument?
 * common smoothing policy (as control rate as possible?) - smoothing control?
+* max_delay -> set sample rate? see reverb
+* mem req -> return value of set sample rate? or sample rate argument of mem req?
+* c++ get coeffs/state? or public? src nIn/OutSamples case (array vs single value pre 1.0.0), delay read/write, process1? process single?
+* bw_comb: should also modulate feedback?
+* bw_comb: integer target delay values?
 
 build system:
 * make makefiles handle paths with spaces etc

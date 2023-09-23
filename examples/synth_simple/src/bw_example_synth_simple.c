@@ -47,7 +47,7 @@ void bw_example_synth_simple_reset(bw_example_synth_simple *instance) {
 	float p, inc;
 	bw_phase_gen_reset_state(&instance->phase_gen_coeffs, &instance->phase_gen_state, 0.f, &p, &inc);
 	bw_osc_pulse_reset_coeffs(&instance->osc_pulse_coeffs);
-	bw_osc_filt_reset_state(&instance->osc_filt_state);
+	bw_osc_filt_reset_state(&instance->osc_filt_state, 0.f);
 	bw_svf_reset_coeffs(&instance->svf_coeffs);
 	float lp, bp, hp;
 	bw_svf_reset_state(&instance->svf_coeffs, &instance->svf_state, 0.f, &lp, &bp, &hp);

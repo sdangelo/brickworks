@@ -45,12 +45,15 @@ void bw_example_synthpp_poly_init(bw_example_synthpp_poly *instance) {
 }
 
 void bw_example_synthpp_poly_set_sample_rate(bw_example_synthpp_poly *instance, float sample_rate) {
+	instance->vco1OscSaw.setSampleRate(sample_rate);
 	instance->vco1OscPulse.setSampleRate(sample_rate);
 	instance->vco1OscTri.setSampleRate(sample_rate);
 	instance->vco1Gain.setSampleRate(sample_rate);
+	instance->vco2OscSaw.setSampleRate(sample_rate);
 	instance->vco2OscPulse.setSampleRate(sample_rate);
 	instance->vco2OscTri.setSampleRate(sample_rate);
 	instance->vco2Gain.setSampleRate(sample_rate);
+	instance->vco3OscSaw.setSampleRate(sample_rate);
 	instance->vco3OscPulse.setSampleRate(sample_rate);
 	instance->vco3OscTri.setSampleRate(sample_rate);
 	instance->vco3Gain.setSampleRate(sample_rate);
@@ -78,16 +81,20 @@ void bw_example_synthpp_poly_reset(bw_example_synthpp_poly *instance) {
 		instance->voices[i].vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 
 	instance->noteQueue = NoteQueue();
+	instance->vco1OscSaw.reset();
 	instance->vco1OscPulse.reset();
 	instance->vco1OscTri.reset();
 	instance->vco1Gain.reset();
+	instance->vco2OscSaw.reset();
 	instance->vco2OscPulse.reset();
 	instance->vco2OscTri.reset();
 	instance->vco2Gain.reset();
+	instance->vco3OscSaw.reset();
 	instance->vco3OscPulse.reset();
 	instance->vco3OscTri.reset();
 	instance->vco3Gain.reset();
 	instance->oscFilt.reset();
+	instance->noiseGen.reset();
 	instance->pinkFilt.reset();
 	instance->noiseGain.reset();
 	instance->vcfEnvGen.reset();
@@ -101,6 +108,7 @@ void bw_example_synthpp_poly_reset(bw_example_synthpp_poly *instance) {
 		instance->voices[i].vco3PhaseGen.reset();
 		instance->voices[i].vcf.reset();
 
+		instance->voices[i].note = 69;
 		instance->voices[i].gate = 0;
 	}
 
@@ -212,7 +220,7 @@ void bw_example_synthpp_poly_process(bw_example_synthpp_poly *instance, const fl
 		
 		for (int j = 0; j < N_VOICES; j++) {
 			bufScale<1>({b2[j]}, instance->params[p_vco1_mod], {b3[j]}, n);
-			instance->voices[j].vco1PhaseGen.process({b3[j]}, {b4[j]}, {b3[j]}, n);
+			instance->voices[j].vco1PhaseGen.process({b3[j]}, {b3[j]}, {b4[j]}, n);
 		}
 		if (instance->params[p_vco1_waveform] >= (1.f / 4.f + 1.f / 2.f)) {
 			instance->vco1OscTri.process(b3, b4, b3, n);

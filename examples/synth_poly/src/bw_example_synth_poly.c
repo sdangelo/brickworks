@@ -64,6 +64,7 @@ void bw_example_synth_poly_init(bw_example_synth_poly *instance) {
 }
 
 void bw_example_synth_poly_set_sample_rate(bw_example_synth_poly *instance, float sample_rate) {
+	bw_osc_saw_set_sample_rate(&instance->vco_saw_coeffs, sample_rate);
 	bw_osc_pulse_set_sample_rate(&instance->vco1_pulse_coeffs, sample_rate);
 	bw_osc_tri_set_sample_rate(&instance->vco1_tri_coeffs, sample_rate);
 	bw_gain_set_sample_rate(&instance->vco1_gain_coeffs, sample_rate);
@@ -97,6 +98,7 @@ void bw_example_synth_poly_reset(bw_example_synth_poly *instance) {
 		bw_svf_set_cutoff(&instance->voices[i].vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 	
 	bw_note_queue_reset(&instance->note_queue);
+	bw_osc_saw_reset_coeffs(&instance->vco_saw_coeffs);
 	bw_osc_pulse_reset_coeffs(&instance->vco1_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco1_tri_coeffs);
 	bw_gain_reset_coeffs(&instance->vco1_gain_coeffs);
@@ -106,29 +108,35 @@ void bw_example_synth_poly_reset(bw_example_synth_poly *instance) {
 	bw_osc_pulse_reset_coeffs(&instance->vco3_pulse_coeffs);
 	bw_osc_tri_reset_coeffs(&instance->vco3_tri_coeffs);
 	bw_gain_reset_coeffs(&instance->vco3_gain_coeffs);
+	bw_noise_gen_reset_coeffs(&instance->noise_gen_coeffs);
+	bw_pink_filt_reset_coeffs(&instance->pink_filt_coeffs);
 	bw_gain_reset_coeffs(&instance->noise_gain_coeffs);
 	bw_env_gen_reset_coeffs(&instance->vcf_env_gen_coeffs);
 	bw_env_gen_reset_coeffs(&instance->vca_env_gen_coeffs);
 	bw_phase_gen_reset_coeffs(&instance->a440_phase_gen_coeffs);
-	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, 0.f);
+	float p, pi;
+	bw_phase_gen_reset_state(&instance->a440_phase_gen_coeffs, &instance->a440_phase_gen_state, 0.f, &p, &pi);
 	bw_gain_reset_coeffs(&instance->gain_coeffs);
 	bw_ppm_reset_coeffs(&instance->ppm_coeffs);
-	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state);
+	bw_ppm_reset_state(&instance->ppm_coeffs, &instance->ppm_state, 0.f);
 
 	for (int i = 0; i < N_VOICES; i++) {
+		bw_phase_gen_reset_coeffs(&instance->voices[i].vco1_phase_gen_coeffs);
 		bw_phase_gen_reset_coeffs(&instance->voices[i].vco2_phase_gen_coeffs);
 		bw_phase_gen_reset_coeffs(&instance->voices[i].vco3_phase_gen_coeffs);
 		bw_svf_reset_coeffs(&instance->voices[i].vcf_coeffs);
 		
-		bw_phase_gen_reset_state(&instance->voices[i].vco1_phase_gen_coeffs, &instance->voices[i].vco1_phase_gen_state, 0.f);
-		bw_phase_gen_reset_state(&instance->voices[i].vco2_phase_gen_coeffs, &instance->voices[i].vco2_phase_gen_state, 0.f);
-		bw_phase_gen_reset_state(&instance->voices[i].vco3_phase_gen_coeffs, &instance->voices[i].vco3_phase_gen_state, 0.f);
-		bw_osc_filt_reset_state(&instance->voices[i].osc_filt_state);
-		bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->voices[i].pink_filt_state);
-		bw_svf_reset_state(&instance->voices[i].vcf_coeffs, &instance->voices[i].vcf_state, 0.f);
-		bw_env_gen_reset_state(&instance->vcf_env_gen_coeffs, &instance->voices[i].vcf_env_gen_state);
-		bw_env_gen_reset_state(&instance->vca_env_gen_coeffs, &instance->voices[i].vca_env_gen_state);
+		bw_phase_gen_reset_state(&instance->voices[i].vco1_phase_gen_coeffs, &instance->voices[i].vco1_phase_gen_state, 0.f, &p, &pi);
+		bw_phase_gen_reset_state(&instance->voices[i].vco2_phase_gen_coeffs, &instance->voices[i].vco2_phase_gen_state, 0.f, &p, &pi);
+		bw_phase_gen_reset_state(&instance->voices[i].vco3_phase_gen_coeffs, &instance->voices[i].vco3_phase_gen_state, 0.f, &p, &pi);
+		bw_osc_filt_reset_state(&instance->voices[i].osc_filt_state, 0.f);
+		bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->voices[i].pink_filt_state, 0.f);
+		float lp, bp, hp;
+		bw_svf_reset_state(&instance->voices[i].vcf_coeffs, &instance->voices[i].vcf_state, 0.f, &lp, &bp, &hp);
+		bw_env_gen_reset_state(&instance->vcf_env_gen_coeffs, &instance->voices[i].vcf_env_gen_state, 0.f);
+		bw_env_gen_reset_state(&instance->vca_env_gen_coeffs, &instance->voices[i].vca_env_gen_state, 0.f);
 		
+		instance->voices[i].note = 69;
 		instance->voices[i].gate = 0;
 	}
 
@@ -236,7 +244,7 @@ void bw_example_synth_poly_process(bw_example_synth_poly *instance, const float*
 			bw_pink_filt_process_multi(&instance->pink_filt_coeffs, pink_filt_states, (const float **)b1, b1, N_VOICES, n);
 		else
 			for (int j = 0; j < N_VOICES; j++)
-				bw_pink_filt_reset_state(&instance->pink_filt_coeffs, pink_filt_states[j]); // FIXME: calling this here is sloppy coding
+				bw_pink_filt_reset_state(&instance->pink_filt_coeffs, pink_filt_states[j], 0.f); // FIXME: calling this here is sloppy coding
 		bw_buf_scale_multi((const float * const *)b1, 5.f, b1, N_VOICES, n);
 		
 		float vcf_mod[N_VOICES];

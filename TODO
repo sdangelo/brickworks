@@ -1,6 +1,7 @@
 1.0.0
 -----
 
+* test flush-to-zero on arm
 * debugging - also check outputs different (incl bw_buf)
 * check all examples again
 * clearly specify that state is tied to a particular set of coeffs (1:N)

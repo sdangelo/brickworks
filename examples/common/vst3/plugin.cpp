@@ -16,30 +16,6 @@
  * along with Brickworks.  If not, see <http://www.gnu.org/licenses/>.
  *
  * File author: Stefano D'Angelo, Paolo Marrone
- *
- * This file contains code from sse2neon
- * (https://github.com/DLTcollab/sse2neon/), which is released under the
- * following licensing conditions.
- *
- * sse2neon is freely redistributable under the MIT License.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 #include "plugin.h"
@@ -53,99 +29,9 @@
 #include <stdlib.h>
 #include <algorithm>
 
-#if defined(__aarch64__)
-
-/* Beginning of sse2neon code */
-
-/* Denormals are zeros mode macros. */
-#define _MM_DENORMALS_ZERO_MASK 0x0040
-#define _MM_DENORMALS_ZERO_ON 0x0040
-#define _MM_DENORMALS_ZERO_OFF 0x0000
-
-#define _MM_GET_DENORMALS_ZERO_MODE _sse2neon_mm_get_denormals_zero_mode
-#define _MM_SET_DENORMALS_ZERO_MODE _sse2neon_mm_set_denormals_zero_mode
-
-/* Flush zero mode macros. */
-#define _MM_FLUSH_ZERO_MASK 0x8000
-#define _MM_FLUSH_ZERO_ON 0x8000
-#define _MM_FLUSH_ZERO_OFF 0x0000
-
-#define _MM_GET_FLUSH_ZERO_MODE _sse2neon_mm_get_flush_zero_mode
-#define _MM_SET_FLUSH_ZERO_MODE _sse2neon_mm_set_flush_zero_mode
-
-typedef struct {
-    uint16_t res0;
-    uint8_t res1 : 6;
-    uint8_t bit22 : 1;
-    uint8_t bit23 : 1;
-    uint8_t bit24 : 1;
-    uint8_t res2 : 7;
-    uint32_t res3;
-} fpcr_bitfield;
-
-static inline unsigned int _sse2neon_mm_get_denormals_zero_mode()
-{
-    union {
-        fpcr_bitfield field;
-        uint64_t value;
-    } r;
-
-    __asm__ __volatile__("mrs %0, FPCR" : "=r"(r.value));
-
-    return r.field.bit24 ? _MM_DENORMALS_ZERO_ON : _MM_DENORMALS_ZERO_OFF;
-}
-
-static inline void _sse2neon_mm_set_denormals_zero_mode(unsigned int flag)
-{
-    union {
-        fpcr_bitfield field;
-        uint64_t value;
-    } r;
-
-    __asm__ __volatile__("mrs %0, FPCR" : "=r"(r.value));
-
-    r.field.bit24 = (flag & _MM_DENORMALS_ZERO_MASK) == _MM_DENORMALS_ZERO_ON;
-
-    __asm__ __volatile__("msr FPCR, %0" ::"r"(r));
-}
-
-static inline unsigned int _sse2neon_mm_get_flush_zero_mode()
-{
-    union {
-        fpcr_bitfield field;
-        uint64_t value;
-    } r;
-
-    __asm__ __volatile__("mrs %0, FPCR" : "=r"(r.value));
-
-    return r.field.bit24 ? _MM_FLUSH_ZERO_ON : _MM_FLUSH_ZERO_OFF;
-}
-
-static inline void _sse2neon_mm_set_flush_zero_mode(unsigned int flag)
-{
-    union {
-        fpcr_bitfield field;
-        uint64_t value;
-    } r;
-
-    __asm__ __volatile__("mrs %0, FPCR" : "=r"(r.value));
-
-    r.field.bit24 = (flag & _MM_FLUSH_ZERO_MASK) == _MM_FLUSH_ZERO_ON;
-
-    __asm__ __volatile__("msr FPCR, %0" ::"r"(r)); 
-}
-
-/* End of sse2neon code */
-
-#elif defined(__i386__) || defined(__x86_64__)
-
+#if defined(__i386__) || defined(__x86_64__)
 #include <xmmintrin.h>
 #include <pmmintrin.h>
-
-#else
-
-#define NO_DAZ_FTZ
-
 #endif
 
 Plugin::Plugin() {
@@ -326,10 +212,14 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 			outputs[ko] = data.outputs[i].channelBuffers32[j];
 #endif
 
+#if defined(__aarch64__)
+	uint64_t fpcr;
+	__asm__ __volatile__ ("mrs %0, fpcr" : "=r"(fpcr));
+	__asm__ __volatile__ ("msr fpcr, %0" :: "r"(fpcr | 0x1000000)); // enable FZ
+#elif defined(__i386__) || defined(__x86_64__)
 	const unsigned int flush_zero_mode = _MM_GET_FLUSH_ZERO_MODE();
 	const unsigned int denormals_zero_mode = _MM_GET_DENORMALS_ZERO_MODE();
 
-#ifndef NO_DAZ_FTZ
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 #endif
@@ -342,7 +232,9 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 #endif
 	P_PROCESS(&instance, inputs, outputs, data.numSamples);
 
-#ifndef NO_DAZ_FTZ
+#if defined(__aarch64__)
+	__asm__ __volatile__ ("msr fpcr, %0" : : "=r"(fpcr));
+#elif defined(__i386__) || defined(__x86_64__)
 	_MM_SET_FLUSH_ZERO_MODE(flush_zero_mode);
 	_MM_SET_DENORMALS_ZERO_MODE(denormals_zero_mode);
 #endif

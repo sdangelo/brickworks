@@ -1,7 +1,6 @@
 1.0.0
 -----
 
-* IMPLEMENTATION prepocessor def???
 * debugging - also check outputs different (incl bw_buf)
 * check all examples again
 * clearly specify that state is tied to a particular set of coeffs (1:N)
@@ -71,6 +70,7 @@ code:
 * bw_comb: integer target delay values?
 * are we sure about inlining everything?
 * reset style is not enough when you have feedbacks... (see reverb)
+* IMPLEMENTATION/DECL/DEF prepocessor defs, maybe if DECL/DEF is defined then IMPLEMENTATION is needed to get implementation, etc.
 
 build system:
 * make makefiles handle paths with spaces etc

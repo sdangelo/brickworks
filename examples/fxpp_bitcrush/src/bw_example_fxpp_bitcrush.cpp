@@ -25,8 +25,8 @@ void bw_example_fxpp_bitcrush_init(bw_example_fxpp_bitcrush *instance) {
 }
 
 void bw_example_fxpp_bitcrush_set_sample_rate(bw_example_fxpp_bitcrush *instance, float sample_rate) {
-	(void)instance;
-	(void)sample_rate;
+	instance->srReduce.setSampleRate(sample_rate);
+	instance->bdReduce.setSampleRate(sample_rate);
 }
 
 void bw_example_fxpp_bitcrush_reset(bw_example_fxpp_bitcrush *instance) {

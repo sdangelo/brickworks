@@ -3,7 +3,7 @@
 
 * test flush-to-zero on arm
 * debugging - also check outputs different (incl bw_buf)
-* check all examples again
+* check all examples again (from fxpp_noise_gate)
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * state that sample rate is finite and > 0
 * state that audio cannot be inf (also in reset)

@@ -7,7 +7,6 @@
 * state that audio cannot be inf (also in reset)
 * state that you need different output buffers to reset
 * thank scientific paper authors
-* change config.h in examples version 1.0.0
 * "Templates must have C++ linkage"?
 * state that mem_set() can/must be called on uninitialized state (before reset_state)
 

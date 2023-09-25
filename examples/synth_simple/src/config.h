@@ -51,7 +51,7 @@ struct config_parameter {
 #define COMPANY_MAILTO		"mailto:info@orastron.com"
 
 #define PLUGIN_NAME		"bw_example_synth_simple"
-#define PLUGIN_VERSION		"0.3.0"
+#define PLUGIN_VERSION		"1.0.0"
 
 #define NUM_BUSES_IN		0
 #define NUM_BUSES_OUT		1

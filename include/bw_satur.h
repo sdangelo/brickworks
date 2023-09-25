@@ -464,13 +464,18 @@ static inline float bw_satur_reset_state(
 static inline void bw_satur_reset_state_multi(
 		const bw_satur_coeffs * BW_RESTRICT              coeffs,
 		bw_satur_state * BW_RESTRICT const * BW_RESTRICT state,
-		const float *                                   x_0,
-		float *                                         y_0,
-		size_t                                          n_channels) {
+		const float *                                    x_0,
+		float *                                          y_0,
+		size_t                                           n_channels) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_satur_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_satur_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_0 != NULL)
@@ -598,8 +603,18 @@ static inline void bw_satur_process_multi(
 	BW_ASSERT_DEEP(bw_satur_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_satur_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	bw_satur_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {

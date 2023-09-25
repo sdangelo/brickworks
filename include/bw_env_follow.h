@@ -391,13 +391,18 @@ static inline float bw_env_follow_reset_state(
 static inline void bw_env_follow_reset_state_multi(
 		const bw_env_follow_coeffs * BW_RESTRICT              coeffs,
 		bw_env_follow_state * BW_RESTRICT const * BW_RESTRICT state,
-		const float *                                   x_0,
-		float *                                         y_0,
-		size_t                                          n_channels) {
+		const float *                                         x_0,
+		float *                                               y_0,
+		size_t                                                n_channels) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_env_follow_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_env_follow_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_0 != NULL)
@@ -501,7 +506,18 @@ static inline void bw_env_follow_process_multi(
 	BW_ASSERT_DEEP(bw_env_follow_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_env_follow_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
+#ifndef BW_NO_DEBUG
+	if (y != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = i + 1; j < n_channels; j++)
+				BW_ASSERT(y[i] != y[j]);
+#endif
 
 	bw_env_follow_update_coeffs_ctrl(coeffs);
 	if (y != NULL)

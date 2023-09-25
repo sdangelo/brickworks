@@ -352,6 +352,11 @@ static inline void bw_ring_mod_process_multi(
 	BW_ASSERT(x_mod != NULL);
 	BW_ASSERT(x_car != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_ring_mod_update_coeffs_audio(coeffs);

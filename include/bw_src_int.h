@@ -330,6 +330,11 @@ static inline void bw_src_int_reset_state_multi(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_0 != NULL)
@@ -418,9 +423,21 @@ static inline void bw_src_int_process_multi(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
-	BW_ASSERT((void*)x != (void*)y);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT((void *)x[i] != (void *)y[j]);
+#endif
 
 	if (n_out_samples != NULL)
 		for (size_t i = 0; i < n_channels; i++)

@@ -106,7 +106,7 @@ static inline void bw_bd_reduce_set_sample_rate(
  *    #### bw_bd_reduce_reset_coeffs()
  *  ```>>> */
 static inline void bw_bd_reduce_reset_coeffs(
-	bw_bd_reduce_coeffs *BW_RESTRICT coeffs);
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs);
 /*! <<<```
  *    Resets coefficients in `coeffs` to assume their target values.
  *
@@ -351,6 +351,11 @@ static inline void bw_bd_reduce_process_multi(
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++)

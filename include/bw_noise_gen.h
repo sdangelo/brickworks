@@ -367,6 +367,11 @@ static inline void bw_noise_gen_process_multi(
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_noise_gen_process(coeffs, y[i], n_samples);

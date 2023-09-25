@@ -326,6 +326,7 @@ static inline void bw_balance_process1(
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x_l));
 	BW_ASSERT(bw_is_finite(x_r));
+	BW_ASSERT(y_l != y_r);
 
 	*y_l = bw_gain_process1(&coeffs->l_coeffs, x_l);
 	*y_r = bw_gain_process1(&coeffs->r_coeffs, x_r);
@@ -352,6 +353,7 @@ static inline void bw_balance_process(
 	BW_ASSERT_DEEP(bw_has_only_finite(x_r, n_samples));
 	BW_ASSERT(y_l != NULL);
 	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != y_r);
 
 	bw_balance_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
@@ -380,6 +382,16 @@ static inline void bw_balance_process_multi(
 	BW_ASSERT(x_r != NULL);
 	BW_ASSERT(y_l != NULL);
 	BW_ASSERT(y_r != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++) {
+			BW_ASSERT(y_l[i] != y_l[j]);
+			BW_ASSERT(y_r[i] != y_r[j]);
+		}
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(y_l[i] != y_r[j]);
+#endif
 
 	bw_balance_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {

@@ -165,6 +165,11 @@ static inline void bw_osc_sin_process_multi(
 		size_t                n_samples) {
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_osc_sin_process(x[i], y[i], n_samples);

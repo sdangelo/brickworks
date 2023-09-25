@@ -214,6 +214,11 @@ static inline void bw_osc_filt_reset_state_multi(
 		float *                                             y_0,
 		size_t                                              n_channels) {
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_0 != NULL)
@@ -267,8 +272,18 @@ static inline void bw_osc_filt_process_multi(
 		size_t                                              n_channels,
 		size_t                                              n_samples) {
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_osc_filt_process(state[i], x[i], y[i], n_samples);

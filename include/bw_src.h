@@ -322,12 +322,17 @@ static inline float bw_src_reset_state(
 static inline void bw_src_reset_state_multi(
 		const bw_src_coeffs * BW_RESTRICT              coeffs,
 		bw_src_state * BW_RESTRICT const * BW_RESTRICT state,
-		const float *                                      x_0,
-		float *                                            y_0,
-		size_t                                             n_channels) {
+		const float *                                  x_0,
+		float *                                        y_0,
+		size_t                                         n_channels) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_src_coeffs_is_valid(coeffs));
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_0 != NULL)
@@ -442,9 +447,21 @@ static inline void bw_src_process_multi(
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_src_coeffs_is_valid(coeffs));
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
-	BW_ASSERT((void*)x != (void*)y);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT((void *)x[i] != (void *)y[j]);
+#endif
 	BW_ASSERT(n_in_samples != NULL);
 	BW_ASSERT(n_out_samples != NULL);
 	BW_ASSERT(n_in_samples != n_out_samples);

@@ -460,6 +460,11 @@ static inline void bw_osc_pulse_process_multi(
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_pulse_coeffs_state_reset_coeffs);
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	if (coeffs->antialiasing)
 		for (size_t i = 0; i < n_samples; i++) {

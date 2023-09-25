@@ -501,6 +501,9 @@ static inline void bw_svf_reset_state(
 	BW_ASSERT(y_lp_0 != NULL);
 	BW_ASSERT(y_bp_0 != NULL);
 	BW_ASSERT(y_hp_0 != NULL);
+	BW_ASSERT(y_lp_0 != y_bp_0);
+	BW_ASSERT(y_lp_0 != y_hp_0);
+	BW_ASSERT(y_bp_0 != y_hp_0);
 
 	state->hp_z1 = 0.f;
 	state->lp_z1 = x_0;
@@ -534,6 +537,11 @@ static inline void bw_svf_reset_state_multi(
 	BW_ASSERT_DEEP(bw_svf_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_svf_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_lp_0 != NULL) {
@@ -632,6 +640,9 @@ static inline void bw_svf_process1(
 	BW_ASSERT(y_lp != NULL);
 	BW_ASSERT(y_bp != NULL);
 	BW_ASSERT(y_hp != NULL);
+	BW_ASSERT(y_lp != y_bp);
+	BW_ASSERT(y_lp != y_hp);
+	BW_ASSERT(y_bp != y_hp);
 
 	const float kk = coeffs->kf * state->cutoff_z1;
 	const float lp_xz1 = state->lp_z1 + kk * state->bp_z1;
@@ -750,7 +761,38 @@ static inline void bw_svf_process_multi(
 	BW_ASSERT_DEEP(bw_svf_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_svf_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
+#ifndef BW_NO_DEBUG
+	if (y_lp != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = i + 1; j < n_channels; j++)
+				BW_ASSERT(y_lp[i] != y_lp[j]);
+	if (y_bp != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = i + 1; j < n_channels; j++)
+				BW_ASSERT(y_bp[i] != y_bp[j]);
+	if (y_hp != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = i + 1; j < n_channels; j++)
+				BW_ASSERT(y_hp[i] != y_hp[j]);
+	if (y_lp != NULL && y_bp != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(y_lp[i] != y_bp[j]);
+	if (y_lp != NULL && y_hp != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(y_lp[i] != y_hp[j]);
+	if (y_bp != NULL && y_hp != NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(y_bp[i] != y_hp[j]);
+#endif
 
 	if (y_lp != NULL) {
 		if (y_bp != NULL) {

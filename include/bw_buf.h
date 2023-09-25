@@ -335,6 +335,11 @@ static inline void bw_buf_fill_multi(
 		size_t                                  n_elems) {
 	BW_ASSERT(!bw_is_nan(k));
 	BW_ASSERT(dest != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(dest[i] != dest[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_fill(k, dest[i], n_elems);
@@ -347,6 +352,11 @@ static inline void bw_buf_neg_multi(
 		size_t                n_elems) {
 	BW_ASSERT(src != NULL);
 	BW_ASSERT(dest != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(dest[i] != dest[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_neg(src[i], dest[i], n_elems);
@@ -361,6 +371,11 @@ static inline void bw_buf_add_multi(
 	BW_ASSERT(src != NULL);
 	BW_ASSERT(!bw_is_nan(k));
 	BW_ASSERT(dest != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(dest[i] != dest[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_add(src[i], k, dest[i], n_elems);
@@ -375,6 +390,11 @@ static inline void bw_buf_scale_multi(
 	BW_ASSERT(src != NULL);
 	BW_ASSERT(!bw_is_nan(k));
 	BW_ASSERT(dest != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(dest[i] != dest[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_scale(src[i], k, dest[i], n_elems);
@@ -389,6 +409,11 @@ static inline void bw_buf_mix_multi(
 	BW_ASSERT(src1 != NULL);
 	BW_ASSERT(src2 != NULL);
 	BW_ASSERT(dest != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(dest[i] != dest[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_mix(src1[i], src2[i], dest[i], n_elems);
@@ -403,6 +428,11 @@ static inline void bw_buf_mul_multi(
 	BW_ASSERT(src1 != NULL);
 	BW_ASSERT(src2 != NULL);
 	BW_ASSERT(dest != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(dest[i] != dest[j]);
+#endif
 
 	for (size_t i = 0; i < n_channels; i++)
 		bw_buf_mul(src1[i], src2[i], dest[i], n_elems);

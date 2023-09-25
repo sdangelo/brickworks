@@ -118,8 +118,8 @@ static inline void bw_peak_init(
  *    #### bw_peak_set_sample_rate()
  *  ```>>> */
 static inline void bw_peak_set_sample_rate(
-	bw_peak_coeffs *BW_RESTRICT coeffs,
-	float                       sample_rate);
+	bw_peak_coeffs * BW_RESTRICT coeffs,
+	float                        sample_rate);
 /*! <<<```
  *    Sets the `sample_rate` (Hz) value in `coeffs`.
  *
@@ -525,13 +525,18 @@ static inline float bw_peak_reset_state(
 static inline void bw_peak_reset_state_multi(
 		const bw_peak_coeffs * BW_RESTRICT              coeffs,
 		bw_peak_state * BW_RESTRICT const * BW_RESTRICT state,
-		const float *                                  x_0,
-		float *                                        y_0,
-		size_t                                         n_channels) {
+		const float *                                   x_0,
+		float *                                         y_0,
+		size_t                                          n_channels) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x_0 != NULL);
 
 	if (y_0 != NULL)
@@ -651,8 +656,18 @@ static inline void bw_peak_process_multi(
 			&& bw_sqrtf(bw_pow2f(coeffs->bandwidth) * coeffs->peak_gain) * bw_rcpf(bw_pow2f(coeffs->bandwidth) - 1.f) <= 1e6f
 		: 1);
 	BW_ASSERT(state != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(state[i] != state[j]);
+#endif
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+#ifndef BW_NO_DEBUG
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++)
+			BW_ASSERT(y[i] != y[j]);
+#endif
 
 	bw_peak_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {

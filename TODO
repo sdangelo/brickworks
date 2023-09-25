@@ -70,6 +70,7 @@ code:
 * are we sure about inlining everything?
 * reset style is not enough when you have feedbacks... (see reverb)
 * IMPLEMENTATION/DECL/DEF prepocessor defs, maybe if DECL/DEF is defined then IMPLEMENTATION is needed to get implementation, etc.
+* actually assert no buffer overlap
 
 build system:
 * make makefiles handle paths with spaces etc

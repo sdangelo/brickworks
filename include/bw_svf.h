@@ -678,6 +678,9 @@ static inline void bw_svf_process(
 	BW_ASSERT_DEEP(bw_svf_state_is_valid(coeffs, state));
 	BW_ASSERT(x != NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
+	BW_ASSERT(y_lp == NULL || y_bp == NULL || y_lp != y_bp);
+	BW_ASSERT(y_lp == NULL || y_hp == NULL || y_lp != y_hp);
+	BW_ASSERT(y_bp == NULL || y_hp == NULL || y_bp != y_hp);
 
 	if (y_lp != NULL) {
 		if (y_bp != NULL) {
@@ -767,31 +770,34 @@ static inline void bw_svf_process_multi(
 			BW_ASSERT(state[i] != state[j]);
 #endif
 	BW_ASSERT(x != NULL);
+	BW_ASSERT(y_lp == NULL || y_bp == NULL || y_lp != y_bp);
+	BW_ASSERT(y_lp == NULL || y_hp == NULL || y_lp != y_hp);
+	BW_ASSERT(y_bp == NULL || y_hp == NULL || y_bp != y_hp);
 #ifndef BW_NO_DEBUG
 	if (y_lp != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y_lp[i] != y_lp[j]);
+				BW_ASSERT(y_lp[i] == NULL || y_lp[j] == NULL || y_lp[i] != y_lp[j]);
 	if (y_bp != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y_bp[i] != y_bp[j]);
+				BW_ASSERT(y_bp[i] == NULL || y_bp[j] == NULL || y_bp[i] != y_bp[j]);
 	if (y_hp != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y_hp[i] != y_hp[j]);
+				BW_ASSERT(y_hp[i] == NULL || y_hp[j] == NULL || y_hp[i] != y_hp[j]);
 	if (y_lp != NULL && y_bp != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = 0; j < n_channels; j++)
-				BW_ASSERT(y_lp[i] != y_bp[j]);
+				BW_ASSERT(y_lp[i] == NULL || y_bp[j] == NULL || y_lp[i] != y_bp[j]);
 	if (y_lp != NULL && y_hp != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = 0; j < n_channels; j++)
-				BW_ASSERT(y_lp[i] != y_hp[j]);
+				BW_ASSERT(y_lp[i] == NULL || y_hp[j] == NULL || y_lp[i] != y_hp[j]);
 	if (y_bp != NULL && y_hp != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = 0; j < n_channels; j++)
-				BW_ASSERT(y_bp[i] != y_hp[j]);
+				BW_ASSERT(y_bp[i] == NULL || y_hp[j] == NULL || y_bp[i] != y_hp[j]);
 #endif
 
 	if (y_lp != NULL) {

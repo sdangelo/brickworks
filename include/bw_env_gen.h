@@ -691,7 +691,7 @@ static inline void bw_env_gen_process_multi(
 	if (y != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y[i] != y[j]);
+				BW_ASSERT(y[i] == NULL || y[j] == NULL || y[i] != y[j]);
 #endif
 
 	bw_env_gen_update_coeffs_ctrl(coeffs);

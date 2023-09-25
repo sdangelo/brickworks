@@ -454,6 +454,7 @@ static inline void bw_src_process_multi(
 #endif
 	BW_ASSERT(x != NULL);
 	BW_ASSERT(y != NULL);
+	BW_ASSERT((void *)x != (void *)y);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)

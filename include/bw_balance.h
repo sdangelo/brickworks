@@ -382,6 +382,7 @@ static inline void bw_balance_process_multi(
 	BW_ASSERT(x_r != NULL);
 	BW_ASSERT(y_l != NULL);
 	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != y_r);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++) {

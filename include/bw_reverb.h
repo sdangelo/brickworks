@@ -837,6 +837,7 @@ static inline void bw_reverb_process1(
 	BW_ASSERT(bw_is_finite(x_r));
 	BW_ASSERT(y_l != NULL);
 	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != y_r);
 
 	const float i = 0.5f * (x_l + x_r);
 	const float pd = bw_delay_process1(&coeffs->predelay_coeffs, &state->predelay_state, i);
@@ -947,6 +948,7 @@ static inline void bw_reverb_process(
 	BW_ASSERT_DEEP(bw_has_only_finite(x_r, n_samples));
 	BW_ASSERT(y_l != NULL);
 	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != y_r);
 
 	bw_reverb_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
@@ -984,19 +986,16 @@ static inline void bw_reverb_process_multi(
 	BW_ASSERT(x_r != NULL);
 	BW_ASSERT(y_l != NULL);
 	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != y_r);
 #ifndef BW_NO_DEBUG
-	if (y_l_0 != NULL)
-		for (size_t i = 0; i < n_channels; i++)
-			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y_l_0[i] != y_l_0[j]);
-	if (y_r_0 != NULL)
-		for (size_t i = 0; i < n_channels; i++)
-			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y_r_0[i] != y_r_0[j]);
-	if (y_l_0 != y_r_0)
-		for (size_t i = 0; i < n_channels; i++)
-			for (size_t j = 0; j < n_channels; j++)
-				BW_ASSERT(y_l_0[i] != y_r_0[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = i + 1; j < n_channels; j++) {
+			BW_ASSERT(y_l[i] != y_l[j]);
+			BW_ASSERT(y_r[i] != y_r[j]);
+		}
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(y_l[i] != y_r[j]);
 #endif
 
 	bw_reverb_update_coeffs_ctrl(coeffs);

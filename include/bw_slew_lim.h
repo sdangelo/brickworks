@@ -674,7 +674,7 @@ static inline void bw_slew_lim_process_multi(
 	if (y != NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y[i] != y[j]);
+				BW_ASSERT(y[i] == NULL || y[j] == NULL || y[i] != y[j]);
 #endif
 
 	bw_slew_lim_update_coeffs_ctrl(coeffs);

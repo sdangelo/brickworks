@@ -1,13 +1,11 @@
 1.0.0
 -----
 
-* test flush-to-zero on arm
 * clearly specify that state is tied to a particular set of coeffs (1:N)
 * state that sample rate is finite and > 0
 * state that audio cannot be inf (also in reset)
 * state that you need different output buffers to reset
 * thank scientific paper authors
-* "Templates must have C++ linkage"?
 * state that mem_set() can/must be called on uninitialized state (before reset_state)
 
 build system:

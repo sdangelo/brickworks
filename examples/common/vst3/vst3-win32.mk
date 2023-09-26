@@ -13,7 +13,8 @@ LDFLAGS += \
 	-static-libstdc++ \
 	-lole32
 
-SOURCES_COMMON += ${VST3_SDK_DIR}/public.sdk/source/main/dllmain.cpp
+SOURCES_VST3_SDK += \
+	public.sdk/source/main/dllmain.cpp
 	
 DLL_DIR := ${BUILD_PLUGIN_DIR}/Contents/${ARCH}-win
 DLL_FILE := ${DLL_DIR}/${NAME}.vst3
@@ -40,8 +41,8 @@ ${OBJ_DIR}/common/%.o: ${COMMON_DIR}/%.cpp | ${OBJ_DIR}/common
 
 ${OBJ_DIR}/vst3/%.o: ${VST3_SDK_DIR}/%.cpp
 	mkdir -p $(dir $@)
-	${CXX} $^ ${CXXFLAGS} -c -o $@
+	${CXX} $^ ${CXXFLAGS} -include limits -c -o $@
+	# thank you Steinberg for having to force inclusion on command line...
 
 ${DLL_FILE}: ${OBJ_COMMON} ${OBJ_VST3_SDK} ${OBJ_DIR}/${NAME}.o ${SOURCES} | ${DLL_DIR}
 	${CXX} $^ ${LDFLAGS} -o $@
-

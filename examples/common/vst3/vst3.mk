@@ -28,6 +28,7 @@ SOURCES_VST3_SDK := \
 	base/source/fstring.cpp \
 	base/source/fbuffer.cpp \
 	base/source/updatehandler.cpp \
+	base/source/fdebug.cpp \
 	base/thread/source/flock.cpp \
 	pluginterfaces/base/coreiids.cpp \
 	pluginterfaces/base/funknown.cpp \

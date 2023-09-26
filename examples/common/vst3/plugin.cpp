@@ -233,7 +233,7 @@ tresult PLUGIN_API Plugin::process(ProcessData &data) {
 	P_PROCESS(&instance, inputs, outputs, data.numSamples);
 
 #if defined(__aarch64__)
-	__asm__ __volatile__ ("msr fpcr, %0" : : "=r"(fpcr));
+	__asm__ __volatile__ ("msr fpcr, %0" : : "r"(fpcr));
 #elif defined(__i386__) || defined(__x86_64__)
 	_MM_SET_FLUSH_ZERO_MODE(flush_zero_mode);
 	_MM_SET_DENORMALS_ZERO_MODE(denormals_zero_mode);

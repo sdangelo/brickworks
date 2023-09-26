@@ -999,7 +999,7 @@ inline void PhaseGen<N_CHANNELS>::reset(
 		float                                       phase0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yInc0) {
-	reset(phase0, y0 != nullptr ? y0.data() : nullptr, yInc0 != nullptr ? yInc0.data() : nullptr);
+	reset(phase0, y0 != nullptr ? y0->data() : nullptr, yInc0 != nullptr ? yInc0->data() : nullptr);
 }
 
 template<size_t N_CHANNELS>
@@ -1016,7 +1016,7 @@ inline void PhaseGen<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS>               phase0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yInc0) {
-	reset(phase0.data(), y0 != nullptr ? y0.data() : nullptr, yInc0 != nullptr ? yInc0.data() : nullptr);
+	reset(phase0.data(), y0 != nullptr ? y0->data() : nullptr, yInc0 != nullptr ? yInc0->data() : nullptr);
 }
 
 template<size_t N_CHANNELS>

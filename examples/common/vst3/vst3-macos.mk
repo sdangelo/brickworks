@@ -17,7 +17,7 @@ OBJ_DIR := build/obj
 OBJ_DIR_X86_64 := ${OBJ_DIR}/x86_64
 OBJ_DIR_ARM64 := ${OBJ_DIR}/arm64
 OBJ_COMMON_X86_64 := $(addprefix ${OBJ_DIR_X86_64}/common/, $(SOURCES_COMMON:.cpp=.o))
-OBJ_VST3_SDK_X86_64 := $(addprefix ${OBJ_DIRX86_64}/vst3/, $(SOURCES_VST3_SDK:.cpp=.o))
+OBJ_VST3_SDK_X86_64 := $(addprefix ${OBJ_DIR_X86_64}/vst3/, $(SOURCES_VST3_SDK:.cpp=.o))
 OBJ_COMMON_ARM64 := $(addprefix ${OBJ_DIR_ARM64}/common/, $(SOURCES_COMMON:.cpp=.o))
 OBJ_VST3_SDK_ARM64 := $(addprefix ${OBJ_DIR_ARM64}/vst3/, $(SOURCES_VST3_SDK:.cpp=.o))
 
@@ -52,7 +52,7 @@ ${OBJ_DIR_ARM64}/vst3/%.o: ${VST3_SDK_DIR}/%.cpp
 	mkdir -p $(dir $@)
 	${CXX} $^ ${CXXFLAGS} -arch arm64 -c -o $@
 
-build/tmp/${NAME}-x86_64: ${OBJ_COMMON_ARM64} ${OBJ_VST3_SDK_X86_64} ${OBJ_DIR_X86_64}/${NAME}.o | build/tmp
+build/tmp/${NAME}-x86_64: ${OBJ_COMMON_X86_64} ${OBJ_VST3_SDK_X86_64} ${OBJ_DIR_X86_64}/${NAME}.o | build/tmp
 	${CXX} $^ ${LDFLAGS} -arch x86_64 -o $@
 
 build/tmp/${NAME}-arm64: ${OBJ_COMMON_ARM64} ${OBJ_VST3_SDK_ARM64} ${OBJ_DIR_ARM64}/${NAME}.o | build/tmp

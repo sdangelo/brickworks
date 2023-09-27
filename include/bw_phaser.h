@@ -606,7 +606,6 @@ static inline void bw_phaser_set_amount(
 	BW_ASSERT_DEEP(coeffs->state >= bw_phaser_coeffs_state_init);
 }
 
-#include <stdio.h>
 static inline char bw_phaser_coeffs_is_valid(
 		const bw_phaser_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != NULL);

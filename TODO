@@ -5,7 +5,6 @@
 * state that sample rate is finite and > 0
 * state that audio cannot be inf (also in reset)
 * state that you need different output buffers to reset
-* thank scientific paper authors
 * state that mem_set() can/must be called on uninitialized state (before reset_state)
 
 build system:

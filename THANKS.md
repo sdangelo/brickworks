@@ -1,5 +1,5 @@
 We wish to thank and give credit to:
-- the adopters of this software, of which at the moment we can only publicly mention our friends at Elk Audio <https://www.elk.audio/>;
+- the adopters of this software, of which at the moment we can only publicly mention our friends at [Elk Audio](https://www.elk.audio/);
 - users participating to [this thread on the KVR Audio forum](https://www.kvraudio.com/forum/viewtopic.php?f=33&t=589519) for providing useful feedback;
 - [Mads Kjeldgaard](https://madskjeldgaard.dk/) for publishing [instructions to build for the Daisy Seed and uploading the firmware](https://madskjeldgaard.dk/posts/daisy-setup/);
 - [Hereket](https://hereket.github.io/) for providing instructions on [how to build an Android app without Android Studio or Gradle](https://hereket.github.io/posts/android_from_command_line/);

@@ -3,11 +3,11 @@
  *
  * Copyright (C) 2023 Orastron Srl unipersonale
  *
- * Brickworks is free software: you can redriveribute it and/or modify
+ * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
  *
- * Brickworks is driveributed in the hope that it will be useful,
+ * Brickworks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -36,6 +36,8 @@
  *        <ul>
  *          <li>Improved algorithm to be a bit more faithful to the
  *              original.</li>
+ *          <li>Added initial input value to
+ *              <code>bw_drive_reset_state()</code>.</li>
  *          <li>Added <code>bw_drive_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_drive_reset_state()</code> returns the initial

@@ -40,7 +40,7 @@
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added initial value argument in
- *              <code>bw_chorus_reset_state()</code>.</li>
+ *              <code>bw_comb_reset_state()</code>.</li>
  *          <li>Added <code>bw_comb_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_comb_reset_state()</code> returns the initial

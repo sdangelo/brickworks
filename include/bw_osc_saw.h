@@ -50,6 +50,8 @@
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
+ *          <li>Now antialiasing should work also with negative input
+ *              increments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Clearly specified validity ranges for audio-rate signals.</li>
  *          <li>Added debugging code.</li>

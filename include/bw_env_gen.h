@@ -44,6 +44,8 @@
  *        <ul>
  *          <li>Renamed <code>bw_env_gen_update_state_ctrl()</code> as
  *              <code>bw_env_gen_process_ctrl()</code>.</li>
+ *          <li>Added initial gate value to
+ *              <code>bw_env_gen_reset_state()</code>.</li>
  *          <li>Added <code>bw_env_gen_reset_state_multi()</code> and updated
  *              C++ API in this regard.</li>
  *          <li>Now <code>bw_env_gen_reset_state()</code> returns the initial

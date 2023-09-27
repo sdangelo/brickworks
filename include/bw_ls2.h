@@ -36,6 +36,7 @@
  *              value.</li>
  *          <li>Added overloaded C++ <code>reset()</code> functions taking
  *              arrays as arguments.</li>
+ *          <li>Added prewarp_at_cutoff and prewarp_freq parameters.</li>
  *          <li><code>bw_ls2_process()</code> and
  *              <code>bw_ls2_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>
@@ -47,6 +48,8 @@
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Added pragmas to silence bogus GCC uninitialized variable
  *              warnings.</li>
+ *          <li>Fixed documentation to indicate correct default parameter
+ *              values.</li>
  *          <li>Clearly specified parameter validity ranges.</li>
  *          <li>Added debugging code.</li>
  *        </ul>

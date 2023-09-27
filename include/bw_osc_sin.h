@@ -41,6 +41,7 @@
  *          <li>Added overloaded C++ <code>oscSinProcess()</code> function taking
  *              C-style arrays as arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
+ *          <li>Clearly specified validity ranges for audio-rate signals.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
  *      </li>

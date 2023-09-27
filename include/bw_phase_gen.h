@@ -36,7 +36,7 @@
  *          <li>Added <code>bw_phase_gen_reset_state_multi()</code> and updated
  *              C++ API in this regard.</li>
  *          <li>Now <code>bw_phase_gen_reset_state()</code> returns the initial
- *              output value.</li>
+ *              output values.</li>
  *          <li>Added overloaded C++ <code>reset()</code> functions taking
  *              arrays as arguments.</li>
  *          <li><code>bw_phase_gen_process()</code> and

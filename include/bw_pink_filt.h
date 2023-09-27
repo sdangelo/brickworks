@@ -61,6 +61,8 @@
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
+ *          <li>Fixed type of coefficient in
+ *              <code>bw_pink_filt_process1()</code>.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
@@ -174,6 +176,20 @@ static inline void bw_pink_filt_reset_state_multi(
  *
  *    The corresponding initial output values are written into the `y_0` array,
  *    if not `NULL`.
+ *
+ *    #### bw_pink_filt_update_coeffs_ctrl()
+ *  ```>>> */
+static inline void bw_pink_filt_update_coeffs_ctrl(
+	bw_pink_filt_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers control-rate update of coefficients in `coeffs`.
+ *
+ *    #### bw_pink_filt_update_coeffs_audio()
+ *  ```>>> */
+static inline void bw_pink_filt_update_coeffs_audio(
+	bw_pink_filt_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Triggers audio-rate update of coefficients in `coeffs`.
  *
  *    #### bw_pink_filt_process1()
  *  ```>>> */

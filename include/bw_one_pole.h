@@ -49,8 +49,8 @@
  *          <li>Now using backward Euler rather than impulse invariant
  *              method.</li>
  *          <li>Clearly specified parameter validity ranges.</li>
- *          <li>Added more debugging code and added `coeffs` argument to
- *              <code>bw_one_pole_state_is_valid()</code>.</li>
+ *          <li>Added more debugging code and added <code>coeffs</code> argument
+ *              to <code>bw_one_pole_state_is_valid()</code>.</li>
  *          <li>Added pragmas to silence bogus GCC uninitialized variable
  *              warnings.</li>
  *        </ul>

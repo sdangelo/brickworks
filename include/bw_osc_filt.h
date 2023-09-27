@@ -51,6 +51,7 @@
  *          <li>Moved C++ code to C header.</li>
  *          <li>Added overloaded C++ <code>process()</code> function taking
  *              C-style arrays as arguments.</li>
+ *          <li>Changed implementation topology to use less memory.</li>
  *          <li>Removed usage of reserved identifiers.</li>
  *          <li>Added debugging code.</li>
  *        </ul>
@@ -187,7 +188,7 @@ struct bw_osc_filt_state {
 #endif
 
 	// States
-	float	z1;
+	float		z1;
 };
 
 static inline float bw_osc_filt_reset_state(

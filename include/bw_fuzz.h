@@ -36,6 +36,8 @@
  *        <ul>
  *          <li>Improved algorithm to be a bit more faithful to the
  *              original.</li>
+ *          <li>Added initial input value to
+ *              <code>bw_fuzz_reset_state()</code>.</li>
  *          <li>Added <code>bw_fuzz_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_fuzz_reset_state()</code> returns the initial

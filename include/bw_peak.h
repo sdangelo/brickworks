@@ -43,6 +43,7 @@
  *              output value.</li>
  *          <li>Added overloaded C++ <code>reset()</code> functions taking
  *              arrays as arguments.</li>
+ *          <li>Added prewarp_at_cutoff and prewarp_freq parameters.</li>
  *          <li><code>bw_peak_process()</code> and
  *              <code>bw_peak_process_multi()</code> now use <code>size_t</code>
  *              to count samples and channels.</li>

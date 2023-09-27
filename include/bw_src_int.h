@@ -27,8 +27,8 @@
  *
  *    The multi-rate filtering approach was inspired by
  *
- *    M. Holters and J.Parker, "A Combined Model for a Bucket Brigade Device and
- *    its Input and Output Filters", 21st Intl. Conf. Digital Audio Effects
+ *    M. Holters and J. D. Parker, "A Combined Model for a Bucket Brigade Device
+ *    and its Input and Output Filters", 21st Intl. Conf. Digital Audio Effects
  *    (DAFx-18), Aveiro, Portugal, September 2018.
  *  }}}
  *  changelog {{{
@@ -111,7 +111,7 @@ static inline void bw_src_int_init(
  *    negative, then the sample rate of the output signal will be equal to the
  *    sample rate of the input signal divided by `-ratio`.
  *
- *    `ratio` must not be `0`.
+ *    `ratio` must not be in [`-1`, `1`].
  *
  *    #### bw_src_int_reset_state()
  *  ```>>> */
@@ -263,7 +263,7 @@ static inline void bw_src_int_init(
 		bw_src_int_coeffs * BW_RESTRICT coeffs,
 		int ratio) {
 	BW_ASSERT(coeffs != NULL);
-	BW_ASSERT(ratio != 0);
+	BW_ASSERT(ratio < -1 || ratio > 1);
 
 	coeffs->ratio = ratio;
 	// 4th-degree Butterworth with cutoff at ratio * Nyquist, using bilinear transform w/ prewarping
@@ -459,7 +459,7 @@ static inline char bw_src_int_coeffs_is_valid(
 		return 0;
 #endif
 
-	return coeffs->ratio != 0
+	return (coeffs->ratio < -1 || coeffs->ratio > 1)
 		&& bw_is_finite(coeffs->b0)
 		&& bw_is_finite(coeffs->ma1)
 		&& bw_is_finite(coeffs->ma2)

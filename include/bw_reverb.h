@@ -37,12 +37,12 @@
  *    <ul>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
- *          <li>Added initial value argument in
+ *          <li>Added initial value arguments in
  *              <code>bw_reverb_reset_state()</code>.</li>
  *          <li>Added <code>bw_reverb_reset_state_multi()</code> and updated C++
  *              API in this regard.</li>
  *          <li>Now <code>bw_reverb_reset_state()</code> returns the initial
- *              output value.</li>
+ *              output values.</li>
  *          <li>Added overloaded C++ <code>reset()</code> functions taking
  *              arrays as arguments.</li>
  *          <li>Now using <code>size_t</code> instead of

@@ -120,10 +120,3 @@ At this point you can build and run as with any other iOS app.
 Effect examples process audio input signals, therefore they will require permission to use the capture device.
 
 Synth examples use input MIDI and support hotplugging.
-
-## Thanks
-
-Thanks to:
-
-- [Mads Kjeldgaard](https://madskjeldgaard.dk/) for publishing [instructions to build for the Daisy Seed and uploading the firmware](https://madskjeldgaard.dk/posts/daisy-setup/);
-- [Hereket](https://hereket.github.io/) for providing instructions on [how to build an Android app without Android Studio or Gradle](https://hereket.github.io/posts/android_from_command_line/).

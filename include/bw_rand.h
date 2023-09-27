@@ -38,7 +38,7 @@
  *
  *    M. E. O'Neill, "PCG: A Family of Simple Fast Space-Efficient Statistically
  *    Good Algorithms for Random Number Generation", September 2014, available
- *    at https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf.
+ *    at <https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf>.
  *  }}}
  *  changelog {{{
  *    <ul>

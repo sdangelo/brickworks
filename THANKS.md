@@ -1,0 +1,13 @@
+We wish to thank and give credit to:
+- the adopters of this software, of which at the moment we can only publicly mention our friends at Elk Audio <https://www.elk.audio/>;
+- users participating to [this thread on the KVR Audio forum](https://www.kvraudio.com/forum/viewtopic.php?f=33&t=589519) for providing useful feedback;
+- [Mads Kjeldgaard](https://madskjeldgaard.dk/) for publishing [instructions to build for the Daisy Seed and uploading the firmware](https://madskjeldgaard.dk/posts/daisy-setup/);
+- [Hereket](https://hereket.github.io/) for providing instructions on [how to build an Android app without Android Studio or Gradle](https://hereket.github.io/posts/android_from_command_line/);
+- the authors of the following publications, which some algorithms in this software are based on:
+  - J. Dattorro, "Effect Design, Part 1: Reverberator and Other Filters", J. Audio Eng. Soc., vol. 45, no. 9, pp. 660-684, September 1997;
+  - J. Dattorro, "Effect Design, Part 2: Delay-Line Modulation and Chorus", J. Audio Eng. Soc., vol. 45, no. 10, pp. 764-788, October 1997;
+  - V. Valimaki and A. Huovilainen, "Antialiasing Oscillators in Subtractive Synthesis", IEEE Signal Processing Magazine, vol. 24, no. 2, pp. 116-125, March 2007;
+  - M. E. O'Neill, "PCG: A Family of Simple Fast Space-Efficient Statistically Good Algorithms for Random Number Generation", September 2014, available at <https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf>;
+  - C. Wellons, "Finding the Best 64-bit Simulation PRNG", September 2017, available at <https://nullprogram.com/blog/2017/09/21/>;
+  - M. Holters and J.Parker, "A Combined Model for a Bucket Brigade Device and its Input and Output Filters", 21st Intl. Conf. Digital Audio Effects (DAFx-18), Aveiro, Portugal, September 2018;
+  - P. P. La Pastina and S. D'Angelo, "Optimal Integer Order Approximation of Fractional Order Filters", Proc. 24th Intl. Conf. Digital Audio Effects (DAFx20in21), pp. 89-96, Vienna, Austria, September 2021.

@@ -39,8 +39,8 @@
  *          <li>Added overloaded C++ functions taking C-style arrays as
  *              arguments.</li>
  *          <li>Removed usage of reserved identifiers.</li>
- *          <li>Now enforcing that buffers are never <code>NULL</code> in
- *              debugging code.</li>
+ *          <li>Now checking that buffers are never <code>NULL</code> and that
+ *              output buffers are different in debugging code.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>0.6.0</strong>:

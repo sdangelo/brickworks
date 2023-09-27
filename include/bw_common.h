@@ -170,7 +170,7 @@
  *
  *    Otherwise, `BW_ASSERT` and `BW_ASSERT_DEEP` can either be provided by you,
  *    otherwise `BW_ASSERT` is defined as `assert` (`assert.h` is `#include`d
- *    and `BW_NO_STDLIB` must not be defined &mdash; please mid that `assert.h`
+ *    and `BW_NO_STDLIB` must not be defined &mdash; please mind that `assert.h`
  *    is still influenced by `NDEBUG`), and `BW_ASSERT_DEEP` is defined as
  *    `BW_ASSERT`.
  *

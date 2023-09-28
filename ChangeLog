@@ -1,16 +1,23 @@
 1.0.0
 -----
+  * Removed C++ headers and moved C++ code to now-unique C/C++ headers.
+  * Added extern "C" linkage specifier to C functions declarations and
+    definitions.
+  * Added bw_*_reset_state_multi() and updated C++ APIs in this regard.
+  * Now bw_*_reset_state() take initial input values and return initial output
+    values.
+  * Added more const and BW_RESTRICT specifiers to input arguments.
+  * Added overloaded C++ functions taking C-style arrays as arguments.
+  * Added debugging code to all modules and improved existing debugging code.
+  * Removed usage of reserved identifiers and designated initializers.
   * Now using size_t rather than BW_SIZE_T and for counting items.
+  * Improved documentation w.r.t. validity of input values and approximation
+    errors.
+  * Added pragmas to silence bogus GCC uninitialized variable warnings.
   * Made control over inclusion of standard library headers more explicit via
     specific preprocessor definitions.
   * Introduced BW_NO_DEBUG and prevented useless inclusion of assert.h.
-  * Added more const and BW_RESTRICT specifiers to input arguments.
-  * Removed usage of reserved identifiers and designated initializers.
-  * Added extern "C" to functions.
-  * Removed C++ headers and moved C++ code to now-unique C/C++ headers.
   * Changed order of arguments to improve consistency in bw_buf.
-  * Added overloaded C++ functions taking C-style arrays as arguments.
-  * Added debugging code to all modules and improved existing debugging code.
   * Renamed bw_min0xf() as bw_min0f() and bw_max0xf() as bw_max0f().
   * Removed precision suffixes from function names in bw_math.
   * New implementations for bw_min0f(), bw_max0f(), bw_minf(), bw_maxf(), and
@@ -20,15 +27,10 @@
   * Fixed bw_ceilf() for negative input values.
   * Fixed bw_sqrtf() for very large input values and improved implementation.
   * Fixed input validity ranges in bw_asinhf() and bw_acoshf().
-  * Improved documentation w.r.t. validity of input values and approximation
-    errors.
   * Removed redundant status member from bw_note_queue_event.
   * Possibly improved memeory layout of bw_note_queue.
   * Clarified ambiguity in the documentation of bw_note_queue_status.
   * Specified that velocity can be negative in bw_voice_alloc_opts.
-  * Added bw_*_reset_state_multi() and updated C++ APIs in this regard.
-  * Now bw_*_reset_state() take initial input values and return initial output
-    values.
   * Fixed output polarity in bw_ap1.
   * Added bw_bd_reduce_set_sample_rate().
   * Changed default value for gain compensation to off in bw_clip.
@@ -41,16 +43,15 @@
   * bw_drywet renamed as bw_dry_wet.
   * Renamed bw_env_gen_update_state_ctrl() as bw_env_gen_process_ctrl().
   * Faster and more robust implementation in bw_env_gen.
-  * Added pragmas to silence bogus GCC uninitialized variable warnings.
   * Improved algorithm to be a bit more faithful to the original in bw_fuzz.
   * Added bw_gain_get_gain_lin().
   * Renamed bw_gain_get_gain() as bw_gain_get_gain_cur().
   * Simplified implementation to use less memory in bw_gain.
   * Added prewarp_at_cutoff and prewarp_freq parameters in bw_ap1, bw_ap2,
-    bw_hp1, bw_hs1, bw_ls1, bw_ls2, bw_notch, bw_peak.
-  * Fixed bug when setting default parameter values in bw_hs1_init().
+    bw_hp1, bw_hs1, bw_ls1, bw_ls2, bw_notch, and bw_peak.
   * Fixed documentation to indicate correct default parameter values in bw_hs1,
-    bw_hs2, bw_ls1, bw_ls2, bw_notch, bw_peak.
+    bw_hs2, bw_ls1, bw_ls2, bw_notch, and bw_peak.
+  * Fixed bug when setting default parameter values in bw_hs1_init().
   * Limited actual prewarping frequency to prevent instability in bw_lp1.
   * Fixed missing smoothing filter initialization in bw_noise_gate.
   * Fixed missing forced coefficients' update in bw_noise_gate_reset_coeffs().
@@ -61,9 +62,10 @@
     bw_one_pole.
   * Added coeffs argument to bw_one_pole_state_is_valid().
   * Changed implementation topology to use less memory in bw_osc_filt.
-  * Now antialiasing should work also with negative input increments.
+  * Now antialiasing should work also with negative input increments in
+    bw_osc_pulse, bw_osc_saw, and bw_osc_tri.
   * Clearly specified validity ranges for audio-rate signals in bw_osc_pulse,
-    bw_osc_saw, bw_osc_sin, bw_osc_tri.
+    bw_osc_saw, bw_osc_sin, and bw_osc_tri.
   * Added bw_osc_saw_set_sample_rate(), bw_osc_saw_reset_coeffs(),
     bw_osc_saw_update_coeffs_ctrl(), and bw_osc_saw_update_coeffs_audio().
   * Now using parabolic curves instead of trigonometric ones in bw_pan.
@@ -71,7 +73,7 @@
   * Removed internal limits on cutoff frequency in bw_phaser.
   * Added bw_pink_filt_reset_coeffs(), bw_pink_filt_update_coeffs_ctrl(), and
     bw_pink_filt_update_coeffs_audio().
-  * Fixed type of coefficient in <code>bw_pink_filt_process1()</code>.</li>
+  * Fixed type of coefficient in bw_pink_filt_process1().
   * Enforced minimum output value -600.f in bw_ppm.
   * bw_ringmod renamed as bw_ring_mod.
   * Fixed inverted-polarity modulation (for real this time) in bw_ring_mod.
@@ -83,7 +85,7 @@
     bw_sr_reduce_update_coeffs_ctrl(), and bw_sr_reduce_update_coeffs_audio().
   * Removed useless computation when upsampling in bw_src.
   * Clarified when the same buffers cannot be used for both input and output in
-    bw_src, bw_src_int.
+    bw_src and bw_src_int.
   * Fixed frequency response and improved speed in bw_src_int.
   * Changed model to get positive polarity at the bandpass output in bw_svf.
   * Limited actual prewarping frequency to prevent instability in bw_svf.

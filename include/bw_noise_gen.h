@@ -188,6 +188,8 @@ static inline float bw_noise_gen_get_scaling_k(
  *    Returns the sample rate scaling factor that is applied or would be applied
  *    if sample rate scaling were enabled, as stored in `coeffs`.
  *
+ *    `coeffs` must be at least inthe "sample-rate-set" state.
+ *
  *    #### bw_noise_gen_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_noise_gen_coeffs_is_valid(

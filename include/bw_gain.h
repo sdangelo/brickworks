@@ -216,6 +216,8 @@ static inline float bw_gain_get_gain_cur(
 /*! <<<```
  *    Returns the actual current gain coefficient (linear gain) in `coeffs`.
  *
+ *    `coeffs` must be at least in the "reset" state.
+ *
  *    #### bw_gain_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_gain_coeffs_is_valid(

@@ -266,6 +266,8 @@ static inline float bw_pink_filt_get_scaling_k(
  *    Returns the sample rate scaling factor that is applied or would be applied
  *    if sample rate scaling were enabled, as stored in `coeffs`.
  *
+ *    `coeffs` must be at least in the "sample-rate-set" state.
+ *
  *    #### bw_pink_filt_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_pink_filt_coeffs_is_valid(

@@ -268,6 +268,8 @@ static inline size_t bw_delay_get_length(
 /*! <<<```
  *    Returns the length of the delay line in samples as stored in `coeffs`.
  *
+ *    `coeffs` must be at least in the "sample-rate-set" state.
+ *
  *    #### bw_delay_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_delay_coeffs_is_valid(

@@ -497,15 +497,20 @@ static inline void bw_env_gen_reset_coeffs(
 static inline float bw_env_gen_reset_state(
 		const bw_env_gen_coeffs * BW_RESTRICT coeffs,
 		bw_env_gen_state * BW_RESTRICT        state,
-		char                                  gate) {
+		char                                  gate_0) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_env_gen_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != NULL);
 
 	bw_one_pole_reset_state(&coeffs->smooth_coeffs, &state->smooth_state, coeffs->sustain);
-	state->phase = bw_env_gen_phase_off;
-	state->v = gate ? coeffs->sustain_v : 0;
+	if (gate_0) {
+		state->phase = bw_env_gen_phase_sustain;
+		state->v = coeffs->sustain_v;
+	} else {
+		state->phase = bw_env_gen_phase_off;
+		state->v = 0;
+	}
 	const float y = (1.f / (float)BW_ENV_V_MAX) * state->v;
 
 #ifdef BW_DEBUG_DEEP

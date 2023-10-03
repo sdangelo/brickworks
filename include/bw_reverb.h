@@ -813,7 +813,7 @@ static inline void bw_reverb_update_coeffs_audio(
 	bw_phase_gen_process1(&coeffs->phase_gen_coeffs, &coeffs->phase_gen_state, &p, &pi);
 	coeffs->s = (8.f / 29761.f) * bw_osc_sin_process1(p);
 	bw_lp1_update_coeffs_audio(&coeffs->damping_coeffs);
-	coeffs->diff2 = bw_clipf(bw_gain_get_gain_lin(&coeffs->decay_coeffs) + 0.15f, 0.25f, 0.5f);
+	coeffs->diff2 = bw_clipf(bw_gain_get_gain_cur(&coeffs->decay_coeffs) + 0.15f, 0.25f, 0.5f);
 	bw_dry_wet_update_coeffs_audio(&coeffs->dry_wet_coeffs);
 
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));

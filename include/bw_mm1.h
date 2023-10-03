@@ -405,7 +405,7 @@ static inline float bw_mm1_reset_state(
 	BW_ASSERT(bw_is_finite(x_0));
 
 	const float lp = bw_lp1_reset_state(&coeffs->lp1_coeffs, &state->lp1_state, x_0);
-	const float y = bw_gain_get_gain_lin(&coeffs->gain_x_coeffs) * x_0 + bw_gain_get_gain_lin(&coeffs->gain_lp_coeffs) * lp;
+	const float y = bw_gain_get_gain_cur(&coeffs->gain_x_coeffs) * x_0 + bw_gain_get_gain_cur(&coeffs->gain_lp_coeffs) * lp;
 
 #ifdef BW_DEBUG_DEEP
 	state->hash = bw_hash_sdbm("bw_mm1_state");

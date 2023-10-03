@@ -696,7 +696,9 @@ static inline void bw_peak_set_cutoff(
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_init);
 }
 
-static inline void bw_peak_set_Q(bw_peak_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_peak_set_Q(
+		bw_peak_coeffs * BW_RESTRICT coeffs,
+		float                        value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_init);
@@ -800,7 +802,9 @@ static inline void bw_peak_set_bandwidth(
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_init);
 }
 
-static inline void bw_peak_set_use_bandwidth(bw_peak_coeffs *BW_RESTRICT coeffs, char value) {
+static inline void bw_peak_set_use_bandwidth(
+		bw_peak_coeffs * BW_RESTRICT coeffs,
+		char                         value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_peak_coeffs_state_init);

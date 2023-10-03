@@ -999,7 +999,9 @@ static inline void bw_one_pole_process_multi(
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_reset_coeffs);
 }
 
-static inline void bw_one_pole_set_cutoff(bw_one_pole_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_one_pole_set_cutoff(
+		bw_one_pole_coeffs *BW_RESTRICT coeffs,
+		float                           value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_one_pole_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_one_pole_coeffs_state_init);

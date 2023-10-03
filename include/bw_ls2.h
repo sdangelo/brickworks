@@ -644,7 +644,9 @@ static inline void bw_ls2_set_cutoff(
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls2_coeffs_state_init);
 }
 
-static inline void bw_ls2_set_Q(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_ls2_set_Q(
+		bw_ls2_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_ls2_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls2_coeffs_state_init);
@@ -685,7 +687,9 @@ static inline void bw_ls2_set_prewarp_freq(
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls2_coeffs_state_init);
 }
 
-static inline void bw_ls2_set_dc_gain_lin(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_ls2_set_dc_gain_lin(
+		bw_ls2_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_ls2_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls2_coeffs_state_init);
@@ -704,7 +708,9 @@ static inline void bw_ls2_set_dc_gain_lin(bw_ls2_coeffs *BW_RESTRICT coeffs, flo
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls2_coeffs_state_init);
 }
 
-static inline void bw_ls2_set_dc_gain_dB(bw_ls2_coeffs *BW_RESTRICT coeffs, float value) {
+static inline void bw_ls2_set_dc_gain_dB(
+		bw_ls2_coeffs * BW_RESTRICT coeffs,
+		float                       value) {
 	BW_ASSERT(coeffs != NULL);
 	BW_ASSERT_DEEP(bw_ls2_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ls2_coeffs_state_init);

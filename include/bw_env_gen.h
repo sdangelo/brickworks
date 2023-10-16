@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Linear ADSR envelope generator.
@@ -40,6 +40,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.0</strong>:
+ *        <ul>
+ *          <li>Added skip_sustain and always_reach_sustain parameters.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Renamed <code>bw_env_gen_update_state_ctrl()</code> as
@@ -310,6 +315,27 @@ static inline void bw_env_gen_set_release(
  *
  *    Default value: `0.f`.
  *
+ *    #### bw_env_gen_set_skip_sustain()
+ *  ```>>> */
+static inline void bw_env_gen_set_skip_sustain(
+	bw_env_gen_coeffs * BW_RESTRICT coeffs,
+	char                            value);
+/*! <<<```
+ *    Sets whether the sustain phase should be skipped (non-`0`) or not (`0`).
+ *
+ *    Default value: `0` (do not skip).
+ *
+ *    #### bw_env_gen_set_always_reach_sustain()
+ *  ```>>> */
+static inline void bw_env_gen_set_always_reach_sustain(
+	bw_env_gen_coeffs * BW_RESTRICT coeffs,
+	char                            value);
+/*! <<<```
+ *    Sets whether the sustain phase should be reached even if gate goes off
+ *    before (non-`0`) or not (`0`).
+ *
+ *    Default value: `0` (off).
+ *
  *    #### bw_env_gen_get_phase()
  *  ```>>> */
 static inline bw_env_gen_phase bw_env_gen_get_phase(
@@ -401,6 +427,8 @@ struct bw_env_gen_coeffs {
 	float				decay;
 	float				sustain;
 	float				release;
+	char				skip_sustain;
+	char				always_reach_sustain;
 	int				param_changed;
 };
 
@@ -432,6 +460,8 @@ static inline void bw_env_gen_init(
 	coeffs->decay = 0.f;
 	coeffs->sustain = 1.f;
 	coeffs->release = 0.f;
+	coeffs->skip_sustain = 0;
+	coeffs->always_reach_sustain = 0;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_env_gen_coeffs");
@@ -585,12 +615,11 @@ static inline void bw_env_gen_process_ctrl(
 	BW_ASSERT(state != NULL);
 	BW_ASSERT_DEEP(bw_env_gen_state_is_valid(coeffs, state));
 
-	(void)coeffs;
 	if (gate) {
 		if (state->phase == bw_env_gen_phase_off || state->phase == bw_env_gen_phase_release)
 			state->phase = bw_env_gen_phase_attack;
 	} else {
-		if (state->phase != bw_env_gen_phase_off)
+		if (state->phase == bw_env_gen_phase_sustain || (state->phase != bw_env_gen_phase_off && !coeffs->always_reach_sustain))
 			state->phase = bw_env_gen_phase_release;
 	}
 
@@ -620,13 +649,14 @@ static inline float bw_env_gen_process1(
 	case bw_env_gen_phase_decay:
 		v = state->v - coeffs->decay_dec;
 		if (v <= coeffs->sustain_v || v >= state->v) {
-			v = coeffs->sustain_v;
 			state->phase = bw_env_gen_phase_sustain;
 			bw_one_pole_reset_state(&coeffs->smooth_coeffs, &state->smooth_state, coeffs->sustain);
 		}
 		break;
 	case bw_env_gen_phase_sustain:
 		v = (uint32_t)((float)BW_ENV_V_MAX * bw_one_pole_process1(&coeffs->smooth_coeffs, &state->smooth_state, coeffs->sustain));
+		if (coeffs->skip_sustain)
+			state->phase = bw_env_gen_phase_release;
 		break;
 	case bw_env_gen_phase_release:
 		v = state->v - coeffs->release_dec;
@@ -804,6 +834,32 @@ static inline void bw_env_gen_set_release(
 	BW_ASSERT_DEEP(coeffs->state >= bw_env_gen_coeffs_state_init);
 }
 
+static inline void bw_env_gen_set_skip_sustain(
+		bw_env_gen_coeffs * BW_RESTRICT coeffs,
+		char                            value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_env_gen_coeffs_state_init);
+
+	coeffs->skip_sustain = value;
+
+	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_env_gen_coeffs_state_init);
+}
+
+static inline void bw_env_gen_set_always_reach_sustain(
+		bw_env_gen_coeffs * BW_RESTRICT coeffs,
+		char                            value) {
+	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_env_gen_coeffs_state_init);
+
+	coeffs->always_reach_sustain = value;
+
+	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_env_gen_coeffs_state_init);
+}
+
 static inline bw_env_gen_phase bw_env_gen_get_phase(
 		const bw_env_gen_state * BW_RESTRICT state) {
 	BW_ASSERT(state != NULL);
@@ -933,7 +989,13 @@ public:
 
 	void setRelease(
 		float value);
-	
+
+	void setSkipSustain(
+		bool value);
+
+	void setAlwaysReachSustain(
+		bool value);
+
 	bw_env_gen_phase getPhase(
 		size_t channel);
 
@@ -1041,6 +1103,18 @@ template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setRelease(
 		float value) {
 	bw_env_gen_set_release(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setSkipSustain(
+		bool value) {
+	bw_env_gen_set_skip_sustain(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void EnvGen<N_CHANNELS>::setAlwaysReachSustain(
+		bool value) {
+	bw_env_gen_set_always_reach_sustain(&coeffs, value);
 }
 
 template<size_t N_CHANNELS>

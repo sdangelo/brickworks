@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -29,6 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Fixed rouding bug when frequency is tiny and negative.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added initial input value to
@@ -520,7 +525,7 @@ static inline void bw_phase_gen_update_coeffs_audio(
 static inline float bw_phase_gen_update_phase(
 		bw_phase_gen_state * BW_RESTRICT state,
 		float                            inc) {
-	state->phase += inc;
+	state->phase += inc + 1.f; // + 1.f solves rounding issues with tiny negative frequencies
 	state->phase -= bw_floorf(state->phase);
 	return state->phase;
 }

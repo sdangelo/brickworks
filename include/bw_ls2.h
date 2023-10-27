@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_mm2 bw_one_pole bw_svf }}}
  *  description {{{
  *    Second-order low shelf filter (12 dB/oct) with gain asymptotically
@@ -28,6 +28,14 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Fixed typos in documentation of
+ *              <code>bw_ls2_set_cutoff()</code>,
+ *              <code>bw_ls2_set_dc_gain_lin()</code>, and
+ *              <code>bw_ls2_set_dc_gain_dB()</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_ls2_reset_state_multi()</code> and updated C++
@@ -214,7 +222,7 @@ static inline void bw_ls2_set_cutoff(
  *
  *    `value` must be finite and positive.
  *
- *    By the time ``bw_ls2_reset_coeffs(), `bw_ls2_update_coeffs_ctrl()`,
+ *    By the time `bw_ls2_reset_coeffs()`, `bw_ls2_update_coeffs_ctrl()`,
  *    `bw_ls2_update_coeffs_audio()`, `bw_ls2_process1()`, `bw_ls2_process()`,
  *    or `bw_ls2_process_multi()` is called,
  *    `cutoff * bw_rcpf(bw_sqrtf(bw_sqrtf(dc_gain)))` must be in [`1e-6f`,
@@ -270,7 +278,7 @@ static inline void bw_ls2_set_dc_gain_lin(
  *
  *    Valid range: [`1e-30f`, `1e30f`].
  *
- *    By the time ``bw_ls2_reset_coeffs(), `bw_ls2_update_coeffs_ctrl()`,
+ *    By the time `bw_ls2_reset_coeffs()`, `bw_ls2_update_coeffs_ctrl()`,
  *    `bw_ls2_update_coeffs_audio()`, `bw_ls2_process1()`, `bw_ls2_process()`,
  *    or `bw_ls2_process_multi()` is called,
  *    `cutoff * bw_rcpf(bw_sqrtf(bw_sqrtf(dc_gain)))` must be in [`1e-6f`,
@@ -288,7 +296,7 @@ static inline void bw_ls2_set_dc_gain_dB(
  *
  *    Valid range: [`-600.f`, `600.f`].
  *
- *    By the time ``bw_ls2_reset_coeffs(), `bw_ls2_update_coeffs_ctrl()`,
+ *    By the time `bw_ls2_reset_coeffs()`, `bw_ls2_update_coeffs_ctrl()`,
  *    `bw_ls2_update_coeffs_audio()`, `bw_ls2_process1()`, `bw_ls2_process()`,
  *    or `bw_ls2_process_multi()` is called,
  *    `cutoff * bw_rcpf(bw_sqrtf(bw_sqrtf(dc_gain)))` must be in [`1e-6f`,

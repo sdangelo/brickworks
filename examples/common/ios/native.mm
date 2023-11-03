@@ -167,6 +167,8 @@ char audioStart() {
 	deviceConfig.playback.channels		= NUM_CHANNELS_OUT;
 	deviceConfig.playback.shareMode		= ma_share_mode_shared;
 
+	size_t req = 0; // make stupid compiler happy
+
 	if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS)
 		goto err_device_init;
 
@@ -201,7 +203,7 @@ char audioStart() {
 	P_INIT(&instance);
 	P_SET_SAMPLE_RATE(&instance, (float)device.sampleRate);
 #ifdef P_MEM_REQ
-	size_t req = P_MEM_REQ(&instance);
+	req = P_MEM_REQ(&instance);
 	if (req) {
 		mem = malloc(req);
 		if (mem == NULL)

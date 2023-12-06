@@ -329,7 +329,7 @@ static inline uint32_t bw_hash_sdbm(
 		const char * BW_RESTRICT string) {
 	uint32_t hash = 0;
 	for (; *string != '\0'; string++)
-		hash = *string + (hash << 6) + (hash << 16) - hash;
+		hash = (uint32_t)*string + (hash << 6) + (hash << 16) - hash;
 	return hash;
 }
 

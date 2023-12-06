@@ -698,8 +698,8 @@ static inline float bw_truncf(
 	union { float f; uint32_t u; } v;
 	v.f = x;
 	const int32_t ex = (v.u & 0x7f800000u) >> 23;
-	int32_t m = (~0u) << bw_clipi32(150 - ex, 0, 23);
-	m &= bw_signfilli32(126 - ex) | 0x80000000;
+	uint32_t m = (~0u) << bw_clipi32(150 - ex, 0, 23);
+	m &= (uint32_t)bw_signfilli32(126 - ex) | 0x80000000;
 	v.u &= m;
 	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
@@ -712,12 +712,12 @@ static inline float bw_roundf(
 	v.f = x;
 	const int32_t ex = (v.u & 0x7f800000u) >> 23;
 	const int32_t sh = bw_clipi32(150 - ex, 0, 24);
-	int32_t mt = (~0u) << sh;
-	mt &= bw_signfilli32(126 - ex) | 0x80000000;
-	int32_t mr = (1 << sh) >> 1;
-	mr &= bw_signfilli32(125 - ex);
+	uint32_t mt = (~0u) << sh;
+	mt &= (uint32_t)bw_signfilli32(126 - ex) | 0x80000000;
+	uint32_t mr = (1u << sh) >> 1;
+	mr &= (uint32_t)bw_signfilli32(125 - ex);
 	s.f = bw_copysignf(1.f, x);
-	int32_t ms = bw_signfilli32(((v.u | 0x00800000u) & mr) << (32 - sh));
+	uint32_t ms = (uint32_t)bw_signfilli32((int32_t)(((v.u | 0x00800000u) & mr) << (32 - sh)));
 	v.u &= mt;
 	s.u &= ms;
 	const float y = v.f + s.f;
@@ -928,12 +928,12 @@ static inline float bw_sqrtf(
 	union { float f; int32_t i; } v;
 	v.f = x;
 	int i = (v.i >> 26) & 0x38;
-	v.i += (0x200000e0 << i) & 0xff000000;
+	v.i += (int32_t)((0x200000e0 << i) & 0xff000000);
 	const float r = bw_rcpf(v.f);
 	v.i = (((v.i - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
-	v.i -= (0x100000f0 << i) & 0xff000000;
+	v.i -= (int32_t)((0x100000f0 << i) & 0xff000000);
 	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }

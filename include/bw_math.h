@@ -928,12 +928,12 @@ static inline float bw_sqrtf(
 	union { float f; int32_t i; } v;
 	v.f = x;
 	int i = (v.i >> 26) & 0x38;
-	v.i += (int32_t)((0x200000e0 << i) & 0xff000000);
+	v.i += (int32_t)((0x200000e0 << i) & (int32_t)0xff000000);
 	const float r = bw_rcpf(v.f);
 	v.i = (((v.i - 0x3f82a127) >> 1) + 0x3f7d8fc7) & 0x7fffffff;
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
 	v.f = v.f + v.f * (0.5f - 0.5f * r * v.f * v.f);
-	v.i -= (int32_t)((0x100000f0 << i) & 0xff000000);
+	v.i -= (int32_t)((0x100000f0 << i) & (int32_t)0xff000000);
 	BW_ASSERT(bw_is_finite(v.f));
 	return v.f;
 }

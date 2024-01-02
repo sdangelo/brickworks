@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Ring modulator with variable modulation amount.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Module renamed as bw_ring_mod.</li>
@@ -226,7 +231,7 @@ struct bw_ring_mod_coeffs {
 
 static inline void bw_ring_mod_init(
 		bw_ring_mod_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.05f);
@@ -243,7 +248,7 @@ static inline void bw_ring_mod_init(
 static inline void bw_ring_mod_set_sample_rate(
 		bw_ring_mod_coeffs * BW_RESTRICT coeffs,
 		float                            sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -260,7 +265,7 @@ static inline void bw_ring_mod_set_sample_rate(
 
 static inline void bw_ring_mod_reset_coeffs(
 		bw_ring_mod_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_set_sample_rate);
 
@@ -275,7 +280,7 @@ static inline void bw_ring_mod_reset_coeffs(
 
 static inline void bw_ring_mod_update_coeffs_ctrl(
 		bw_ring_mod_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_reset_coeffs);
 
@@ -284,7 +289,7 @@ static inline void bw_ring_mod_update_coeffs_ctrl(
 
 static inline void bw_ring_mod_update_coeffs_audio(
 		bw_ring_mod_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_reset_coeffs);
 
@@ -298,7 +303,7 @@ static inline float bw_ring_mod_process1(
 		const bw_ring_mod_coeffs * BW_RESTRICT coeffs,
 		float                                  x_mod,
 		float                                  x_car) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x_mod));
@@ -320,14 +325,14 @@ static inline void bw_ring_mod_process(
 		const float *                    x_car,
 		float *                          y,
 		size_t                           n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_reset_coeffs);
-	BW_ASSERT(x_mod != NULL);
+	BW_ASSERT(x_mod != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x_mod, n_samples));
-	BW_ASSERT(x_car != NULL);
+	BW_ASSERT(x_car != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x_car, n_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	for (size_t i = 0; i < n_samples; i++) {
 		bw_ring_mod_update_coeffs_audio(coeffs);
@@ -346,12 +351,12 @@ static inline void bw_ring_mod_process_multi(
 		float * const *                  y,
 		size_t                           n_channels,
 		size_t                           n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_reset_coeffs);
-	BW_ASSERT(x_mod != NULL);
-	BW_ASSERT(x_car != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x_mod != BW_NULL);
+	BW_ASSERT(x_car != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -371,7 +376,7 @@ static inline void bw_ring_mod_process_multi(
 static inline void bw_ring_mod_set_amount(
 		bw_ring_mod_coeffs * BW_RESTRICT coeffs,
 		float                            value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_ring_mod_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_ring_mod_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -385,7 +390,7 @@ static inline void bw_ring_mod_set_amount(
 
 static inline char bw_ring_mod_coeffs_is_valid(
 		const bw_ring_mod_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_ring_mod_coeffs"))

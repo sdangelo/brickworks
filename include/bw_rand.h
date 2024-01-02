@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Pseudo-random number generators.
@@ -42,6 +42,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added one more assertion in <code>bw_randf()</code>.</li>
@@ -119,7 +124,7 @@ extern "C" {
 
 static inline uint32_t bw_randu32(
 		uint64_t * BW_RESTRICT state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	// Permuted Congruential Generator,
 	// taken from https://nullprogram.com/blog/2017/09/21/
 	*state = *state * 0x9b60933458e17d7d + 0xd737232eeccdf7ed;
@@ -128,7 +133,7 @@ static inline uint32_t bw_randu32(
 
 static inline float bw_randf(
 		uint64_t * BW_RESTRICT state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	const float y = (2.f / (float)UINT32_MAX) * (float)bw_randu32(state) - 1.f;
 	BW_ASSERT(bw_is_finite(y));
 	return y;

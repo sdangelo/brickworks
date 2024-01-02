@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Post-filter to decolorate oscillator waveshapers when antialiasing is on.
@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added initial input value to
@@ -120,7 +125,7 @@ static inline void bw_osc_filt_reset_state_multi(
  *    corresponding initial input value in the `x_0` array.
  *
  *    The corresponding initial output values are written into the `y_0` array,
- *    if not `NULL`.
+ *    if not `BW_NULL`.
  *
  *    #### bw_osc_filt_process1()
  *  ```>>> */
@@ -194,7 +199,7 @@ struct bw_osc_filt_state {
 static inline float bw_osc_filt_reset_state(
 		bw_osc_filt_state * BW_RESTRICT state,
 		float                           x_0) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
 	state->z1 = 0.f;
@@ -214,28 +219,28 @@ static inline void bw_osc_filt_reset_state_multi(
 		const float *                                       x_0,
 		float *                                             y_0,
 		size_t                                              n_channels) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_0 != NULL);
+	BW_ASSERT(x_0 != BW_NULL);
 
-	if (y_0 != NULL)
+	if (y_0 != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			y_0[i] = bw_osc_filt_reset_state(state[i], x_0[i]);
 	else
 		for (size_t i = 0; i < n_channels; i++)
 			bw_osc_filt_reset_state(state[i], x_0[i]);
 
-	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_0 != BW_NULL ? bw_has_only_finite(y_0, n_channels) : 1);
 }
 
 static inline float bw_osc_filt_process1(
 		bw_osc_filt_state * BW_RESTRICT state,
 		float                           x) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_filt_state_is_valid(state));
 	BW_ASSERT(bw_is_finite(x));
 
@@ -253,11 +258,11 @@ static inline void bw_osc_filt_process(
 		const float *                   x,
 		float *                         y,
 		size_t                          n_samples) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_filt_state_is_valid(state));
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_osc_filt_process1(state, x[i]);
@@ -272,14 +277,14 @@ static inline void bw_osc_filt_process_multi(
 		float * const *                                     y,
 		size_t                                              n_channels,
 		size_t                                              n_samples) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -292,7 +297,7 @@ static inline void bw_osc_filt_process_multi(
 
 static inline char bw_osc_filt_state_is_valid(
 	const bw_osc_filt_state * BW_RESTRICT state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_osc_filt_state"))

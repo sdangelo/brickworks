@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Integer-ratio IIR sample rate converter.
@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_src_int_reset_state_multi()</code> and updated
@@ -139,7 +144,7 @@ static inline void bw_src_int_reset_state_multi(
  *    array.
  *
  *    The corresponding initial output values are written into the `y_0` array,
- *    if not `NULL`.
+ *    if not `BW_NULL`.
  *
  *    #### bw_src_int_process()
  *  ```>>> */
@@ -184,7 +189,7 @@ static inline void bw_src_int_process_multi(
  *    A given buffer cannot be used both as an input and output buffer.
  *
  *    `n_out_samples` is filled with the number of generated output samples for
- *    each output buffer, if not `NULL`.
+ *    each output buffer, if not `BW_NULL`.
  *
  *    #### bw_src_int_coeffs_is_valid()
  *  ```>>> */
@@ -208,8 +213,8 @@ static inline char bw_src_int_state_is_valid(
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
  *
- *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
- *    is supposed to be associated to `coeffs`).
+ *    If `coeffs` is not `BW_NULL` extra cross-checks might be performed
+ *    (`state` is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_src_int_state`.
@@ -262,7 +267,7 @@ struct bw_src_int_state {
 static inline void bw_src_int_init(
 		bw_src_int_coeffs * BW_RESTRICT coeffs,
 		int ratio) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT(ratio < -1 || ratio > 1);
 
 	coeffs->ratio = ratio;
@@ -288,9 +293,9 @@ static inline float bw_src_int_reset_state(
 		const bw_src_int_coeffs * BW_RESTRICT coeffs,
 		bw_src_int_state * BW_RESTRICT        state,
 		float                                 x_0) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
 	if (coeffs->ratio < 0) {
@@ -327,17 +332,17 @@ static inline void bw_src_int_reset_state_multi(
 		const float *                                      x_0,
 		float *                                            y_0,
 		size_t                                             n_channels) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_0 != NULL);
+	BW_ASSERT(x_0 != BW_NULL);
 
-	if (y_0 != NULL)
+	if (y_0 != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			y_0[i] = bw_src_int_reset_state(coeffs, state[i], x_0[i]);
 	else
@@ -345,7 +350,7 @@ static inline void bw_src_int_reset_state_multi(
 			bw_src_int_reset_state(coeffs, state[i], x_0[i]);
 
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
-	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_0 != BW_NULL ? bw_has_only_finite(y_0, n_channels) : 1);
 }
 
 static inline size_t bw_src_int_process(
@@ -354,13 +359,13 @@ static inline size_t bw_src_int_process(
 		const float * BW_RESTRICT             x,
 		float * BW_RESTRICT                   y,
 		size_t                                n_in_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_src_int_state_is_valid(coeffs, state));
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_in_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 	BW_ASSERT(x != y);
 
 	size_t n = 0;
@@ -420,16 +425,16 @@ static inline void bw_src_int_process_multi(
 		size_t                                             n_channels,
 		size_t                                             n_in_samples,
 		size_t * BW_RESTRICT                               n_out_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_src_int_coeffs_is_valid(coeffs));
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 	BW_ASSERT((void *)x != (void *)y);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
@@ -440,7 +445,7 @@ static inline void bw_src_int_process_multi(
 			BW_ASSERT((void *)x[i] != (void *)y[j]);
 #endif
 
-	if (n_out_samples != NULL)
+	if (n_out_samples != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			n_out_samples[i] = bw_src_int_process(coeffs, state[i], x[i], y[i], n_in_samples);
 	else
@@ -452,7 +457,7 @@ static inline void bw_src_int_process_multi(
 
 static inline char bw_src_int_coeffs_is_valid(
 		const bw_src_int_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_src_int_coeffs"))
@@ -470,13 +475,13 @@ static inline char bw_src_int_coeffs_is_valid(
 static inline char bw_src_int_state_is_valid(
 		const bw_src_int_coeffs * BW_RESTRICT coeffs,
 		const bw_src_int_state * BW_RESTRICT  state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_src_int_state"))
 		return 0;
 
-	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+	if (coeffs != BW_NULL && coeffs->reset_id != state->coeffs_reset_id)
 		return 0;
 #endif
 

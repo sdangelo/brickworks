@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Bit depth reducer.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_bd_reduce_set_sample_rate()</code>.</li>
@@ -225,7 +230,7 @@ struct bw_bd_reduce_coeffs {
 
 static inline void bw_bd_reduce_init(
 		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	coeffs->bit_depth = 16;
 
@@ -240,7 +245,7 @@ static inline void bw_bd_reduce_init(
 static inline void bw_bd_reduce_set_sample_rate(
 		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
 		float                             sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -267,7 +272,7 @@ static inline void bw_bd_reduce_do_update_coeffs_ctrl(
 
 static inline void bw_bd_reduce_reset_coeffs(
 		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_set_sample_rate);
 
@@ -283,7 +288,7 @@ static inline void bw_bd_reduce_reset_coeffs(
 
 static inline void bw_bd_reduce_update_coeffs_ctrl(
 		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 
@@ -295,7 +300,7 @@ static inline void bw_bd_reduce_update_coeffs_ctrl(
 
 static inline void bw_bd_reduce_update_coeffs_audio(
 		bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 
@@ -305,7 +310,7 @@ static inline void bw_bd_reduce_update_coeffs_audio(
 static inline float bw_bd_reduce_process1(
 		const bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
 		float                                   x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x));
@@ -324,12 +329,12 @@ static inline void bw_bd_reduce_process(
 		const float *                     x,
 		float *                           y,
 		size_t                            n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++)
@@ -346,11 +351,11 @@ static inline void bw_bd_reduce_process_multi(
 		float * const *                   y,
 		size_t                            n_channels,
 		size_t                            n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -369,7 +374,7 @@ static inline void bw_bd_reduce_process_multi(
 static inline void bw_bd_reduce_set_bit_depth(
 		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
 		char                              value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
 	BW_ASSERT(value >= 1 && value <= 64);
@@ -382,7 +387,7 @@ static inline void bw_bd_reduce_set_bit_depth(
 
 static inline char bw_bd_reduce_coeffs_is_valid(
 		const bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_bd_reduce_coeffs"))

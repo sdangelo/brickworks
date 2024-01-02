@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Triangle oscillator waveshaper with variable slope (increasing time over
@@ -37,6 +37,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li><code>bw_osc_tri_process()</code> and
@@ -179,7 +184,7 @@ static inline void bw_osc_tri_process(
  *    buffer `y`, while using and updating `coeffs`.
  *
  *    If antialiasing is enabled, `x_inc` must contain phase increment values,
- *    otherwise it is ignored and can be `NULL`.
+ *    otherwise it is ignored and can be `BW_NULL`.
  *
  *    All samples in `x` must be in [`0.f`, `1.f`).
  *
@@ -201,7 +206,7 @@ static inline void bw_osc_tri_process_multi(
  *    common `coeffs` (control and audio rate).
  *
  *    If antialiasing is enabled, `x_inc` must contain `n_channels` buffers of
- *    phase increment values, otherwise it is ignored and can be `NULL`.
+ *    phase increment values, otherwise it is ignored and can be `BW_NULL`.
  *
  *    All samples in `x` must be in [`0.f`, `1.f`).
  *
@@ -285,7 +290,7 @@ struct bw_osc_tri_coeffs {
 
 static inline void bw_osc_tri_init(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_one_pole_init(&coeffs->smooth_coeffs);
 	bw_one_pole_set_tau(&coeffs->smooth_coeffs, 0.005f);
@@ -303,7 +308,7 @@ static inline void bw_osc_tri_init(
 static inline void bw_osc_tri_set_sample_rate(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs,
 		float                           sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -320,7 +325,7 @@ static inline void bw_osc_tri_set_sample_rate(
 
 static inline void bw_osc_tri_reset_coeffs(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_set_sample_rate);
 
@@ -335,7 +340,7 @@ static inline void bw_osc_tri_reset_coeffs(
 
 static inline void bw_osc_tri_update_coeffs_ctrl(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_reset_coeffs);
 
@@ -344,7 +349,7 @@ static inline void bw_osc_tri_update_coeffs_ctrl(
 
 static inline void bw_osc_tri_update_coeffs_audio(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_reset_coeffs);
 
@@ -357,7 +362,7 @@ static inline void bw_osc_tri_update_coeffs_audio(
 static inline float bw_osc_tri_process1(
 		const bw_osc_tri_coeffs * BW_RESTRICT coeffs,
 		float                                 x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x));
@@ -386,7 +391,7 @@ static inline float bw_osc_tri_process1_antialias(
 		const bw_osc_tri_coeffs * BW_RESTRICT coeffs,
 		float                                 x,
 		float                                 x_inc) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x));
@@ -432,14 +437,14 @@ static inline void bw_osc_tri_process(
 		const float *                   x_inc,
 		float *                         y,
 		size_t                          n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_reset_coeffs);
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(coeffs->antialiasing ? x_inc != NULL : 1);
+	BW_ASSERT(coeffs->antialiasing ? x_inc != BW_NULL : 1);
 	BW_ASSERT_DEEP(coeffs->antialiasing ? bw_has_only_finite(x_inc, n_samples) : 1);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	if (coeffs->antialiasing)
 		for (size_t i = 0; i < n_samples; i++) {
@@ -464,11 +469,11 @@ static inline void bw_osc_tri_process_multi(
 		float * const *                 y,
 		size_t                          n_channels,
 		size_t                          n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_reset_coeffs);
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -495,7 +500,7 @@ static inline void bw_osc_tri_process_multi(
 static inline void bw_osc_tri_set_antialiasing(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs,
 		char                            value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_init);
 
@@ -508,7 +513,7 @@ static inline void bw_osc_tri_set_antialiasing(
 static inline void bw_osc_tri_set_slope(
 		bw_osc_tri_coeffs * BW_RESTRICT coeffs,
 		float                           value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_tri_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -522,7 +527,7 @@ static inline void bw_osc_tri_set_slope(
 
 static inline char bw_osc_tri_coeffs_is_valid(
 		const bw_osc_tri_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_osc_tri_coeffs"))

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Simple data structure that helps keeping track of note on/off events and
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Removed redundant <code>status</code> member from
@@ -172,7 +177,7 @@ extern "C" {
 
 static inline void bw_note_queue_reset(
 		bw_note_queue * BW_RESTRICT queue) {
-	BW_ASSERT(queue != NULL);
+	BW_ASSERT(queue != BW_NULL);
 	for (int i = 0; i < 128; i++) {
 		queue->status[i].pressed = 0;
 		queue->status[i].velocity = 0.f;
@@ -184,7 +189,7 @@ static inline void bw_note_queue_reset(
 
 static inline void bw_note_queue_clear(
 		bw_note_queue * BW_RESTRICT queue) {
-	BW_ASSERT(queue != NULL);
+	BW_ASSERT(queue != BW_NULL);
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 	queue->n_events = 0;
 }
@@ -195,7 +200,7 @@ static inline void bw_note_queue_add(
 		char                        pressed,
 		float                       velocity,
 		char                        force_went_off) {
-	BW_ASSERT(queue != NULL);
+	BW_ASSERT(queue != BW_NULL);
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
 	BW_ASSERT(note < 128);
 	BW_ASSERT(bw_is_finite(velocity) && velocity <= 1.f);
@@ -227,7 +232,7 @@ static inline void bw_note_queue_add(
 
 static inline char bw_note_queue_is_valid(
 		const bw_note_queue * BW_RESTRICT queue) {
-	BW_ASSERT(queue != NULL);
+	BW_ASSERT(queue != BW_NULL);
 
 	if (queue->n_events >= 128 || queue->n_pressed >= 128)
 		return 0;

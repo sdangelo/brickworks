@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Sinusoidal oscillator waveshaper.
@@ -30,6 +30,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li><code>bw_osc_sin_process()</code> and
@@ -149,9 +154,9 @@ static inline void bw_osc_sin_process(
 		const float * x,
 		float *       y,
 		size_t        n_samples) {
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	for (size_t i = 0; i < n_samples; i++)
 		y[i] = bw_osc_sin_process1(x[i]);
@@ -164,8 +169,8 @@ static inline void bw_osc_sin_process_multi(
 		float * const *       y,
 		size_t                n_channels,
 		size_t                n_samples) {
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)

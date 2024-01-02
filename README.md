@@ -11,7 +11,7 @@ You can find information and documentation [on the official web page](https://ww
 
 ## Legal
 
-Copyright (C) 2021-2023 Orastron Srl unipersonale.
+Copyright (C) 2021-2024 Orastron Srl unipersonale.
 
 Authors: Stefano D'Angelo, Paolo Marrone.
 

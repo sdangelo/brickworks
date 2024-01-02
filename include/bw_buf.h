@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Common operations on buffers.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Now using <code>size_t</code> instead of
@@ -240,7 +245,7 @@ static inline void bw_buf_fill(
 		float * BW_RESTRICT dest,
 		size_t              n_elems) {
 	BW_ASSERT(!bw_is_nan(k));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = k;
@@ -252,9 +257,9 @@ static inline void bw_buf_neg(
 		const float * src,
 		float *       dest,
 		size_t        n_elems) {
-	BW_ASSERT(src != NULL);
+	BW_ASSERT(src != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = -src[i];
@@ -267,10 +272,10 @@ static inline void bw_buf_add(
 		float         k,
 		float *       dest,
 		size_t        n_elems) {
-	BW_ASSERT(src != NULL);
+	BW_ASSERT(src != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = k + src[i];
@@ -283,10 +288,10 @@ static inline void bw_buf_scale(
 		float         k,
 		float *       dest,
 		size_t        n_elems) {
-	BW_ASSERT(src != NULL);
+	BW_ASSERT(src != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src, n_elems));
 	BW_ASSERT(!bw_is_nan(k));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = k * src[i];
@@ -299,11 +304,11 @@ static inline void bw_buf_mix(
 		const float * src2,
 		float *       dest,
 		size_t        n_elems) {
-	BW_ASSERT(src1 != NULL);
+	BW_ASSERT(src1 != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
-	BW_ASSERT(src2 != NULL);
+	BW_ASSERT(src2 != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = src1[i] + src2[i];
@@ -316,11 +321,11 @@ static inline void bw_buf_mul(
 		const float * src2,
 		float *       dest,
 		size_t        n_elems) {
-	BW_ASSERT(src1 != NULL);
+	BW_ASSERT(src1 != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src1, n_elems));
-	BW_ASSERT(src2 != NULL);
+	BW_ASSERT(src2 != BW_NULL);
 	BW_ASSERT_DEEP(!bw_has_nan(src2, n_elems));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 
 	for (size_t i = 0; i < n_elems; i++)
 		dest[i] = src1[i] * src2[i];
@@ -334,7 +339,7 @@ static inline void bw_buf_fill_multi(
 		size_t                                  n_channels,
 		size_t                                  n_elems) {
 	BW_ASSERT(!bw_is_nan(k));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -350,8 +355,8 @@ static inline void bw_buf_neg_multi(
 		float * const *       dest,
 		size_t                n_channels,
 		size_t                n_elems) {
-	BW_ASSERT(src != NULL);
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(src != BW_NULL);
+	BW_ASSERT(dest != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -368,9 +373,9 @@ static inline void bw_buf_add_multi(
 		float * const *       dest,
 		size_t                n_channels,
 		size_t                n_elems) {
-	BW_ASSERT(src != NULL);
+	BW_ASSERT(src != BW_NULL);
 	BW_ASSERT(!bw_is_nan(k));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -387,9 +392,9 @@ static inline void bw_buf_scale_multi(
 		float * const *       dest,
 		size_t                n_channels,
 		size_t                n_elems) {
-	BW_ASSERT(src != NULL);
+	BW_ASSERT(src != BW_NULL);
 	BW_ASSERT(!bw_is_nan(k));
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(dest != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -406,9 +411,9 @@ static inline void bw_buf_mix_multi(
 		float * const *       dest,
 		size_t                n_channels,
 		size_t                n_elems) {
-	BW_ASSERT(src1 != NULL);
-	BW_ASSERT(src2 != NULL);
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(src1 != BW_NULL);
+	BW_ASSERT(src2 != BW_NULL);
+	BW_ASSERT(dest != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -425,9 +430,9 @@ static inline void bw_buf_mul_multi(
 		float * const *       dest,
 		size_t                n_channels,
 		size_t                n_elems) {
-	BW_ASSERT(src1 != NULL);
-	BW_ASSERT(src2 != NULL);
-	BW_ASSERT(dest != NULL);
+	BW_ASSERT(src1 != BW_NULL);
+	BW_ASSERT(src2 != BW_NULL);
+	BW_ASSERT(dest != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)

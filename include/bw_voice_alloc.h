@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_note_queue }}}
  *  description {{{
  *    Basic voice allocator with low/high note priority.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Specified that velocity can be negative in
@@ -149,15 +154,15 @@ void bw_voice_alloc(
 		bw_note_queue * BW_RESTRICT             queue,
 		void * BW_RESTRICT const * BW_RESTRICT  voices,
 		size_t                                  n_voices) {
-	BW_ASSERT(opts != NULL);
+	BW_ASSERT(opts != BW_NULL);
 	BW_ASSERT(opts->priority == bw_voice_alloc_priority_low || opts->priority == bw_voice_alloc_priority_high);
-	BW_ASSERT(n_voices == 0 || opts->note_on != NULL);
-	BW_ASSERT(n_voices == 0 || opts->note_off != NULL);
-	BW_ASSERT(n_voices == 0 || opts->get_note != NULL);
-	BW_ASSERT(n_voices == 0 || opts->is_free != NULL);
-	BW_ASSERT(queue != NULL);
+	BW_ASSERT(n_voices == 0 || opts->note_on != BW_NULL);
+	BW_ASSERT(n_voices == 0 || opts->note_off != BW_NULL);
+	BW_ASSERT(n_voices == 0 || opts->get_note != BW_NULL);
+	BW_ASSERT(n_voices == 0 || opts->is_free != BW_NULL);
+	BW_ASSERT(queue != BW_NULL);
 	BW_ASSERT_DEEP(bw_note_queue_is_valid(queue));
-	BW_ASSERT(n_voices == 0 || voices != NULL);
+	BW_ASSERT(n_voices == 0 || voices != BW_NULL);
 
 	for (unsigned char i = 0; i < queue->n_events; i++) {
 		bw_note_queue_event *ev = queue->events + i;

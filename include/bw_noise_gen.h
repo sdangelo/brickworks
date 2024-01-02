@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math bw_rand }}}
  *  description {{{
  *    Generator of white noise with uniform distribution.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_noise_gen_reset_coeffs()</code>,
@@ -245,8 +250,8 @@ struct bw_noise_gen_coeffs {
 static inline void bw_noise_gen_init(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs,
 		uint64_t * BW_RESTRICT            state) {
-	BW_ASSERT(coeffs != NULL);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
+	BW_ASSERT(state != BW_NULL);
 
 	coeffs->rand_state = state;
 	coeffs->sample_rate_scaling = 0;
@@ -262,7 +267,7 @@ static inline void bw_noise_gen_init(
 static inline void bw_noise_gen_set_sample_rate(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs,
 		float                             sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -278,7 +283,7 @@ static inline void bw_noise_gen_set_sample_rate(
 
 static inline void bw_noise_gen_reset_coeffs(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_set_sample_rate);
 
@@ -293,7 +298,7 @@ static inline void bw_noise_gen_reset_coeffs(
 
 static inline void bw_noise_gen_update_coeffs_ctrl(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
 
@@ -302,7 +307,7 @@ static inline void bw_noise_gen_update_coeffs_ctrl(
 
 static inline void bw_noise_gen_update_coeffs_audio(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
 
@@ -311,7 +316,7 @@ static inline void bw_noise_gen_update_coeffs_audio(
 
 static inline float bw_noise_gen_process1(
 		const bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
 
@@ -326,7 +331,7 @@ static inline float bw_noise_gen_process1(
 
 static inline float bw_noise_gen_process1_scaling(
 		const bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
 
@@ -343,10 +348,10 @@ static inline void bw_noise_gen_process(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs,
 		float * BW_RESTRICT               y,
 		size_t                            n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	if (coeffs->sample_rate_scaling)
 		for (size_t i = 0; i < n_samples; i++)
@@ -365,10 +370,10 @@ static inline void bw_noise_gen_process_multi(
 		float * BW_RESTRICT const * BW_RESTRICT y,
 		size_t                                  n_channels,
 		size_t                                  n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -385,7 +390,7 @@ static inline void bw_noise_gen_process_multi(
 static inline void bw_noise_gen_set_sample_rate_scaling(
 		bw_noise_gen_coeffs * BW_RESTRICT coeffs,
 		char                              value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_init);
 
@@ -397,7 +402,7 @@ static inline void bw_noise_gen_set_sample_rate_scaling(
 
 static inline float bw_noise_gen_get_scaling_k(
 		const bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_noise_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gen_coeffs_state_set_sample_rate);
 
@@ -406,7 +411,7 @@ static inline float bw_noise_gen_get_scaling_k(
 
 static inline char bw_noise_gen_coeffs_is_valid(
 		const bw_noise_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_noise_gen_coeffs"))
@@ -415,7 +420,7 @@ static inline char bw_noise_gen_coeffs_is_valid(
 		return 0;
 #endif
 
-	if (coeffs->rand_state == NULL)
+	if (coeffs->rand_state == BW_NULL)
 		return 0;
 
 #ifdef BW_DEBUG_DEEP

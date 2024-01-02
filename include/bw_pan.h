@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Stereo panner with -3 dB center pan law.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Now using parabolic curves instead of trigonometric ones.</li>
@@ -225,7 +230,7 @@ struct bw_pan_coeffs {
 
 static inline void bw_pan_init(
 		bw_pan_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_gain_init(&coeffs->l_coeffs);
 	bw_gain_init(&coeffs->r_coeffs);
@@ -242,7 +247,7 @@ static inline void bw_pan_init(
 static inline void bw_pan_set_sample_rate(
 		bw_pan_coeffs * BW_RESTRICT coeffs,
 		float                       sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -270,7 +275,7 @@ static inline void bw_pan_do_update_coeffs(
 
 static inline void bw_pan_reset_coeffs(
 		bw_pan_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_set_sample_rate);
 
@@ -287,7 +292,7 @@ static inline void bw_pan_reset_coeffs(
 
 static inline void bw_pan_update_coeffs_ctrl(
 		bw_pan_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_reset_coeffs);
 
@@ -301,7 +306,7 @@ static inline void bw_pan_update_coeffs_ctrl(
 
 static inline void bw_pan_update_coeffs_audio(
 		bw_pan_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_reset_coeffs);
 
@@ -317,12 +322,12 @@ static inline void bw_pan_process1(
 		float                             x,
 		float * BW_RESTRICT               y_l,
 		float * BW_RESTRICT               y_r) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 
 	*y_l = bw_gain_process1(&coeffs->l_coeffs, x);
@@ -340,13 +345,13 @@ static inline void bw_pan_process(
 		float *                     y_l,
 		float *                     y_r,
 		size_t                      n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_reset_coeffs);
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 
 	bw_pan_update_coeffs_ctrl(coeffs);
@@ -368,12 +373,12 @@ static inline void bw_pan_process_multi(
 		float * const *             y_r,
 		size_t                      n_channels,
 		size_t                      n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_reset_coeffs);
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
@@ -400,7 +405,7 @@ static inline void bw_pan_process_multi(
 static inline void bw_pan_set_pan(
 		bw_pan_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_pan_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_pan_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -414,7 +419,7 @@ static inline void bw_pan_set_pan(
 
 static inline char bw_pan_coeffs_is_valid(
 		const bw_pan_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_pan_coeffs"))

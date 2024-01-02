@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Stereo balance.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li><code>bw_balance_process()</code> and
@@ -229,7 +234,7 @@ struct bw_balance_coeffs {
 
 static inline void bw_balance_init(
 		bw_balance_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_gain_init(&coeffs->l_coeffs);
 	bw_gain_init(&coeffs->r_coeffs);
@@ -246,7 +251,7 @@ static inline void bw_balance_init(
 static inline void bw_balance_set_sample_rate(
 		bw_balance_coeffs * BW_RESTRICT coeffs,
 		float                           sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -273,7 +278,7 @@ static inline void bw_balance_do_update_coeffs(
 
 static inline void bw_balance_reset_coeffs(
 		bw_balance_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_set_sample_rate);
 
@@ -290,7 +295,7 @@ static inline void bw_balance_reset_coeffs(
 
 static inline void bw_balance_update_coeffs_ctrl(
 		bw_balance_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_reset_coeffs);
 
@@ -304,7 +309,7 @@ static inline void bw_balance_update_coeffs_ctrl(
 
 static inline void bw_balance_update_coeffs_audio(
 		bw_balance_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_reset_coeffs);
 
@@ -321,7 +326,7 @@ static inline void bw_balance_process1(
 		float                                 x_r,
 		float * BW_RESTRICT                   y_l,
 		float * BW_RESTRICT                   y_r) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x_l));
@@ -344,15 +349,15 @@ static inline void bw_balance_process(
 		float *                         y_l,
 		float *                         y_r,
 		size_t                          n_samples){
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_reset_coeffs);
-	BW_ASSERT(x_l != NULL);
+	BW_ASSERT(x_l != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x_l, n_samples));
-	BW_ASSERT(x_r != NULL);
+	BW_ASSERT(x_r != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x_r, n_samples));
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 
 	bw_balance_update_coeffs_ctrl(coeffs);
@@ -375,13 +380,13 @@ static inline void bw_balance_process_multi(
 		float * const *                 y_r,
 		size_t                          n_channels,
 		size_t                          n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_reset_coeffs);
-	BW_ASSERT(x_l != NULL);
-	BW_ASSERT(x_r != NULL);
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(x_l != BW_NULL);
+	BW_ASSERT(x_r != BW_NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
@@ -408,7 +413,7 @@ static inline void bw_balance_process_multi(
 static inline void bw_balance_set_balance(
 		bw_balance_coeffs * BW_RESTRICT coeffs,
 		float                           value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_balance_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_balance_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -422,7 +427,7 @@ static inline void bw_balance_set_balance(
 
 static inline char bw_balance_coeffs_is_valid(
 		const bw_balance_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_balance_coeffs"))

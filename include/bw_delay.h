@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_buf bw_common bw_math }}}
  *  description {{{
  *    Interpolated delay line, not smoothed.
@@ -31,6 +31,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Removed <code>read()</code> and <code>write()</code> from C++
@@ -171,7 +176,7 @@ static inline void bw_delay_reset_state_multi(
  *    array.
  *
  *    The corresponding initial output values are written into the `y_0` array,
- *    if not `NULL`.
+ *    if not `BW_NULL`.
  *
  *    #### bw_delay_read()
  *  ```>>> */
@@ -292,8 +297,8 @@ static inline char bw_delay_state_is_valid(
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
  *
- *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
- *    is supposed to be associated to `coeffs`).
+ *    If `coeffs` is not `BW_NULL` extra cross-checks might be performed
+ *    (`state` is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_delay_state`.
@@ -367,7 +372,7 @@ struct bw_delay_state {
 static inline void bw_delay_init(
 		bw_delay_coeffs * BW_RESTRICT coeffs,
 		float                         max_delay) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT(bw_is_finite(max_delay));
 	BW_ASSERT(max_delay >= 0.f);
 
@@ -386,7 +391,7 @@ static inline void bw_delay_init(
 static inline void bw_delay_set_sample_rate(
 		bw_delay_coeffs * BW_RESTRICT coeffs,
 		float                         sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -403,7 +408,7 @@ static inline void bw_delay_set_sample_rate(
 
 static inline size_t bw_delay_mem_req(
 		const bw_delay_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_set_sample_rate);
 
@@ -414,11 +419,11 @@ static inline void bw_delay_mem_set(
 		const bw_delay_coeffs * BW_RESTRICT coeffs,
 		bw_delay_state * BW_RESTRICT        state,
 		void * BW_RESTRICT                  mem) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_set_sample_rate);
-	BW_ASSERT(state != NULL);
-	BW_ASSERT(mem != NULL);
+	BW_ASSERT(state != BW_NULL);
+	BW_ASSERT(mem != BW_NULL);
 
 	(void)coeffs;
 	state->buf = (float *)mem;
@@ -444,7 +449,7 @@ static inline void bw_delay_do_update_coeffs_ctrl(bw_delay_coeffs *BW_RESTRICT c
 
 static inline void bw_delay_reset_coeffs(
 		bw_delay_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_set_sample_rate);
 
@@ -463,10 +468,10 @@ static inline float bw_delay_reset_state(
 		const bw_delay_coeffs * BW_RESTRICT coeffs,
 		bw_delay_state * BW_RESTRICT        state,
 		float                               x_0) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_mem_set);
 	BW_ASSERT(bw_is_finite(x_0));
@@ -494,18 +499,18 @@ static inline void bw_delay_reset_state_multi(
 		const float *                                    x_0,
 		float *                                          y_0,
 		size_t                                           n_channels) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_0 != NULL);
+	BW_ASSERT(x_0 != BW_NULL);
 
-	if (y_0 != NULL)
+	if (y_0 != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			y_0[i] = bw_delay_reset_state(coeffs, state[i], x_0[i]);
 	else
@@ -514,7 +519,7 @@ static inline void bw_delay_reset_state_multi(
 
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_0 != BW_NULL ? bw_has_only_finite(y_0, n_channels) : 1);
 }
 
 static float bw_delay_read(
@@ -522,10 +527,10 @@ static float bw_delay_read(
 		const bw_delay_state * BW_RESTRICT  state,
 		size_t                              di,
 		float                               df) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(df));
@@ -549,10 +554,10 @@ static void bw_delay_write(
 		const bw_delay_coeffs * BW_RESTRICT coeffs,
 		bw_delay_state * BW_RESTRICT        state,
 		float                               x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(x));
@@ -569,7 +574,7 @@ static void bw_delay_write(
 
 static inline void bw_delay_update_coeffs_ctrl(
 		bw_delay_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 
@@ -581,7 +586,7 @@ static inline void bw_delay_update_coeffs_ctrl(
 
 static inline void bw_delay_update_coeffs_audio(
 		bw_delay_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
 
@@ -592,10 +597,10 @@ static inline float bw_delay_process1(
 		const bw_delay_coeffs * BW_RESTRICT coeffs,
 		bw_delay_state * BW_RESTRICT        state,
 		float                               x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(x));
@@ -618,15 +623,15 @@ static inline void bw_delay_process(
 		const float *                 x,
 		float *                       y,
 		size_t                        n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_delay_state_state_reset_state);
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	bw_delay_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++)
@@ -646,17 +651,17 @@ static inline void bw_delay_process_multi(
 		float * const *                                  y,
 		size_t                                           n_channels,
 		size_t                                           n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -675,7 +680,7 @@ static inline void bw_delay_process_multi(
 static inline void bw_delay_set_delay(
 		bw_delay_coeffs * BW_RESTRICT coeffs,
 		float                         value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -691,7 +696,7 @@ static inline void bw_delay_set_delay(
 
 static inline size_t bw_delay_get_length(
 		const bw_delay_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_delay_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_delay_coeffs_state_set_sample_rate);
 
@@ -700,7 +705,7 @@ static inline size_t bw_delay_get_length(
 
 static inline char bw_delay_coeffs_is_valid(
 		const bw_delay_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_delay_coeffs"))
@@ -736,7 +741,7 @@ static inline char bw_delay_coeffs_is_valid(
 static inline char bw_delay_state_is_valid(
 		const bw_delay_coeffs * BW_RESTRICT coeffs,
 		const bw_delay_state * BW_RESTRICT  state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_delay_state"))
@@ -747,11 +752,11 @@ static inline char bw_delay_state_is_valid(
 
 	(void)coeffs;
 
-	if (state->buf == NULL)
+	if (state->buf == BW_NULL)
 		return 0;
 
 #ifdef BW_DEBUG_DEEP
-	if (state->state >= bw_delay_state_state_reset_state && coeffs != NULL) {
+	if (state->state >= bw_delay_state_state_reset_state && coeffs != BW_NULL) {
 		if (coeffs->reset_id != state->coeffs_reset_id)
 			return 0;
 

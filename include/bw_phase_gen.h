@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@
  *    <ul>
  *      <li>Version <strong>1.0.1</strong>:
  *        <ul>
- *          <li>Fixed rouding bug when frequency is tiny and negative.</li>
+ *          <li>Fixed rounding bug when frequency is tiny and negative.</li>
+ *          <li>Now using <code>BW_NULL</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -169,7 +170,7 @@ static inline void bw_phase_gen_reset_state_multi(
  *    array.
  *
  *    The corresponding initial output and phase increment values are put into
- *    the `y_0` and `y_inc_0` arrays, respectively, if they are not `NULL`.
+ *    the `y_0` and `y_inc_0` arrays, respectively, if they are not `BW_NULL`.
  *
  *    #### bw_phase_gen_update_coeffs_ctrl()
  *  ```>>> */
@@ -222,10 +223,10 @@ static inline void bw_phase_gen_process(
  *    Generates and fills the first `n_samples` of the output buffer `y`, while
  *    using and updating both `coeffs` and `state` (control and audio rate).
  *
- *    If `x_mod` is not `NULL`, it is used as a source of exponential frequency
- *    modulation (scale `1.f`/octave).
+ *    If `x_mod` is not `BW_NULL`, it is used as a source of exponential
+ *    frequency modulation (scale `1.f`/octave).
  *
- *    If `y_inc` is not `NULL`, it is filled with phase increment values.
+ *    If `y_inc` is not `BW_NULL`, it is filled with phase increment values.
  *
  *    #### bw_phase_gen_process_multi()
  *  ```>>> */
@@ -242,12 +243,12 @@ static inline void bw_phase_gen_process_multi(
  *    buffers `y`, while using and updating both the common `coeffs` and each of
  *    the `n_channels` `state`s (control and audio rate).
  *
- *    If `x_mod` and the channel-specific element are not `NULL`, this is used
- *    as a source of exponential frequency modulation (scale `1.f`/octave) for
- *    that channel.
+ *    If `x_mod` and the channel-specific element are not `BW_NULL`, this is
+ *    used as a source of exponential frequency modulation (scale `1.f`/octave)
+ *    for that channel.
  *
- *    If `y_inc` and the channel-specific element are not `NULL`, this is filled
- *    with phase increment values for that channel.
+ *    If `y_inc` and the channel-specific element are not `BW_NULL`, this is
+ *    filled with phase increment values for that channel.
  *
  *    #### bw_phase_gen_set_frequency()
  *  ```>>> */
@@ -295,8 +296,8 @@ static inline char bw_phase_gen_state_is_valid(
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
  *
- *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
- *    is supposed to be associated to `coeffs`).
+ *    If `coeffs` is not `BW_NULL` extra cross-checks might be performed
+ *    (`state` is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_phase_gen_state`.
@@ -360,7 +361,7 @@ struct bw_phase_gen_state {
 
 static inline void bw_phase_gen_init(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_one_pole_init(&coeffs->portamento_coeffs);
 	coeffs->frequency = 1.f;
@@ -377,7 +378,7 @@ static inline void bw_phase_gen_init(
 static inline void bw_phase_gen_set_sample_rate(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs,
 		float                             sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -403,7 +404,7 @@ static inline void bw_phase_gen_do_update_coeffs_ctrl(
 
 static inline void bw_phase_gen_reset_coeffs(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_set_sample_rate);
 
@@ -425,13 +426,13 @@ static inline void bw_phase_gen_reset_state(
 		float                                   phase_0,
 		float * BW_RESTRICT                     y_0,
 		float * BW_RESTRICT                     y_inc_0) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT(bw_is_finite(phase_0));
-	BW_ASSERT(y_0 != NULL);
-	BW_ASSERT(y_inc_0 != NULL);
+	BW_ASSERT(y_0 != BW_NULL);
+	BW_ASSERT(y_inc_0 != BW_NULL);
 	BW_ASSERT(y_0 != y_inc_0);
 
 	state->phase = phase_0;
@@ -456,20 +457,20 @@ static inline void bw_phase_gen_reset_state_multi(
 		float *                                              y_0,
 		float *                                              y_inc_0,
 		size_t                                               n_channels) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(phase_0 != NULL);
-	BW_ASSERT(y_0 != NULL && y_inc_0 != NULL ? y_0 != y_inc_0 : 1);
+	BW_ASSERT(phase_0 != BW_NULL);
+	BW_ASSERT(y_0 != BW_NULL && y_inc_0 != BW_NULL ? y_0 != y_inc_0 : 1);
 
-	if (y_0 != NULL) {
-		if (y_inc_0 != NULL) {
+	if (y_0 != BW_NULL) {
+		if (y_inc_0 != BW_NULL) {
 			for (size_t i = 0; i < n_channels; i++)
 				bw_phase_gen_reset_state(coeffs, state[i], phase_0[i], y_0 + i, y_inc_0 + i);
 		} else {
@@ -479,7 +480,7 @@ static inline void bw_phase_gen_reset_state_multi(
 			}
 		}
 	} else {
-		if (y_inc_0 != NULL) {
+		if (y_inc_0 != BW_NULL) {
 			for (size_t i = 0; i < n_channels; i++) {
 				float v;
 				bw_phase_gen_reset_state(coeffs, state[i], phase_0[i], &v, y_inc_0 + i);
@@ -494,13 +495,13 @@ static inline void bw_phase_gen_reset_state_multi(
 
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
-	BW_ASSERT_DEEP(y_inc_0 != NULL ? bw_has_only_finite(y_inc_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_0 != BW_NULL ? bw_has_only_finite(y_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_inc_0 != BW_NULL ? bw_has_only_finite(y_inc_0, n_channels) : 1);
 }
 
 static inline void bw_phase_gen_update_coeffs_ctrl(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
 
@@ -512,7 +513,7 @@ static inline void bw_phase_gen_update_coeffs_ctrl(
 
 static inline void bw_phase_gen_update_coeffs_audio(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
 
@@ -535,13 +536,13 @@ static inline void bw_phase_gen_process1(
 		bw_phase_gen_state * BW_RESTRICT        state,
 		float * BW_RESTRICT                     y,
 		float * BW_RESTRICT                     y_inc) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_state_is_valid(coeffs, state));
-	BW_ASSERT(y != NULL);
-	BW_ASSERT(y_inc != NULL);
+	BW_ASSERT(y != BW_NULL);
+	BW_ASSERT(y_inc != BW_NULL);
 	BW_ASSERT(y != y_inc);
 
 	*y_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state);
@@ -561,14 +562,14 @@ static inline void bw_phase_gen_process1_mod(
 		float                                   x_mod,
 		float * BW_RESTRICT                     y,
 		float * BW_RESTRICT                     y_inc) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x_mod));
-	BW_ASSERT(y != NULL);
-	BW_ASSERT(y_inc != NULL);
+	BW_ASSERT(y != BW_NULL);
+	BW_ASSERT(y_inc != BW_NULL);
 	BW_ASSERT(y != y_inc);
 
 	*y_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state) * bw_pow2f(x_mod);
@@ -589,18 +590,18 @@ static inline void bw_phase_gen_process(
 		float *                           y,
 		float *                           y_inc,
 		size_t                            n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_state_is_valid(coeffs, state));
-	BW_ASSERT_DEEP(x_mod != NULL ? bw_has_only_finite(x_mod, n_samples) : 1);
-	BW_ASSERT(y != NULL && y_inc != NULL ? y != y_inc : 1);
+	BW_ASSERT_DEEP(x_mod != BW_NULL ? bw_has_only_finite(x_mod, n_samples) : 1);
+	BW_ASSERT(y != BW_NULL && y_inc != BW_NULL ? y != y_inc : 1);
 
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
-	if (y != NULL) {
-		if (x_mod != NULL) {
-			if (y_inc != NULL)
+	if (y != BW_NULL) {
+		if (x_mod != BW_NULL) {
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, y_inc + i);
@@ -612,7 +613,7 @@ static inline void bw_phase_gen_process(
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], y + i, &v_phase_inc);
 				}
 		} else {
-			if (y_inc != NULL)
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					bw_phase_gen_process1(coeffs, state, y + i, y_inc + i);
@@ -625,8 +626,8 @@ static inline void bw_phase_gen_process(
 				}
 		}
 	} else {
-		if (x_mod != NULL) {
-			if (y_inc != NULL)
+		if (x_mod != BW_NULL) {
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v;
@@ -639,7 +640,7 @@ static inline void bw_phase_gen_process(
 					bw_phase_gen_process1_mod(coeffs, state, x_mod[i], &v, &v_phase_inc);
 				}
 		} else {
-			if (y_inc != NULL)
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					float v;
@@ -657,8 +658,8 @@ static inline void bw_phase_gen_process(
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_phase_gen_state_is_valid(coeffs, state));
-	BW_ASSERT_DEEP(y != NULL ? bw_has_only_finite(y, n_samples) : 1);
-	BW_ASSERT_DEEP(y_inc != NULL ? bw_has_only_finite(y_inc, n_samples) : 1);
+	BW_ASSERT_DEEP(y != BW_NULL ? bw_has_only_finite(y, n_samples) : 1);
+	BW_ASSERT_DEEP(y_inc != BW_NULL ? bw_has_only_finite(y_inc, n_samples) : 1);
 }
 
 static inline void bw_phase_gen_process_multi(
@@ -669,32 +670,32 @@ static inline void bw_phase_gen_process_multi(
 		float * const *                                      y_inc,
 		size_t                                               n_channels,
 		size_t                                               n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
-	if (y != NULL)
+	if (y != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
 				BW_ASSERT(y[i] != y[j]);
-	if (y_inc != NULL)
+	if (y_inc != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
 				BW_ASSERT(y_inc[i] != y_inc[j]);
-	if (y != NULL && y_inc != NULL)
+	if (y != BW_NULL && y_inc != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = 0; j < n_channels; j++)
 				BW_ASSERT(y[i] != y_inc[j]);
 #endif
 
 	bw_phase_gen_update_coeffs_ctrl(coeffs);
-	if (y != NULL) {
-		if (x_mod != NULL) {
-			if (y_inc != NULL)
+	if (y != BW_NULL) {
+		if (x_mod != BW_NULL) {
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					for (size_t j = 0; j < n_channels; j++) {
@@ -723,7 +724,7 @@ static inline void bw_phase_gen_process_multi(
 					}
 				}
 		} else {
-			if (y_inc != NULL)
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					for (size_t j = 0; j < n_channels; j++) {
@@ -747,8 +748,8 @@ static inline void bw_phase_gen_process_multi(
 				}
 		}
 	} else {
-		if (x_mod != NULL) {
-			if (y_inc != NULL)
+		if (x_mod != BW_NULL) {
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					for (size_t j = 0; j < n_channels; j++) {
@@ -773,7 +774,7 @@ static inline void bw_phase_gen_process_multi(
 					}
 				}
 		} else {
-			if (y_inc != NULL)
+			if (y_inc != BW_NULL)
 				for (size_t i = 0; i < n_samples; i++) {
 					bw_phase_gen_update_coeffs_audio(coeffs);
 					for (size_t j = 0; j < n_channels; j++) {
@@ -801,7 +802,7 @@ static inline void bw_phase_gen_process_multi(
 static inline void bw_phase_gen_set_frequency(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs,
 		float                             value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -815,7 +816,7 @@ static inline void bw_phase_gen_set_frequency(
 static inline void bw_phase_gen_set_portamento_tau(
 		bw_phase_gen_coeffs * BW_RESTRICT coeffs,
 		float                             value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -829,7 +830,7 @@ static inline void bw_phase_gen_set_portamento_tau(
 
 static inline char bw_phase_gen_coeffs_is_valid(
 		const bw_phase_gen_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_phase_gen_coeffs"))
@@ -867,13 +868,13 @@ static inline char bw_phase_gen_coeffs_is_valid(
 static inline char bw_phase_gen_state_is_valid(
 		const bw_phase_gen_coeffs * BW_RESTRICT coeffs,
 		const bw_phase_gen_state * BW_RESTRICT  state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_phase_gen_state"))
 		return 0;
 
-	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+	if (coeffs != BW_NULL && coeffs->reset_id != state->coeffs_reset_id)
 		return 0;
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2023 Orastron Srl unipersonale
+ * Copyright (C) 2023, 2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{
  *    bw_buf bw_common bw_delay bw_dry_wet bw_gain bw_lp1 bw_math bw_one_pole
  *    bw_osc_sin bw_phase_gen
@@ -35,6 +35,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added initial value arguments in
@@ -170,7 +175,7 @@ static inline void bw_reverb_reset_state_multi(
  *    (left) and `x_r_0` (right) arrays.
  *
  *    The corresponding initial output values are written into the `y_l_0`
- *    (left) and `y_r_0` arrays, if each is not `NULL`.
+ *    (left) and `y_r_0` arrays, if each is not `BW_NULL`.
  *
  *    #### bw_reverb_update_coeffs_ctrl()
  *  ```>>> */
@@ -316,8 +321,8 @@ static inline char bw_reverb_state_is_valid(
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
  *
- *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
- *    is supposed to be associated to `coeffs`).
+ *    If `coeffs` is not `BW_NULL` extra cross-checks might be performed
+ *    (`state` is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_reverb_state`.
@@ -455,7 +460,7 @@ struct bw_reverb_state {
 
 static inline void bw_reverb_init(
 		bw_reverb_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_delay_init(&coeffs->predelay_coeffs, 0.1f);
 	bw_lp1_init(&coeffs->bandwidth_coeffs);
@@ -498,7 +503,7 @@ static inline void bw_reverb_init(
 static inline void bw_reverb_set_sample_rate(
 		bw_reverb_coeffs * BW_RESTRICT coeffs,
 		float                          sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -559,7 +564,7 @@ static inline void bw_reverb_set_sample_rate(
 
 static inline size_t bw_reverb_mem_req(
 		const bw_reverb_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_set_sample_rate);
 
@@ -582,11 +587,11 @@ static inline void bw_reverb_mem_set(
 		const bw_reverb_coeffs * BW_RESTRICT coeffs,
 		bw_reverb_state * BW_RESTRICT        state,
 		void * BW_RESTRICT                   mem) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_set_sample_rate);
-	BW_ASSERT(state != NULL);
-	BW_ASSERT(mem != NULL);
+	BW_ASSERT(state != BW_NULL);
+	BW_ASSERT(mem != BW_NULL);
 
 	char *m = (char *)mem;
 	bw_delay_mem_set(&coeffs->predelay_coeffs, &state->predelay_state, m);
@@ -627,7 +632,7 @@ static inline void bw_reverb_mem_set(
 
 static inline void bw_reverb_reset_coeffs(
 		bw_reverb_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_set_sample_rate);
 
@@ -671,16 +676,16 @@ static inline void bw_reverb_reset_state(
 		float                                x_r_0,
 		float * BW_RESTRICT                  y_l_0,
 		float * BW_RESTRICT                  y_r_0) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_reverb_state_state_mem_set);
 	BW_ASSERT(bw_is_finite(x_l_0));
 	BW_ASSERT(bw_is_finite(x_r_0));
-	BW_ASSERT(y_l_0 != NULL);
-	BW_ASSERT(y_r_0 != NULL);
+	BW_ASSERT(y_l_0 != BW_NULL);
+	BW_ASSERT(y_r_0 != BW_NULL);
 	BW_ASSERT(y_l_0 != y_r_0);
 
 	const float i = 0.5f * (x_l_0 + x_r_0);
@@ -739,21 +744,21 @@ static inline void bw_reverb_reset_state_multi(
 		float *                                           y_l_0,
 		float *                                           y_r_0,
 		size_t                                            n_channels) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_l_0 != NULL);
-	BW_ASSERT(x_r_0 != NULL);
-	BW_ASSERT(y_l_0 != NULL && y_r_0 != NULL ? y_l_0 != y_r_0 : 1);
+	BW_ASSERT(x_l_0 != BW_NULL);
+	BW_ASSERT(x_r_0 != BW_NULL);
+	BW_ASSERT(y_l_0 != BW_NULL && y_r_0 != BW_NULL ? y_l_0 != y_r_0 : 1);
 
-	if (y_l_0 != NULL) {
-		if (y_r_0 != NULL) {
+	if (y_l_0 != BW_NULL) {
+		if (y_r_0 != BW_NULL) {
 			for (size_t i = 0; i < n_channels; i++)
 				bw_reverb_reset_state(coeffs, state[i], x_l_0[i], x_r_0[i], y_l_0 + i, y_r_0 + i);
 		} else {
@@ -762,7 +767,7 @@ static inline void bw_reverb_reset_state_multi(
 				bw_reverb_reset_state(coeffs, state[i], x_l_0[i], x_r_0[i], y_l_0 + i, &yr);
 		}
 	} else {
-		if (y_r_0 != NULL) {
+		if (y_r_0 != BW_NULL) {
 			float yl;
 			for (size_t i = 0; i < n_channels; i++)
 				bw_reverb_reset_state(coeffs, state[i], x_l_0[i], x_r_0[i], &yl, y_r_0 + i);
@@ -775,13 +780,13 @@ static inline void bw_reverb_reset_state_multi(
 
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(y_l_0 != NULL ? bw_has_only_finite(y_l_0, n_channels) : 1);
-	BW_ASSERT_DEEP(y_r_0 != NULL ? bw_has_only_finite(y_r_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_l_0 != BW_NULL ? bw_has_only_finite(y_l_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_r_0 != BW_NULL ? bw_has_only_finite(y_r_0, n_channels) : 1);
 }
 
 static inline void bw_reverb_update_coeffs_ctrl(
 		bw_reverb_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
 
@@ -797,7 +802,7 @@ static inline void bw_reverb_update_coeffs_ctrl(
 
 static inline void bw_reverb_update_coeffs_audio(
 		bw_reverb_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
 
@@ -827,16 +832,16 @@ static inline void bw_reverb_process1(
 		float                                x_r,
 		float *                              y_l,
 		float *                              y_r) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_reverb_state_state_reset_state);
 	BW_ASSERT(bw_is_finite(x_l));
 	BW_ASSERT(bw_is_finite(x_r));
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 
 	const float i = 0.5f * (x_l + x_r);
@@ -936,18 +941,18 @@ static inline void bw_reverb_process(
 		float *                        y_l,
 		float *                        y_r,
 		size_t                         n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_state_is_valid(coeffs, state));
 	BW_ASSERT_DEEP(state->state >= bw_reverb_state_state_reset_state);
-	BW_ASSERT(x_l != NULL);
+	BW_ASSERT(x_l != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x_l, n_samples));
-	BW_ASSERT(x_r != NULL);
+	BW_ASSERT(x_r != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x_r, n_samples));
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 
 	bw_reverb_update_coeffs_ctrl(coeffs);
@@ -973,19 +978,19 @@ static inline void bw_reverb_process_multi(
 		float * const *                                   y_r,
 		size_t                                            n_channels,
 		size_t                                            n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_l != NULL);
-	BW_ASSERT(x_r != NULL);
-	BW_ASSERT(y_l != NULL);
-	BW_ASSERT(y_r != NULL);
+	BW_ASSERT(x_l != BW_NULL);
+	BW_ASSERT(x_r != BW_NULL);
+	BW_ASSERT(y_l != BW_NULL);
+	BW_ASSERT(y_r != BW_NULL);
 	BW_ASSERT(y_l != y_r);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
@@ -1012,7 +1017,7 @@ static inline void bw_reverb_process_multi(
 static inline void bw_reverb_set_predelay(
 		bw_reverb_coeffs * BW_RESTRICT coeffs,
 		float                          value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -1027,7 +1032,7 @@ static inline void bw_reverb_set_predelay(
 static inline void bw_reverb_set_bandwidth(
 		bw_reverb_coeffs * BW_RESTRICT coeffs,
 		float                          value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -1042,7 +1047,7 @@ static inline void bw_reverb_set_bandwidth(
 static inline void bw_reverb_set_damping(
 		bw_reverb_coeffs * BW_RESTRICT coeffs,
 		float                          value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -1057,7 +1062,7 @@ static inline void bw_reverb_set_damping(
 static inline void bw_reverb_set_decay(
 		bw_reverb_coeffs * BW_RESTRICT coeffs,
 		float                          value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -1072,7 +1077,7 @@ static inline void bw_reverb_set_decay(
 static inline void bw_reverb_set_wet(
 		bw_reverb_coeffs * BW_RESTRICT coeffs,
 		float                          value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_reverb_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_reverb_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -1086,7 +1091,7 @@ static inline void bw_reverb_set_wet(
 
 static inline char bw_reverb_coeffs_is_valid(
 		const bw_reverb_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_reverb_coeffs"))
@@ -1145,7 +1150,7 @@ static inline char bw_reverb_coeffs_is_valid(
 static inline char bw_reverb_state_is_valid(
 		const bw_reverb_coeffs * BW_RESTRICT coeffs,
 		const bw_reverb_state * BW_RESTRICT  state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_reverb_state"))
@@ -1154,29 +1159,29 @@ static inline char bw_reverb_state_is_valid(
 		return 0;
 
 	if (state->state >= bw_reverb_state_state_reset_state) {
-		if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+		if (coeffs != BW_NULL && coeffs->reset_id != state->coeffs_reset_id)
 			return 0;
 
-		if (!bw_lp1_state_is_valid(coeffs ? &coeffs->bandwidth_coeffs : NULL, &state->bandwidth_state)
-			|| !bw_lp1_state_is_valid(coeffs ? &coeffs->damping_coeffs : NULL, &state->damping_1_state)
-			|| !bw_lp1_state_is_valid(coeffs ? &coeffs->damping_coeffs : NULL, &state->damping_2_state))
+		if (!bw_lp1_state_is_valid(coeffs ? &coeffs->bandwidth_coeffs : BW_NULL, &state->bandwidth_state)
+			|| !bw_lp1_state_is_valid(coeffs ? &coeffs->damping_coeffs : BW_NULL, &state->damping_1_state)
+			|| !bw_lp1_state_is_valid(coeffs ? &coeffs->damping_coeffs : BW_NULL, &state->damping_2_state))
 			return 0;
 	}
 #endif
 
-	return bw_delay_state_is_valid(coeffs ? &coeffs->predelay_coeffs : NULL, &state->predelay_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id1_coeffs : NULL, &state->delay_id1_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id2_coeffs : NULL, &state->delay_id2_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id3_coeffs : NULL, &state->delay_id3_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id4_coeffs : NULL, &state->delay_id4_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd1_coeffs : NULL, &state->delay_dd1_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd2_coeffs : NULL, &state->delay_dd2_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd3_coeffs : NULL, &state->delay_dd3_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd4_coeffs : NULL, &state->delay_dd4_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d1_coeffs : NULL, &state->delay_d1_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d2_coeffs : NULL, &state->delay_d2_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d3_coeffs : NULL, &state->delay_d3_state)
-		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d4_coeffs : NULL, &state->delay_d4_state);
+	return bw_delay_state_is_valid(coeffs ? &coeffs->predelay_coeffs : BW_NULL, &state->predelay_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id1_coeffs : BW_NULL, &state->delay_id1_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id2_coeffs : BW_NULL, &state->delay_id2_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id3_coeffs : BW_NULL, &state->delay_id3_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_id4_coeffs : BW_NULL, &state->delay_id4_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd1_coeffs : BW_NULL, &state->delay_dd1_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd2_coeffs : BW_NULL, &state->delay_dd2_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd3_coeffs : BW_NULL, &state->delay_dd3_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_dd4_coeffs : BW_NULL, &state->delay_dd4_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d1_coeffs : BW_NULL, &state->delay_d1_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d2_coeffs : BW_NULL, &state->delay_d2_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d3_coeffs : BW_NULL, &state->delay_d3_state)
+		&& bw_delay_state_is_valid(coeffs ? &coeffs->delay_d4_coeffs : BW_NULL, &state->delay_d4_state);
 }
 
 #ifdef __cplusplus

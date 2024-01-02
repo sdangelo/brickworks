@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,19 @@
 
 /*!
  *  module_type {{{ foundation }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.1.0 }}}
  *  description {{{
  *    A common header to make sure that a bunch of basic definitions are
  *    available and consistent for all Brickworks modules.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.0</strong>:
+ *        <ul>
+ *          <li>Added <code>BW_NULL</code> and relaxed <code>NULL</code> definition
+ *              requirement in C++.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Removed <code>BW_SIZE_T</code> and went for <code>size_t</code>
@@ -91,7 +97,7 @@
  *
  *    Brickworks requires definitions of:
  *
- *    * `NULL` and `size_t`, normally supplied by `stddef.h`;
+ *    * `NULL` (C only) and `size_t`, normally supplied by `stddef.h`;
  *    * `(u)int{8,16,32,64}_t`, `INT{8,16,32,64}_{MIN,MAX}`, and
  *      `UINT{8,16,32,64}_MAX`, normally supplied by `stdint.h`;
  *    * `INFINITY`, normally supplied by `math.h`.
@@ -106,13 +112,20 @@
  *    * if `BW_NO_STDLIB` or `BW_NO_MATH_H` is defined, then `math.h` is not
  *      `#include`d.
  *
+ *    A `BW_NULL` macro is defined whose value is either `NULL` (C) or `nullptr`
+ *    (C++).
  *  >>> */
 #if !defined(BW_NO_STDLIB) && !defined(BW_NO_STDDEF_H)
 # include <stddef.h>
 #endif
 
-#ifndef NULL
-# error NULL not defined
+#ifdef __cplusplus
+# define BW_NULL nullptr
+#else
+# ifndef NULL
+#  error NULL not defined
+# endif
+# define BW_NULL NULL
 #endif
 
 #if !defined(BW_NO_STDLIB) && !defined(BW_NO_STDINT_H)

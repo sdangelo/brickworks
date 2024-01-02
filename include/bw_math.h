@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2021-2023 Orastron Srl unipersonale
+ * Copyright (C) 2021-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    A collection of mathematical routines that strive to be better suited to
@@ -44,6 +44,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Renamed <code>bw_min0xf()</code> as <code>bw_min0f()</code> and
@@ -756,8 +761,8 @@ static inline void bw_intfracf(
 		float * BW_RESTRICT i,
 		float * BW_RESTRICT f) {
 	BW_ASSERT(bw_is_finite(x));
-	BW_ASSERT(i != NULL);
-	BW_ASSERT(f != NULL);
+	BW_ASSERT(i != BW_NULL);
+	BW_ASSERT(f != BW_NULL);
 	BW_ASSERT(i != f);
 	*i = bw_floorf(x);
 	*f = x - *i;

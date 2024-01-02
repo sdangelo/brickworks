@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Slew-rate limiter with separate maximum increasing and decreasing rates.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_slew_lim_reset_state_multi()</code> and updated
@@ -150,7 +155,7 @@ static inline void bw_slew_lim_reset_state_multi(
  *    array.
  *
  *    The corresponding initial output values are written into the
- *    `y_0` array, if not `NULL`.
+ *    `y_0` array, if not `BW_NULL`.
  *
  *    #### bw_slew_lim_update_coeffs_ctrl()
  *  ```>>> */
@@ -219,7 +224,7 @@ static inline void bw_slew_lim_process(
  *    first `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
- *    `y` may be `NULL`.
+ *    `y` may be `BW_NULL`.
  *
  *    #### bw_slew_lim_process_multi()
  *  ```>>> */
@@ -236,7 +241,7 @@ static inline void bw_slew_lim_process_multi(
  *    using and updating both the common `coeffs` and each of the `n_channels`
  *    `state`s (control and audio rate).
  *
- *    `y` or any element of `y` may be `NULL`.
+ *    `y` or any element of `y` may be `BW_NULL`.
  *
  *    #### bw_slew_lim_set_max_rate()
  *  ```>>> */
@@ -316,8 +321,8 @@ static inline char bw_slew_lim_state_is_valid(
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
  *
- *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
- *    is supposed to be associated to `coeffs`).
+ *    If `coeffs` is not `BW_NULL` extra cross-checks might be performed
+ *    (`state` is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_slew_lim_state`.
@@ -377,7 +382,7 @@ struct bw_slew_lim_state {
 
 static inline void bw_slew_lim_init(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	coeffs->max_rate_up = INFINITY;
 	coeffs->max_rate_down = INFINITY;
@@ -394,7 +399,7 @@ static inline void bw_slew_lim_init(
 static inline void bw_slew_lim_set_sample_rate(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		float                            sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -417,7 +422,7 @@ static inline void bw_slew_lim_do_update_coeffs_ctrl(
 
 static inline void bw_slew_lim_reset_coeffs(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_set_sample_rate);
 
@@ -435,10 +440,10 @@ static inline float bw_slew_lim_reset_state(
 		const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		bw_slew_lim_state * BW_RESTRICT        state,
 		float                                  x_0) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
 	(void)coeffs;
@@ -463,18 +468,18 @@ static inline void bw_slew_lim_reset_state_multi(
 		const float *                                       x_0,
 		float *                                             y_0,
 		size_t                                              n_channels) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_0 != NULL);
+	BW_ASSERT(x_0 != BW_NULL);
 
-	if (y_0 != NULL)
+	if (y_0 != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			y_0[i] = bw_slew_lim_reset_state(coeffs, state[i], x_0[i]);
 	else
@@ -483,12 +488,12 @@ static inline void bw_slew_lim_reset_state_multi(
 
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_0 != BW_NULL ? bw_has_only_finite(y_0, n_channels) : 1);
 }
 
 static inline void bw_slew_lim_update_coeffs_ctrl(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 
@@ -500,7 +505,7 @@ static inline void bw_slew_lim_update_coeffs_ctrl(
 
 static inline void bw_slew_lim_update_coeffs_audio(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 
@@ -511,10 +516,10 @@ static inline float bw_slew_lim_process1(
 		const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		bw_slew_lim_state * BW_RESTRICT        state,
 		float                                  x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(bw_is_finite(coeffs->max_inc) && bw_is_finite(coeffs->max_dec));
@@ -534,10 +539,10 @@ static inline float bw_slew_lim_process1_up(
 		const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		bw_slew_lim_state * BW_RESTRICT        state,
 		float                                  x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(bw_is_finite(coeffs->max_inc));
@@ -557,10 +562,10 @@ static inline float bw_slew_lim_process1_down(
 		const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		bw_slew_lim_state * BW_RESTRICT        state,
 		float                                  x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 	BW_ASSERT(bw_is_finite(coeffs->max_dec));
@@ -580,10 +585,10 @@ static inline float bw_slew_lim_process1_none(
 	const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 	bw_slew_lim_state * BW_RESTRICT        state,
 	float                                  x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 
@@ -603,16 +608,16 @@ static inline void bw_slew_lim_process(
 		const float *                    x,
 		float *                          y,
 		size_t                           n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
 
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
-	if (y != NULL) {
+	if (y != BW_NULL) {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
 				for (size_t i = 0; i < n_samples; i++)
@@ -650,7 +655,7 @@ static inline void bw_slew_lim_process(
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state));
-	BW_ASSERT_DEEP(y != NULL ? bw_has_only_finite(y, n_samples) : 1);
+	BW_ASSERT_DEEP(y != BW_NULL ? bw_has_only_finite(y, n_samples) : 1);
 }
 
 static inline void bw_slew_lim_process_multi(
@@ -660,29 +665,29 @@ static inline void bw_slew_lim_process_multi(
 		float * const *                                     y,
 		size_t                                              n_channels,
 		size_t                                              n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 #ifndef BW_NO_DEBUG
-	if (y != NULL)
+	if (y != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y[i] == NULL || y[j] == NULL || y[i] != y[j]);
+				BW_ASSERT(y[i] == BW_NULL || y[j] == BW_NULL || y[i] != y[j]);
 #endif
 
 	bw_slew_lim_update_coeffs_ctrl(coeffs);
-	if (y != NULL) {
+	if (y != BW_NULL) {
 		if (coeffs->max_rate_up != INFINITY) {
 			if (coeffs->max_rate_down != INFINITY)
 				for (size_t j = 0; j < n_channels; j++)
-					if (y[j] != NULL)
+					if (y[j] != BW_NULL)
 						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = bw_slew_lim_process1(coeffs, state[j], x[j][i]);
 					else
@@ -691,14 +696,14 @@ static inline void bw_slew_lim_process_multi(
 			else
 				for (size_t j = 0; j < n_channels; j++)
 					for (size_t i = 0; i < n_samples; i++)
-						if (y[j] != NULL)
+						if (y[j] != BW_NULL)
 							y[j][i] = bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
 						else
 							bw_slew_lim_process1_up(coeffs, state[j], x[j][i]);
 		} else {
 			if (coeffs->max_rate_down != INFINITY)
 				for (size_t j = 0; j < n_channels; j++)
-					if (y[j] != NULL)
+					if (y[j] != BW_NULL)
 						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 					else
@@ -706,18 +711,18 @@ static inline void bw_slew_lim_process_multi(
 							bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
 				for (size_t j = 0; j < n_channels; j++) {
-					BW_ASSERT(state[j] != NULL);
+					BW_ASSERT(state[j] != BW_NULL);
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
-					BW_ASSERT(x[j] != NULL);
+					BW_ASSERT(x[j] != BW_NULL);
 					BW_ASSERT_DEEP(bw_has_only_finite(x[j], n_samples));
 
-					if (y[j] != NULL)
+					if (y[j] != BW_NULL)
 						for (size_t i = 0; i < n_samples; i++)
 							y[j][i] = x[j][i];
 					state[j]->y_z1 = x[j][n_samples - 1];
 
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
-					BW_ASSERT_DEEP(y[j] != NULL ? bw_has_only_finite(y[j], n_samples) : 1);
+					BW_ASSERT_DEEP(y[j] != BW_NULL ? bw_has_only_finite(y[j], n_samples) : 1);
 				}
 		}
 	} else {
@@ -737,9 +742,9 @@ static inline void bw_slew_lim_process_multi(
 						bw_slew_lim_process1_down(coeffs, state[j], x[j][i]);
 			else
 				for (size_t j = 0; j < n_channels; j++) {
-					BW_ASSERT(state[j] != NULL);
+					BW_ASSERT(state[j] != BW_NULL);
 					BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(coeffs, state[j]));
-					BW_ASSERT(x[j] != NULL);
+					BW_ASSERT(x[j] != BW_NULL);
 					BW_ASSERT_DEEP(bw_has_only_finite(x[j], n_samples));
 
 					state[j]->y_z1 = x[j][n_samples - 1];
@@ -756,7 +761,7 @@ static inline void bw_slew_lim_process_multi(
 static inline void bw_slew_lim_set_max_rate(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		float                            value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_init);
 	BW_ASSERT(!bw_is_nan(value));
@@ -772,7 +777,7 @@ static inline void bw_slew_lim_set_max_rate(
 static inline void bw_slew_lim_set_max_rate_up(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		float                            value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_init);
 	BW_ASSERT(!bw_is_nan(value));
@@ -787,7 +792,7 @@ static inline void bw_slew_lim_set_max_rate_up(
 static inline void bw_slew_lim_set_max_rate_down(
 		bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		float                            value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_slew_lim_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_slew_lim_coeffs_state_init);
 	BW_ASSERT(!bw_is_nan(value));
@@ -801,15 +806,15 @@ static inline void bw_slew_lim_set_max_rate_down(
 
 static inline float bw_slew_lim_get_y_z1(
 		const bw_slew_lim_state * BW_RESTRICT state) {
-	BW_ASSERT(state != NULL);
-	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(NULL, state));
+	BW_ASSERT(state != BW_NULL);
+	BW_ASSERT_DEEP(bw_slew_lim_state_is_valid(BW_NULL, state));
 
 	return state->y_z1;
 }
 
 static inline char bw_slew_lim_coeffs_is_valid(
 		const bw_slew_lim_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_slew_lim_coeffs"))
@@ -843,13 +848,13 @@ static inline char bw_slew_lim_coeffs_is_valid(
 static inline char bw_slew_lim_state_is_valid(
 		const bw_slew_lim_coeffs * BW_RESTRICT coeffs,
 		const bw_slew_lim_state * BW_RESTRICT  state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_slew_lim_state"))
 		return 0;
 
-	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+	if (coeffs != BW_NULL && coeffs->reset_id != state->coeffs_reset_id)
 		return 0;
 #endif
 

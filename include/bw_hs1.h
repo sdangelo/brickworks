@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022, 2023 Orastron Srl unipersonale
+ * Copyright (C) 2022-2024 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,18 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.0 }}}
+ *  version {{{ 1.0.1 }}}
  *  requires {{{ bw_common bw_gain bw_lp1 bw_math bw_mm1 bw_one_pole }}}
  *  description {{{
  *    First-order high shelf filter (6 dB/oct) with unitary DC gain.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.1</strong>:
+ *        <ul>
+ *          <li>Now using <code>BW_NULL</code>.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.0</strong>:
  *        <ul>
  *          <li>Added <code>bw_hs1_reset_state_multi()</code> and updated C++
@@ -147,7 +152,7 @@ static inline void bw_hs1_reset_state_multi(
  *    array.
  *
  *    The corresponding initial output values are written into the `y_0` array,
- *    if not `NULL`.
+ *    if not `BW_NULL`.
  *
  *    #### bw_hs1_update_coeffs_ctrl()
  *  ```>>> */
@@ -302,8 +307,8 @@ static inline char bw_hs1_state_is_valid(
  *    seems to be the case and `0` if it is certainly not. False positives are
  *    possible, false negatives are not.
  *
- *    If `coeffs` is not `NULL` extra cross-checks might be performed (`state`
- *    is supposed to be associated to `coeffs`).
+ *    If `coeffs` is not `BW_NULL` extra cross-checks might be performed
+ *    (`state` is supposed to be associated to `coeffs`).
  *
  *    `state` must at least point to a readable memory block of size greater
  *    than or equal to that of `bw_hs1_state`.
@@ -364,7 +369,7 @@ struct bw_hs1_state {
 
 static inline void bw_hs1_init(
 		bw_hs1_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 	bw_mm1_init(&coeffs->mm1_coeffs);
 	bw_mm1_set_prewarp_at_cutoff(&coeffs->mm1_coeffs, 0);
@@ -387,7 +392,7 @@ static inline void bw_hs1_init(
 static inline void bw_hs1_set_sample_rate(
 		bw_hs1_coeffs * BW_RESTRICT coeffs,
 		float                       sample_rate) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(sample_rate) && sample_rate > 0.f);
@@ -414,7 +419,7 @@ static inline void bw_hs1_update_mm1_params(
 
 static inline void bw_hs1_reset_coeffs(
 		bw_hs1_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_set_sample_rate);
 	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
@@ -435,10 +440,10 @@ static inline float bw_hs1_reset_state(
 		const bw_hs1_coeffs * BW_RESTRICT coeffs,
 		bw_hs1_state * BW_RESTRICT        state,
 		float                             x_0) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT(bw_is_finite(x_0));
 
 	const float y = bw_mm1_reset_state(&coeffs->mm1_coeffs, &state->mm1_state, x_0);
@@ -461,18 +466,18 @@ static inline void bw_hs1_reset_state_multi(
 		const float *                                  x_0,
 		float *                                        y_0,
 		size_t                                         n_channels) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x_0 != NULL);
+	BW_ASSERT(x_0 != BW_NULL);
 
-	if (y_0 != NULL)
+	if (y_0 != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			y_0[i] = bw_hs1_reset_state(coeffs, state[i], x_0[i]);
 	else
@@ -481,12 +486,12 @@ static inline void bw_hs1_reset_state_multi(
 
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
-	BW_ASSERT_DEEP(y_0 != NULL ? bw_has_only_finite(y_0, n_channels) : 1);
+	BW_ASSERT_DEEP(y_0 != BW_NULL ? bw_has_only_finite(y_0, n_channels) : 1);
 }
 
 static inline void bw_hs1_update_coeffs_ctrl(
 		bw_hs1_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
@@ -500,7 +505,7 @@ static inline void bw_hs1_update_coeffs_ctrl(
 
 static inline void bw_hs1_update_coeffs_audio(
 		bw_hs1_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
@@ -515,11 +520,11 @@ static inline float bw_hs1_process1(
 		const bw_hs1_coeffs * BW_RESTRICT coeffs,
 		bw_hs1_state * BW_RESTRICT        state,
 		float                             x) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_state_is_valid(coeffs, state));
 	BW_ASSERT(bw_is_finite(x));
 
@@ -539,15 +544,15 @@ static inline void bw_hs1_process(
 		const float *               x,
 		float *                     y,
 		size_t                      n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_state_is_valid(coeffs, state));
-	BW_ASSERT(x != NULL);
+	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(y != BW_NULL);
 
 	bw_hs1_update_coeffs_ctrl(coeffs);
 	for (size_t i = 0; i < n_samples; i++) {
@@ -568,18 +573,18 @@ static inline void bw_hs1_process_multi(
 		float * const *                                y,
 		size_t                                         n_channels,
 		size_t                                         n_samples) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_reset_coeffs);
 	BW_ASSERT_DEEP(coeffs->cutoff * bw_sqrtf(coeffs->high_gain) >= 1e-6f && coeffs->cutoff * bw_sqrtf(coeffs->high_gain) <= 1e12f);
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(state[i] != state[j]);
 #endif
-	BW_ASSERT(x != NULL);
-	BW_ASSERT(y != NULL);
+	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
@@ -600,7 +605,7 @@ static inline void bw_hs1_process_multi(
 static inline void bw_hs1_set_cutoff(
 		bw_hs1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -618,7 +623,7 @@ static inline void bw_hs1_set_cutoff(
 static inline void bw_hs1_set_prewarp_at_cutoff(
 		bw_hs1_coeffs * BW_RESTRICT coeffs,
 		char                        value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 
@@ -631,7 +636,7 @@ static inline void bw_hs1_set_prewarp_at_cutoff(
 static inline void bw_hs1_set_prewarp_freq(
 		bw_hs1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -646,7 +651,7 @@ static inline void bw_hs1_set_prewarp_freq(
 static inline void bw_hs1_set_high_gain_lin(
 		bw_hs1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -664,7 +669,7 @@ static inline void bw_hs1_set_high_gain_lin(
 static inline void bw_hs1_set_high_gain_dB(
 		bw_hs1_coeffs * BW_RESTRICT coeffs,
 		float                       value) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 	BW_ASSERT_DEEP(bw_hs1_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_hs1_coeffs_state_init);
 	BW_ASSERT(bw_is_finite(value));
@@ -678,7 +683,7 @@ static inline void bw_hs1_set_high_gain_dB(
 
 static inline char bw_hs1_coeffs_is_valid(
 		const bw_hs1_coeffs * BW_RESTRICT coeffs) {
-	BW_ASSERT(coeffs != NULL);
+	BW_ASSERT(coeffs != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (coeffs->hash != bw_hash_sdbm("bw_hs1_coeffs"))
@@ -702,17 +707,17 @@ static inline char bw_hs1_coeffs_is_valid(
 static inline char bw_hs1_state_is_valid(
 		const bw_hs1_coeffs * BW_RESTRICT coeffs,
 		const bw_hs1_state * BW_RESTRICT  state) {
-	BW_ASSERT(state != NULL);
+	BW_ASSERT(state != BW_NULL);
 
 #ifdef BW_DEBUG_DEEP
 	if (state->hash != bw_hash_sdbm("bw_hs1_state"))
 		return 0;
 
-	if (coeffs != NULL && coeffs->reset_id != state->coeffs_reset_id)
+	if (coeffs != BW_NULL && coeffs->reset_id != state->coeffs_reset_id)
 		return 0;
 #endif
 
-	return bw_mm1_state_is_valid(coeffs ? &coeffs->mm1_coeffs : NULL, &state->mm1_state);
+	return bw_mm1_state_is_valid(coeffs ? &coeffs->mm1_coeffs : BW_NULL, &state->mm1_state);
 }
 
 #ifdef __cplusplus

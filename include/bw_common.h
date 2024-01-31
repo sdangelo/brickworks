@@ -29,8 +29,9 @@
  *    <ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Added <code>BW_NULL</code> and relaxed <code>NULL</code> definition
- *              requirement in C++.</li>
+ *          <li>Added <code>BW_NULL</code> and relaxed <code>NULL</code>
+ *              definition requirement in C++.</li>
+ *          <li>Fixed sign-related warning in <code>bw_hash_sdbm()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:

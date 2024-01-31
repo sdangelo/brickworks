@@ -47,6 +47,8 @@
  *      <li>Version <strong>1.0.1</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Fixed sign-related warnings in <code>bw_truncf()</code>,
+ *              <code>bw_roundf()</code>, and <code>bw_sqrtf()</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:

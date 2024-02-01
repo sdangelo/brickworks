@@ -1,0 +1,12 @@
+{
+	"lv2": {
+		"prefixes": {
+			"bw_examples": "https://www.orastron.com/brickworks/examples/"
+		},
+		"uri": "@bw_examples:fx_ap2",
+		"types": [ "@lv2:AllpassPlugin" ],
+		"version": "1.0",
+		"busSymbols": [ "input", "output" ],
+		"parameterSymbols": [ "cutoff", "q" ]
+	}
+}

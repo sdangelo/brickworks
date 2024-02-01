@@ -44,6 +44,8 @@
  *        <ul>
  *          <li>Added skip_sustain and always_reach_sustain parameters.</li>
  *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Replaced GCC pragmas to suppress bogus uninitialized variable
+ *              warnings with useless harmless statement.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -463,6 +465,8 @@ static inline void bw_env_gen_init(
 	coeffs->release = 0.f;
 	coeffs->skip_sustain = 0;
 	coeffs->always_reach_sustain = 0;
+	
+	coeffs->param_changed = ~0;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_env_gen_coeffs");
@@ -762,10 +766,7 @@ static inline void bw_env_gen_set_attack(
 
 	if (coeffs->attack != value) {
 		coeffs->attack = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_ATTACK;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
@@ -783,10 +784,7 @@ static inline void bw_env_gen_set_decay(
 
 	if (coeffs->decay != value) {
 		coeffs->decay = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_DECAY;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
@@ -804,10 +802,7 @@ static inline void bw_env_gen_set_sustain(
 
 	if (coeffs->sustain != value) {
 		coeffs->sustain = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_SUSTAIN;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));
@@ -825,10 +820,7 @@ static inline void bw_env_gen_set_release(
 
 	if (coeffs->release != value) {
 		coeffs->release = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_ENV_GEN_PARAM_RELEASE;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_env_gen_coeffs_is_valid(coeffs));

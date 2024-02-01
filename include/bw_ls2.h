@@ -35,6 +35,8 @@
  *              <code>bw_ls2_set_cutoff()</code>,
  *              <code>bw_ls2_set_dc_gain_lin()</code>, and
  *              <code>bw_ls2_set_dc_gain_dB()</code>.</li>
+ *          <li>Replaced GCC pragmas to suppress bogus uninitialized variable
+ *              warnings with useless harmless statement.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -404,6 +406,8 @@ static inline void bw_ls2_init(
 	coeffs->prewarp_k = 1.f;
 	coeffs->prewarp_freq = 1.f;
 	coeffs->dc_gain = 1.f;
+	
+	coeffs->param_changed = ~0;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_ls2_coeffs");
@@ -643,10 +647,7 @@ static inline void bw_ls2_set_cutoff(
 
 	if (coeffs->cutoff != value) {
 		coeffs->cutoff = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_LS2_PARAM_CUTOFF;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_ls2_coeffs_is_valid(coeffs));
@@ -707,10 +708,7 @@ static inline void bw_ls2_set_dc_gain_lin(
 
 	if (coeffs->dc_gain != value) {
 		coeffs->dc_gain = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_LS2_PARAM_DC_GAIN;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_ls2_coeffs_is_valid(coeffs));

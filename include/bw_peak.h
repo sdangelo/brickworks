@@ -38,6 +38,8 @@
  *      <li>Version <strong>1.0.1</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Replaced GCC pragmas to suppress bogus uninitialized variable
+ *              warnings with useless harmless statement.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -433,6 +435,8 @@ static inline void bw_peak_init(
 	coeffs->peak_gain = 1.f;
 	coeffs->bandwidth = 2.543106606327224f;
 	coeffs->use_bandwidth = 1;
+	
+	coeffs->param_changed = ~0;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_peak_coeffs");
@@ -712,10 +716,7 @@ static inline void bw_peak_set_Q(
 
 	if (coeffs->Q != value) {
 		coeffs->Q = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_Q;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
@@ -761,10 +762,7 @@ static inline void bw_peak_set_peak_gain_lin(
 
 	if (coeffs->peak_gain != value) {
 		coeffs->peak_gain = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_PEAK_GAIN;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
@@ -797,10 +795,7 @@ static inline void bw_peak_set_bandwidth(
 
 	if (coeffs->bandwidth != value) {
 		coeffs->bandwidth = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_BANDWIDTH;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));
@@ -816,10 +811,7 @@ static inline void bw_peak_set_use_bandwidth(
 
 	if ((coeffs->use_bandwidth && !value) || (!coeffs->use_bandwidth && value)) {
 		coeffs->use_bandwidth = value;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
 		coeffs->param_changed |= BW_PEAK_PARAM_Q | BW_PEAK_PARAM_BANDWIDTH;
-#pragma GCC diagnostic pop
 	}
 
 	BW_ASSERT_DEEP(bw_peak_coeffs_is_valid(coeffs));

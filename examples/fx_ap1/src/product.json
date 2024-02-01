@@ -1,7 +1,7 @@
 {
 	"product": {
-		"name":	"Brickworks 1st-order allpass example (C)",
-		"version": "1.0.1",
+		"name":	"Brickworks 1st-order allpass example",
+		"version": "1.1.0",
 		"buildVersion": "1",
 		"bundleName": "bw_example_fx_ap1",
 		"buses": [

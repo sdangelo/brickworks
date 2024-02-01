@@ -1,0 +1,6 @@
+{
+	"web_make": {
+		"cflags": "-DWASM",
+		"commonDir": "../../common/web"
+	}
+}

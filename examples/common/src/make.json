@@ -1,0 +1,6 @@
+{
+	"make": {
+		"cflags": "-I../../../include -I../../common/src",
+		"pluginDir": "../src"
+	}
+}

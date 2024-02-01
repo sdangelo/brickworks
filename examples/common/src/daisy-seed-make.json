@@ -1,0 +1,6 @@
+{
+	"daisy_seed_make": {
+		"commonDir": "../../common/daisy-seed",
+		"libdaisyDir": "../../../../libDaisy"
+	}
+}

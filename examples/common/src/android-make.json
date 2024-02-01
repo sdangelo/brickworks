@@ -1,0 +1,22 @@
+{
+	"android_make": {
+		"cxxflags": "-I../../../../miniaudio",
+		"commonDir": "../../common/android",
+		"keyStore": "../../common/src/keystore.jks",
+		"keyAlias": "androidkey",
+		"storePass": "android",
+		"keyPass": "android",
+		"sdkDir": "${HOME}/Android/Sdk",
+		"ndkVersion": "25.2.9519653",
+		"buildToolsVersion": "34.0.0",
+		"androidxDir": "${HOME}/Android/androidx",
+		"kotlinDir": "${HOME}/Android/kotlin",
+		"androidVersion": "34",
+		"androidxCoreVersion": "1.10.1",
+		"androidxLifecycleCommonVersion": "2.6.1",
+		"androidxVersionedparcelableVersion": "1.1.1",
+		"kotlinStdlibVersion": "1.9.0",
+		"kotlinxCoroutinesCoreVersion": "1.7.3",
+		"kotlinxCoroutinesCoreJVMVersion": "1.7.3"
+	}
+}

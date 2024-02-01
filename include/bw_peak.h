@@ -436,7 +436,7 @@ static inline void bw_peak_init(
 	coeffs->bandwidth = 2.543106606327224f;
 	coeffs->use_bandwidth = 1;
 	
-	coeffs->param_changed = ~0;
+	coeffs->param_changed = ~0; // useless, just to make compilers happy about uninitialized variables
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_peak_coeffs");

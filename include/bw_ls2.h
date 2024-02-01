@@ -407,7 +407,7 @@ static inline void bw_ls2_init(
 	coeffs->prewarp_freq = 1.f;
 	coeffs->dc_gain = 1.f;
 	
-	coeffs->param_changed = ~0;
+	coeffs->param_changed = ~0; // useless, just to make compilers happy about uninitialized variables
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_ls2_coeffs");

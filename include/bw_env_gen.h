@@ -466,7 +466,7 @@ static inline void bw_env_gen_init(
 	coeffs->skip_sustain = 0;
 	coeffs->always_reach_sustain = 0;
 	
-	coeffs->param_changed = ~0;
+	coeffs->param_changed = ~0; // useless, just to make compilers happy about uninitialized variables
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_env_gen_coeffs");

@@ -521,7 +521,7 @@ static inline void bw_one_pole_init(
 	coeffs->sticky_thresh = 0.f;
 	coeffs->sticky_mode = bw_one_pole_sticky_mode_abs;
 
-	coeffs->param_changed = ~0; // useless, just to make compilers happy about initialized variables
+	coeffs->param_changed = ~0; // useless, just to make compilers happy about uninitialized variables
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_one_pole_coeffs");

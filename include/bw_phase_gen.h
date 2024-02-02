@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -29,10 +29,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Fixed rounding bug when frequency is tiny and negative.</li>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -886,7 +887,9 @@ static inline char bw_phase_gen_state_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -908,20 +911,24 @@ public:
 		float * BW_RESTRICT y0 = nullptr,
 		float * BW_RESTRICT yInc0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		float                                       phase0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yInc0);
+#endif
 
 	void reset(
 		const float * phase0,
 		float *       y0 = nullptr,
 		float *       yInc0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		std::array<float, N_CHANNELS>               phase0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0 = nullptr,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yInc0 = nullptr);
+#endif
 
 	void process(
 		const float * const * xMod,
@@ -929,11 +936,13 @@ public:
 		float * const *       yInc,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> xMod,
 		std::array<float *, N_CHANNELS>       y,
 		std::array<float *, N_CHANNELS>       yInc,
 		size_t                                nSamples);
+#endif
 
 	void setFrequency(
 		float value);
@@ -1000,6 +1009,7 @@ inline void PhaseGen<N_CHANNELS>::reset(
 	}
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::reset(
 		float                                       phase0,
@@ -1007,6 +1017,7 @@ inline void PhaseGen<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS> * BW_RESTRICT yInc0) {
 	reset(phase0, y0 != nullptr ? y0->data() : nullptr, yInc0 != nullptr ? yInc0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::reset(
@@ -1017,6 +1028,7 @@ inline void PhaseGen<N_CHANNELS>::reset(
 	bw_phase_gen_reset_state_multi(&coeffs, statesP, phase0, y0, yInc0, N_CHANNELS);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS>               phase0,
@@ -1024,6 +1036,7 @@ inline void PhaseGen<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS> * BW_RESTRICT yInc0) {
 	reset(phase0.data(), y0 != nullptr ? y0->data() : nullptr, yInc0 != nullptr ? yInc0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::process(
@@ -1034,6 +1047,7 @@ inline void PhaseGen<N_CHANNELS>::process(
 	bw_phase_gen_process_multi(&coeffs, statesP, xMod, y, yInc, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> xMod,
@@ -1042,6 +1056,7 @@ inline void PhaseGen<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(xMod.data(), y.data(), yInc.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void PhaseGen<N_CHANNELS>::setFrequency(

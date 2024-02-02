@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    State variable filter (2nd order, 12 dB/oct) model with separated lowpass,
@@ -28,9 +28,10 @@
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -1049,7 +1050,9 @@ static inline char bw_svf_state_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -1072,11 +1075,13 @@ public:
 		float * BW_RESTRICT yBp0 = nullptr,
 		float * BW_RESTRICT yHp0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		float                                       x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yLp0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yBp0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yHp0);
+#endif
 
 	void reset(
 		const float * x0,
@@ -1084,11 +1089,13 @@ public:
 		float *       yBp0 = nullptr,
 		float *       yHp0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		std::array<float, N_CHANNELS>               x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yLp0 = nullptr,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yBp0 = nullptr,
 		std::array<float, N_CHANNELS> * BW_RESTRICT yHp0 = nullptr);
+#endif
 
 	void process(
 		const float * const * x,
@@ -1097,12 +1104,14 @@ public:
 		float * const *       yHp,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS>       yLp,
 		std::array<float *, N_CHANNELS>       yBp,
 		std::array<float *, N_CHANNELS>       yHp,
 		size_t                                nSamples);
+#endif
 
 	void setCutoff(
 		float value);
@@ -1204,6 +1213,7 @@ inline void SVF<N_CHANNELS>::reset(
 	}
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::reset(
 		float                                       x0,
@@ -1212,6 +1222,7 @@ inline void SVF<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS> * BW_RESTRICT yHp0) {
 	reset(x0, yLp0 != nullptr ? yLp0->data() : nullptr, yBp0 != nullptr ? yBp0->data() : nullptr, yHp0 != nullptr ? yHp0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::reset(
@@ -1223,6 +1234,7 @@ inline void SVF<N_CHANNELS>::reset(
 	bw_svf_reset_state_multi(&coeffs, statesP, x0, yLp0, yBp0, yHp0, N_CHANNELS);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS>               x0,
@@ -1231,6 +1243,7 @@ inline void SVF<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS> * BW_RESTRICT yHp0) {
 	reset(x0.data(), yLp0 != nullptr ? yLp0->data() : nullptr, yBp0 != nullptr ? yBp0->data() : nullptr, yHp0 != nullptr ? yHp0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::process(
@@ -1242,6 +1255,7 @@ inline void SVF<N_CHANNELS>::process(
 	bw_svf_process_multi(&coeffs, statesP, x, yLp, yBp, yHp, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
@@ -1251,6 +1265,7 @@ inline void SVF<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(x.data(), yLp.data(), yBp.data(), yHp.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void SVF<N_CHANNELS>::setCutoff(

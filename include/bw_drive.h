@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{
  *    bw_common bw_gain bw_hs1 bw_lp1 bw_math bw_mm2 bw_one_pole bw_peak
  *    bw_satur bw_svf
@@ -32,9 +32,10 @@
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -660,7 +661,9 @@ static inline char bw_drive_state_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -681,27 +684,33 @@ public:
 		float               x0 = 0.f,
 		float * BW_RESTRICT y0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		float                                       x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0);
+#endif
 
 	void reset(
 		const float * x0,
 		float *       y0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		std::array<float, N_CHANNELS>               x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0 = nullptr);
+#endif
 
 	void process(
 		const float * const * x,
 		float * const *       y,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
+#endif
 
 	void setDrive(
 		float value);
@@ -753,11 +762,13 @@ inline void Drive<N_CHANNELS>::reset(
 			bw_drive_reset_state(&coeffs, states + i, x0);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void Drive<N_CHANNELS>::reset(
 		float                                       x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
 	reset(x0, y0 != nullptr ? y0->data() : nullptr);
+#endif
 }
 
 template<size_t N_CHANNELS>
@@ -768,12 +779,14 @@ inline void Drive<N_CHANNELS>::reset(
 	bw_drive_reset_state_multi(&coeffs, statesP, x0, y0, N_CHANNELS);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void Drive<N_CHANNELS>::reset(
 		std::array<float, N_CHANNELS>               x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
 	reset(x0.data(), y0 != nullptr ? y0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void Drive<N_CHANNELS>::process(
@@ -783,6 +796,7 @@ inline void Drive<N_CHANNELS>::process(
 	bw_drive_process_multi(&coeffs, statesP, x, y, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void Drive<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
@@ -790,6 +804,7 @@ inline void Drive<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void Drive<N_CHANNELS>::setDrive(

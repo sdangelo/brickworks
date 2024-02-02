@@ -20,16 +20,17 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Ring modulator with variable modulation amount.
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -416,7 +417,9 @@ static inline char bw_ring_mod_coeffs_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -441,11 +444,13 @@ public:
 		float * const *       y,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> xMod,
 		std::array<const float *, N_CHANNELS> xCar,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
+#endif
 
 	void setAmount(float value);
 /*! <<<...
@@ -487,6 +492,7 @@ inline void RingMod<N_CHANNELS>::process(
 	bw_ring_mod_process_multi(&coeffs, xMod, xCar, y, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void RingMod<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> xMod,
@@ -495,6 +501,7 @@ inline void RingMod<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(xMod.data(), xCar.data(), y.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void RingMod<N_CHANNELS>::setAmount(

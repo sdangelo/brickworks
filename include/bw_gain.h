@@ -20,16 +20,17 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Gain.
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -506,7 +507,9 @@ static inline char bw_gain_coeffs_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -530,10 +533,12 @@ public:
 		float * const *       y,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
+#endif
 
 	void setGainLin(
 		float value);
@@ -585,6 +590,7 @@ inline void Gain<N_CHANNELS>::process(
 	bw_gain_process_multi(&coeffs, x, y, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
@@ -592,6 +598,7 @@ inline void Gain<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(x.data(), y.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void Gain<N_CHANNELS>::setGainLin(

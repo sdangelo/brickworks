@@ -31,6 +31,7 @@
  *        <ul>
  *          <li>Added <code>BW_NULL</code> and relaxed <code>NULL</code>
  *              definition requirement in C++.</li>
+ *          <li>Added <code>BW_CXX_NO_ARRAY</code>.</li>
  *          <li>Fixed sign-related warning in <code>bw_hash_sdbm()</code>.</li>
  *        </ul>
  *      </li>
@@ -92,6 +93,12 @@
 
 /*** Public API ***/
 
+#ifdef __cplusplus
+# if __cplusplus < 201103L
+#  error Detected C++ compiler that doesn't support C++11
+# endif
+#endif
+
 /*! api {{{
  *
  *    #### Basic definitions
@@ -150,6 +157,14 @@
 # error INFINITY not defined
 #endif
 /*! ...
+ *
+ *    #### BW_CXX_NO_ARRAY
+ *
+ *    C++ APIs of Brickworks modules typically include overloaded methods that
+ *    use `std::array` arguments, and thus require the `<array>` header file.
+ *
+ *    If this is not wanted, defining `BW_CXX_NO_ARRAY` suppresses such methods
+ *    and the inclusion of said header file.
  *
  *    #### BW_RESTRICT
  *

@@ -20,16 +20,17 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Stereo balance.
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -452,7 +453,9 @@ static inline char bw_balance_coeffs_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -478,12 +481,14 @@ public:
 		float * const *       yR,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> xL,
 		std::array<const float *, N_CHANNELS> xR,
 		std::array<float *, N_CHANNELS>       yL,
 		std::array<float *, N_CHANNELS>       yR,
 		size_t                                nSamples);
+#endif
 
 	void setBalance(
 		float value);
@@ -527,6 +532,7 @@ inline void Balance<N_CHANNELS>::process(
 	bw_balance_process_multi(&coeffs, xL, xR, yL, yR, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> xL,
@@ -536,6 +542,7 @@ inline void Balance<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(xL.data(), xR.data(), yL.data(), yR.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void Balance<N_CHANNELS>::setBalance(

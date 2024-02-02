@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Sinusoidal oscillator waveshaper.
@@ -30,9 +30,10 @@
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -184,7 +185,9 @@ static inline void bw_osc_sin_process_multi(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -199,11 +202,13 @@ void oscSinProcess(
 		float * const *       y,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 void oscSinProcess(
 		std::array<const float *, N_CHANNELS> x,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
+#endif
 /*! <<<```
  *  }}} */
 
@@ -220,6 +225,7 @@ inline void oscSinProcess(
 	bw_osc_sin_process_multi(x, y, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void oscSinProcess(
 		std::array<const float *, N_CHANNELS> x,
@@ -227,6 +233,7 @@ inline void oscSinProcess(
 		size_t                                nSamples) {
 	oscSinProcess<N_CHANNELS>(x.data(), y.data(), nSamples);
 }
+#endif
 
 }
 #endif

@@ -43,7 +43,8 @@
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Added skip_sustain and always_reach_sustain parameters.</li>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *          <li>Replaced GCC pragmas to suppress bogus uninitialized variable
  *              warnings with useless harmless statement.</li>
  *        </ul>
@@ -928,7 +929,9 @@ static inline char bw_env_gen_state_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -949,27 +952,33 @@ public:
 		char                gate0 = 0,
 		float * BW_RESTRICT y0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		char                                        gate0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0);
+#endif
 
 	void reset(
 		const char * BW_RESTRICT gate0,
 		float * BW_RESTRICT      y0 = nullptr);
 
+#ifndef BW_CXX_NO_ARRAY
 	void reset(
 		std::array<char, N_CHANNELS>                gate0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0 = nullptr);
+#endif
 
 	void process(
 		const char * BW_RESTRICT                gate,
 		float * BW_RESTRICT const * BW_RESTRICT y,
 		size_t                                  nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<char, N_CHANNELS>                gate,
 		std::array<float * BW_RESTRICT, N_CHANNELS> y,
 		size_t                                      nSamples);
+#endif
 
 	void setAttack(
 		float value);
@@ -1036,12 +1045,14 @@ inline void EnvGen<N_CHANNELS>::reset(
 			bw_env_gen_reset_state(&coeffs, states + i, gate0);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::reset(
 		char                                        gate0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
 	reset(gate0, y0 != nullptr ? y0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::reset(
@@ -1051,12 +1062,14 @@ inline void EnvGen<N_CHANNELS>::reset(
 	bw_env_gen_reset_state_multi(&coeffs, statesP, gate0, y0, N_CHANNELS);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::reset(
 		std::array<char, N_CHANNELS>                gate0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
 	reset(gate0.data(), y0 != nullptr ? y0->data() : nullptr);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::process(
@@ -1066,6 +1079,7 @@ inline void EnvGen<N_CHANNELS>::process(
 	bw_env_gen_process_multi(&coeffs, statesP, gate, y, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::process(
 		std::array<char, N_CHANNELS>                gate,
@@ -1073,6 +1087,7 @@ inline void EnvGen<N_CHANNELS>::process(
 		size_t                                      nSamples) {
 	process(gate.data(), y.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void EnvGen<N_CHANNELS>::setAttack(

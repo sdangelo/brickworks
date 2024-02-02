@@ -20,16 +20,17 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.0.1 }}}
+ *  version {{{ 1.1.0 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Dry/wet mixer.
  *  }}}
  *  changelog {{{
  *    <ul>
- *      <li>Version <strong>1.0.1</strong>:
+ *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
- *          <li>Now using <code>BW_NULL</code>.</li>
+ *          <li>Now using <code>BW_NULL</code> and
+ *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -415,7 +416,9 @@ static inline char bw_dry_wet_coeffs_is_valid(
 #ifdef __cplusplus
 }
 
-#include <array>
+#ifndef BW_CXX_NO_ARRAY
+# include <array>
+#endif
 
 namespace Brickworks {
 
@@ -440,11 +443,13 @@ public:
 		float * const *       y,
 		size_t                nSamples);
 
+#ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> xDry,
 		std::array<const float *, N_CHANNELS> xWet,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
+#endif
 
 	void setWet(
 		float value);
@@ -490,6 +495,7 @@ inline void DryWet<N_CHANNELS>::process(
 	bw_dry_wet_process_multi(&coeffs, xDry, xWet, y, N_CHANNELS, nSamples);
 }
 
+#ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void DryWet<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> xDry,
@@ -498,6 +504,7 @@ inline void DryWet<N_CHANNELS>::process(
 		size_t                                nSamples) {
 	process(xDry.data(), xWet.data(), y.data(), nSamples);
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void DryWet<N_CHANNELS>::setWet(

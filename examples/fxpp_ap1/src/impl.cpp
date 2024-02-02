@@ -1,4 +1,6 @@
 #include "impl.h"
+
+#include "common.h"
 #include <bw_ap1.h>
 
 using namespace Brickworks;

@@ -1,6 +1,7 @@
 {
 	"web_make": {
 		"cflags": "-DWASM",
+		"cxxflags": "-DWASM -std=c++11",
 		"commonDir": "../../common/web"
 	}
 }

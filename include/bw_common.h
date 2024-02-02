@@ -33,6 +33,7 @@
  *              definition requirement in C++.</li>
  *          <li>Added <code>BW_CXX_NO_ARRAY</code>.</li>
  *          <li>Fixed sign-related warning in <code>bw_hash_sdbm()</code>.</li>
+ *          <li>Now checking that C++ compilers support C++11 or later.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -95,7 +96,7 @@
 
 #ifdef __cplusplus
 # if __cplusplus < 201103L
-#  error Detected C++ compiler that doesn't support C++11
+#  error Detected C++ compiler that does not support C++11
 # endif
 #endif
 

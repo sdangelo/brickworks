@@ -1,0 +1,36 @@
+{
+	"product": {
+		"name":	"Brickworks 1st-order allpass example (C++)",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fxpp_ap1",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Cutoff",
+				"shortName": "Cutoff",
+				"direction": "input",
+				"defaultValue": 1000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			}
+		]
+	}
+}

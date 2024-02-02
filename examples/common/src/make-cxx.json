@@ -1,0 +1,8 @@
+{
+	"make": {
+		"cxxSrcs": "../src/impl.cpp",
+		"cflags": "-I../../../include -I../../common/src -I../../common/src/cxx",
+		"cxxflags": "-I../../../include -I../../common/src -I../../common/src/cxx",
+		"pluginDir": "../src"
+	}
+}

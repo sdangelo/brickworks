@@ -23,7 +23,7 @@ cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/vst3-make vst3 && cd
 cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android android && cd ..
 cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android-make android && cd ..
 
-dirs="fx_ap1 fx_ap2 fx_balance fxpp_ap1"
+dirs="fx_ap1 fx_ap2 fx_balance fxpp_ap1 fxpp_ap2 fxpp_balance"
 
 for d in $dirs; do
 	echo Generating data files for $d

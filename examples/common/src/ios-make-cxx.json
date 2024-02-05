@@ -1,0 +1,14 @@
+{
+	"ios_make": {
+		"headerSearchPaths": [
+			"../../../../../../miniaudio",
+			"../../../../common/src",
+			"../../../../../include"
+		],
+		"deploymentTarget": 16.6,
+		"commonDir": "../../common/ios",
+		"pluginDir": "../../common/src/cxx",
+		"cSrcs": "../../common/src/cxx/impl.h",
+		"cxxSrcs": "../src/impl.cpp"
+	}
+}

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TIBIA_DIR=~/repos/tibia
+TIBIA_DIR=../../../tibia
 
 echo Generating common files
 
@@ -22,6 +22,9 @@ cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/vst3-make vst3 && cd
 
 cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android android && cd ..
 cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android-make android && cd ..
+
+cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios ios && cd ..
+cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios-make ios && cd ..
 
 dirs="fx_ap1 fx_ap2 fx_balance fxpp_ap1 fxpp_ap2 fxpp_balance"
 
@@ -61,4 +64,8 @@ for d in $dirs; do
 	cd $d && $TIBIA_DIR/tibia --data ../common/src/company.json,src/product.json,src/android.json $TIBIA_DIR/templates/android android && cd ..
 	cd $d && $TIBIA_DIR/tibia --data ../common/src/company.json,src/product.json,src/android.json,../common/src/$make_json,../common/src/android-make.json $TIBIA_DIR/templates/android-make android && cd ..
 	echo "include ../../common/android/Makefile" > $d/android/Makefile
+
+	cd $d && $TIBIA_DIR/tibia --data ../common/src/company.json,src/product.json,src/ios.json $TIBIA_DIR/templates/ios ios && cd ..
+	cd $d && $TIBIA_DIR/tibia --data ../common/src/company.json,src/product.json,src/ios.json,../common/src/ios-$make_json $TIBIA_DIR/templates/ios-make ios && cd ..
+	echo "include ../../common/ios/Makefile" > $d/ios/Makefile
 done

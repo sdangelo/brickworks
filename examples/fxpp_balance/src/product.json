@@ -1,9 +1,9 @@
 {
 	"product": {
-		"name":	"Brickworks stereo balance example",
+		"name":	"Brickworks stereo balance example (C++)",
 		"version": "1.1.0",
 		"buildVersion": "1",
-		"bundleName": "bw_example_fx_balance",
+		"bundleName": "bw_example_fxpp_balance",
 		"buses": [
 			{
 				"type":	"audio",

@@ -2,7 +2,7 @@
 
 Each subfolder contains an example application, except the `common` folder, which contains common code for all examples.
 
-In order to build an example just `cd` to `*example*/*platofrm*` and use the following platform-specific instructions.
+In order to build an example just `cd` to `*example*/*platform*` and use the following platform-specific instructions.
 
 Building for any platform requires a recent enough version of [GNU Make](https://www.gnu.org/software/make/) installed.
 

@@ -29,6 +29,10 @@
  *    <ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
+ *          <li>Relaxed <code>bw_noise_gate_reset_state_multi</code>,
+ *              <code>bw_noise_gate_process</code>, and
+ *              <code>bw_noise_gate_process_multi</code> APIs to accept
+ *              <code>BW_NULL</code> as sidechain inputs.</li>
  *          <li>Now using <code>BW_NULL</code> and
  *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
@@ -154,6 +158,9 @@ static inline void bw_noise_gate_reset_state_multi(
  *    The corresponding initial output values are written into the `y_0` array,
  *    if not `BW_NULL`.
  *
+ *    If `x_sc_0` is `BW_NULL` the initial sidechain input values are assumed to
+ *    be `0.f`.
+ *
  *    #### bw_noise_gate_update_coeffs_ctrl()
  *  ```>>> */
 static inline void bw_noise_gate_update_coeffs_ctrl(
@@ -195,6 +202,9 @@ static inline void bw_noise_gate_process(
  *    `n_samples` of the output buffer `y`, while using and updating both
  *    `coeffs` and `state` (control and audio rate).
  *
+ *    If `x_sc` is `BW_NULL` it behaves as if a zero-filled buffer was passed
+ *    instead.
+ *
  *    #### bw_noise_gate_process_multi()
  *  ```>>> */
 static inline void bw_noise_gate_process_multi(
@@ -211,6 +221,9 @@ static inline void bw_noise_gate_process_multi(
  *    and fills the first `n_samples` of the `n_channels` output buffers `y`,
  *    while using and updating both the common `coeffs` and each of the
  *    `n_channels` `state`s (control and audio rate).
+ *
+ *    If `x_sc` is `BW_NULL` it behaves as if zero-filled buffers were passed
+ *    instead.
  *
  *    #### bw_noise_gate_set_thresh_lin()
  *  ```>>> */
@@ -472,14 +485,23 @@ static inline void bw_noise_gate_reset_state_multi(
 			BW_ASSERT(state[i] != state[j]);
 #endif
 	BW_ASSERT(x_0 != BW_NULL);
-	BW_ASSERT(x_sc_0 != BW_NULL);
 
-	if (y_0 != BW_NULL)
-		for (size_t i = 0; i < n_channels; i++)
-			y_0[i] = bw_noise_gate_reset_state(coeffs, state[i], x_0[i], x_sc_0[i]);
-	else
-		for (size_t i = 0; i < n_channels; i++)
-			bw_noise_gate_reset_state(coeffs, state[i], x_0[i], x_sc_0[i]);
+	if (x_sc_0 != BW_NULL) {
+		if (y_0 != BW_NULL)
+			for (size_t i = 0; i < n_channels; i++)
+				y_0[i] = bw_noise_gate_reset_state(coeffs, state[i], x_0[i], x_sc_0[i]);
+		else
+			for (size_t i = 0; i < n_channels; i++)
+				bw_noise_gate_reset_state(coeffs, state[i], x_0[i], x_sc_0[i]);
+	} else {
+		if (y_0 != BW_NULL)
+			for (size_t i = 0; i < n_channels; i++)
+				y_0[i] = bw_noise_gate_reset_state(coeffs, state[i], x_0[i], 0.f);
+		else
+			for (size_t i = 0; i < n_channels; i++)
+				bw_noise_gate_reset_state(coeffs, state[i], x_0[i], 0.f);
+
+	}
 
 	BW_ASSERT_DEEP(bw_noise_gate_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gate_coeffs_state_reset_coeffs);
@@ -549,15 +571,20 @@ static inline void bw_noise_gate_process(
 	BW_ASSERT_DEEP(bw_noise_gate_state_is_valid(coeffs, state));
 	BW_ASSERT(x != BW_NULL);
 	BW_ASSERT_DEEP(bw_has_only_finite(x, n_samples));
-	BW_ASSERT(x_sc != BW_NULL);
-	BW_ASSERT_DEEP(bw_has_only_finite(x_sc, n_samples));
+	BW_ASSERT_DEEP(x_sc != BW_NULL ? bw_has_only_finite(x_sc, n_samples) : 1);
 	BW_ASSERT(y != BW_NULL);
 
 	bw_noise_gate_update_coeffs_ctrl(coeffs);
-	for (size_t i = 0; i < n_samples; i++) {
-		bw_noise_gate_update_coeffs_audio(coeffs);
-		y[i] = bw_noise_gate_process1(coeffs, state, x[i], x_sc[i]);
-	}
+	if (x_sc != BW_NULL)
+		for (size_t i = 0; i < n_samples; i++) {
+			bw_noise_gate_update_coeffs_audio(coeffs);
+			y[i] = bw_noise_gate_process1(coeffs, state, x[i], x_sc[i]);
+		}
+	else
+		for (size_t i = 0; i < n_samples; i++) {
+			bw_noise_gate_update_coeffs_audio(coeffs);
+			y[i] = bw_noise_gate_process1(coeffs, state, x[i], 0.f);
+		}
 
 	BW_ASSERT_DEEP(bw_noise_gate_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gate_coeffs_state_reset_coeffs);
@@ -582,7 +609,6 @@ static inline void bw_noise_gate_process_multi(
 			BW_ASSERT(state[i] != state[j]);
 #endif
 	BW_ASSERT(x != BW_NULL);
-	BW_ASSERT(x_sc != BW_NULL);
 	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
@@ -591,11 +617,18 @@ static inline void bw_noise_gate_process_multi(
 #endif
 
 	bw_noise_gate_update_coeffs_ctrl(coeffs);
-	for (size_t i = 0; i < n_samples; i++) {
-		bw_noise_gate_update_coeffs_audio(coeffs);
-		for (size_t j = 0; j < n_channels; j++)
-			y[j][i] = bw_noise_gate_process1(coeffs, state[j], x[j][i], x_sc[j][i]);
-	}
+	if (x_sc != BW_NULL)
+		for (size_t i = 0; i < n_samples; i++) {
+			bw_noise_gate_update_coeffs_audio(coeffs);
+			for (size_t j = 0; j < n_channels; j++)
+				y[j][i] = bw_noise_gate_process1(coeffs, state[j], x[j][i], x_sc[j][i]);
+		}
+	else
+		for (size_t i = 0; i < n_samples; i++) {
+			bw_noise_gate_update_coeffs_audio(coeffs);
+			for (size_t j = 0; j < n_channels; j++)
+				y[j][i] = bw_noise_gate_process1(coeffs, state[j], x[j][i], 0.f);
+		}
 
 	BW_ASSERT_DEEP(bw_noise_gate_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_noise_gate_coeffs_state_reset_coeffs);

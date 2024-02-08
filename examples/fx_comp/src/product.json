@@ -1,0 +1,95 @@
+{
+	"product": {
+		"name":	"Brickworks compressor example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_comp",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			},
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Sidechain input",
+				"shortName": "Sidechain in",
+				"sidechain": true,
+				"cv": false,
+				"optional": true
+			}
+		],
+		"parameters": [
+			{
+				"name": "Threshold",
+				"shortName": "Threshold",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -60.0,
+				"maximum": 0.0,
+				"unit": "db",
+				"map": "linear"
+			},
+			{
+				"name": "Ratio",
+				"shortName": "Ratio",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": 1.0,
+				"maximum": 20.0,
+				"map": "linear"
+			},
+			{
+				"name": "Attack",
+				"shortName": "Attack",
+				"direction": "input",
+				"defaultValue": 20.0,
+				"minimum": 1.0,
+				"maximum": 2000.0,
+				"unit": "ms",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Release",
+				"shortName": "Release",
+				"direction": "input",
+				"defaultValue": 250.0,
+				"minimum": 1.0,
+				"maximum": 2000.0,
+				"unit": "ms",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Makeup gain",
+				"shortName": "Gain",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 40.0,
+				"unit": "db",
+				"map": "linear"
+			},
+			{
+				"name": "External sidechain",
+				"shortName": "Ext sidechain",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 1.0,
+				"toggled": true,
+				"map": "linear"
+			}
+		]
+	}
+}

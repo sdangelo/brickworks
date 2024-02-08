@@ -26,7 +26,7 @@ cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android-make android
 cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios ios && cd ..
 cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios-make ios && cd ..
 
-dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab"
+dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_comp fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_comp"
 
 for d in $dirs; do
 	echo Generating data files for $d

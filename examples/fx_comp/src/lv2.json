@@ -1,0 +1,12 @@
+{
+	"lv2": {
+		"prefixes": {
+			"bw_examples": "https://www.orastron.com/brickworks/examples/"
+		},
+		"uri": "@bw_examples:fx_comp",
+		"types": [ "@lv2:CompressorPlugin" ],
+		"version": "1.0",
+		"busSymbols": [ "input", "output", "sidechain_in" ],
+		"parameterSymbols": [ "threshold", "ratio", "attack", "release", "gain", "ext_sidechain" ]
+	}
+}

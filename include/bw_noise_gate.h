@@ -35,6 +35,9 @@
  *              <code>BW_NULL</code> as sidechain inputs.</li>
  *          <li>Now using <code>BW_NULL</code> and
  *              <code>BW_CXX_NO_ARRAY</code>.</li>
+ *          <li>Added <code>setThreshLin()</code> and <code>setThreshDB()</code>
+ *              methods to fix a typo in method names without breaking the
+ *              API.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.0.0</strong>:
@@ -621,7 +624,7 @@ static inline void bw_noise_gate_process_multi(
 		for (size_t i = 0; i < n_samples; i++) {
 			bw_noise_gate_update_coeffs_audio(coeffs);
 			for (size_t j = 0; j < n_channels; j++)
-				y[j][i] = bw_noise_gate_process1(coeffs, state[j], x[j][i], x_sc[j][i]);
+				y[j][i] = bw_noise_gate_process1(coeffs, state[j], x[j][i], x_sc[j] != BW_NULL ? x_sc[j][i] : 0.f);
 		}
 	else
 		for (size_t i = 0; i < n_samples; i++) {
@@ -821,10 +824,18 @@ public:
 		size_t                                nSamples);
 #endif
 
+	// >> the following 2 methods only exist because of a typo, don't use
 	void setTreshLin(
 		float value);
 
 	void setTreshDBFS(
+		float value);
+	// <<
+
+	void setThreshLin(
+		float value);
+
+	void setThreshDBFS(
 		float value);
 
 	void setRatio(
@@ -930,11 +941,23 @@ inline void NoiseGate<N_CHANNELS>::process(
 template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setTreshLin(
 		float value) {
-	bw_noise_gate_set_thresh_lin(&coeffs, value);
+	setThreshLin(value);
 }
 
 template<size_t N_CHANNELS>
 inline void NoiseGate<N_CHANNELS>::setTreshDBFS(
+		float value) {
+	setThreshDBFS(value);
+}
+
+template<size_t N_CHANNELS>
+inline void NoiseGate<N_CHANNELS>::setThreshLin(
+		float value) {
+	bw_noise_gate_set_thresh_lin(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void NoiseGate<N_CHANNELS>::setThreshDBFS(
 		float value) {
 	bw_noise_gate_set_thresh_dBFS(&coeffs, value);
 }

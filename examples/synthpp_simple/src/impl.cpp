@@ -126,6 +126,16 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		int n = bw_minf(n_samples - i, BUFFER_SIZE);
 
 #ifdef WASM
+		float * const * b = reinterpret_cast<float * const *>(&instance->buf);
+		instance->phaseGen.process(nullptr, &out, b, n);
+		instance->oscPulse.process(&out, b, &out, n);
+		instance->oscFilt.process(&out, &out, n);
+		instance->svf.process(&out, &out, nullptr, nullptr, n);
+		char gate = instance->note >= 0;
+		instance->envGen.process(&gate, b, n);
+		bufMul<1>(&out, b, &out, n);
+		instance->gain.process(&out, &out, n);
+		instance->ppm.process(&out, nullptr, n);
 #else
 		instance->phaseGen.process({nullptr}, {out}, {instance->buf}, n);
 		instance->oscPulse.process({out}, {instance->buf}, {out}, n);

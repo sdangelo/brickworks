@@ -56,7 +56,7 @@ static float plugin_get_parameter(plugin *instance, size_t index) {
 		v = bw_ppm_get_y_z1(&instance->ppm_r_state);
 		break;
 	}
-	return v < -60.f ? -60.f : (v > 0.f ? 0.f : v);
+	return bw_clipf(v, -60.f, 0.f);
 }
 
 static void plugin_process(plugin *instance, const float **inputs, float **outputs, size_t n_samples) {

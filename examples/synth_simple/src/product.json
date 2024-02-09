@@ -1,0 +1,135 @@
+{
+	"product": {
+		"name":	"Brickworks simple synth example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_synth_simple",
+		"buses": [
+			{
+				"type": "midi",
+				"direction": "input",
+				"name": "MIDI input",
+				"shortName": "MIDI input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Volume",
+				"shortName": "Volume",
+				"direction": "input",
+				"defaultValue": 50.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Master tune",
+				"shortName": "Master tune",
+				"direction": "input",
+				"defaultValue": 440.0,
+				"minimum": 415.304697579945,
+				"maximum": 466.1637615180899,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Portamento",
+				"shortName": "Portamento",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 1.0,
+				"unit": "s",
+				"map": "linear"
+			},
+			{
+				"name": "Pulse width",
+				"shortName": "Pulse width",
+				"direction": "input",
+				"defaultValue": 50.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Cutoff",
+				"shortName": "Cutoff",
+				"direction": "input",
+				"defaultValue": 20e3,
+				"minimum": 20.0,
+				"maximum": 20e3,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Resonance",
+				"shortName": "Resonance",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Attack",
+				"shortName": "Attack",
+				"direction": "input",
+				"defaultValue": 2.0,
+				"minimum": 2.0,
+				"maximum": 1000.0,
+				"unit": "ms",
+				"map": "linear"
+			},
+			{
+				"name": "Decay",
+				"shortName": "Decay",
+				"direction": "input",
+				"defaultValue": 2.0,
+				"minimum": 2.0,
+				"maximum": 1000.0,
+				"unit": "ms",
+				"map": "linear"
+			},
+			{
+				"name": "Sustain",
+				"shortName": "Sustain",
+				"direction": "input",
+				"defaultValue": 100.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Release",
+				"shortName": "Release",
+				"direction": "input",
+				"defaultValue": 2.0,
+				"minimum": 2.0,
+				"maximum": 1000.0,
+				"unit": "ms",
+				"map": "linear"
+			},
+			{
+				"name": "Level",
+				"shortName": "Level",
+				"direction": "output",
+				"defaultValue": -60.0,
+				"minimum": -60.0,
+				"maximum": 0.0,
+				"unit": "db",
+				"map": "linear"
+			}
+		]
+	}
+}

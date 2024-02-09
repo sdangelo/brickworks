@@ -1,6 +1,6 @@
 {
 	"android_make": {
-		"cxxflags": "-I../../../../miniaudio",
+		"cxxflags": "-I../../../include -I../../common/src -I../../../../miniaudio",
 		"commonDir": "../../common/android",
 		"keyStore": "../../common/src/keystore.jks",
 		"keyAlias": "androidkey",

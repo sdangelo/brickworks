@@ -131,7 +131,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 	if (instance->note >= 0)
 		bw_phase_gen_set_frequency(&instance->phase_gen_coeffs,
-			instance->master_tune * bw_pow2f(8.333333333333333e-2f * ((instance->note - 69))));
+			instance->master_tune * bw_pow2f(8.333333333333333e-2f * (instance->note - 69)));
 	
 	for (size_t i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = outputs[0] + i;

@@ -1,0 +1,8 @@
+{
+	"make": {
+		"cxxSrcs": "../src/impl.cpp",
+		"cflags": "-I../../../include -I../../common/src -I../../common/src/cxx-synth",
+		"cxxflags": "-I../../../include -I../../common/src -I../../common/src/cxx-synth -std=c++11",
+		"pluginDir": "../../common/src/cxx-synth"
+	}
+}

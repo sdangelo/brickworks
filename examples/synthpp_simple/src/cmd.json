@@ -1,0 +1,6 @@
+{
+	"cmd": {
+		"busIds": [ "midi_in", "output" ],
+		"parameterIds": [ "volume", "master_tune", "portamento", "pulse_width", "cutoff", "resonance", "attack", "decay", "sustain", "release", "level" ]
+	}
+}

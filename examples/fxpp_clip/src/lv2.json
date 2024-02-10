@@ -1,0 +1,12 @@
+{
+	"lv2": {
+		"prefixes": {
+			"bw_examples": "https://www.orastron.com/brickworks/examples/"
+		},
+		"uri": "@bw_examples:fxpp_clip",
+		"types": [ "@lv2:WaveshaperPlugin" ],
+		"version": "1.0",
+		"busSymbols": [ "input", "output" ],
+		"parameterSymbols": [ "gain", "bias" ]
+	}
+}

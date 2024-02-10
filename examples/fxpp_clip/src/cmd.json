@@ -1,0 +1,6 @@
+{
+	"cmd": {
+		"busIds": [ "input", "output" ],
+		"parameterIds": [ "gain", "bias" ]
+	}
+}

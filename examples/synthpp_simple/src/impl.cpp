@@ -36,7 +36,6 @@ extern "C" {
 impl impl_new(void) {
 	Engine *instance = new Engine();
 	instance->oscPulse.setAntialiasing(true);
-	instance->masterTune = 440.f;
 	return reinterpret_cast<impl>(instance);
 }
 

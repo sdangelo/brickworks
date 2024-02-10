@@ -9,7 +9,6 @@ typedef struct plugin {
 
 static void plugin_init(plugin *instance) {
 	bw_comp_init(&instance->comp_coeffs);
-	instance->ext_sidechain = 0;
 }
 
 static void plugin_fini(plugin *instance) {

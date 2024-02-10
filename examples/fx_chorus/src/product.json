@@ -1,0 +1,61 @@
+{
+	"product": {
+		"name":	"Brickwork chorus example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_chorus",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Rate",
+				"shortName": "Rate",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": 0.01,
+				"maximum": 20.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Depth",
+				"shortName": "Depth",
+				"direction": "input",
+				"defaultValue": 50.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Type",
+				"shortName": "Type",
+				"direction": "input",
+				"defaultValue": 1,
+				"minimum": 1,
+				"maximum": 2,
+				"integer": true,
+				"scalePoints": {
+					"Standard": 1,
+					"White": 2
+				},
+				"list": true,
+				"map": "linear"
+			}
+		]
+	}
+}

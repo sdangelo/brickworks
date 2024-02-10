@@ -36,10 +36,7 @@ static void plugin_init(plugin *instance) {
 	bw_env_gen_init(&instance->env_gen_coeffs);
 	bw_gain_init(&instance->gain_coeffs);
 	bw_ppm_init(&instance->ppm_coeffs);
-
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse_coeffs, 1);
-
-	instance->master_tune = 440.f;
 }
 
 static void plugin_fini(plugin *instance) {

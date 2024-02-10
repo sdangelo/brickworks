@@ -15,7 +15,6 @@ extern "C" {
 
 impl impl_new(void) {
 	Engine *instance = new Engine();
-	instance->extSidechain = false;
 	return reinterpret_cast<impl>(instance);
 }
 

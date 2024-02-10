@@ -2,31 +2,41 @@
 
 TIBIA_DIR=../../../tibia
 
-echo Generating common files
+if [ -z "$1" -o "$1" = "common" ]; then
+	echo Generating common files
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/cmd cmd && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/cmd-make cmd && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/cmd cmd && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/cmd-make cmd && cd ..
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/web web && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/web-make web && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/web-demo web && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/web web && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/web-make web && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/web-demo web && cd ..
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/daisy-seed daisy-seed && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/daisy-seed-make daisy-seed && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/daisy-seed daisy-seed && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/daisy-seed-make daisy-seed && cd ..
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/lv2 lv2 && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/lv2-make lv2 && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/lv2 lv2 && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/lv2-make lv2 && cd ..
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/vst3 vst3 && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/vst3-make vst3 && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/vst3 vst3 && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/vst3-make vst3 && cd ..
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android android && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android-make android && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android android && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/android-make android && cd ..
 
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios ios && cd ..
-cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios-make ios && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios ios && cd ..
+	cd common && $TIBIA_DIR/tibia --common $TIBIA_DIR/templates/ios-make ios && cd ..
+fi
 
-dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_comp synth_simple fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_comp synthpp_simple"
+if [ "$1" = "common" ]; then
+	exit 0
+fi
+
+if [ -z "$1" ]; then
+	dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_chorus fx_comp synth_simple fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_chorus fxpp_comp synthpp_simple"
+else
+	dirs="$1"
+fi
 
 for d in $dirs; do
 	echo Generating data files for $d

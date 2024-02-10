@@ -8,7 +8,8 @@ using namespace Brickworks;
 extern "C" {
 
 impl impl_new(void) {
-	return reinterpret_cast<impl>(new AP2<1>());
+	AP2<1> *instance = new AP2<1>();
+	return reinterpret_cast<impl>(instance);
 }
 
 void impl_free(impl handle) {

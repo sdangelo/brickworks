@@ -15,7 +15,8 @@ public:
 extern "C" {
 
 impl impl_new(void) {
-	return reinterpret_cast<impl>(new Engine());
+	Engine *instance = new Engine();
+	return reinterpret_cast<impl>(instance);
 }
 
 void impl_free(impl handle) {

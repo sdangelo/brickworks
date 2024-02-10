@@ -1,0 +1,73 @@
+{
+	"product": {
+		"name":	"Brickwork comb filter example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_comb",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Feedforward delay",
+				"shortName": "FF delay",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 1000.0,
+				"unit": "ms",
+				"map": "linear"
+			},
+			{
+				"name": "Feedback delay",
+				"shortName": "FB delay",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 1000.0,
+				"unit": "ms",
+				"map": "linear"
+			},
+			{
+				"name": "Blend coefficient",
+				"shortName": "Blend coeff",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": 0.0,
+				"maximum": 1.0,
+				"map": "linear"
+			},
+			{
+				"name": "Feedforward coefficient",
+				"shortName": "FF coeff",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			},
+			{
+				"name": "Feedback coefficient",
+				"shortName": "FB coeff",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -0.999,
+				"maximum": 0.999,
+				"map": "linear"
+			}
+		]
+	}
+}

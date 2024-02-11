@@ -1,12 +1,12 @@
 #include "common.h"
-#include <bw_clip.h>
+#include <bw_dist.h>
 #include <bw_src_int.h>
 
 #define BUF_SIZE	32
 
 typedef struct plugin {
-	bw_clip_coeffs		clip_coeffs;
-	bw_clip_state		clip_state;
+	bw_dist_coeffs		dist_coeffs;
+	bw_dist_state		dist_state;
 	bw_src_int_coeffs	src_up_coeffs;
 	bw_src_int_state	src_up_state;
 	bw_src_int_coeffs	src_down_coeffs;
@@ -16,10 +16,9 @@ typedef struct plugin {
 } plugin;
 
 static void plugin_init(plugin *instance) {
-	bw_clip_init(&instance->clip_coeffs);
+	bw_dist_init(&instance->dist_coeffs);
 	bw_src_int_init(&instance->src_up_coeffs, 2);
 	bw_src_int_init(&instance->src_down_coeffs, -2);
-	bw_clip_set_gain_compensation(&instance->clip_coeffs, 1);
 }
 
 static void plugin_fini(plugin *instance) {
@@ -27,7 +26,7 @@ static void plugin_fini(plugin *instance) {
 }
 
 static void plugin_set_sample_rate(plugin *instance, float sample_rate) {
-	bw_clip_set_sample_rate(&instance->clip_coeffs, 2.f * sample_rate);
+	bw_dist_set_sample_rate(&instance->dist_coeffs, 2.f * sample_rate);
 }
 
 static size_t plugin_mem_req(plugin *instance) {
@@ -41,8 +40,8 @@ static void plugin_mem_set(plugin *instance, void *mem) {
 }
 
 static void plugin_reset(plugin *instance) {
-	bw_clip_reset_coeffs(&instance->clip_coeffs);
-	bw_clip_reset_state(&instance->clip_coeffs, &instance->clip_state, 0.f);
+	bw_dist_reset_coeffs(&instance->dist_coeffs);
+	bw_dist_reset_state(&instance->dist_coeffs, &instance->dist_state, 0.f);
 	bw_src_int_reset_state(&instance->src_up_coeffs, &instance->src_up_state, 0.f);
 	bw_src_int_reset_state(&instance->src_down_coeffs, &instance->src_down_state, 0.f);
 }
@@ -50,10 +49,13 @@ static void plugin_reset(plugin *instance) {
 static void plugin_set_parameter(plugin *instance, size_t index, float value) {
 	switch (index) {
 	case 0:
-		bw_clip_set_gain(&instance->clip_coeffs, value);
+		bw_dist_set_distortion(&instance->dist_coeffs, 0.01f * value);
 		break;
 	case 1:
-		bw_clip_set_bias(&instance->clip_coeffs, value);
+		bw_dist_set_tone(&instance->dist_coeffs, 0.01f * value);
+		break;
+	case 2:
+		bw_dist_set_volume(&instance->dist_coeffs, 0.01f * value);
 		break;
 	}
 }
@@ -69,7 +71,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	while (i < n_samples) {
 		int n = bw_mini32(n_samples - i, BUF_SIZE >> 1);
 		bw_src_int_process(&instance->src_up_coeffs, &instance->src_up_state, inputs[0] + i, instance->buf, n);
-		bw_clip_process(&instance->clip_coeffs, &instance->clip_state, instance->buf, instance->buf, n << 1);
+		bw_dist_process(&instance->dist_coeffs, &instance->dist_state, instance->buf, instance->buf, n << 1);
 		bw_src_int_process(&instance->src_down_coeffs, &instance->src_down_state, instance->buf, outputs[0] + i, n << 1);
 		i += n;
 	}

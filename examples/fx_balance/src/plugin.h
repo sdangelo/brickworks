@@ -42,7 +42,6 @@ static void plugin_reset(plugin *instance) {
 
 static void plugin_set_parameter(plugin *instance, size_t index, float value) {
 	(void)index;
-
 	bw_balance_set_balance(&instance->balance_coeffs, 0.01f * value);
 }
 

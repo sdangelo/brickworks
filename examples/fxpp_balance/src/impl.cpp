@@ -38,7 +38,6 @@ void impl_reset(impl handle) {
 
 void impl_set_parameter(impl handle, size_t index, float value) {
 	(void)index;
-
 	Engine *instance = reinterpret_cast<Engine *>(handle);
 	instance->balance.setBalance(0.01f * value);
 }

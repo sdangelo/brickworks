@@ -768,8 +768,8 @@ inline void Drive<N_CHANNELS>::reset(
 		float                                       x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
 	reset(x0, y0 != nullptr ? y0->data() : nullptr);
-#endif
 }
+#endif
 
 template<size_t N_CHANNELS>
 inline void Drive<N_CHANNELS>::reset(

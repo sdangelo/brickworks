@@ -1,0 +1,81 @@
+{
+	"product": {
+		"name":	"Brickworks 2nd-order multimode filter example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_mm2",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Cutoff",
+				"shortName": "Cutoff",
+				"direction": "input",
+				"defaultValue": 1000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Q",
+				"shortName": "Q",
+				"direction": "input",
+				"defaultValue": 0.5,
+				"minimum": 0.5,
+				"maximum": 10.0,
+				"map": "linear"
+			},
+			{
+				"name": "Input coefficient",
+				"shortName": "In coeff",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			},
+			{
+				"name": "Lowpass coefficient",
+				"shortName": "LP coeff",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			},
+			{
+				"name": "Bandpass coefficient",
+				"shortName": "BP coeff",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			},
+			{
+				"name": "Highpass coefficient",
+				"shortName": "HP coeff",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			}
+		]
+	}
+}

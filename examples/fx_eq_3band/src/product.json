@@ -1,0 +1,114 @@
+{
+	"product": {
+		"name":	"Brickworks 3-band parametric equalizer example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_eq_3band",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Low shelf cutoff",
+				"shortName": "LS cutoff",
+				"direction": "input",
+				"defaultValue": 112.4682650380698,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Low shelf gain",
+				"shortName": "LS gain",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -20.0,
+				"maximum": 20.0,
+				"unit": "db",
+				"map": "linear"
+			},
+			{
+				"name": "Low shelf Q",
+				"shortName": "LS Q",
+				"direction": "input",
+				"defaultValue": 0.5,
+				"minimum": 0.5,
+				"maximum": 10.0,
+				"map": "linear"
+			},
+			{
+				"name": "Peak cutoff",
+				"shortName": "Peak cutoff",
+				"direction": "input",
+				"defaultValue": 632.4555320336758,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Peak gain",
+				"shortName": "Peak gain",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -20.0,
+				"maximum": 20.0,
+				"unit": "db",
+				"map": "linear"
+			},
+			{
+				"name": "Peak bandwidth",
+				"shortName": "Peak bw",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": 0.01,
+				"maximum": 2.0,
+				"unit": "oct",
+				"map": "linear"
+			},
+			{
+				"name": "High shelf cutoff",
+				"shortName": "HS cutoff",
+				"direction": "input",
+				"defaultValue": 3556.558820077844,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "High shelf gain",
+				"shortName": "HS gain",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -20.0,
+				"maximum": 20.0,
+				"unit": "db",
+				"map": "linear"
+			},
+			{
+				"name": "High shelf Q",
+				"shortName": "HS Q",
+				"direction": "input",
+				"defaultValue": 0.5,
+				"minimum": 0.5,
+				"maximum": 10.0,
+				"map": "linear"
+			}
+		]
+	}
+}

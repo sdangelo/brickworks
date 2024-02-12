@@ -4,7 +4,7 @@ echo Removing common files
 
 rm -fr common/cmd common/web common/daisy-seed common/lv2 common/vst3 common/android common/ios
 
-dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_chorus fx_clip fx_comb fx_comp fx_delay fx_dist fx_drive synth_simple fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_chorus fxpp_clip fxpp_comb fxpp_comp fxpp_delay fxpp_dist fxpp_drive synthpp_simple"
+dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_chorus fx_clip fx_comb fx_comp fx_delay fx_dist fx_drive fx_eq_3band synth_simple fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_chorus fxpp_clip fxpp_comb fxpp_comp fxpp_delay fxpp_dist fxpp_drive fxpp_eq_3band synthpp_simple"
 
 for d in $dirs; do
 	echo Removing data files for $d

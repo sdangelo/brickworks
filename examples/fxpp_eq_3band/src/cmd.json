@@ -1,0 +1,6 @@
+{
+	"cmd": {
+		"busIds": [ "input", "output" ],
+		"parameterIds": [ "ls_cutoff", "ls_gain", "ls_q", "peak_cutoff", "peak_gain", "peak_bw", "hs_cutoff", "hs_gain", "hs_q" ]
+	}
+}

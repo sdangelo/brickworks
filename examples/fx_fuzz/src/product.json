@@ -1,0 +1,46 @@
+{
+	"product": {
+		"name":	"Brickworks fuzz example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_fuzz",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Fuzz",
+				"shortName": "Fuzz",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Volume",
+				"shortName": "Volume",
+				"direction": "input",
+				"defaultValue": 100.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			}
+		]
+	}
+}

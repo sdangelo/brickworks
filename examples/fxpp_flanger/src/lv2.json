@@ -1,0 +1,12 @@
+{
+	"lv2": {
+		"prefixes": {
+			"bw_examples": "https://www.orastron.com/brickworks/examples/"
+		},
+		"uri": "@bw_examples:fxpp_flanger",
+		"types": [ "@lv2:FlangerPlugin" ],
+		"version": "1.0",
+		"busSymbols": [ "input", "output" ],
+		"parameterSymbols": [ "rate", "depth", "feedback" ]
+	}
+}

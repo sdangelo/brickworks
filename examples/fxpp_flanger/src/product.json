@@ -1,0 +1,56 @@
+{
+	"product": {
+		"name":	"Brickwork flanger example (C++)",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fxpp_flanger",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Rate",
+				"shortName": "Rate",
+				"direction": "input",
+				"defaultValue": 0.5,
+				"minimum": 0.01,
+				"maximum": 2.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Amount",
+				"shortName": "Amount",
+				"direction": "input",
+				"defaultValue": 50.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Feedback",
+				"shortName": "Feedback",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -99.9,
+				"maximum": 99.9,
+				"unit": "pc",
+				"map": "linear"
+			}
+		]
+	}
+}

@@ -33,7 +33,7 @@ if [ "$1" = "common" ]; then
 fi
 
 if [ -z "$1" ]; then
-	dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_chorus fx_clip fx_comb fx_comp fx_delay fx_dist fx_drive fx_eq_3band synth_simple fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_chorus fxpp_clip fxpp_comb fxpp_comp fxpp_delay fxpp_dist fxpp_drive fxpp_eq_3band synthpp_simple"
+	dirs="fx_ap1 fx_ap2 fx_balance fx_bitcrush fx_cab fx_chorus fx_clip fx_comb fx_comp fx_delay fx_dist fx_drive fx_eq_3band fx_flanger synth_simple fxpp_ap1 fxpp_ap2 fxpp_balance fxpp_bitcrush fxpp_cab fxpp_chorus fxpp_clip fxpp_comb fxpp_comp fxpp_delay fxpp_dist fxpp_drive fxpp_eq_3band fxpp_flanger synthpp_simple"
 else
 	dirs="$1"
 fi

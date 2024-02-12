@@ -1,0 +1,54 @@
+{
+	"product": {
+		"name":	"Brickworks 1st-order multimode filter example (C++)",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fxpp_mm1",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Cutoff",
+				"shortName": "Cutoff",
+				"direction": "input",
+				"defaultValue": 1000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Input coefficient",
+				"shortName": "In coeff",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			},
+			{
+				"name": "Lowpass coefficient",
+				"shortName": "LP coeff",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -1.0,
+				"maximum": 1.0,
+				"map": "linear"
+			}
+		]
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"lv2": {
+		"prefixes": {
+			"bw_examples": "https://www.orastron.com/brickworks/examples/"
+		},
+		"uri": "@bw_examples:fx_noise_gate",
+		"types": [ "@lv2:GatePlugin" ],
+		"version": "1.0",
+		"busSymbols": [ "input", "output", "sidechain_in" ],
+		"parameterSymbols": [ "threshold", "ratio", "attack", "release", "ext_sidechain" ]
+	}
+}

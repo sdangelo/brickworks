@@ -1,0 +1,46 @@
+{
+	"product": {
+		"name":	"Brickwork ring modulator example (C++)",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fxpp_ring_mod",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Frequency",
+				"shortName": "Frequency",
+				"direction": "input",
+				"defaultValue": 300.0,
+				"minimum": 100.0,
+				"maximum": 1000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Amount",
+				"shortName": "Amount",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -100.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			}
+		]
+	}
+}

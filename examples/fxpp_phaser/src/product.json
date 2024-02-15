@@ -1,0 +1,56 @@
+{
+	"product": {
+		"name":	"Brickwork phaser example (C++)",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fxpp_phaser",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Modulation rate",
+				"shortName": "Mod rate",
+				"direction": "input",
+				"defaultValue": 1.0,
+				"minimum": 0.1,
+				"maximum": 5.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Modulation amount",
+				"shortName": "Mod amount",
+				"direction": "input",
+				"defaultValue": 2.0,
+				"minimum": 0.0,
+				"maximum": 4.0,
+				"unit": "oct",
+				"map": "linear"
+			},
+			{
+				"name": "Center frequency",
+				"shortName": "Center freq",
+				"direction": "input",
+				"defaultValue": 1000.0,
+				"minimum": 100.0,
+				"maximum": 10000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			}
+		]
+	}
+}

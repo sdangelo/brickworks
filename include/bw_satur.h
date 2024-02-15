@@ -47,6 +47,7 @@
  *    <ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
+ *          <li>Fixed gain compensation in <code>bw_satur_process_multi().</li>
  *          <li>Now using <code>BW_NULL</code> and
  *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
@@ -623,11 +624,18 @@ static inline void bw_satur_process_multi(
 #endif
 
 	bw_satur_update_coeffs_ctrl(coeffs);
-	for (size_t i = 0; i < n_samples; i++) {
-		bw_satur_update_coeffs_audio(coeffs);
-		for (size_t j = 0; j < n_channels; j++)
-			y[j][i] = bw_satur_process1(coeffs, state[j], x[j][i]);
-	}
+	if (coeffs->gain_compensation)
+		for (size_t i = 0; i < n_samples; i++) {
+			bw_satur_update_coeffs_audio(coeffs);
+			for (size_t j = 0; j < n_channels; j++)
+				y[j][i] = bw_satur_process1_comp(coeffs, state[j], x[j][i]);
+		}
+	else
+		for (size_t i = 0; i < n_samples; i++) {
+			bw_satur_update_coeffs_audio(coeffs);
+			for (size_t j = 0; j < n_channels; j++)
+				y[j][i] = bw_satur_process1(coeffs, state[j], x[j][i]);
+		}
 
 	BW_ASSERT_DEEP(bw_satur_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_satur_coeffs_state_reset_coeffs);

@@ -1,0 +1,76 @@
+{
+	"product": {
+		"name":	"Brickworks stereo reverb example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_reverb",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "stereo",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "stereo",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Predelay",
+				"shortName": "Predelay",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "ms",
+				"map": "linear"
+			},
+			{
+				"name": "Bandwidth",
+				"shortName": "Bandwidth",
+				"direction": "input",
+				"defaultValue": 20000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Damping cutoff",
+				"shortName": "Damping cutoff",
+				"direction": "input",
+				"defaultValue": 20000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Decay rate",
+				"shortName": "Decay rate",
+				"direction": "input",
+				"defaultValue": 50.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Wet",
+				"shortName": "Wet",
+				"direction": "input",
+				"defaultValue": 50.0,
+				"minimum": 0.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			}
+		]
+	}
+}

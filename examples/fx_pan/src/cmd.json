@@ -1,0 +1,6 @@
+{
+	"cmd": {
+		"busIds": [ "input", "output" ],
+		"parameterIds": [ "pan", "l_level", "r_level" ]
+	}
+}

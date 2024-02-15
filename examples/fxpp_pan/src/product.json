@@ -1,0 +1,56 @@
+{
+	"product": {
+		"name":	"Brickworks stereo panner example (C++)",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fxpp_pan",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "stereo",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Pan",
+				"shortName": "Pan",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": -100.0,
+				"maximum": 100.0,
+				"unit": "pc",
+				"map": "linear"
+			},
+			{
+				"name": "Left level",
+				"shortName": "L level",
+				"direction": "output",
+				"defaultValue": -60.0,
+				"minimum": -60.0,
+				"maximum": 0.0,
+				"unit": "db",
+				"map": "linear"
+			},
+			{
+				"name": "Right level",
+				"shortName": "R level",
+				"direction": "output",
+				"defaultValue": -60.0,
+				"minimum": -60.0,
+				"maximum": 0.0,
+				"unit": "db",
+				"map": "linear"
+			}
+		]
+	}
+}

@@ -1,0 +1,35 @@
+{
+	"product": {
+		"name":	"Brickworks slew-rate limiter example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_slew_lim",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Maximumm rate",
+				"shortName": "Max rate",
+				"direction": "input",
+				"defaultValue": 10000.0,
+				"minimum": 1.0,
+				"maximum": 10000.0,
+				"map": "logarithmic"
+			}
+		]
+	}
+}

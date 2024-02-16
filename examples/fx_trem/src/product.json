@@ -1,9 +1,9 @@
 {
 	"product": {
-		"name":	"Brickworks flanger example (C++)",
+		"name":	"Brickworks tremolo example",
 		"version": "1.1.0",
 		"buildVersion": "1",
-		"bundleName": "bw_example_fxpp_flanger",
+		"bundleName": "bw_example_fx_trem",
 		"buses": [
 			{
 				"type":	"audio",
@@ -25,9 +25,9 @@
 				"name": "Rate",
 				"shortName": "Rate",
 				"direction": "input",
-				"defaultValue": 0.5,
-				"minimum": 0.01,
-				"maximum": 2.0,
+				"defaultValue": 5.0,
+				"minimum": 1.0,
+				"maximum": 20.0,
 				"unit": "hz",
 				"map": "logarithmic"
 			},
@@ -35,19 +35,9 @@
 				"name": "Amount",
 				"shortName": "Amount",
 				"direction": "input",
-				"defaultValue": 50.0,
+				"defaultValue": 0.0,
 				"minimum": 0.0,
 				"maximum": 100.0,
-				"unit": "pc",
-				"map": "linear"
-			},
-			{
-				"name": "Feedback",
-				"shortName": "Feedback",
-				"direction": "input",
-				"defaultValue": 0.0,
-				"minimum": -99.9,
-				"maximum": 99.9,
 				"unit": "pc",
 				"map": "linear"
 			}

@@ -1,0 +1,46 @@
+{
+	"product": {
+		"name":	"Brickworks vibrato example",
+		"version": "1.1.0",
+		"buildVersion": "1",
+		"bundleName": "bw_example_fx_vibrato",
+		"buses": [
+			{
+				"type":	"audio",
+				"direction": "input",
+				"channels": "mono",
+				"name": "Input",
+				"shortName": "Input"
+			},
+			{
+				"type": "audio",
+				"direction": "output",
+				"channels": "mono",
+				"name": "Output",
+				"shortName": "Output"
+			}
+		],
+		"parameters": [
+			{
+				"name": "Rate",
+				"shortName": "Rate",
+				"direction": "input",
+				"defaultValue": 3.0,
+				"minimum": 1.0,
+				"maximum": 10.0,
+				"unit": "hz",
+				"map": "logarithmic"
+			},
+			{
+				"name": "Amount",
+				"shortName": "Amount",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 2.0,
+				"unit": "semitone12TET",
+				"map": "linear"
+			}
+		]
+	}
+}

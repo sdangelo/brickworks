@@ -46,8 +46,8 @@
 				"direction": "input",
 				"defaultValue": 0.0,
 				"minimum": 0.0,
-				"maximum": 1.0,
-				"unit": "s",
+				"maximum": 1000.0,
+				"unit": "ms",
 				"map": "linear"
 			},
 			{

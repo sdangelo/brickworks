@@ -80,7 +80,7 @@ void impl_set_parameter(impl handle, size_t index, float value) {
 		break;
 	case 2:
 		// using portamento time 0% -> 90%: tau = portamento time / log(10)
-		instance->phaseGen.setPortamentoTau(0.4342944819032517f * value);
+		instance->phaseGen.setPortamentoTau((0.001f * 0.4342944819032517f) * value);
 		break;
 	case 3:
 		instance->oscPulse.setPulseWidth(0.01f * value);

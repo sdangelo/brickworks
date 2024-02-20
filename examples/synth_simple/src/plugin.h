@@ -92,7 +92,7 @@ static void plugin_set_parameter(plugin *instance, size_t index, float value) {
 		break;
 	case 2:
 		// using portamento time 0% -> 90%: tau = portamento time / log(10)
-		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, 0.4342944819032517f * value);
+		bw_phase_gen_set_portamento_tau(&instance->phase_gen_coeffs, (0.001f * 0.4342944819032517f) * value);
 		break;
 	case 3:
 		bw_osc_pulse_set_pulse_width(&instance->osc_pulse_coeffs, 0.01f * value);

@@ -56,15 +56,15 @@ typedef struct plugin {
 	float			master_tune;
 	float			modulation_mix;
 	float			vco1_modulation;
-	int			vco1_coarse;
+	float			vco1_coarse;
 	float			vco1_fine;
 	char			vco1_waveform;
 	float			vco2_modulation;
-	int			vco2_coarse;
+	float			vco2_coarse;
 	float			vco2_fine;
 	char			vco2_waveform;
 	char			vco3_kbd_ctrl;
-	int			vco3_coarse;
+	float			vco3_coarse;
 	float			vco3_fine;
 	char			vco3_waveform;
 	char			noise_color;

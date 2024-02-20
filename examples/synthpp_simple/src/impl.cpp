@@ -1,4 +1,3 @@
-#define IMPL_MIDI
 #include "impl.h"
 
 #include "common.h"

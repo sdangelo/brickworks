@@ -1,9 +1,9 @@
 {
 	"product": {
-		"name":	"Brickworks monophonic synth example",
+		"name":	"Brickworks polyphonic synth example",
 		"version": "1.1.0",
 		"buildVersion": "1",
-		"bundleName": "bw_example_synth_mono",
+		"bundleName": "bw_example_synth_poly",
 		"buses": [
 			{
 				"type": "midi",

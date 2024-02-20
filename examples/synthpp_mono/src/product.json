@@ -1,6 +1,6 @@
 {
 	"product": {
-		"name":	"Brickworks mono synth example (C++)",
+		"name":	"Brickworks monophonic synth example (C++)",
 		"version": "1.1.0",
 		"buildVersion": "1",
 		"bundleName": "bw_example_synthpp_mono",

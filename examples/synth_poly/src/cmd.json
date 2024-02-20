@@ -1,0 +1,16 @@
+{
+	"cmd": {
+		"busIds": [ "midi_in", "output" ],
+		"parameterIds": [
+			"volume", "master_tune", "portamento", "mod_mix",
+			"vco1_mod", "vco1_coarse", "vco1_fine", "vco1_wave", "vco1_pw", "vco1_level",
+			"vco2_mod", "vco2_coarse", "vco2_fine", "vco2_wave", "vco2_pw", "vco2_level",
+			"vco3_kbd_ctrl", "vco3_coarse", "vco3_fine", "vco3_wave", "vco3_pw", "vco3_level",
+			"noise_color", "noise_level",
+			"vcf_mod", "vcf_kbd_ctrl", "vcf_cutoff", "vcf_resonance", "vcf_contour",
+			"vcf_attack", "vcf_decay", "vcf_sustain", "vcf_release",
+			"vca_attack", "vca_decay", "vca_sustain", "vca_release",
+			"a440", "level"
+		]
+	}
+}

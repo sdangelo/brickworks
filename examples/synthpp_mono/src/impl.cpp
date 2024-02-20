@@ -359,7 +359,7 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 	// asynchronous control-rate operations
 
 	int n = instance->note - 69;
-	int n3 = instance->vco3KbdCtrl >= 0.5f ? instance->note - 69 : -69;
+	int n3 = instance->vco3KbdCtrl ? instance->note - 69 : -69;
 	instance->vco1PhaseGen.setFrequency(
 		instance->masterTune
 		* bw_pow2f(instance->vco1Coarse + instance->pitchBend

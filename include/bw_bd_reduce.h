@@ -33,6 +33,7 @@
  *    <ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
+ *          <li>Added silence_dc parameter.</li>
  *          <li>Now using <code>BW_NULL</code> and
  *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>
@@ -176,6 +177,17 @@ static inline void bw_bd_reduce_set_bit_depth(
  *
  *    Default value: `16`.
  *
+ *    #### bw_bd_reduce_set_silence_dc()
+ *  ```>>> */
+static inline void bw_bd_reduce_set_silence_dc(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	char                              value);
+/*! <<<```
+ *    Sets whether the output value corresponding to silence has null dc
+ *    (`value` `0`) or not (non-`0`) in `coeffs`.
+ *
+ *    Default value: non-`0` (non-null dc).
+ *
  *    #### bw_bd_reduce_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_bd_reduce_coeffs_is_valid(
@@ -222,6 +234,7 @@ struct bw_bd_reduce_coeffs {
 	// Coefficients
 	float				ki;
 	float				k;
+	float				ko;
 	float				max;
 	
 	// Parameters
@@ -234,6 +247,7 @@ static inline void bw_bd_reduce_init(
 	BW_ASSERT(coeffs != BW_NULL);
 
 	coeffs->bit_depth = 16;
+	coeffs->ko = 0.5f;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_bd_reduce_coeffs");
@@ -316,7 +330,7 @@ static inline float bw_bd_reduce_process1(
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x));
 
-	const float y = coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + 0.5f);
+	const float y = coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + coeffs->ko);
 
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
@@ -386,6 +400,19 @@ static inline void bw_bd_reduce_set_bit_depth(
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
 }
 
+static inline void bw_bd_reduce_set_silence_dc(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		char                              value) {
+	BW_ASSERT(coeffs != BW_NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+
+	coeffs->ko = value ? 0.5f : 0.f;
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+}
+
 static inline char bw_bd_reduce_coeffs_is_valid(
 		const bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != BW_NULL);
@@ -404,9 +431,11 @@ static inline char bw_bd_reduce_coeffs_is_valid(
 	if (coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs) {
 		if (coeffs->bit_depth_prev < 1 || coeffs->bit_depth_prev > 64)
 			return 0;
+		if (!bw_is_finite(coeffs->ki) || coeffs->ki <= 0.f)
+			return 0;
 		if (!bw_is_finite(coeffs->k) || coeffs->k <= 0.f)
 			return 0;
-		if (!bw_is_finite(coeffs->ki) || coeffs->ki <= 0.f)
+		if (coeffs->ko != 0.f && coeffs->ko != 0.5f)
 			return 0;
 		if (!bw_is_finite(coeffs->max) || coeffs->max < 0.5f || coeffs->max > 1.f)
 			return 0;
@@ -453,6 +482,9 @@ public:
 #endif
 
 	void setBitDepth(
+		char value);
+
+	void setSilenceDc(
 		char value);
 /*! <<<...
  *  }
@@ -506,6 +538,12 @@ template<size_t N_CHANNELS>
 inline void BDReduce<N_CHANNELS>::setBitDepth(
 		char value) {
 	bw_bd_reduce_set_bit_depth(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::setSilenceDc(
+		char value) {
+	bw_bd_reduce_set_silence_dc(&coeffs, value);
 }
 
 }

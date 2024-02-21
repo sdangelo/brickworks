@@ -16,6 +16,7 @@ extern "C" {
 
 impl impl_new(void) {
 	Engine *instance = new Engine();
+	instance->bd.setSilenceDc(0);
 	return reinterpret_cast<impl>(instance);
 }
 

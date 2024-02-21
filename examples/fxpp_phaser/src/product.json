@@ -26,8 +26,8 @@
 				"shortName": "Mod rate",
 				"direction": "input",
 				"defaultValue": 1.0,
-				"minimum": 0.1,
-				"maximum": 5.0,
+				"minimum": 0.01,
+				"maximum": 20.0,
 				"unit": "hz",
 				"map": "logarithmic"
 			},
@@ -46,8 +46,8 @@
 				"shortName": "Center freq",
 				"direction": "input",
 				"defaultValue": 1000.0,
-				"minimum": 100.0,
-				"maximum": 10000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
 				"unit": "hz",
 				"map": "logarithmic"
 			}

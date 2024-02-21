@@ -25,9 +25,9 @@
 				"name": "Rate",
 				"shortName": "Rate",
 				"direction": "input",
-				"defaultValue": 0.5,
+				"defaultValue": 1.0,
 				"minimum": 0.01,
-				"maximum": 2.0,
+				"maximum": 20.0,
 				"unit": "hz",
 				"map": "logarithmic"
 			},

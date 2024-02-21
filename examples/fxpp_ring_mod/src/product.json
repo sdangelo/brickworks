@@ -25,9 +25,9 @@
 				"name": "Frequency",
 				"shortName": "Frequency",
 				"direction": "input",
-				"defaultValue": 300.0,
-				"minimum": 100.0,
-				"maximum": 1000.0,
+				"defaultValue": 1000.0,
+				"minimum": 20.0,
+				"maximum": 20000.0,
 				"unit": "hz",
 				"map": "logarithmic"
 			},

@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:fxpp_comp",
 		"types": [ "@lv2:CompressorPlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "input", "output", "sidechain_in" ],
 		"parameterSymbols": [ "threshold", "ratio", "attack", "release", "gain", "ext_sidechain" ]
 	}

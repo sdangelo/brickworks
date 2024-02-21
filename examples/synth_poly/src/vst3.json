@@ -1,10 +1,10 @@
 {
 	"vst3": {
 		"plugin": {
-			"cid": "14f4e502f2314c26a89226a1d539f201"
+			"cid": "f32c9805645949af8f3dd96e721b2df9"
 		},
 		"controller": {
-			"cid": "d7917a95b3e14394a6c5bcb7852d78bb"
+			"cid": "4e2988a79f354194b97bbf9a03f4bb39"
 		},
 		"subCategory": "Instrument|Synth"
 	}

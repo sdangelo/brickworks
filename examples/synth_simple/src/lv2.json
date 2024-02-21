@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:synth_simple",
 		"types": [ "@lv2:InstrumentPlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "midi_in", "output" ],
 		"parameterSymbols": [ "volume", "master_tune", "portamento", "pulse_width", "cutoff", "resonance", "attack", "decay", "sustain", "release", "level" ]
 	}

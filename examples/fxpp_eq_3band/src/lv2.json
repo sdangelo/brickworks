@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:fxpp_eq_3band",
 		"types": [ "@lv2:ParaEQPlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "input", "output" ],
 		"parameterSymbols": [ "ls_cutoff", "ls_gain", "ls_q", "peak_cutoff", "peak_gain", "peak_bw", "hs_cutoff", "hs_gain", "hs_q" ]
 	}

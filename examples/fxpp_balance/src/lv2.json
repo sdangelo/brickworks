@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:fxpp_balance",
 		"types": [ "@lv2:SpatialPlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "input", "output" ],
 		"parameterSymbols": [ "balance", "l_level", "r_level" ]
 	}

@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:fxpp_noise_gate",
 		"types": [ "@lv2:GatePlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "input", "output", "sidechain_in" ],
 		"parameterSymbols": [ "threshold", "ratio", "attack", "release", "ext_sidechain" ]
 	}

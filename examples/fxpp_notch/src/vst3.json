@@ -1,10 +1,10 @@
 {
 	"vst3": {
 		"plugin": {
-			"cid": "42ed7e51d2294b82ae1029111cd55cdd"
+			"cid": "46abfea0277042a4a874b79f6bf5bae8"
 		},
 		"controller": {
-			"cid": "afd02bdfe0054347b1b0faca968932f2"
+			"cid": "c23ba42818cb40b9ba32efec41bc17de"
 		},
 		"subCategory": "Fx|Filter"
 	}

@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:fxpp_hp1",
 		"types": [ "@lv2:HighpassPlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "input", "output" ],
 		"parameterSymbols": [ "cutoff" ]
 	}

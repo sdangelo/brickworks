@@ -5,7 +5,7 @@
 		},
 		"uri": "@bw_examples:fx_phaser",
 		"types": [ "@lv2:PhaserPlugin" ],
-		"version": "1.0",
+		"version": "0.0",
 		"busSymbols": [ "input", "output" ],
 		"parameterSymbols": [ "rate", "amount", "center" ]
 	}

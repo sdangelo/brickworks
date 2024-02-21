@@ -662,7 +662,6 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);
 
-endloop:
 		instance->sync_left -= n;
 		if (instance->sync_left == 0)
 			instance->sync_left = instance->sync_count;

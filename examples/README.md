@@ -12,7 +12,7 @@ Each subfolder contains an example, except the `common` folder, which contains a
 
 Windows (via [MSYS2/Mingw-w64](https://www.msys2.org/)), macOS, and Linux OSes are supported. Building tested with [GCC](https://gcc.gnu.org/), probably also works with [Clang](https://clang.llvm.org/).
 
-You also need to download or clone the [VST3 C API](https://github.com/steinbergmedia/vst3_c_api) and place it in the same folder as the Brickworks folder, or otherwise edit `common/src/vst3-make.json` then change `cflags` to point to the correct directory and finally [run Tibia](#tibia), or invoke `make` with appropriate `CFLAGS` straight from the command line.
+You also need to download or clone the [VST3 C API](https://github.com/steinbergmedia/vst3_c_api) and place it in the same folder as the Brickworks folder, or otherwise edit `common/src/vst3-make.json` and change `cflags` to point to the correct directory then finally [run Tibia](#tibia), or invoke `make` with appropriate `CFLAGS` straight from the command line.
 
 ### Build
 
@@ -58,7 +58,7 @@ The output files need to be served over HTTPS. A self-signed certificate is gene
 
 Building and firmware upload was only tested on Linux. You need [arm-none-eabi-gcc](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain) (for building) and [dfu-util](https://dfu-util.sourceforge.net/) (for firmware upload) installed.
 
-You also need to clone/download [libDaisy](https://github.com/electro-smith/libDaisy) (beware that since version 7.0.0 you also need to clone submodules, see the [release notes](https://github.com/electro-smith/libDaisy/releases/tag/v7.0.0)), `cd` to it, and run `make`. You should either place it in the same folder as the Brickworks folder, or otherwise edit `common/src/daisy-seed-make.json` then change `libdaisyDir` to point to the correct directory and finally [run Tibia](#tibia).
+You also need to clone/download [libDaisy](https://github.com/electro-smith/libDaisy) (beware that since version 7.0.0 you also need to clone submodules, see the [release notes](https://github.com/electro-smith/libDaisy/releases/tag/v7.0.0)), `cd` to it, and run `make`. You should either place it in the same folder as the Brickworks folder, or otherwise edit `common/src/daisy-seed-make.json` and change `libdaisyDir` to point to the correct directory then finally [run Tibia](#tibia).
 
 ### Build
 
@@ -133,9 +133,33 @@ Effect examples process audio input signals, therefore they will require permiss
 
 Synth examples use input MIDI and support hotplugging.
 
+## Command line program
+
+### Prerequisites
+
+Windows (via [MSYS2/Mingw-w64](https://www.msys2.org/)), macOS, and Linux OSes are supported. Building tested with [GCC](https://gcc.gnu.org/), probably also works with [Clang](https://clang.llvm.org/).
+
+XXX
+
+Depending on the specific example, you might need to download or clone [tinywav](https://github.com/mhroth/tinywav) and/or [midi-parser](https://github.com/abique/midi-parser) and place them in the same folder as the Brickworks folder, or otherwise edit `common/src/cmd-make.json`
+
+You also need to download or clone the [VST3 C API](https://github.com/steinbergmedia/vst3_c_api) and place it in the same folder as the Brickworks folder, or otherwise edit `common/src/vst3-make.json` and change `tinywavDir` and `midiParserDir` to point to the correct directories then finally [run Tibia](#tibia).
+
+### Build
+
+In order to build just type `make`. You'll find the resulting executable file in `build`.
+
+### Usage
+
+Just run the executable without arguments to get usage instructions.
+
 ## Tibia
 
+### Prerequisites
+
 You need [Node.js](https://nodejs.org/en) and [npm](https://www.npmjs.com/) to be installed.
+
+### Usage
 
 Get [Tibia 0.0.1](https://github.com/sdangelo/tibia/releases/tag/v0.0.1), place it in the same directory as the Brickworks folder, and rename it as `tibia`. Then either `cd` to the Tibia folder and `npm install dot`, or install the [dot npm package](https://www.npmjs.com/package/dot) globally and make sure that the `NODE_PATH` environment variable is corretly set to find it.
 

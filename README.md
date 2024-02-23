@@ -17,7 +17,7 @@ Authors: Stefano D'Angelo, Paolo Marrone.
 
 All the code in the repo is released under GPLv3. See the `LICENSE` file. Alternatively, we offer a commercial license that doesn't restrict usage with respect to time, projects, or developers involved. More details [on the official web page](https://www.orastron.com/brickworks#license-pricing).
 
-The `include/bw\_rand.h` file contains code from https://nullprogram.com/blog/2017/09/21/, which was released into the public domain by its author.
+The `include/bw_rand.h` file contains code from https://nullprogram.com/blog/2017/09/21/, which was released into the public domain by its author.
 
 VST is a registered trademark of Steinberg Media Technologies GmbH.
 

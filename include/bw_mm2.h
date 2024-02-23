@@ -29,6 +29,8 @@
  *    <ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
+ *          <li>Fixed computation of initial state in
+ *              <code>bw_mm2_reset_state()</code>.</li>
  *          <li>Now using <code>BW_NULL</code> and
  *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>

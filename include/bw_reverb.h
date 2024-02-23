@@ -37,6 +37,8 @@
  *    <ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
+ *          <li>Fixed smoothing of decay parameter in
+ *              <code>bw_reverb_update_coeffs_audio()</code>.</li>
  *          <li>Now using <code>BW_NULL</code> and
  *              <code>BW_CXX_NO_ARRAY</code>.</li>
  *        </ul>

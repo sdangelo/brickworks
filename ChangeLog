@@ -1,3 +1,31 @@
+1.1.0
+-----
+  * Added new bw_cab module.
+  * Added new fx_cab and fxpp_cab examples.
+  * Added skip_sustain and always_reach_sustain parameters to bw_env_gen.
+  * Added silence_dc parameter to bw_bd_reduce.
+  * Added BW_NULL definition in bw_common and used it throughout the entire
+    codebase.
+  * Added BW_CXX_NO_ARRAY to control the inclusion of features depending on
+    C++ <array>.
+  * Relaxed sidechain APIs in bw_comp and bw_noise_gate to accept BW_NULL to
+    represent null sidechain inputs.
+  * Added setThreshLin() and setThreshDb() methods to the C++ APIs of bw_comp
+    and bw_noise_gate to fix naming typos without breaking the API.
+  * Reworked all example code and added LV2, command line application, and
+    C++/WebAssembly targets.
+  * Fixed gain compensation in bw_satur_process_multi().
+  * Fixed rounding bug in bw_phase_gen when frequency is tiny and negative.
+  * Fixed smoothing of decay parameter in bw_reverb.
+  * Fixed computation of initial states in bw_mm1 and bw_mm2.
+  * Fixed sign-related issues in bw_hash_sdbm(), bw_truncf(), bw_roundf(), and
+    bw_sqrtf() (thanks Kevin Molcard). 
+  * Replace GCC pragmas to suppress uninitalized variable warnings with
+    useless harmless statements in bw_env_gen, bw_hs2, bw_ls2, bw_one_pole, and
+    bw_peak.
+  * Fixed documentation typos in bw_ls2.
+  * Updated examples' documentation.
+
 1.0.0
 -----
   * Removed C++ headers and moved C++ code to now-unique C/C++ headers.

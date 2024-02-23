@@ -139,11 +139,7 @@ Synth examples use input MIDI and support hotplugging.
 
 Windows (via [MSYS2/Mingw-w64](https://www.msys2.org/)), macOS, and Linux OSes are supported. Building tested with [GCC](https://gcc.gnu.org/), probably also works with [Clang](https://clang.llvm.org/).
 
-XXX
-
 Depending on the specific example, you might need to download or clone [tinywav](https://github.com/mhroth/tinywav) and/or [midi-parser](https://github.com/abique/midi-parser) and place them in the same folder as the Brickworks folder, or otherwise edit `common/src/cmd-make.json`
-
-You also need to download or clone the [VST3 C API](https://github.com/steinbergmedia/vst3_c_api) and place it in the same folder as the Brickworks folder, or otherwise edit `common/src/vst3-make.json` and change `tinywavDir` and `midiParserDir` to point to the correct directories then finally [run Tibia](#tibia).
 
 ### Build
 

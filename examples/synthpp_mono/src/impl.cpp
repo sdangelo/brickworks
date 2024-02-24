@@ -71,6 +71,7 @@ public:
 	PPM<1>		ppm;
 
 	size_t		syncCount;
+	float		noiseKV[2];
 
 	uint64_t	randState;
 	float		masterTune;
@@ -101,7 +102,6 @@ public:
 	char		notesPressed[128];
 	size_t		syncLeft;
 	char		vco3WaveformCur;
-	char		noiseColorCur;
 	float		modK;
 	char		vco1WaveformCur;
 	char		vco2WaveformCur;
@@ -165,6 +165,9 @@ void impl_set_sample_rate(impl handle, float sample_rate) {
 	instance->ppm.setSampleRate(sample_rate);
 
 	instance->syncCount = (size_t)bw_roundf(sample_rate * SYNC_RATE);
+
+	instance->noiseKV[0] = 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK();
+	instance->noiseKV[1] = 0.1f * instance->noiseGen.getScalingK();
 }
 
 void impl_reset(impl handle) {
@@ -205,7 +208,6 @@ void impl_reset(impl handle) {
 		instance->notesPressed[i] = 0;
 	instance->syncLeft = instance->syncCount;
 	instance->vco3WaveformCur = instance->vco3Waveform;
-	instance->noiseColorCur = instance->noiseColor;
 	instance->vco1WaveformCur = instance->vco1Waveform;
 	instance->vco2WaveformCur = instance->vco2Waveform;
 }
@@ -379,7 +381,7 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 	// asynchronous control-rate operations
 
 	int n = instance->note - 69;
-	int n3 = instance->vco3KbdCtrl ? instance->note - 69 : -69;
+	int n3 = instance->vco3KbdCtrl ? n : -69;
 	instance->vco1PhaseGen.setFrequency(
 		instance->masterTune
 		* bw_pow2f(instance->vco1Coarse + instance->pitchBend
@@ -405,12 +407,6 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		instance->vco3WaveformCur = instance->vco3Waveform;
 	}
 
-	if (instance->noiseColorCur != instance->noiseColor) {
-		if (instance->noiseColor == 2)
-			instance->pinkFilt.reset();
-		instance->noiseColorCur = instance->noiseColor;
-	}
-
 	if (instance->vco1WaveformCur != instance->vco1Waveform) {
 		switch (instance->vco1Waveform) {
 		case 2:
@@ -434,6 +430,19 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		}
 		instance->vco2WaveformCur = instance->vco2Waveform;
 	}
+
+	const float cutoffUnmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcfCutoff);
+	static const float cutoffKbdKV[4] = {
+		0.f, // off
+		0.629960524947437f * 8.333333333333333e-2f, // 1/3
+		0.793700525984100f * 8.333333333333333e-2f, // 2/3
+		8.333333333333333e-2f // full
+	};
+	const float cutoffKbdK = bw_pow2f(cutoffKbdKV[instance->vcfKbdCtrl - 1] * (instance->note - 60));
+
+	const float noiseK = instance->noiseKV[instance->noiseColor - 1];
+
+	const char vcaOpen = instance->vcaEnvGen.getPhase(0) != bw_env_gen_phase_off || instance->gate;
 
 	float *b0[1] = {instance->buf[0]};
 	float *b1[1] = {instance->buf[1]};
@@ -465,8 +474,9 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		// noise generator
 
 		instance->noiseGen.process(b0, n);
-		if (instance->noiseColorCur == 2)
+		if (instance->noiseColor == 2)
 			instance->pinkFilt.process(b0, b0, n);
+			// no need to ever reset pink filt, as input is noise and filter is static
 		bufScale<1>(b0, 5.f, b0, n);
 
 		// modulation signals
@@ -519,40 +529,27 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 
 		instance->oscFilt.process(y, y, n);
 
-		const float k = instance->noiseColorCur == 2
-			? 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK()
-			: 0.1f * instance->noiseGen.getScalingK();
-		bufScale<1>(b0, k, b0, n);
+		bufScale<1>(b0, noiseK, b0, n);
 		bufMix<1>(y, b0, y, n);
 
 		// vcf
 
 		instance->vcfEnvGen.process(g, nullptr, n);
-		if (sync)
+		if (sync) {
 			instance->vcfEnvK = instance->vcfEnvGen.getYZ1(0);
-		const float cutoffUnmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcfCutoff);
-		const float cutoffVpos = cutoffUnmapped + instance->vcfContour * instance->vcfEnvK + 0.3f * instance->vcfModulation * instance->modK;
-		float cutoff = 20.f * bw_expf(6.907755278982137 * cutoffVpos);
-		switch (instance->vcfKbdCtrl) {
-		case 2: // 1/3
-			cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->note - 60));
-			break;
-		case 3: // 2/3
-			cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->note - 60));
-			break;
-		case 4: // full
-			cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->note - 60));
-			break;
-		default: // off, do nothing
-			break;
+			const float cutoffVpos = cutoffUnmapped + instance->vcfContour * instance->vcfEnvK + 0.3f * instance->vcfModulation * instance->modK;
+			const float cutoff = cutoffKbdK * 20.f * bw_expf(6.907755278982137 * cutoffVpos);
+			instance->vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 		}
-		instance->vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 		instance->vcf.process(y, y, nullptr, nullptr, n);
 
 		// vca
 
-		instance->vcaEnvGen.process(g, b0, n);
-		bufMul<1>(y, b0, y, n);
+		if (vcaOpen) {
+			instance->vcaEnvGen.process(g, b0, n);
+			bufMul<1>(y, b0, y, n);
+		} else
+			bufFill<1>(0.f, y, n);
 
 		// A 440 Hz osc
 

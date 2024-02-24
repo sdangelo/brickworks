@@ -71,6 +71,7 @@ typedef struct plugin {
 	bw_ppm_state		ppm_state;
 
 	size_t			sync_count;
+	float			noise_kv[2];
 
 	uint64_t		rand_state;
 	float			master_tune;
@@ -101,7 +102,6 @@ typedef struct plugin {
 	char			notes_pressed[128];
 	size_t			sync_left;
 	char			vco3_waveform_cur;
-	char			noise_color_cur;
 	float			mod_k;
 	char			vco1_waveform_cur;
 	char			vco2_waveform_cur;
@@ -179,6 +179,9 @@ static void plugin_set_sample_rate(plugin *instance, float sample_rate) {
 	bw_pink_filt_reset_coeffs(&instance->pink_filt_coeffs);
 
 	instance->sync_count = (size_t)bw_roundf(sample_rate * SYNC_RATE);
+
+	instance->noise_kv[0] = 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs);
+	instance->noise_kv[1] = 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
 }
 
 static size_t plugin_mem_req(plugin *instance) {
@@ -233,7 +236,6 @@ static void plugin_reset(plugin *instance) {
 		instance->notes_pressed[i] = 0;
 	instance->sync_left = instance->sync_count;
 	instance->vco3_waveform_cur = instance->vco3_waveform;
-	instance->noise_color_cur = instance->noise_color;
 	instance->vco1_waveform_cur = instance->vco1_waveform;
 	instance->vco2_waveform_cur = instance->vco2_waveform;
 }
@@ -401,7 +403,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	// asynchronous control-rate operations
 
 	int n = instance->note - 69;
-	int n3 = instance->vco3_kbd_ctrl ? instance->note - 69 : -69;
+	int n3 = instance->vco3_kbd_ctrl ? n : -69;
 	bw_phase_gen_set_frequency(&instance->vco1_phase_gen_coeffs,
 		instance->master_tune
 		* bw_pow2f(instance->vco1_coarse + instance->pitch_bend
@@ -427,12 +429,6 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		instance->vco3_waveform_cur = instance->vco3_waveform;
 	}
 
-	if (instance->noise_color_cur != instance->noise_color) {
-		if (instance->noise_color == 2)
-			bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->pink_filt_state, 0.f);
-		instance->noise_color_cur = instance->noise_color;
-	}
-
 	if (instance->vco1_waveform_cur != instance->vco1_waveform) {
 		switch (instance->vco1_waveform) {
 		case 2:
@@ -456,6 +452,19 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		}
 		instance->vco2_waveform_cur = instance->vco2_waveform;
 	}
+
+	const float cutoff_unmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcf_cutoff);
+	static const float cutoff_kbd_kv[4] = {
+		0.f, // off
+		0.629960524947437f * 8.333333333333333e-2f, // 1/3
+		0.793700525984100f * 8.333333333333333e-2f, // 2/3
+		8.333333333333333e-2f // full
+	};
+	const float cutoff_kbd_k = bw_pow2f(cutoff_kbd_kv[instance->vcf_kbd_ctrl - 1] * (instance->note - 60));
+
+	const float noise_k = instance->noise_kv[instance->noise_color - 1];
+
+	const char vca_open = bw_env_gen_get_phase(&instance->vca_env_gen_state) != bw_env_gen_phase_off || instance->gate;
 
 	// synchronous control-rate and audio-rate operations
 
@@ -483,8 +492,9 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		// noise generator
 		
 		bw_noise_gen_process(&instance->noise_gen_coeffs, instance->buf[0], n);
-		if (instance->noise_color_cur == 2)
+		if (instance->noise_color == 2)
 			bw_pink_filt_process(&instance->pink_filt_coeffs, &instance->pink_filt_state, instance->buf[0], instance->buf[0], n);
+			// no need to ever reset pink filt, as input is noise and filter is static
 		bw_buf_scale(instance->buf[0], 5.f, instance->buf[0], n);
 
 		// modulation signals
@@ -537,40 +547,27 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);
 
-		const float k = instance->noise_color_cur == 2
-			? 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
-			: 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
-		bw_buf_scale(instance->buf[0], k, instance->buf[0], n);
+		bw_buf_scale(instance->buf[0], noise_k, instance->buf[0], n);
 		bw_buf_mix(out, instance->buf[0], out, n);
 
 		// vcf
 
 		bw_env_gen_process(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, instance->gate, NULL, n);
-		if (sync)
+		if (sync) {
 			instance->vcf_env_k = bw_env_gen_get_y_z1(&instance->vcf_env_gen_state);
-		const float cutoff_unmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcf_cutoff);
-		const float cutoff_vpos = cutoff_unmapped + instance->vcf_contour * instance->vcf_env_k + 0.3f * instance->vcf_modulation * instance->mod_k;
-		float cutoff = 20.f * bw_expf(6.907755278982137 * cutoff_vpos);
-		switch (instance->vcf_kbd_ctrl) {
-		case 2: // 1/3
-			cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->note - 60));
-			break;
-		case 3: // 2/3
-			cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->note - 60));
-			break;
-		case 4: // full
-			cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->note - 60));
-			break;
-		default: // off, do nothing
-			break;
+			const float cutoff_vpos = cutoff_unmapped + instance->vcf_contour * instance->vcf_env_k + 0.3f * instance->vcf_modulation * instance->mod_k;
+			const float cutoff = cutoff_kbd_k * 20.f * bw_expf(6.907755278982137 * cutoff_vpos);
+			bw_svf_set_cutoff(&instance->vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 		}
-		bw_svf_set_cutoff(&instance->vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 		bw_svf_process(&instance->vcf_coeffs, &instance->vcf_state, out, out, NULL, NULL, n);
 
 		// vca
 
-		bw_env_gen_process(&instance->vca_env_gen_coeffs, &instance->vca_env_gen_state, instance->gate, instance->buf[0], n);
-		bw_buf_mul(out, instance->buf[0], out, n);
+		if (vca_open) {
+			bw_env_gen_process(&instance->vca_env_gen_coeffs, &instance->vca_env_gen_state, instance->gate, instance->buf[0], n);
+			bw_buf_mul(out, instance->buf[0], out, n);
+		} else
+			bw_buf_fill(0.f, out, n);
 
 		// A 440 Hz osc
 

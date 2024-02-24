@@ -180,8 +180,8 @@ static void plugin_set_sample_rate(plugin *instance, float sample_rate) {
 
 	instance->sync_count = (size_t)bw_roundf(sample_rate * SYNC_RATE);
 
-	instance->noise_kv[0] = 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs);
-	instance->noise_kv[1] = 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
+	instance->noise_kv[0] = 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
+	instance->noise_kv[1] = 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs);
 }
 
 static size_t plugin_mem_req(plugin *instance) {

@@ -166,8 +166,8 @@ void impl_set_sample_rate(impl handle, float sample_rate) {
 
 	instance->syncCount = (size_t)bw_roundf(sample_rate * SYNC_RATE);
 
-	instance->noiseKV[0] = 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK();
-	instance->noiseKV[1] = 0.1f * instance->noiseGen.getScalingK();
+	instance->noiseKV[0] = 0.1f * instance->noiseGen.getScalingK();
+	instance->noiseKV[1] = 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK();
 }
 
 void impl_reset(impl handle) {

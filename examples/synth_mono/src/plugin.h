@@ -474,7 +474,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		const char sync = instance->sync_left == instance->sync_count;
 
-		// osc 3
+		// vco 3
 
 		bw_phase_gen_process(&instance->vco3_phase_gen_coeffs, &instance->vco3_phase_gen_state, NULL, out, instance->buf[0], n);
 		switch (instance->vco3_waveform_cur) {
@@ -504,7 +504,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		if (sync)
 			instance->mod_k = instance->buf[1][0];
 
-		// osc 1
+		// vco 1
 
 		bw_buf_scale(instance->buf[1], instance->vco1_modulation, instance->buf[2], n);
 		bw_phase_gen_process(&instance->vco1_phase_gen_coeffs, &instance->vco1_phase_gen_state, instance->buf[2], instance->buf[2], instance->buf[3], n);
@@ -520,7 +520,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 			break;
 		}
 
-		// osc 2
+		// vco 2
 
 		bw_buf_scale(instance->buf[1], instance->vco2_modulation, instance->buf[1], n);
 		bw_phase_gen_process(&instance->vco2_phase_gen_coeffs, &instance->vco2_phase_gen_state, instance->buf[1], instance->buf[1], instance->buf[3], n);

@@ -93,6 +93,7 @@ public:
 	Voice			voices[N_VOICES];
 
 	size_t			syncCount;
+	float			noiseKV[2];
 
 	uint64_t		randState;
 	float			masterTune;
@@ -120,11 +121,16 @@ public:
 	float			modWheel;
 	size_t			syncLeft;
 	char			vco3WaveformCur;
-	char			noiseColorCur;
 	char			vco1WaveformCur;
 	char			vco2WaveformCur;
 
 	float			buf[BUFFER_SIZE];
+
+	float *			b0[N_VOICES];
+	float *			b1[N_VOICES];
+	float *			b2[N_VOICES];
+	float *			b3[N_VOICES];
+	float *			b4[N_VOICES];
 };
 
 extern "C" {
@@ -148,6 +154,11 @@ impl impl_new(void) {
 	for (int i = 0; i < N_VOICES; i++) {
 		instance->voices[i].instance = instance;
 		instance->voices[i].index = i;
+		instance->b0[i] = instance->voices[i].buf[0];
+		instance->b1[i] = instance->voices[i].buf[1];
+		instance->b2[i] = instance->voices[i].buf[2];
+		instance->b3[i] = instance->voices[i].buf[3];
+		instance->b4[i] = instance->voices[i].buf[4];
 	}
 
 	return reinterpret_cast<impl>(instance);
@@ -190,6 +201,9 @@ void impl_set_sample_rate(impl handle, float sample_rate) {
 	}
 
 	instance->syncCount = (size_t)bw_roundf(sample_rate * SYNC_RATE);
+
+	instance->noiseKV[0] = 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK();
+	instance->noiseKV[1] = 0.1f * instance->noiseGen.getScalingK();
 }
 
 void impl_reset(impl handle) {
@@ -233,7 +247,6 @@ void impl_reset(impl handle) {
 	instance->modWheel = 0.f;
 	instance->syncLeft = instance->syncCount;
 	instance->vco3WaveformCur = instance->vco3Waveform;
-	instance->noiseColorCur = instance->noiseColor;
 	instance->vco1WaveformCur = instance->vco1Waveform;
 	instance->vco2WaveformCur = instance->vco2Waveform;
 }
@@ -450,7 +463,7 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 	const float df3 = instance->vco3Coarse + instance->pitchBend + (8.333333333333333e-2f * 0.01f) * instance->vco3Fine;
 	for (int i = 0; i < N_VOICES; i++) {
 		int n = instance->voices[i].note - 69;
-		int n3 = instance->vco3KbdCtrl ? instance->voices[i].note - 69 : -69;
+		int n3 = instance->vco3KbdCtrl ? n : -69;
 		instance->voices[i].vco1PhaseGen.setFrequency(instance->masterTune * bw_pow2f(df1 + 8.333333333333333e-2f * n));
 		instance->voices[i].vco2PhaseGen.setFrequency(instance->masterTune * bw_pow2f(df2 + 8.333333333333333e-2f * n));
 		instance->voices[i].vco3PhaseGen.setFrequency(instance->masterTune * bw_pow2f(df3 + 8.333333333333333e-2f * n3));
@@ -466,12 +479,6 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 			break;
 		}
 		instance->vco3WaveformCur = instance->vco3Waveform;
-	}
-
-	if (instance->noiseColorCur != instance->noiseColor) {
-		if (instance->noiseColor == 2)
-			instance->pinkFilt.reset();
-		instance->noiseColorCur = instance->noiseColor;
 	}
 
 	if (instance->vco1WaveformCur != instance->vco1Waveform) {
@@ -498,18 +505,24 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		instance->vco2WaveformCur = instance->vco2Waveform;
 	}
 
-	// synchronous control-rate and audio-rate operations
+	const float cutoffUnmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcfCutoff);
+	static const float cutoffKbdKV[4] = {
+		0.f, // off
+		0.629960524947437f * 8.333333333333333e-2f, // 1/3
+		0.793700525984100f * 8.333333333333333e-2f, // 2/3
+		8.333333333333333e-2f // full
+	};
+	float cutoffKbdK[N_VOICES];
+	for (int i = 0; i < N_VOICES; i++)
+		cutoffKbdK[i] = bw_pow2f(cutoffKbdKV[instance->vcfKbdCtrl - 1] * (instance->voices[i].note - 60));
 
-	float *b0[N_VOICES], *b1[N_VOICES], *b2[N_VOICES], *b3[N_VOICES], *b4[N_VOICES];
-	char g[N_VOICES];
-	for (int j = 0; j < N_VOICES; j++) {
-		b0[j] = instance->voices[j].buf[0];
-		b1[j] = instance->voices[j].buf[1];
-		b2[j] = instance->voices[j].buf[2];
-		b3[j] = instance->voices[j].buf[3];
-		b4[j] = instance->voices[j].buf[4];
-		g[j] = instance->voices[j].gate;
-	}
+	const float noiseK = instance->noiseKV[instance->noiseColor - 1];
+
+	char gates[N_VOICES];
+	for (int j = 0; j < N_VOICES; j++)
+		gates[j] = instance->voices[j].gate;
+
+	// synchronous control-rate and audio-rate operations
 
 	for (size_t i = 0; i < n_samples; ) {
 		float *out = outputs[0] + i;
@@ -527,32 +540,33 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		}
 		switch (instance->vco3WaveformCur) {
 		case 1:
-			instance->vco3OscSaw.process(b0, b1, b0, n);
+			instance->vco3OscSaw.process(instance->b0, instance->b1, instance->b0, n);
 			break;
 		case 2:
-			instance->vco3OscPulse.process(b0, b1, b0, n);
+			instance->vco3OscPulse.process(instance->b0, instance->b1, instance->b0, n);
 			break;
 		default:
-			instance->vco3OscTri.process(b0, b1, b0, n);
+			instance->vco3OscTri.process(instance->b0, instance->b1, instance->b0, n);
 			break;
 		}
 
 		// noise generator
 
-		instance->noiseGen.process(b1, n);
-		if (instance->noiseColorCur == 2)
-			instance->pinkFilt.process(b1, b1, n);
-		bufScale<N_VOICES>(b1, 5.f, b1, n);
+		instance->noiseGen.process(instance->b1, n);
+		if (instance->noiseColor == 2)
+			instance->pinkFilt.process(instance->b1, instance->b1, n);
+			// no need to ever reset pink filt, as inputs are noise and filters are static
+		bufScale<N_VOICES>(instance->b1, 5.f, instance->b1, n);
 
 		// modulation signals
 
 		for (int j = 0; j < N_VOICES; j++) {
 			for (int k = 0; k < n; k++)
-				b2[j][k] = instance->modWheel * (b0[j][k] + instance->modulationMix * (b1[j][k] - b0[j][k]));
+				instance->b2[j][k] = instance->modWheel * (instance->b0[j][k] + instance->modulationMix * (instance->b1[j][k] - instance->b0[j][k]));
 		}
 		if (sync)
 			for (int j = 0; j < N_VOICES; j++)
-				instance->voices[j].modK = b2[j][0];
+				instance->voices[j].modK = instance->b2[j][0];
 
 		// vco 1
 
@@ -565,13 +579,13 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		}
 		switch (instance->vco1WaveformCur) {
 		case 1:
-			instance->vco1OscSaw.process(b3, b4, b3, n);
+			instance->vco1OscSaw.process(instance->b3, instance->b4, instance->b3, n);
 			break;
 		case 2:
-			instance->vco1OscPulse.process(b3, b4, b3, n);
+			instance->vco1OscPulse.process(instance->b3, instance->b4, instance->b3, n);
 			break;
 		default:
-			instance->vco1OscTri.process(b3, b4, b3, n);
+			instance->vco1OscTri.process(instance->b3, instance->b4, instance->b3, n);
 			break;
 		}
 
@@ -585,68 +599,52 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 		}
 		switch (instance->vco2WaveformCur) {
 		case 1:
-			instance->vco2OscSaw.process(b2, b4, b2, n);
+			instance->vco2OscSaw.process(instance->b2, instance->b4, instance->b2, n);
 			break;
 		case 2:
-			instance->vco2OscPulse.process(b2, b4, b2, n);
+			instance->vco2OscPulse.process(instance->b2, instance->b4, instance->b2, n);
 			break;
 		default:
-			instance->vco2OscTri.process(b2, b4, b2, n);
+			instance->vco2OscTri.process(instance->b2, instance->b4, instance->b2, n);
 			break;
 		}
 
 		// mixer
 
-		instance->vco1Gain.process(b3, b3, n);
-		instance->vco2Gain.process(b2, b2, n);
-		instance->vco3Gain.process(b0, b0, n);
-		instance->noiseGain.process(b1, b1, n);
-		bufMix<N_VOICES>(b0, b2, b0, n);
-		bufMix<N_VOICES>(b0, b3, b0, n);
+		instance->vco1Gain.process(instance->b3, instance->b3, n);
+		instance->vco2Gain.process(instance->b2, instance->b2, n);
+		instance->vco3Gain.process(instance->b0, instance->b0, n);
+		instance->noiseGain.process(instance->b1, instance->b1, n);
+		bufMix<N_VOICES>(instance->b0, instance->b2, instance->b0, n);
+		bufMix<N_VOICES>(instance->b0, instance->b3, instance->b0, n);
 
-		instance->oscFilt.process(b0, b0, n);
+		instance->oscFilt.process(instance->b0, instance->b0, n);
 
-		const float k = instance->noiseColorCur == 2
-			? 6.f * instance->noiseGen.getScalingK() * instance->pinkFilt.getScalingK()
-			: 0.1f * instance->noiseGen.getScalingK();
-		bufScale<N_VOICES>(b1, k, b1, n);
-		bufMix<N_VOICES>(b0, b1, b0, n);
+		bufScale<N_VOICES>(instance->b1, noiseK, instance->b1, n);
+		bufMix<N_VOICES>(instance->b0, instance->b1, instance->b0, n);
 
 		// vcf
 
-		instance->vcfEnvGen.process(g, nullptr, n);
+		instance->vcfEnvGen.process(gates, nullptr, n);
 		if (sync)
-			for (int j = 0; j < N_VOICES; j++)
+			for (int j = 0; j < N_VOICES; j++) {
 				instance->voices[j].vcfEnvK = instance->vcfEnvGen.getYZ1(j);
-		const float cutoffUnmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcfCutoff);
-		for (int j = 0; j < N_VOICES; j++) {
-			const float cutoffVpos =
-				cutoffUnmapped
-				+ instance->vcfContour * instance->voices[j].vcfEnvK
-				+ 0.3f * instance->vcfModulation * instance->voices[j].modK;
-			float cutoff = 20.f * bw_expf(6.907755278982137 * cutoffVpos);
-			switch (instance->vcfKbdCtrl) {
-			case 2: // 1/3
-				cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
-				break;
-			case 3: // 2/3
-				cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
-				break;
-			case 4: // full
-				cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->voices[j].note - 60));
-				break;
-			default: // off, do nothing
-				break;
+				const float cutoffVpos =
+					cutoffUnmapped
+					+ instance->vcfContour * instance->voices[j].vcfEnvK
+					+ 0.3f * instance->vcfModulation * instance->voices[j].modK;
+				float cutoff = cutoffKbdK[j] * 20.f * bw_expf(6.907755278982137 * cutoffVpos);
+				instance->voices[j].vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 			}
-			instance->voices[j].vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
+		for (int j = 0; j < N_VOICES; j++) {
 			float *vb0[1] = {instance->voices[j].buf[0]};
 			instance->voices[j].vcf.process(vb0, vb0, nullptr, nullptr, n);
 		}
 
 		// vca
 
-		instance->vcaEnvGen.process(g, b1, n);
-		bufMul<N_VOICES>(b0, b1, b0, n);
+		instance->vcaEnvGen.process(gates, instance->b1, n);
+		bufMul<N_VOICES>(instance->b0, instance->b1, instance->b0, n);
 
 		// mix voices
 

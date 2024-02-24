@@ -89,6 +89,7 @@ typedef struct plugin {
 	voice			voices[N_VOICES];
 
 	size_t			sync_count;
+	float			noise_kv[2];
 
 	uint64_t		rand_state;
 	float			master_tune;
@@ -116,11 +117,20 @@ typedef struct plugin {
 	float			mod_wheel;
 	size_t			sync_left;
 	char			vco3_waveform_cur;
-	char			noise_color_cur;
 	char			vco1_waveform_cur;
 	char			vco2_waveform_cur;
 
 	float			buf[BUFFER_SIZE];
+
+	float *			b0[N_VOICES];
+	float *			b1[N_VOICES];
+	float *			b2[N_VOICES];
+	float *			b3[N_VOICES];
+	float *			b4[N_VOICES];
+	bw_osc_filt_state *	osc_filt_states[N_VOICES];
+	bw_pink_filt_state *	pink_filt_states[N_VOICES];
+	bw_env_gen_state *	vcf_env_gen_states[N_VOICES];
+	bw_env_gen_state *	vca_env_gen_states[N_VOICES];
 } plugin;
 
 static void plugin_init(plugin *instance) {
@@ -160,6 +170,19 @@ static void plugin_init(plugin *instance) {
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
 	
 	instance->rand_state = 0xbaddecaf600dfeed;
+
+	for (int i = 0; i < N_VOICES; j++) {
+		instance->b0[i] = instance->voices[i].buf[0];
+		instance->b1[i] = instance->voices[i].buf[1];
+		instance->b2[i] = instance->voices[i].buf[2];
+		instance->b3[i] = instance->voices[i].buf[3];
+		instance->b4[i] = instance->voices[i].buf[4];
+		instance->osc_filt_states[i] = &instance->voices[i].osc_filt_state;
+		instance->pink_filt_states[i] = &instance->voices[i].pink_filt_state;
+		instance->vcf_env_gen_states[i] = &instance->voices[i].vcf_env_gen_state;
+		instance->vca_env_gen_states[i] = &instance->voices[i].vca_env_gen_state;
+	}
+
 }
 
 static void plugin_fini(plugin *instance) {
@@ -194,6 +217,9 @@ static void plugin_set_sample_rate(plugin *instance, float sample_rate) {
 	}
 
 	instance->sync_count = (size_t)bw_roundf(sample_rate * SYNC_RATE);
+
+	instance->noise_kv[0] = 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs);
+	instance->noise_kv[1] = 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
 }
 
 static size_t plugin_mem_req(plugin *instance) {
@@ -256,7 +282,6 @@ static void plugin_reset(plugin *instance) {
 	instance->mod_wheel = 0.f;
 	instance->sync_left = instance->sync_count;
 	instance->vco3_waveform_cur = instance->vco3_waveform;
-	instance->noise_color_cur = instance->noise_color;
 	instance->vco1_waveform_cur = instance->vco1_waveform;
 	instance->vco2_waveform_cur = instance->vco2_waveform;
 }
@@ -467,7 +492,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	const float df3 = instance->vco3_coarse + instance->pitch_bend + (8.333333333333333e-2f * 0.01f) * instance->vco3_fine;
 	for (int i = 0; i < N_VOICES; i++) {
 		int n = instance->voices[i].note - 69;
-		int n3 = instance->vco3_kbd_ctrl ? instance->voices[i].note - 69 : -69;
+		int n3 = instance->vco3_kbd_ctrl ? n : -69;
 		bw_phase_gen_set_frequency(&instance->voices[i].vco1_phase_gen_coeffs, instance->master_tune * bw_pow2f(df1 + 8.333333333333333e-2f * n));
 		bw_phase_gen_set_frequency(&instance->voices[i].vco2_phase_gen_coeffs, instance->master_tune * bw_pow2f(df2 + 8.333333333333333e-2f * n));
 		bw_phase_gen_set_frequency(&instance->voices[i].vco3_phase_gen_coeffs, instance->master_tune * bw_pow2f(df3 + 8.333333333333333e-2f * n3));
@@ -483,13 +508,6 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 			break;
 		}
 		instance->vco3_waveform_cur = instance->vco3_waveform;
-	}
-
-	if (instance->noise_color_cur != instance->noise_color) {
-		if (instance->noise_color == 2)
-			for (int j = 0; j < N_VOICES; j++)
-				bw_pink_filt_reset_state(&instance->pink_filt_coeffs, &instance->voices[j].pink_filt_state, 0.f);
-		instance->noise_color_cur = instance->noise_color;
 	}
 
 	if (instance->vco1_waveform_cur != instance->vco1_waveform) {
@@ -516,25 +534,24 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		instance->vco2_waveform_cur = instance->vco2_waveform;
 	}
 
-	// synchronous control-rate and audio-rate operations
+	const float cutoff_unmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcf_cutoff);
+	static const float cutoff_kbd_kv[4] = {
+		0.f, // off
+		0.629960524947437f * 8.333333333333333e-2f, // 1/3
+		0.793700525984100f * 8.333333333333333e-2f, // 2/3
+		8.333333333333333e-2f // full
+	};
+	float cutoff_kbd_k[N_VOICES];
+	for (int i = 0; i < N_VOICES; i++)
+		cutoff_kbd_k[i] = bw_pow2f(cutoff_kbd_kv[instance->vcf_kbd_ctrl - 1] * (instance->voices[i].note - 60));
 
-	float *b0[N_VOICES], *b1[N_VOICES], *b2[N_VOICES], *b3[N_VOICES], *b4[N_VOICES];
+	const float noise_k = instance->noise_kv[instance->noise_color - 1];
+
 	char gates[N_VOICES];
-	bw_osc_filt_state *osc_filt_states[N_VOICES];
-	bw_pink_filt_state *pink_filt_states[N_VOICES];
-	bw_env_gen_state *vcf_env_gen_states[N_VOICES], *vca_env_gen_states[N_VOICES];
-	for (int j = 0; j < N_VOICES; j++) {
-		b0[j] = instance->voices[j].buf[0];
-		b1[j] = instance->voices[j].buf[1];
-		b2[j] = instance->voices[j].buf[2];
-		b3[j] = instance->voices[j].buf[3];
-		b4[j] = instance->voices[j].buf[4];
-		gates[j] = instance->voices[j].gate;
-		osc_filt_states[j] = &instance->voices[j].osc_filt_state;
-		pink_filt_states[j] = &instance->voices[j].pink_filt_state;
-		vcf_env_gen_states[j] = &instance->voices[j].vcf_env_gen_state;
-		vca_env_gen_states[j] = &instance->voices[j].vca_env_gen_state;
-	}
+	for (int i = 0; i < N_VOICES; i++)
+		gates[i] = instance->voices[i].gate;
+
+	// synchronous control-rate and audio-rate operations
 
 	for (size_t i = 0; i < n_samples; ) {
 		float *out = outputs[0] + i;
@@ -542,132 +559,116 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		const char sync = instance->sync_left == instance->sync_count;
 
-		// osc 3
+		// vco 3
 
 		for (int j = 0; j < N_VOICES; j++)
-			bw_phase_gen_process(&instance->voices[j].vco3_phase_gen_coeffs, &instance->voices[j].vco3_phase_gen_state, NULL, b0[j], b1[j], n);
+			bw_phase_gen_process(&instance->voices[j].vco3_phase_gen_coeffs, &instance->voices[j].vco3_phase_gen_state, NULL, instance->b0[j], instance->b1[j], n);
 		switch (instance->vco3_waveform_cur) {
 		case 1:
-			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)b0, (const float **)b1, b0, N_VOICES, n);
+			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)instance->b0, (const float **)instance->b1, instance->b0, N_VOICES, n);
 			break;
 		case 2:
-			bw_osc_pulse_process_multi(&instance->vco3_pulse_coeffs, (const float **)b0, (const float **)b1, b0, N_VOICES, n);
+			bw_osc_pulse_process_multi(&instance->vco3_pulse_coeffs, (const float **)instance->b0, (const float **)instance->b1, instance->b0, N_VOICES, n);
 			break;
 		default:
-			bw_osc_tri_process_multi(&instance->vco3_tri_coeffs, (const float **)b0, (const float **)b1, b0, N_VOICES, n);
+			bw_osc_tri_process_multi(&instance->vco3_tri_coeffs, (const float **)instance->b0, (const float **)instance->b1, instance->b0, N_VOICES, n);
 			break;
 		}
 
 		// noise generator
 		
-		bw_noise_gen_process_multi(&instance->noise_gen_coeffs, b1, N_VOICES, n);
-		if (instance->noise_color_cur == 2)
-			bw_pink_filt_process_multi(&instance->pink_filt_coeffs, pink_filt_states, (const float **)b1, b1, N_VOICES, n);
-		bw_buf_scale_multi((const float * const *)b1, 5.f, b1, N_VOICES, n);
+		bw_noise_gen_process_multi(&instance->noise_gen_coeffs, instance->b1, N_VOICES, n);
+		if (instance->noise_color == 2)
+			bw_pink_filt_process_multi(&instance->pink_filt_coeffs, instance->pink_filt_states, (const float **)instance->b1, instance->b1, N_VOICES, n);
+			// no need to ever reset pink filt, as inputs are noise and filters are static
+		bw_buf_scale_multi((const float * const *)instance->b1, 5.f, instance->b1, N_VOICES, n);
 
 		// modulation signals
 
 		for (int j = 0; j < N_VOICES; j++) {
 			for (int k = 0; k < n; k++)
-				b2[j][k] = instance->mod_wheel * (b0[j][k] + instance->modulation_mix * (b1[j][k] - b0[j][k]));
+				instance->b2[j][k] = instance->mod_wheel * (instance->b0[j][k] + instance->modulation_mix * (instance->b1[j][k] - instance->b0[j][k]));
 		}
 		if (sync)
 			for (int j = 0; j < N_VOICES; j++)
-				instance->voices[j].mod_k = b2[j][0];
+				instance->voices[j].mod_k = instance->b2[j][0];
 
-		// osc 1
+		// vco 1
 
 		for (int j = 0; j < N_VOICES; j++) {
-			bw_buf_scale(b2[j], instance->vco1_modulation, b3[j], n);
-			bw_phase_gen_process(&instance->voices[j].vco1_phase_gen_coeffs, &instance->voices[j].vco1_phase_gen_state, b3[j], b3[j], b4[j], n);
+			bw_buf_scale(instance->b2[j], instance->vco1_modulation, instance->b3[j], n);
+			bw_phase_gen_process(&instance->voices[j].vco1_phase_gen_coeffs, &instance->voices[j].vco1_phase_gen_state, instance->b3[j], instance->b3[j], instance->b4[j], n);
 		}
 		switch (instance->vco1_waveform_cur) {
 		case 1:
-			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)b3, (const float **)b4, b3, N_VOICES, n);
+			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)instance->b3, (const float **)instance->b4, instance->b3, N_VOICES, n);
 			break;
 		case 2:
-			bw_osc_pulse_process_multi(&instance->vco1_pulse_coeffs, (const float **)b3, (const float **)b4, b3, N_VOICES, n);
+			bw_osc_pulse_process_multi(&instance->vco1_pulse_coeffs, (const float **)instance->b3, (const float **)instance->b4, instance->b3, N_VOICES, n);
 			break;
 		default:
-			bw_osc_tri_process_multi(&instance->vco1_tri_coeffs, (const float **)b3, (const float **)b4, b3, N_VOICES, n);
+			bw_osc_tri_process_multi(&instance->vco1_tri_coeffs, (const float **)instance->b3, (const float **)instance->b4, instance->b3, N_VOICES, n);
 			break;
 		}
 
-		// osc 2
+		// vco 2
 
 		for (int j = 0; j < N_VOICES; j++) {
-			bw_buf_scale(b2[j], instance->vco2_modulation, b2[j], n);
-			bw_phase_gen_process(&instance->voices[j].vco2_phase_gen_coeffs, &instance->voices[j].vco2_phase_gen_state, b2[j], b2[j], b4[j], n);
+			bw_buf_scale(instance->b2[j], instance->vco2_modulation, instance->b2[j], n);
+			bw_phase_gen_process(&instance->voices[j].vco2_phase_gen_coeffs, &instance->voices[j].vco2_phase_gen_state, instance->b2[j], instance->b2[j], instance->b4[j], n);
 		}
 		switch (instance->vco2_waveform_cur) {
 		case 1:
-			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)b2, (const float **)b4, b2, N_VOICES, n);
+			bw_osc_saw_process_multi(&instance->vco_saw_coeffs, (const float **)instance->b2, (const float **)instance->b4, instance->b2, N_VOICES, n);
 			break;
 		case 2:
-			bw_osc_pulse_process_multi(&instance->vco2_pulse_coeffs, (const float **)b2, (const float **)b4, b2, N_VOICES, n);
+			bw_osc_pulse_process_multi(&instance->vco2_pulse_coeffs, (const float **)instance->b2, (const float **)instance->b4, instance->b2, N_VOICES, n);
 			break;
 		default:
-			bw_osc_tri_process_multi(&instance->vco2_tri_coeffs, (const float **)b2, (const float **)b4, b2, N_VOICES, n);
+			bw_osc_tri_process_multi(&instance->vco2_tri_coeffs, (const float **)instance->b2, (const float **)instance->b4, instance->b2, N_VOICES, n);
 			break;
 		}
 
 		// mixer
 
-		bw_gain_process_multi(&instance->vco1_gain_coeffs, (const float **)b3, b3, N_VOICES, n);
-		bw_gain_process_multi(&instance->vco2_gain_coeffs, (const float **)b2, b2, N_VOICES, n);
-		bw_gain_process_multi(&instance->vco3_gain_coeffs, (const float **)b0, b0, N_VOICES, n);
-		bw_gain_process_multi(&instance->noise_gain_coeffs, (const float **)b1, b1, N_VOICES, n);
-		bw_buf_mix_multi((const float * const *)b0, (const float * const *)b2, b0, N_VOICES, n);
-		bw_buf_mix_multi((const float * const *)b0, (const float * const *)b3, b0, N_VOICES, n);
+		bw_gain_process_multi(&instance->vco1_gain_coeffs, (const float **)instance->b3, instance->b3, N_VOICES, n);
+		bw_gain_process_multi(&instance->vco2_gain_coeffs, (const float **)instance->b2, instance->b2, N_VOICES, n);
+		bw_gain_process_multi(&instance->vco3_gain_coeffs, (const float **)instance->b0, instance->b0, N_VOICES, n);
+		bw_gain_process_multi(&instance->noise_gain_coeffs, (const float **)instance->b1, instance->b1, N_VOICES, n);
+		bw_buf_mix_multi((const float * const *)instance->b0, (const float * const *)instance->b2, instance->b0, N_VOICES, n);
+		bw_buf_mix_multi((const float * const *)instance->b0, (const float * const *)instance->b3, instance->b0, N_VOICES, n);
 
-		bw_osc_filt_process_multi(osc_filt_states, (const float **)b0, b0, N_VOICES, n);
+		bw_osc_filt_process_multi(instance->osc_filt_states, (const float **)instance->b0, instance->b0, N_VOICES, n);
 
-		const float k = instance->noise_color_cur == 2
-			? 6.f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs) * bw_pink_filt_get_scaling_k(&instance->pink_filt_coeffs)
-			: 0.1f * bw_noise_gen_get_scaling_k(&instance->noise_gen_coeffs);
-		bw_buf_scale_multi((const float * const *)b1, k, b1, N_VOICES, n);
-		bw_buf_mix_multi((const float * const *)b0, (const float * const *)b1, b0, N_VOICES, n);
+		bw_buf_scale_multi((const float * const *)instance->b1, noise_k, instance->b1, N_VOICES, n);
+		bw_buf_mix_multi((const float * const *)instance->b0, (const float * const *)instance->b1, instance->b0, N_VOICES, n);
 
 		// vcf
 
-		bw_env_gen_process_multi(&instance->vcf_env_gen_coeffs, vcf_env_gen_states, gates, NULL, N_VOICES, n);
+		bw_env_gen_process_multi(&instance->vcf_env_gen_coeffs, instance->vcf_env_gen_states, gates, NULL, N_VOICES, n);
 		if (sync)
-			for (int j = 0; j < N_VOICES; j++)
-				instance->voices[j].vcf_env_k = bw_env_gen_get_y_z1(vcf_env_gen_states[j]);
-		const float cutoff_unmapped = 0.1447648273010839f * bw_logf(0.05f * instance->vcf_cutoff);
-		for (int j = 0; j < N_VOICES; j++) {
-			const float cutoff_vpos =
-				cutoff_unmapped
-				+ instance->vcf_contour * instance->voices[j].vcf_env_k
-				+ 0.3f * instance->vcf_modulation * instance->voices[j].mod_k;
-			float cutoff = 20.f * bw_expf(6.907755278982137 * cutoff_vpos);
-			switch (instance->vcf_kbd_ctrl) {
-			case 2: // 1/3
-				cutoff *= bw_pow2f((0.629960524947437f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
-				break;
-			case 3: // 2/3
-				cutoff *= bw_pow2f((0.793700525984100f * 8.333333333333333e-2f) * (instance->voices[j].note - 60));
-				break;
-			case 4: // full
-				cutoff *= bw_pow2f(8.333333333333333e-2f * (instance->voices[j].note - 60));
-				break;
-			default: // off, do nothing
-				break;
+			for (int j = 0; j < N_VOICES; j++) {
+				instance->voices[j].vcf_env_k = bw_env_gen_get_y_z1(instance->vcf_env_gen_states[j]);
+				const float cutoff_vpos =
+					cutoff_unmapped
+					+ instance->vcf_contour * instance->voices[j].vcf_env_k
+					+ 0.3f * instance->vcf_modulation * instance->voices[j].mod_k;
+				float cutoff = cutoff_kbd_k[j] * 20.f * bw_expf(6.907755278982137 * cutoff_vpos);
+				bw_svf_set_cutoff(&instance->voices[j].vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 			}
-			bw_svf_set_cutoff(&instance->voices[j].vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
-			bw_svf_process(&instance->voices[j].vcf_coeffs, &instance->voices[j].vcf_state, b0[j], b0[j], NULL, NULL, n);
-		}
+		for (int j = 0; j < N_VOICES; j++)
+			bw_svf_process(&instance->voices[j].vcf_coeffs, &instance->voices[j].vcf_state, instance->b0[j], instance->b0[j], NULL, NULL, n);
 
 		// vca
 
-		bw_env_gen_process_multi(&instance->vca_env_gen_coeffs, vca_env_gen_states, gates, b1, N_VOICES, n);
-		bw_buf_mul_multi((const float * const *)b0, (const float * const *)b1, b0, N_VOICES, n);
+		bw_env_gen_process_multi(&instance->vca_env_gen_coeffs, instance->vca_env_gen_states, gates, instance->b1, N_VOICES, n);
+		bw_buf_mul_multi((const float * const *)instance->b0, (const float * const *)instance->b1, instance->b0, N_VOICES, n);
 
 		// mix voices
 
 		bw_buf_fill(0.f, out, n);
 		for (int j = 0; j < N_VOICES; j++)
-			bw_buf_mix(out, b0[j], out, n);
+			bw_buf_mix(out, instance->b0[j], out, n);
 
 		// A 440 Hz osc
 

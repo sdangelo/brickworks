@@ -20,13 +20,20 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.2.0 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Dry/wet mixer.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.2.0</strong>:
+ *        <ul>
+ *          <li>Added <code>bw_dry_wet_get_wet()</code> and
+ *              <code>bw_dry_wet_get_wet_cur()</code>, and corresponding C++
+ *              API.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code> and
@@ -176,6 +183,22 @@ static inline void bw_dry_wet_set_smooth_tau(
  *    `value` must be non-negative.
  *
  *    Default value: `0.05f`.
+ *
+ *    #### bw_dry_wet_get_wet()
+ *  ```>>> */
+static inline float bw_dry_wet_get_wet(
+	const bw_dry_wet_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Returns the current wet parameter value (linear gain) in `coeffs`.
+ *
+ *    #### bw_dry_wet_get_wet_cur()
+ *  ```>>> */
+static inline float bw_dry_wet_get_wet_cur(
+	const bw_dry_wet_coeffs * BW_RESTRICT coeffs);
+/*! <<<```
+ *    Returns the actual current wet coefficient (linear gain) in `coeffs`.
+ *
+ *    `coeffs` must be at least in the "reset" state.
  *
  *    #### bw_dry_wet_coeffs_is_valid()
  *  ```>>> */
@@ -399,6 +422,23 @@ static inline void bw_dry_wet_set_smooth_tau(
 	BW_ASSERT_DEEP(coeffs->state >= bw_dry_wet_coeffs_state_init);
 }
 
+static inline float bw_dry_wet_get_wet(
+		const bw_dry_wet_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != BW_NULL);
+	BW_ASSERT_DEEP(bw_dry_wet_coeffs_is_valid(coeffs));
+
+	return bw_gain_get_gain_lin(&coeffs->gain_coeffs);
+}
+
+static inline float bw_dry_wet_get_wet_cur(
+		const bw_dry_wet_coeffs * BW_RESTRICT coeffs) {
+	BW_ASSERT(coeffs != BW_NULL);
+	BW_ASSERT_DEEP(bw_dry_wet_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_dry_wet_coeffs_state_reset_coeffs);
+
+	return bw_gain_get_gain_cur(&coeffs->gain_coeffs);
+}
+
 static inline char bw_dry_wet_coeffs_is_valid(
 		const bw_dry_wet_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != BW_NULL);
@@ -456,6 +496,10 @@ public:
 
 	void setSmoothTau(
 		float value);
+
+	float getWet();
+
+	float getWetCur();
 /*! <<<...
  *  }
  *  ```
@@ -516,6 +560,16 @@ template<size_t N_CHANNELS>
 inline void DryWet<N_CHANNELS>::setSmoothTau(
 		float value) {
 	bw_dry_wet_set_smooth_tau(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline float DryWet<N_CHANNELS>::getWet() {
+	return bw_dry_wet_get_wet(&coeffs);
+}
+
+template<size_t N_CHANNELS>
+inline float DryWet<N_CHANNELS>::getWetCur() {
+	return bw_dry_wet_get_wet_cur(&coeffs);
 }
 
 }

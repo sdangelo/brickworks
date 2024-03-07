@@ -470,7 +470,9 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 	for (size_t i = 0; i < n_samples; ) {
 		float *out = outputs[0] + i;
-		int n = bw_minf(bw_minf(n_samples - i, BUFFER_SIZE), instance->sync_left);
+		size_t ni = n_samples - i;
+		size_t n = ni < BUFFER_SIZE ? ni : BUFFER_SIZE;
+		n = n < instance->sync_left ? n : instance->sync_left;
 
 		const char sync = instance->sync_left == instance->sync_count;
 
@@ -499,7 +501,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		// modulation signals
 
-		for (int j = 0; j < n; j++)
+		for (size_t j = 0; j < n; j++)
 			instance->buf[1][j] = instance->mod_wheel * (out[j] + instance->modulation_mix * (instance->buf[0][j] - out[j]));
 		if (sync)
 			instance->mod_k = instance->buf[1][0];

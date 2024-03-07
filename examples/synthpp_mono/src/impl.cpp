@@ -451,7 +451,9 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 	char g[1] = {instance->gate};
 	for (size_t i = 0; i < n_samples; ) {
 		float *out = outputs[0] + i;
-		int n = bw_minf(bw_minf(n_samples - i, BUFFER_SIZE), instance->syncLeft);
+		size_t ni = n_samples - i;
+		size_t n = ni < BUFFER_SIZE ? ni : BUFFER_SIZE;
+		n = n < instance->syncLeft ? n : instance->syncLeft;
 
 		const char sync = instance->syncLeft == instance->syncCount;
 		float *y[1] = {out};
@@ -481,7 +483,7 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 
 		// modulation signals
 
-		for (int j = 0; j < n; j++)
+		for (size_t j = 0; j < n; j++)
 			instance->buf[1][j] = instance->modWheel * (out[j] + instance->modulationMix * (instance->buf[0][j] - out[j]));
 		if (sync)
 			instance->modK = instance->buf[1][0];

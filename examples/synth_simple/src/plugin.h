@@ -152,7 +152,8 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	
 	for (size_t i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = outputs[0] + i;
-		int n = bw_minf(n_samples - i, BUFFER_SIZE);
+		size_t ni = n_samples - i;
+		size_t n = ni < BUFFER_SIZE ? ni : BUFFER_SIZE;
 		
 		bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, out, instance->buf, n);
 		bw_osc_pulse_process(&instance->osc_pulse_coeffs, out, instance->buf, out, n);

@@ -141,7 +141,8 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 
 	for (size_t i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = outputs[0] + i;
-		int n = bw_minf(n_samples - i, BUFFER_SIZE);
+		size_t ni = n_samples - i;
+		size_t n = ni < BUFFER_SIZE ? ni : BUFFER_SIZE;
 
 #ifdef WASM
 		float *y[1] = {out};

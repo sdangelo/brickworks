@@ -66,6 +66,9 @@ void impl_set_parameter(impl handle, size_t index, float value) {
 	case 1:
 		instance->bd.setBitDepth((char)value);
 		break;
+	case 2:
+		instance->bd.setGateLin(value);
+		break;
 	}
 }
 
@@ -78,7 +81,7 @@ float impl_get_parameter(impl handle, size_t index) {
 void impl_process(impl handle, const float **inputs, float **outputs, size_t n_samples) {
 	Engine *instance = reinterpret_cast<Engine *>(handle);
 	instance->sr.process(inputs, outputs, n_samples);
-	instance->bd.process(inputs, outputs, n_samples);
+	instance->bd.process(outputs, outputs, n_samples);
 }
 
 }

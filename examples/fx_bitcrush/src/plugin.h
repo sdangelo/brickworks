@@ -67,6 +67,9 @@ static void plugin_set_parameter(plugin *instance, size_t index, float value) {
 	case 1:
 		bw_bd_reduce_set_bit_depth(&instance->bd_reduce_coeffs, (char)value);
 		break;
+	case 2:
+		bw_bd_reduce_set_gate_lin(&instance->bd_reduce_coeffs, value);
+		break;
 	}
 }
 

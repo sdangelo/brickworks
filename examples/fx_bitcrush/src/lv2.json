@@ -7,6 +7,6 @@
 		"types": [ "@lv2:DistortionPlugin" ],
 		"version": "0.0",
 		"busSymbols": [ "input", "output" ],
-		"parameterSymbols": [ "sr_ratio", "bit_depth" ]
+		"parameterSymbols": [ "sr_ratio", "bit_depth", "gate" ]
 	}
 }

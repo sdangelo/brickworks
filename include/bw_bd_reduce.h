@@ -20,17 +20,24 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.2.0 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
- *    Bit depth reducer.
+ *    Bit depth reducer with input gate.
  *
  *    This is purely an audio effect, it doesn't actually produce an output
  *    signal with a different encoding. The algorithm is deliberately crude to
  *    obtain the characteristic noise due to lo-fi A/D quantization.
+ *
+ *    It 
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.2.0</strong>:
+ *        <ul>
+ *          <li>Added gate parameter.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Added silence_dc parameter.</li>
@@ -188,6 +195,30 @@ static inline void bw_bd_reduce_set_silence_dc(
  *
  *    Default value: non-`0` (non-null dc).
  *
+ *    #### bw_bd_reduce_set_gate_lin()
+ *  ```>>> */
+static inline void bw_bd_reduce_set_gate_lin(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	float                             value);
+/*! <<<```
+ *    Sets the input gate threshold `value` (linear) in `coeffs`.
+ *
+ *    Valid range: [`0.f`, `1.f`].
+ *
+ *    Default value: `0.f`.
+ *
+ *    #### bw_bd_reduce_set_gate_dBFS()
+ *  ```>>> */
+static inline void bw_bd_reduce_set_gate_dBFS(
+	bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+	float                             value);
+/*! <<<```
+ *    Sets the input gate threshold `value` (dBFS) in `coeffs`.
+ *
+ *    Valid range: [`-INFINITY`, `0.f`].
+ *
+ *    Default value: `-INFINITY`.
+ *
  *    #### bw_bd_reduce_coeffs_is_valid()
  *  ```>>> */
 static inline char bw_bd_reduce_coeffs_is_valid(
@@ -236,6 +267,7 @@ struct bw_bd_reduce_coeffs {
 	float				k;
 	float				ko;
 	float				max;
+	float				gate;
 	
 	// Parameters
 	char				bit_depth;
@@ -248,6 +280,7 @@ static inline void bw_bd_reduce_init(
 
 	coeffs->bit_depth = 16;
 	coeffs->ko = 0.5f;
+	coeffs->gate = 0.f;
 
 #ifdef BW_DEBUG_DEEP
 	coeffs->hash = bw_hash_sdbm("bw_bd_reduce_coeffs");
@@ -330,6 +363,7 @@ static inline float bw_bd_reduce_process1(
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_reset_coeffs);
 	BW_ASSERT(bw_is_finite(x));
 
+	x = bw_absf(x) < coeffs->gate ? 0.f : x;
 	const float y = coeffs->ki * (bw_floorf(coeffs->k * bw_clipf(x, -coeffs->max, coeffs->max)) + coeffs->ko);
 
 	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
@@ -413,6 +447,36 @@ static inline void bw_bd_reduce_set_silence_dc(
 	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
 }
 
+static inline void bw_bd_reduce_set_gate_lin(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		float                             value) {
+	BW_ASSERT(coeffs != BW_NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+	BW_ASSERT(value >= 0.f && value <= 1.f);
+
+	coeffs->gate = value;
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+}
+
+static inline void bw_bd_reduce_set_gate_dBFS(
+		bw_bd_reduce_coeffs * BW_RESTRICT coeffs,
+		float                             value) {
+	BW_ASSERT(coeffs != BW_NULL);
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+	BW_ASSERT(bw_is_finite(value));
+	BW_ASSERT(value <= 0.f);
+
+	coeffs->gate = bw_dB2linf(value);
+
+	BW_ASSERT_DEEP(bw_bd_reduce_coeffs_is_valid(coeffs));
+	BW_ASSERT_DEEP(coeffs->state >= bw_bd_reduce_coeffs_state_init);
+}
+
 static inline char bw_bd_reduce_coeffs_is_valid(
 		const bw_bd_reduce_coeffs * BW_RESTRICT coeffs) {
 	BW_ASSERT(coeffs != BW_NULL);
@@ -438,6 +502,8 @@ static inline char bw_bd_reduce_coeffs_is_valid(
 		if (coeffs->ko != 0.f && coeffs->ko != 0.5f)
 			return 0;
 		if (!bw_is_finite(coeffs->max) || coeffs->max < 0.5f || coeffs->max > 1.f)
+			return 0;
+		if (!bw_is_finite(coeffs->gate) || coeffs->gate < 0.f || coeffs->gate > 1.f)
 			return 0;
 	}
 #endif
@@ -486,6 +552,12 @@ public:
 
 	void setSilenceDc(
 		char value);
+
+	void setGateLin(
+		float value);
+
+	void setGateDBFS(
+		float value);
 /*! <<<...
  *  }
  *  ```
@@ -544,6 +616,18 @@ template<size_t N_CHANNELS>
 inline void BDReduce<N_CHANNELS>::setSilenceDc(
 		char value) {
 	bw_bd_reduce_set_silence_dc(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::setGateLin(
+		float value) {
+	bw_bd_reduce_set_gate_lin(&coeffs, value);
+}
+
+template<size_t N_CHANNELS>
+inline void BDReduce<N_CHANNELS>::setGateDBFS(
+		float value) {
+	bw_bd_reduce_set_gate_dBFS(&coeffs, value);
 }
 
 }

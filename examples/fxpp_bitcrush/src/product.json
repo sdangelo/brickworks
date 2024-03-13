@@ -40,6 +40,16 @@
 				"maximum": 16.0,
 				"integer": true,
 				"map": "linear"
+			},
+			{
+				"name": "Gate",
+				"shortName": "Gate",
+				"direction": "input",
+				"defaultValue": 0.0,
+				"minimum": 0.0,
+				"maximum": 1.0,
+				"optional": true,
+				"map": "linear"
 			}
 		]
 	}

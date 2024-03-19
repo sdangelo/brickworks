@@ -76,7 +76,7 @@ void impl_process(impl handle, const float **inputs, float **outputs, size_t n_s
 	instance->pan.process(inputs, yL, yR, n_samples);
 	instance->ppm.process(outputs, nullptr, n_samples);
 #else
-	instance->pan.process({inputs[0]}, {inputs[1]}, {outputs[0]}, {outputs[1]}, n_samples);
+	instance->pan.process({inputs[0]}, {outputs[0]}, {outputs[1]}, n_samples);
 	instance->ppm.process({outputs[0], outputs[1]}, {nullptr, nullptr}, n_samples);
 #endif
 }

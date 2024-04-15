@@ -20,13 +20,17 @@
 
 /*!
  *  module_type {{{ foundation }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  description {{{
  *    A common header to make sure that a bunch of basic definitions are
  *    available and consistent for all Brickworks modules.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Accomodate MSVC reporting incorrect C++ standard support.</li>
+ *        </ul>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Added <code>BW_NULL</code> and relaxed <code>NULL</code>
@@ -96,7 +100,11 @@
 
 #ifdef __cplusplus
 # if __cplusplus < 201103L
-#  error Detected C++ compiler that does not support C++11
+#  if _MSC_VER
+#   pragma message("Detected MSVC compiler reporting not to support C++11. Please use /Zc:__cplusplus if possible, or otherwise ignore this message if everything works for you. See https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/ for more information.")
+#  else
+#   error Detected C++ compiler that does not support C++11
+#  endif
 # endif
 #endif
 

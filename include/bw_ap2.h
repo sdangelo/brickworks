@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{ bw_common bw_math bw_one_pole bw_svf }}}
  *  description {{{
  *    Second-order allpass filter (180° shift at cutoff, approaching 360° shift
@@ -28,6 +28,13 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging check in <code>bw_ap2_process_multi()</code> to
+ *              ensure that buffers used for both input and output appear at the
+ *              same channel indices.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code> and
@@ -531,6 +538,9 @@ static inline void bw_ap2_process_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(y[i] != y[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(i == j || x[i] != y[j]);
 #endif
 
 	bw_ap2_update_coeffs_ctrl(coeffs);

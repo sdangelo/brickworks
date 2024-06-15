@@ -32,6 +32,9 @@
  *          <li>Added <code>bw_dry_wet_get_wet()</code> and
  *              <code>bw_dry_wet_get_wet_cur()</code>, and corresponding C++
  *              API.</li>
+ *          <li>Added debugging check in <code>bw_dry_wet_process_multi()</code>
+ *              to ensure that buffers used for both input and output appear at
+ *              the same channel indices.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.1.0</strong>:
@@ -379,6 +382,11 @@ static inline void bw_dry_wet_process_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(y[i] != y[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++) {
+			BW_ASSERT(i == j || x_dry[i] != y[j]);
+			BW_ASSERT(i == j || x_wet[i] != y[j]);
+		}
 #endif
 
 	bw_dry_wet_update_coeffs_ctrl(coeffs);

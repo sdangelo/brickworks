@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    State variable filter (2nd order, 12 dB/oct) model with separated lowpass,
@@ -28,6 +28,13 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging check in <code>bw_svf_process_multi()</code> to
+ *              ensure that buffers used for both input and output appear at the
+ *              same channel indices.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code> and
@@ -773,18 +780,30 @@ static inline void bw_svf_process_multi(
 	BW_ASSERT(y_lp == BW_NULL || y_hp == BW_NULL || y_lp != y_hp);
 	BW_ASSERT(y_bp == BW_NULL || y_hp == BW_NULL || y_bp != y_hp);
 #ifndef BW_NO_DEBUG
-	if (y_lp != BW_NULL)
+	if (y_lp != BW_NULL) {
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
 				BW_ASSERT(y_lp[i] == BW_NULL || y_lp[j] == BW_NULL || y_lp[i] != y_lp[j]);
-	if (y_bp != BW_NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(i == j || x[i] != y_lp[j]);
+	}
+	if (y_bp != BW_NULL) {
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
 				BW_ASSERT(y_bp[i] == BW_NULL || y_bp[j] == BW_NULL || y_bp[i] != y_bp[j]);
-	if (y_hp != BW_NULL)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(i == j || x[i] != y_bp[j]);
+	}
+	if (y_hp != BW_NULL) {
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
 				BW_ASSERT(y_hp[i] == BW_NULL || y_hp[j] == BW_NULL || y_hp[i] != y_hp[j]);
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(i == j || x[i] != y_hp[j]);
+	}
 	if (y_lp != BW_NULL && y_bp != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = 0; j < n_channels; j++)

@@ -20,13 +20,20 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{ bw_common bw_gain bw_math bw_one_pole }}}
  *  description {{{
  *    Stereo panner with -3 dB center pan law.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging check in <code>bw_pan_process_multi()</code> to
+ *              ensure that buffers used for both input and output appear at the
+ *              same channel indices.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code> and
@@ -390,6 +397,11 @@ static inline void bw_pan_process_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = 0; j < n_channels; j++)
 			BW_ASSERT(y_l[i] != y_r[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++) {
+			BW_ASSERT(i == j || x[i] != y_l[j]);
+			BW_ASSERT(i == j || x[i] != y_r[j]);
+		}
 #endif
 
 	bw_pan_update_coeffs_ctrl(coeffs);

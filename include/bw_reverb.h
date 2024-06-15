@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{
  *    bw_buf bw_common bw_delay bw_dry_wet bw_gain bw_lp1 bw_math bw_one_pole
  *    bw_osc_sin bw_phase_gen
@@ -35,6 +35,13 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging check in <code>bw_reverb_process_multi()</code>
+ *              to ensure that buffers used for both input and output appear at
+ *              the same channel indices.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Fixed smoothing of decay parameter in
@@ -1004,6 +1011,13 @@ static inline void bw_reverb_process_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = 0; j < n_channels; j++)
 			BW_ASSERT(y_l[i] != y_r[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++) {
+			BW_ASSERT(i == j || x_l[i] != y_l[j]);
+			BW_ASSERT(i == j || x_l[i] != y_r[j]);
+			BW_ASSERT(i == j || x_r[i] != y_l[j]);
+			BW_ASSERT(i == j || x_r[i] != y_r[j]);
+		}
 #endif
 
 	bw_reverb_update_coeffs_ctrl(coeffs);

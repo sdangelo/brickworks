@@ -28,14 +28,16 @@
  *    This is purely an audio effect, it doesn't actually produce an output
  *    signal with a different encoding. The algorithm is deliberately crude to
  *    obtain the characteristic noise due to lo-fi A/D quantization.
- *
- *    It 
  *  }}}
  *  changelog {{{
  *    <ul>
  *      <li>Version <strong>1.2.0</strong>:
  *        <ul>
  *          <li>Added gate parameter.</li>
+ *          <li>Added debugging check in
+ *              <code>bw_balance_bd_reduce_multi()</code> to ensure that buffers
+ *              used for both input and output appear at the same channel
+ *              indices.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.1.0</strong>:
@@ -409,6 +411,9 @@ static inline void bw_bd_reduce_process_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(y[i] != y[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(i == j || x[i] != y[j]);
 #endif
 
 	bw_bd_reduce_update_coeffs_ctrl(coeffs);

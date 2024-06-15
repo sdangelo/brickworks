@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{ bw_common bw_math bw_one_pole }}}
  *  description {{{
  *    Phase generator with portamento and exponential frequency modulation.
@@ -29,6 +29,17 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging check in
+ *              <code>bw_phase_gen_process_multi()</code> to ensure that buffers
+ *              used for both input and output appear at the same channel
+ *              indices.</li>
+ *          <li>Fixed bug in <code>bw_phase_gen_process_multi()</code> by which
+ *              debugging code could report false negatives when
+ *              <code>BW_NULL</code> buffers are used.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Fixed rounding bug when frequency is tiny and negative.</li>
@@ -682,15 +693,25 @@ static inline void bw_phase_gen_process_multi(
 	if (y != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y[i] != y[j]);
+				BW_ASSERT(y[i] == BW_NULL || y[j] == BW_NULL || y[i] != y[j]);
 	if (y_inc != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = i + 1; j < n_channels; j++)
-				BW_ASSERT(y_inc[i] != y_inc[j]);
+				BW_ASSERT(y_inc[i] == BW_NULL || y_inc[j] == BW_NULL || y_inc[i] != y_inc[j]);
 	if (y != BW_NULL && y_inc != BW_NULL)
 		for (size_t i = 0; i < n_channels; i++)
 			for (size_t j = 0; j < n_channels; j++)
-				BW_ASSERT(y[i] != y_inc[j]);
+				BW_ASSERT(y[i] == BW_NULL || y_inc[j] == BW_NULL || y[i] != y_inc[j]);
+	if (x_mod != BW_NULL) {
+		if (y != BW_NULL)
+			for (size_t i = 0; i < n_channels; i++)
+				for (size_t j = 0; j < n_channels; j++)
+					BW_ASSERT(i == j || x_mod[i] == BW_NULL || y[i] == BW_NULL || x_mod[i] != y[j]);
+		if (y_inc != BW_NULL)
+			for (size_t i = 0; i < n_channels; i++)
+				for (size_t j = 0; j < n_channels; j++)
+					BW_ASSERT(i == j || x_mod[i] == BW_NULL || y_inc[i] == BW_NULL || x_mod[i] != y_inc[j]);
+	}
 #endif
 
 	bw_phase_gen_update_coeffs_ctrl(coeffs);

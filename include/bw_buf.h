@@ -20,13 +20,21 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{ bw_common }}}
  *  description {{{
  *    Common operations on buffers.
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging check in
+ *              <code>bw_buf_{neg,add,scale,mix,mul}_multi()</code> to ensure
+ *              that buffers used for both input and output appear at the same
+ *              channel indices.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code> and
@@ -362,6 +370,9 @@ static inline void bw_buf_neg_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(dest[i] != dest[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(i == j || src[i] != dest[j]);
 #endif
 
 	for (size_t i = 0; i < n_channels; i++)
@@ -381,6 +392,9 @@ static inline void bw_buf_add_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(dest[i] != dest[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(i == j || src[i] != dest[j]);
 #endif
 
 	for (size_t i = 0; i < n_channels; i++)
@@ -400,6 +414,9 @@ static inline void bw_buf_scale_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(dest[i] != dest[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(i == j || src[i] != dest[j]);
 #endif
 
 	for (size_t i = 0; i < n_channels; i++)
@@ -419,6 +436,11 @@ static inline void bw_buf_mix_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(dest[i] != dest[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++) {
+			BW_ASSERT(i == j || src1[i] != dest[j]);
+			BW_ASSERT(i == j || src2[i] != dest[j]);
+		}
 #endif
 
 	for (size_t i = 0; i < n_channels; i++)
@@ -438,6 +460,11 @@ static inline void bw_buf_mul_multi(
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(dest[i] != dest[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++) {
+			BW_ASSERT(i == j || src1[i] != dest[j]);
+			BW_ASSERT(i == j || src2[i] != dest[j]);
+		}
 #endif
 
 	for (size_t i = 0; i < n_channels; i++)

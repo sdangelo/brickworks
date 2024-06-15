@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ dsp }}}
- *  version {{{ 1.1.0 }}}
+ *  version {{{ 1.1.1 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Sawtooth oscillator waveshaper with PolyBLEP antialiasing.
@@ -36,6 +36,15 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.1.1</strong>:
+ *        <ul>
+ *          <li>Added debugging checks in
+ *              <code>bw_osc_saw_process_multi()</code> to ensure that
+ *              <code>x_inc</code> is not <code>BW_NULL</code> when antialiasing
+ *              is on and that buffers used for both input and output appear at
+ *              the same channel indices.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.1.0</strong>:
  *        <ul>
  *          <li>Now using <code>BW_NULL</code> and
@@ -434,11 +443,19 @@ static inline void bw_osc_saw_process_multi(
 	BW_ASSERT_DEEP(bw_osc_saw_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_osc_saw_coeffs_state_reset_coeffs);
 	BW_ASSERT(x != BW_NULL);
+	BW_ASSERT(coeffs->antialiasing ? x_inc != BW_NULL : 1);
 	BW_ASSERT(y != BW_NULL);
 #ifndef BW_NO_DEBUG
 	for (size_t i = 0; i < n_channels; i++)
 		for (size_t j = i + 1; j < n_channels; j++)
 			BW_ASSERT(y[i] != y[j]);
+	for (size_t i = 0; i < n_channels; i++)
+		for (size_t j = 0; j < n_channels; j++)
+			BW_ASSERT(i == j || x[i] != y[j]);
+	if (coeffs->antialiasing)
+		for (size_t i = 0; i < n_channels; i++)
+			for (size_t j = 0; j < n_channels; j++)
+				BW_ASSERT(i == j || x_inc[i] != y[j]);
 #endif
 
 	if (x_inc != BW_NULL)

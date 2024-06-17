@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_comb_state	comb_state;
 } plugin;
 
-static void plugin_init(plugin*instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_comb_init(&instance->comb_coeffs, 1.f);
 }
 

@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_slew_lim_state	slew_lim_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_slew_lim_init(&instance->slew_lim_coeffs);
 }
 

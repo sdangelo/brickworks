@@ -25,7 +25,8 @@ typedef struct plugin {
 	impl	handle;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	instance->handle = impl_new();
 }
 

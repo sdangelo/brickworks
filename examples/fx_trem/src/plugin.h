@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_trem_state	trem_state;
 } plugin;
 
-static void plugin_init(plugin*instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_trem_init(&instance->trem_coeffs);
 }
 

@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_reverb_state		reverb_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_reverb_init(&instance->reverb_coeffs);
 }
 

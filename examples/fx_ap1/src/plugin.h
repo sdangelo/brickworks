@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_ap1_state	ap1_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_ap1_init(&instance->ap1_coeffs);
 }
 

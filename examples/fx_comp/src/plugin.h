@@ -27,7 +27,8 @@ typedef struct plugin {
 	char		ext_sidechain;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_comp_init(&instance->comp_coeffs);
 }
 

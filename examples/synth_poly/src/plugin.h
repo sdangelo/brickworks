@@ -133,7 +133,8 @@ typedef struct plugin {
 	bw_env_gen_state *	vca_env_gen_states[N_VOICES];
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_osc_saw_init(&instance->vco_saw_coeffs);
 	bw_osc_pulse_init(&instance->vco1_pulse_coeffs);
 	bw_osc_tri_init(&instance->vco1_tri_coeffs);

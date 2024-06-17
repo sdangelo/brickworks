@@ -49,7 +49,8 @@ typedef struct plugin {
 	float			buf[BUFFER_SIZE];
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->osc_pulse_coeffs);
 	bw_svf_init(&instance->svf_coeffs);

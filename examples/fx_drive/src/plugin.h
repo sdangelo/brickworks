@@ -35,7 +35,8 @@ typedef struct plugin {
 	float			buf[BUF_SIZE];
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_drive_init(&instance->drive_coeffs);
 	bw_src_int_init(&instance->src_up_coeffs, 2);
 	bw_src_int_init(&instance->src_down_coeffs, -2);

@@ -28,7 +28,8 @@ typedef struct plugin {
 	float			amount_k;
 } plugin;
 
-static void plugin_init(plugin*instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_chorus_init(&instance->chorus_coeffs, 0.04f); // = 2 semitones * 2 @ 1hz, rounded up
 	bw_chorus_set_coeff_x(&instance->chorus_coeffs, 0.f);
 	bw_chorus_set_coeff_mod(&instance->chorus_coeffs, 1.f);

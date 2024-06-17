@@ -28,7 +28,8 @@ typedef struct plugin {
 	bw_bd_reduce_coeffs	bd_reduce_coeffs;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_sr_reduce_init(&instance->sr_reduce_coeffs);
 	bw_bd_reduce_init(&instance->bd_reduce_coeffs);
 	bw_bd_reduce_set_silence_dc(&instance->bd_reduce_coeffs, 0);

@@ -29,7 +29,8 @@ typedef struct plugin {
 	bw_ppm_state	ppm_r_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_pan_init(&instance->pan_coeffs);
 	bw_ppm_init(&instance->ppm_coeffs);
 }

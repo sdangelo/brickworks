@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_mm2_state	mm2_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_mm2_init(&instance->mm2_coeffs);
 }
 

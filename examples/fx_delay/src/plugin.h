@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_delay_state	delay_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_delay_init(&instance->delay_coeffs, 1.f);
 }
 

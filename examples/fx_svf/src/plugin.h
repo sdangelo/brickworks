@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_svf_state	svf_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_svf_init(&instance->svf_coeffs);
 }
 

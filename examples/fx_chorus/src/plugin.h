@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_chorus_state		chorus_state;
 } plugin;
 
-static void plugin_init(plugin*instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_chorus_init(&instance->chorus_coeffs, 0.01f);
 	bw_chorus_set_delay(&instance->chorus_coeffs, 0.005f);
 }

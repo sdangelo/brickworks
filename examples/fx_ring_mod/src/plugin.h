@@ -29,7 +29,8 @@ typedef struct plugin {
 	bw_ring_mod_coeffs	ring_mod_coeffs;
 } plugin;
 
-static void plugin_init(plugin*instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
 	bw_ring_mod_init(&instance->ring_mod_coeffs);
 }

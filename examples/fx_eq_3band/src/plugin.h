@@ -32,7 +32,8 @@ typedef struct plugin {
 	bw_hs2_state	hs2_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_ls2_init(&instance->ls2_coeffs);
 	bw_peak_init(&instance->peak_coeffs);
 	bw_hs2_init(&instance->hs2_coeffs);

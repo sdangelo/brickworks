@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_one_pole_state	one_pole_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_one_pole_init(&instance->one_pole_coeffs);
 }
 

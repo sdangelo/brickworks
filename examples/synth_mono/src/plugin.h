@@ -110,7 +110,8 @@ typedef struct plugin {
 	float			buf[4][BUFFER_SIZE];
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_osc_saw_init(&instance->vco_saw_coeffs);
 	bw_phase_gen_init(&instance->vco1_phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->vco1_pulse_coeffs);

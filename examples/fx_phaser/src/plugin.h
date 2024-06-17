@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_phaser_state		phaser_state;
 } plugin;
 
-static void plugin_init(plugin*instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_phaser_init(&instance->phaser_coeffs);
 }
 

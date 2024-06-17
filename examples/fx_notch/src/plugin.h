@@ -26,7 +26,8 @@ typedef struct plugin {
 	bw_notch_state	notch_state;
 } plugin;
 
-static void plugin_init(plugin *instance) {
+static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+	(void)cbs;
 	bw_notch_init(&instance->notch_coeffs);
 }
 

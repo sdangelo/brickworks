@@ -31,6 +31,11 @@
  *    <ul>
  *      <li>Version <strong>1.1.1</strong>:
  *        <ul>
+ *          <li>Fixed rounding bug when frequency is tiny (again).</li>
+ *          <li>Added debugging check in <code>bw_phase_reset_state()</code> to
+ *              ensure that <code>phase_0</code> is in [<code>0.f</code>,
+ *              <code>1.f</code>) and indicated such range in the
+ *              documentation.</li>
  *          <li>Added debugging check in
  *              <code>bw_phase_gen_process_multi()</code> to ensure that buffers
  *              used for both input and output appear at the same channel
@@ -167,6 +172,8 @@ static inline void bw_phase_gen_reset_state(
  *    The corresponding initial output and phase increment values are put into
  *    `y_0` and `y_inc_0` respectively.
  *
+ *    `phase_0` must be in [`0.f`, `1.f`).
+ *
  *    #### bw_phase_gen_reset_state_multi()
  *  ```>>> */
 static inline void bw_phase_gen_reset_state_multi(
@@ -183,6 +190,8 @@ static inline void bw_phase_gen_reset_state_multi(
  *
  *    The corresponding initial output and phase increment values are put into
  *    the `y_0` and `y_inc_0` arrays, respectively, if they are not `BW_NULL`.
+ *
+ *    Values in `phase_0` must be in [`0.f`, `1.f`).
  *
  *    #### bw_phase_gen_update_coeffs_ctrl()
  *  ```>>> */
@@ -406,7 +415,8 @@ static inline void bw_phase_gen_set_sample_rate(
 }
 
 static inline void bw_phase_gen_do_update_coeffs_ctrl(
-		bw_phase_gen_coeffs * BW_RESTRICT coeffs, char force) {
+		bw_phase_gen_coeffs * BW_RESTRICT coeffs,
+		char                              force) {
 	bw_one_pole_update_coeffs_ctrl(&coeffs->portamento_coeffs);
 	if (force || coeffs->frequency != coeffs->frequency_prev) {
 		coeffs->portamento_target = coeffs->T * coeffs->frequency;
@@ -443,6 +453,7 @@ static inline void bw_phase_gen_reset_state(
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
 	BW_ASSERT(state != BW_NULL);
 	BW_ASSERT(bw_is_finite(phase_0));
+	BW_ASSERT(phase_0 >= 0.f && phase_0 < 1.f);
 	BW_ASSERT(y_0 != BW_NULL);
 	BW_ASSERT(y_inc_0 != BW_NULL);
 	BW_ASSERT(y_0 != y_inc_0);
@@ -537,8 +548,9 @@ static inline void bw_phase_gen_update_coeffs_audio(
 
 static inline float bw_phase_gen_update_phase(
 		bw_phase_gen_state * BW_RESTRICT state,
-		float                            inc) {
-	state->phase += inc + 1.f; // + 1.f solves rounding issues with tiny negative frequencies
+		float *                          inc) {
+	*inc = bw_absf(*inc) < 1e-7f ? 0.f : *inc; // suppress troublesome tiny frequencies (sub nHz range usually)
+	state->phase += *inc;
 	state->phase -= bw_floorf(state->phase);
 	return state->phase;
 }
@@ -558,7 +570,7 @@ static inline void bw_phase_gen_process1(
 	BW_ASSERT(y != y_inc);
 
 	*y_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state);
-	*y = bw_phase_gen_update_phase(state, *y_inc);
+	*y = bw_phase_gen_update_phase(state, y_inc);
 
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);
@@ -585,7 +597,7 @@ static inline void bw_phase_gen_process1_mod(
 	BW_ASSERT(y != y_inc);
 
 	*y_inc = bw_one_pole_get_y_z1(&coeffs->portamento_state) * bw_pow2f(x_mod);
-	*y = bw_phase_gen_update_phase(state, *y_inc);
+	*y = bw_phase_gen_update_phase(state, y_inc);
 
 	BW_ASSERT_DEEP(bw_phase_gen_coeffs_is_valid(coeffs));
 	BW_ASSERT_DEEP(coeffs->state >= bw_phase_gen_coeffs_state_reset_coeffs);

@@ -460,6 +460,7 @@ static inline void bw_phase_gen_reset_state(
 
 	state->phase = phase_0;
 	*y_inc_0 = bw_one_pole_get_y_z1(&coeffs->portamento_state);
+	*y_inc_0 = bw_absf(*y_inc_0) < 6e-8f ? 0.f : *y_inc_0; // suppress troublesome tiny frequencies (< 0.06 Hz @ fs = 1 MHz, < 0.003 Hz at @ fs = 44.1 kHz)
 	*y_0 = phase_0;
 
 #ifdef BW_DEBUG_DEEP
@@ -549,7 +550,7 @@ static inline void bw_phase_gen_update_coeffs_audio(
 static inline float bw_phase_gen_update_phase(
 		bw_phase_gen_state * BW_RESTRICT state,
 		float *                          inc) {
-	*inc = bw_absf(*inc) < 1e-7f ? 0.f : *inc; // suppress troublesome tiny frequencies (sub nHz range usually)
+	*inc = bw_absf(*inc) < 6e-8f ? 0.f : *inc; // suppress troublesome tiny frequencies (< 0.06 Hz @ fs = 1 MHz, < 0.003 Hz at @ fs = 44.1 kHz)
 	state->phase += *inc;
 	state->phase -= bw_floorf(state->phase);
 	return state->phase;

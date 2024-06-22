@@ -44,6 +44,9 @@
  *              <code>x_inc</code> is not <code>BW_NULL</code> when antialiasing
  *              is on and that buffers used for both input and output appear at
  *              the same channel indices.</li>
+ *          <li>Added extra checks in
+ *              <code>bw_osc_pulse_coeffs_is_valid()</code>.</li>
+ *          <li>Changed the name of C++ arguments to camel case.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.1.0</strong>:
@@ -554,7 +557,15 @@ static inline char bw_osc_tri_coeffs_is_valid(
 		return 0;
 #endif
 
-	return bw_is_finite(coeffs->slope) && coeffs->slope >= 0.001f && coeffs->slope <= 0.999f;
+	if (!bw_is_finite(coeffs->slope) || coeffs->slope < 0.001f || coeffs->slope > 0.999f)
+		return 0;
+
+#ifdef BW_DEBUG_DEEP
+	if (coeffs->state >= bw_gain_coeffs_state_reset_coeffs && !bw_one_pole_state_is_valid(&coeffs->smooth_coeffs, &coeffs->smooth_state))
+		return 0;
+#endif
+
+	return 1;
 }
 
 #ifdef __cplusplus
@@ -583,14 +594,14 @@ public:
 
 	void process(
 		const float * const * x,
-		const float * const * x_inc,
+		const float * const * xInc,
 		float * const *       y,
 		size_t                nSamples);
 
 #ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> x_inc,
+		std::array<const float *, N_CHANNELS> xInc,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
 #endif
@@ -633,20 +644,20 @@ inline void OscTri<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void OscTri<N_CHANNELS>::process(
 		const float * const * x,
-		const float * const * x_inc,
+		const float * const * xInc,
 		float * const *       y,
 		size_t                nSamples) {
-	bw_osc_tri_process_multi(&coeffs, x, x_inc, y, N_CHANNELS, nSamples);
+	bw_osc_tri_process_multi(&coeffs, x, xInc, y, N_CHANNELS, nSamples);
 }
 
 #ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void OscTri<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> x_inc,
+		std::array<const float *, N_CHANNELS> xInc,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples) {
-	process(x.data(), x_inc.data(), y.data(), nSamples);
+	process(x.data(), xInc.data(), y.data(), nSamples);
 }
 #endif
 

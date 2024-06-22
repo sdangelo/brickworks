@@ -43,6 +43,7 @@
  *              <code>x_inc</code> is not <code>BW_NULL</code> when antialiasing
  *              is on and that buffers used for both input and output appear at
  *              the same channel indices.</li>
+ *          <li>Changed the name of C++ arguments to camel case.</li>
  *        </ul>
  *      </li>
  *      <li>Version <strong>1.1.0</strong>:
@@ -524,19 +525,20 @@ public:
 
 	void process(
 		const float * const * x,
-		const float * const * x_inc,
+		const float * const * xInc,
 		float * const *       y,
 		size_t                nSamples);
 
 #ifndef BW_CXX_NO_ARRAY
 	void process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> x_inc,
+		std::array<const float *, N_CHANNELS> xInc,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples);
 #endif
 	
-	void setAntialiasing(bool value);
+	void setAntialiasing(
+		bool value);
 /*! <<<...
  *  }
  *  ```
@@ -570,20 +572,20 @@ inline void OscSaw<N_CHANNELS>::reset() {
 template<size_t N_CHANNELS>
 inline void OscSaw<N_CHANNELS>::process(
 		const float * const * x,
-		const float * const * x_inc,
+		const float * const * xInc,
 		float * const *       y,
 		size_t                nSamples) {
-	bw_osc_saw_process_multi(&coeffs, x, x_inc, y, N_CHANNELS, nSamples);
+	bw_osc_saw_process_multi(&coeffs, x, xInc, y, N_CHANNELS, nSamples);
 }
 
 #ifndef BW_CXX_NO_ARRAY
 template<size_t N_CHANNELS>
 inline void OscSaw<N_CHANNELS>::process(
 		std::array<const float *, N_CHANNELS> x,
-		std::array<const float *, N_CHANNELS> x_inc,
+		std::array<const float *, N_CHANNELS> xInc,
 		std::array<float *, N_CHANNELS>       y,
 		size_t                                nSamples) {
-	process(x.data(), x_inc.data(), y.data(), nSamples);
+	process(x.data(), xInc.data(), y.data(), nSamples);
 }
 #endif
 

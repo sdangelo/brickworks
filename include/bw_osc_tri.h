@@ -413,16 +413,16 @@ static inline float bw_osc_tri_process1_antialias(
 	BW_ASSERT(x_inc >= -0.5f && x_inc <= 0.5f);
 
 	const float slope = bw_one_pole_get_y_z1(&coeffs->smooth_state);
-	const float s_1_p_pw = 1.f + slope;
-	const float s_1_m_pw = 1.f - slope;
+	const float s_1_p_slope = 1.f + slope;
+	const float s_1_m_slope = 1.f - slope;
 	const float phase_d = x + x;
-	float v = x < slope ? (phase_d - slope) * bw_rcpf(slope) : (s_1_p_pw - phase_d) * bw_rcpf(s_1_m_pw);
+	float v = x < slope ? (phase_d - slope) * bw_rcpf(slope) : (s_1_p_slope - phase_d) * bw_rcpf(s_1_m_slope);
 	const float a_inc = bw_absf(x_inc);
 	if (a_inc > 1e-6f) {
 		const float phase_inc_2 = a_inc + a_inc;
 		const float phase_inc_rcp = bw_rcpf(a_inc);
-		const float pw_m_phase = slope - x;
-		const float phase_2 = bw_copysignf(0.5f, pw_m_phase) + 0.5f - pw_m_phase;
+		const float slope_m_phase = slope - x;
+		const float phase_2 = bw_copysignf(0.5f, slope_m_phase) + 0.5f - slope_m_phase;
 		const float s_1_m_phase = 1.f - x;
 		const float s_1_m_phase_2 = 1.f - phase_2;
 		float blamp = 0.f;
@@ -434,7 +434,7 @@ static inline float bw_osc_tri_process1_antialias(
 			blamp -= bw_osc_tri_blamp_diff(x * phase_inc_rcp);
 		if (phase_2 < phase_inc_2)
 			blamp += bw_osc_tri_blamp_diff(phase_2 * phase_inc_rcp);
-		v -= bw_rcpf(slope * s_1_m_pw) * a_inc * blamp;
+		v -= bw_rcpf(slope * s_1_m_slope) * a_inc * blamp;
 	}
 
 	BW_ASSERT_DEEP(bw_osc_tri_coeffs_is_valid(coeffs));

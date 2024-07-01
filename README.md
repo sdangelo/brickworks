@@ -1,3 +1,6 @@
+> [!WARNING]
+> This repository is archived. Development continues at: https://git.orastron.com/orastron/brickworks. See you there.
+
 # Brickworks
 
 Brickworks is a music DSP toolkit that supplies you with the fundamental building blocks for creating and enhancing audio engines on any platform.

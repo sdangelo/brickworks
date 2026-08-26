@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022-2025 Orastron Srl unipersonale
+ * Copyright (C) 2022-2026 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ typedef struct {
 	bw_phase_gen_coeffs	phase_gen_coeffs;
 	bw_phase_gen_state	phase_gen_state;
 	bw_osc_pulse_coeffs	osc_pulse_coeffs;
-	bw_osc_filt_state	osc_filt_state;	
+	bw_osc_filt_state	osc_filt_state;
 	bw_svf_coeffs		svf_coeffs;
 	bw_svf_state		svf_state;
 	bw_env_gen_coeffs	env_gen_coeffs;
@@ -49,7 +49,7 @@ typedef struct {
 	float			buf[BUFFER_SIZE];
 } plugin;
 
-static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+static int plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	(void)cbs;
 	bw_phase_gen_init(&instance->phase_gen_coeffs);
 	bw_osc_pulse_init(&instance->osc_pulse_coeffs);
@@ -58,6 +58,7 @@ static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	bw_gain_init(&instance->gain_coeffs);
 	bw_ppm_init(&instance->ppm_coeffs);
 	bw_osc_pulse_set_antialiasing(&instance->osc_pulse_coeffs, 1);
+	return 0;
 }
 
 static void plugin_fini(plugin *instance) {
@@ -150,12 +151,12 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	if (instance->note >= 0)
 		bw_phase_gen_set_frequency(&instance->phase_gen_coeffs,
 			instance->master_tune * bw_pow2f(8.333333333333333e-2f * (instance->note - 69)));
-	
+
 	for (size_t i = 0; i < n_samples; i += BUFFER_SIZE) {
 		float *out = outputs[0] + i;
 		size_t ni = n_samples - i;
 		size_t n = ni < BUFFER_SIZE ? ni : BUFFER_SIZE;
-		
+
 		bw_phase_gen_process(&instance->phase_gen_coeffs, &instance->phase_gen_state, NULL, out, instance->buf, n);
 		bw_osc_pulse_process(&instance->osc_pulse_coeffs, out, instance->buf, out, n);
 		bw_osc_filt_process(&instance->osc_filt_state, out, out, n);

@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022-2025 Orastron Srl unipersonale
+ * Copyright (C) 2022-2026 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ typedef struct {
 	float			buf[4][BUFFER_SIZE];
 } plugin;
 
-static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+static int plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	(void)cbs;
 	bw_osc_saw_init(&instance->vco_saw_coeffs);
 	bw_phase_gen_init(&instance->vco1_phase_gen_coeffs);
@@ -134,7 +134,7 @@ static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	bw_phase_gen_init(&instance->a440_phase_gen_coeffs);
 	bw_gain_init(&instance->gain_coeffs);
 	bw_ppm_init(&instance->ppm_coeffs);
-	
+
 	bw_osc_saw_set_antialiasing(&instance->vco_saw_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco1_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco1_tri_coeffs, 1);
@@ -143,8 +143,10 @@ static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	bw_osc_pulse_set_antialiasing(&instance->vco3_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco3_tri_coeffs, 1);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
-	
+
 	instance->rand_state = 0xbaddecaf600dfeed;
+
+	return 0;
 }
 
 static void plugin_fini(plugin *instance) {
@@ -493,7 +495,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		}
 
 		// noise generator
-		
+
 		bw_noise_gen_process(&instance->noise_gen_coeffs, instance->buf[0], n);
 		if (instance->noise_color == 2)
 			bw_pink_filt_process(&instance->pink_filt_coeffs, &instance->pink_filt_state, instance->buf[0], instance->buf[0], n);
@@ -581,7 +583,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		}
 
 		// output
-		
+
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);
 

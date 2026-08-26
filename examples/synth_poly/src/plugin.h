@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2022-2025 Orastron Srl unipersonale
+ * Copyright (C) 2022-2026 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ typedef struct {
 	char			gate;
 	float			mod_k;
 	float			vcf_env_k;
-	
+
 	float			buf[5][BUFFER_SIZE];
 } voice;
 
@@ -133,7 +133,7 @@ typedef struct plugin {
 	bw_env_gen_state *	vca_env_gen_states[N_VOICES];
 } plugin;
 
-static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+static int plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	(void)cbs;
 	bw_osc_saw_init(&instance->vco_saw_coeffs);
 	bw_osc_pulse_init(&instance->vco1_pulse_coeffs);
@@ -160,7 +160,7 @@ static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
 		bw_phase_gen_init(&instance->voices[i].vco3_phase_gen_coeffs);
 		bw_svf_init(&instance->voices[i].vcf_coeffs);
 	}
-	
+
 	bw_osc_saw_set_antialiasing(&instance->vco_saw_coeffs, 1);
 	bw_osc_pulse_set_antialiasing(&instance->vco1_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco1_tri_coeffs, 1);
@@ -169,7 +169,7 @@ static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	bw_osc_pulse_set_antialiasing(&instance->vco3_pulse_coeffs, 1);
 	bw_osc_tri_set_antialiasing(&instance->vco3_tri_coeffs, 1);
 	bw_phase_gen_set_frequency(&instance->a440_phase_gen_coeffs, 440.f);
-	
+
 	instance->rand_state = 0xbaddecaf600dfeed;
 
 	for (int i = 0; i < N_VOICES; i++) {
@@ -184,6 +184,7 @@ static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
 		instance->vca_env_gen_states[i] = &instance->voices[i].vca_env_gen_state;
 	}
 
+	return 0;
 }
 
 static void plugin_fini(plugin *instance) {
@@ -265,7 +266,7 @@ static void plugin_reset(plugin *instance) {
 		bw_phase_gen_reset_coeffs(&instance->voices[i].vco2_phase_gen_coeffs);
 		bw_phase_gen_reset_coeffs(&instance->voices[i].vco3_phase_gen_coeffs);
 		bw_svf_reset_coeffs(&instance->voices[i].vcf_coeffs);
-		
+
 		bw_phase_gen_reset_state(&instance->voices[i].vco1_phase_gen_coeffs, &instance->voices[i].vco1_phase_gen_state, 0.f, &p, &pi);
 		bw_phase_gen_reset_state(&instance->voices[i].vco2_phase_gen_coeffs, &instance->voices[i].vco2_phase_gen_state, 0.f, &p, &pi);
 		bw_phase_gen_reset_state(&instance->voices[i].vco3_phase_gen_coeffs, &instance->voices[i].vco3_phase_gen_state, 0.f, &p, &pi);
@@ -275,7 +276,7 @@ static void plugin_reset(plugin *instance) {
 		bw_svf_reset_state(&instance->voices[i].vcf_coeffs, &instance->voices[i].vcf_state, 0.f, &lp, &bp, &hp);
 		bw_env_gen_reset_state(&instance->vcf_env_gen_coeffs, &instance->voices[i].vcf_env_gen_state, 0.f);
 		bw_env_gen_reset_state(&instance->vca_env_gen_coeffs, &instance->voices[i].vca_env_gen_state, 0.f);
-		
+
 		instance->voices[i].note = 60;
 		instance->voices[i].gate = 0;
 	}
@@ -478,16 +479,16 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	(void)inputs;
 
 	// voice allocation
-	
+
 	static bw_voice_alloc_opts alloc_opts = { bw_voice_alloc_priority_low, note_on, note_off, get_note, is_free };
 	void *voices[N_VOICES];
 	for (int i = 0; i < N_VOICES; i++)
 		voices[i] = (void *)(instance->voices + i);
 	bw_voice_alloc(&alloc_opts, &instance->note_queue, voices, N_VOICES);
 	bw_note_queue_clear(&instance->note_queue);
-	
+
 	// asynchronous control-rate operations
-	
+
 	const float df1 = instance->vco1_coarse + instance->pitch_bend + (8.333333333333333e-2f * 0.01f) * instance->vco1_fine;
 	const float df2 = instance->vco2_coarse + instance->pitch_bend + (8.333333333333333e-2f * 0.01f) * instance->vco2_fine;
 	const float df3 = instance->vco3_coarse + instance->pitch_bend + (8.333333333333333e-2f * 0.01f) * instance->vco3_fine;
@@ -579,7 +580,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		}
 
 		// noise generator
-		
+
 		bw_noise_gen_process_multi(&instance->noise_gen_coeffs, instance->b1, N_VOICES, n);
 		if (instance->noise_color == 2)
 			bw_pink_filt_process_multi(&instance->pink_filt_coeffs, instance->pink_filt_states, (const float **)instance->b1, instance->b1, N_VOICES, n);
@@ -682,7 +683,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		}
 
 		// output
-		
+
 		bw_gain_process(&instance->gain_coeffs, out, out, n);
 		bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, out, NULL, n);
 

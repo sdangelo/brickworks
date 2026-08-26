@@ -1,7 +1,7 @@
 /*
  * Brickworks
  *
- * Copyright (C) 2025 Orastron Srl unipersonale
+ * Copyright (C) 2025, 2026 Orastron Srl unipersonale
  *
  * Brickworks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,9 +33,10 @@ typedef struct {
 	char	to_reset;
 } plugin;
 
-static void plugin_init(plugin *instance, plugin_callbacks *cbs) {
+static int plugin_init(plugin *instance, plugin_callbacks *cbs) {
 	(void)instance;
 	(void)cbs;
+	return 0;
 }
 
 static void plugin_fini(plugin *instance) {

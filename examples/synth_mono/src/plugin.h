@@ -557,13 +557,13 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		// vcf
 
-		bw_env_gen_process(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, instance->gate, NULL, n);
 		if (sync) {
 			instance->vcf_env_k = bw_env_gen_get_y_z1(&instance->vcf_env_gen_state);
 			const float cutoff_vpos = cutoff_unmapped + instance->vcf_contour * instance->vcf_env_k + 0.3f * instance->vcf_modulation * instance->mod_k;
 			const float cutoff = cutoff_kbd_k * 20.f * bw_expf(6.907755278982137 * cutoff_vpos);
 			bw_svf_set_cutoff(&instance->vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 		}
+		bw_env_gen_process(&instance->vcf_env_gen_coeffs, &instance->vcf_env_gen_state, instance->gate, NULL, n);
 		bw_svf_process(&instance->vcf_coeffs, &instance->vcf_state, out, out, NULL, NULL, n);
 
 		// vca

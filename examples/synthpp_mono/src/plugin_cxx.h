@@ -555,13 +555,13 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		// vcf
 
-		instance->vcfEnvGen.process(g, nullptr, n);
 		if (sync) {
 			instance->vcfEnvK = instance->vcfEnvGen.getYZ1(0);
 			const float cutoffVpos = cutoffUnmapped + instance->vcfContour * instance->vcfEnvK + 0.3f * instance->vcfModulation * instance->modK;
 			const float cutoff = cutoffKbdK * 20.f * bw_expf(6.907755278982137 * cutoffVpos);
 			instance->vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 		}
+		instance->vcfEnvGen.process(g, nullptr, n);
 		instance->vcf.process(y, y, nullptr, nullptr, n);
 
 		// vca

@@ -645,7 +645,6 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		// vcf
 
-		instance->vcfEnvGen.process(gates, nullptr, n);
 		if (sync)
 			for (int j = 0; j < N_VOICES; j++) {
 				instance->voices[j].vcfEnvK = instance->vcfEnvGen.getYZ1(j);
@@ -656,6 +655,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 				float cutoff = cutoffKbdK[j] * 20.f * bw_expf(6.907755278982137 * cutoffVpos);
 				instance->voices[j].vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 			}
+		instance->vcfEnvGen.process(gates, nullptr, n);
 		for (int j = 0; j < N_VOICES; j++) {
 			float *vb0[1] = {instance->voices[j].buf[0]};
 			instance->voices[j].vcf.process(vb0, vb0, nullptr, nullptr, n);

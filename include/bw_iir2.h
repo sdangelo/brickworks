@@ -837,7 +837,7 @@ static inline void bw_iir2_coeffs_hs2(
 
 	high_gain = high_gain_dB ? bw_dB2linf(high_gain) : high_gain;
 
-	BW_ASSERT_DEEP(cutoff * bw_sqrt(bw_sqrtf(high_gain)) >= 1e-6f && cutoff * bw_sqrt(bw_sqrtf(high_gain)) <= 1e12f);
+	BW_ASSERT_DEEP(cutoff * bw_sqrtf(bw_sqrtf(high_gain)) >= 1e-6f && cutoff * bw_sqrtf(bw_sqrtf(high_gain)) <= 1e12f);
 
 	const float sg = bw_sqrtf(high_gain);
 	const float ssg = bw_sqrtf(sg);
@@ -896,7 +896,7 @@ static inline void bw_iir2_coeffs_ls2(
 
 	dc_gain = dc_gain_dB ? bw_dB2linf(dc_gain) : dc_gain;
 
-	BW_ASSERT_DEEP(cutoff * bw_rcpf(bw_sqrt(bw_sqrtf(dc_gain))) >= 1e-6f && cutoff * bw_rcpf(bw_sqrt(bw_sqrtf(dc_gain))) <= 1e12f);
+	BW_ASSERT_DEEP(cutoff * bw_rcpf(bw_sqrtf(bw_sqrtf(dc_gain))) >= 1e-6f && cutoff * bw_rcpf(bw_sqrtf(bw_sqrtf(dc_gain))) <= 1e12f);
 
 	const float sg = bw_sqrtf(dc_gain);
 	const float issg = bw_rcpf(bw_sqrtf(sg));

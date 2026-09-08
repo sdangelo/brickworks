@@ -21,7 +21,7 @@
 /*!
  *  module_type {{{ dsp }}}
  *  version {{{ 1.2.3 }}}
- *  requires {{{ bw_common }}}
+ *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Pinking filter.
  *
@@ -344,6 +344,12 @@ static inline char bw_pink_filt_state_is_valid(
 
 /* WARNING: This part of the file is not part of the public API. Its content may
  * change at any time in future versions. Please, do not use it directly. */
+
+#ifdef BW_INCLUDE_WITH_QUOTES
+# include "bw_math.h"
+#else
+# include <bw_math.h>
+#endif
 
 #if !defined(BW_CXX_NO_EXTERN_C) && defined(__cplusplus)
 extern "C" {

@@ -113,8 +113,10 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 		bw_sampler_set_rate(&instance->sampler_coeffs,
 			(1.f / 440.f) * instance->master_tune * bw_pow2f(8.333333333333333e-2f * (instance->note - 69)));
 		bw_sampler_process(&instance->sampler_coeffs, &instance->sampler_state, instance->sample, instance->sample_length, outputs[0], n_samples);
-	} else
+	} else {
 		bw_sampler_reset_state(&instance->sampler_coeffs, &instance->sampler_state, instance->sample, instance->sample_length, 0.f); // sloppy but simple coding
+		bw_buf_fill(0.f, outputs[0], n_samples);
+	}
 	bw_gain_process(&instance->gain_coeffs, outputs[0], outputs[0], n_samples);
 	bw_ppm_process(&instance->ppm_coeffs, &instance->ppm_state, outputs[0], NULL, n_samples);
 }

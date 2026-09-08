@@ -630,7 +630,7 @@ static void plugin_midi_msg_in(plugin *instance, size_t index, const uint8_t * d
 	case 0xe0: // pitch bend
 	{
 		const uint16_t v = (data[2] << 7) | data[1];
-		instance->pitchBend = 2.f * bw_maxf((1.f / 16383.f) * (v - 0x2000), -1.f) - 1.f;
+		instance->pitchBend = ((int)v - 8192) / (v < 8192 ? 8192.f : 8191.f);
 		break;
 	}
 	case 0xb0: // control change

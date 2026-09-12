@@ -649,7 +649,6 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		// vcf
 
-		bw_env_gen_process_multi(&instance->vcf_env_gen_coeffs, instance->vcf_env_gen_states, gates, NULL, N_VOICES, n);
 		if (sync)
 			for (int j = 0; j < N_VOICES; j++) {
 				instance->voices[j].vcf_env_k = bw_env_gen_get_y_z1(instance->vcf_env_gen_states[j]);
@@ -660,6 +659,7 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 				float cutoff = cutoff_kbd_k[j] * 20.f * bw_expf(6.907755278982137 * cutoff_vpos);
 				bw_svf_set_cutoff(&instance->voices[j].vcf_coeffs, bw_clipf(cutoff, 20.f, 20e3f));
 			}
+		bw_env_gen_process_multi(&instance->vcf_env_gen_coeffs, instance->vcf_env_gen_states, gates, NULL, N_VOICES, n);
 		for (int j = 0; j < N_VOICES; j++)
 			bw_svf_process(&instance->voices[j].vcf_coeffs, &instance->voices[j].vcf_state, instance->b0[j], instance->b0[j], NULL, NULL, n);
 
@@ -707,7 +707,7 @@ static void plugin_midi_msg_in(plugin *instance, size_t index, const uint8_t * d
 	case 0xe0: // pitch bend
 	{
 		const uint16_t v = (data[2] << 7) | data[1];
-		instance->pitch_bend = 2.f * bw_maxf((1.f / 16383.f) * (v - 0x2000), -1.f) - 1.f;
+		instance->pitch_bend = ((int)v - 8192) / (v < 8192 ? 8192.f : 8191.f);
 		break;
 	}
 	case 0xb0: // control change

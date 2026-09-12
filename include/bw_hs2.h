@@ -968,7 +968,7 @@ template<size_t N_CHANNELS>
 inline void HS2<N_CHANNELS>::reset(
 		float                                       x0,
 		std::array<float, N_CHANNELS> * BW_RESTRICT y0) {
-	reset(x0, y0 != BW_NULL ? y0->data() : y0);
+	reset(x0, y0 != BW_NULL ? y0->data() : BW_NULL);
 }
 # endif
 

@@ -119,14 +119,18 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 	if (instance->note >= 0) {
 		instance->sampler.setRate((1.f / 440.f) * instance->masterTune * bw_pow2f(8.333333333333333e-2f * (instance->note - 69)));
 		instance->sampler.process(sample, sampleLength, y, n_samples);
-	} else
+	} else {
 		instance->sampler.reset(sample, sampleLength); // sloppy but simple coding
+		bufFill<1>(0.f, outputs, n_samples);
+	}
 #else
 	if (instance->note >= 0) {
 		instance->sampler.setRate((1.f / 440.f) * instance->masterTune * bw_pow2f(8.333333333333333e-2f * (instance->note - 69)));
 		instance->sampler.process({instance->sample}, {instance->sampleLength}, {outputs[0]}, n_samples);
-	} else
+	} else {
 		instance->sampler.reset({instance->sample}, {instance->sampleLength}); // sloppy but simple coding
+		bufFill<1>(0.f, outputs, n_samples);
+	}
 #endif
 	instance->gain.process(outputs, outputs, n_samples);
 	instance->ppm.process(outputs, nullptr, n_samples);

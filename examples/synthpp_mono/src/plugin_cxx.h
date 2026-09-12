@@ -555,13 +555,13 @@ static void plugin_process(plugin *instance, const float **inputs, float **outpu
 
 		// vcf
 
-		instance->vcfEnvGen.process(g, nullptr, n);
 		if (sync) {
 			instance->vcfEnvK = instance->vcfEnvGen.getYZ1(0);
 			const float cutoffVpos = cutoffUnmapped + instance->vcfContour * instance->vcfEnvK + 0.3f * instance->vcfModulation * instance->modK;
 			const float cutoff = cutoffKbdK * 20.f * bw_expf(6.907755278982137 * cutoffVpos);
 			instance->vcf.setCutoff(bw_clipf(cutoff, 20.f, 20e3f));
 		}
+		instance->vcfEnvGen.process(g, nullptr, n);
 		instance->vcf.process(y, y, nullptr, nullptr, n);
 
 		// vca
@@ -630,7 +630,7 @@ static void plugin_midi_msg_in(plugin *instance, size_t index, const uint8_t * d
 	case 0xe0: // pitch bend
 	{
 		const uint16_t v = (data[2] << 7) | data[1];
-		instance->pitchBend = 2.f * bw_maxf((1.f / 16383.f) * (v - 0x2000), -1.f) - 1.f;
+		instance->pitchBend = ((int)v - 8192) / (v < 8192 ? 8192.f : 8191.f);
 		break;
 	}
 	case 0xb0: // control change

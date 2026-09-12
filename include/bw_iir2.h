@@ -20,7 +20,7 @@
 
 /*!
  *  module_type {{{ utility }}}
- *  version {{{ 1.0.2 }}}
+ *  version {{{ 1.0.3 }}}
  *  requires {{{ bw_common bw_math }}}
  *  description {{{
  *    Lightweight and fast second-order IIR filter (biquad) in TDF-II form.
@@ -33,6 +33,11 @@
  *  }}}
  *  changelog {{{
  *    <ul>
+ *      <li>Version <strong>1.0.3</strong>:
+ *        <ul>
+ *          <li>Fixed computation of lp2, bp2, and hp2 coefficients.</li>
+ *        </ul>
+ *      </li>
  *      <li>Version <strong>1.0.2</strong>:
  *        <ul>
  *          <li>Fixed coefficients' validity checks in
@@ -788,7 +793,7 @@ static inline void bw_iir2_coeffs_bp2(
 	BW_IIR2_ASSERT_VALID_COEFF_PTRS
 
 	BW_IIR2_COEFFS_COMMON
-	*b0 = Q * k4;
+	*b0 = d * (Q * k4);
 	*b1 = 0.f;
 	*b2 = -*b0;
 
@@ -810,7 +815,7 @@ static inline void bw_iir2_coeffs_hp2(
 	BW_IIR2_ASSERT_VALID_COEFF_PTRS
 
 	BW_IIR2_COEFFS_COMMON
-	*b0 = Q * k1;
+	*b0 = d * (Q * k1);
 	*b1 = -(*b0 + *b0);
 	*b2 = *b0;
 
@@ -869,7 +874,7 @@ static inline void bw_iir2_coeffs_lp2(
 	BW_IIR2_ASSERT_VALID_COEFF_PTRS
 
 	BW_IIR2_COEFFS_COMMON
-	*b0 = Q * k3;
+	*b0 = d * (Q * k3);
 	*b1 = *b0 + *b0;
 	*b2 = *b0;
 
